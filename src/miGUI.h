@@ -1,215 +1,77 @@
-﻿#include "mixer.lib.h"
-#include "mixer.lib.mesh.h"
-#include "mixer.lib.gpuTexture.h"
-#include "mixer.lib.gpuMesh.h"
-#include "mixer.gui.h"
-#include "io/mixer.file.h"
+﻿#ifndef _MI_GUI_H_
+#define _MI_GUI_H_
 
-#include "mixer.gui.contextImpl.h"
-#include "mixer.gui.element.textImpl.h"
-
-#include "miLib.h"
-
-#include <filesystem>
-
-extern miLib* g_lib;
-
-extern "C"
+namespace migui
 {
-	MI_API miGUIContext* MI_C_DECL miGUICreateContext(miWindow* w)
+	template<typename T>
+	struct vec2
 	{
-		miGUIContextImpl* c = miCreate<miGUIContextImpl>();
-		c->m_window = w;
-		return c;
-	}
+		T x = static_cast<T>(0);
+		T y = static_cast<T>(0);
+	};
+	using vec2f = vec2<float>;
+	using vec2i = vec2<int>;
+	using vec2u = vec2<unsigned int>;
 
-	MI_API void MI_C_DECL miGUIDestroyContext(miGUIContext* c)
+	template<typename T>
+	struct vec4
 	{
-		assert(c);
-		miDestroy(c);
-	}
+		T x = static_cast<T>(0);
+		T y = static_cast<T>(0);
+		T z = static_cast<T>(0);
+		T w = static_cast<T>(0);
 
-	MI_API miGUIFont* MI_C_DECL miGUILoadFont(const wchar_t* fileName)
+		void SetAsColorRGB(unsigned int val)
+		{
+		//	x = ;
+		}
+	};
+	using vec4f = vec4<float>;
+	using vec4i = vec4<int>;
+	using vec4u = vec4<unsigned int>;
+
+	// RGBA
+	struct Image
 	{
-		std::filesystem::path p = fileName;
-		if (!std::filesystem::exists(p))
-		{
-			miLogWriteWarning("Font file [%s] not exist\n", fileName);
-			MI_PRINT_FAILED;
-			return nullptr;
-		}
+		unsigned int m_width = 0;
+		unsigned int m_height = 0;
+		unsigned int m_dataSize = 0;
+		unsigned char* m_data = 0;
+	};
 
-		std::filesystem::path parentPath = p.parent_path();
+	using Texture = void*;
 
-		miFile file;
-		file.open(fileName, "rb");
+	// Before creating GUI context you must create this objects.
+	// VideoDriverAPI - callbacks for drawing.
+	// InputContext - information about pressed buttons, cursor position and other
+	struct VideoDriverAPI
+	{
+		// Create GPU texture using RGBA data.
+		// Library can generate fonts, fonts is a textures.
+		Texture(*m_createTexture)(Image*) = 0;
 
-		if (!file.isOpen())
-		{
-			miLogWriteWarning("Can't open file [%s]\n", fileName);
-			MI_PRINT_FAILED;
-			return nullptr;
-		}
+		// Destroy texture. For fonts.
+		void(*m_destroyTexture)(Texture) = 0;
 
-		if (!file.isUTF16LE())
-		{
-			miLogWriteWarning("Font file [%s] is not UTF16-LE\n", fileName);
-			MI_PRINT_FAILED;
-			return nullptr;
-		}
+		// 
+		void(*m_drawRectangle)(const vec2i& position, const vec2i& size, const vec4f& color1, const vec4f& color2, Texture optionalTexture, vec4f* optionalUVRegion) = 0;
+	};
 
-		miString str;
-		file.readWordFromUTF16LE(str);
+	// You must update states by yourself
+	struct InputContext
+	{
 
-		int num_of_textures = util::to_int(str.data(), (int)str.size());
-		if (num_of_textures < 1)
-		{
-			miLogWriteWarning("Bad font file [%s]\n", fileName);
-			MI_PRINT_FAILED;
-			return nullptr;
-		}
+	};
 
-		std::vector<miString> texture_name_array;
-		texture_name_array.reserve(num_of_textures);
-		for (int i = 0; i < num_of_textures; ++i)
-		{
-			file.get_lineUTF16LE(str);
+	class GUIContext
+	{
+	public:
+		GUIContext();
+		~GUIContext();
 
-			miString wstr;
-			wstr = parentPath.c_str();
-			wstr += L"\\";
-			wstr += str;
-
-			texture_name_array.emplace_back(wstr);
-		}
-
-		// skip comment
-		// надо переделать. комментарий по сути обязателен.
-		file.get_lineUTF16LE(str);
-
-		struct CharInfo
-		{
-			CharInfo()
-			{
-				underhang = 0;
-				overhang = 0;
-				textureSlot = 0;
-			}
-
-			wchar_t symbol;
-			v4f rect;
-			float underhang;
-			float overhang;
-			int   textureSlot;
-		};
-
-		std::vector<CharInfo> char_info_array;
-		while (!file.isEOF())
-		{
-			CharInfo ci;
-
-			bool is_new_line = false;
-			int integer = 0;
-
-			// symbol
-			file.readWordFromUTF16LE(str, false, false, false, false, false, false, &is_new_line);
-			if (str.size()) ci.symbol = str[0];
-			if (is_new_line) continue;
-
-			// leftTopX
-			file.readWordFromUTF16LE(str, false, false, false, false, false, false, &is_new_line);
-			if (str.size()) ci.rect.x = (float)util::to_int(str.data(), (int)str.size());
-			if (is_new_line) continue;
-
-
-			// leftTopY
-			file.readWordFromUTF16LE(str, false, false, false, false, false, false, &is_new_line);
-			if (str.size()) ci.rect.y = (float)util::to_int(str.data(), (int)str.size());
-			if (is_new_line) continue;
-
-			// rightBottomX
-			file.readWordFromUTF16LE(str, false, false, false, false, false, false, &is_new_line);
-			if (str.size()) ci.rect.z = (float)util::to_int(str.data(), (int)str.size());
-			if (is_new_line) continue;
-
-			// rightBottomY
-			file.readWordFromUTF16LE(str, false, false, false, false, false, false, &is_new_line);
-			if (str.size()) ci.rect.w = (float)util::to_int(str.data(), (int)str.size());
-			if (is_new_line) continue;
-
-			// underhang
-			file.readWordFromUTF16LE(str, false, false, false, false, false, false, &is_new_line);
-			if (str.size()) ci.underhang = (float)util::to_int(str.data(), (int)str.size());
-			if (is_new_line) continue;
-
-			// overhang
-			file.readWordFromUTF16LE(str, false, false, false, false, false, false, &is_new_line);
-			if (str.size()) ci.overhang = (float)util::to_int(str.data(), (int)str.size());
-			if (is_new_line) continue;
-
-			// textureId
-			file.readWordFromUTF16LE(str, false, false, false, false, false, false, &is_new_line);
-			if (str.size()) ci.textureSlot = util::to_int(str.data(), (int)str.size());
-
-			char_info_array.emplace_back(ci);
-		}
-
-
-		if (char_info_array.size())
-		{
-			miGUIFont* newFont = miCreate<miGUIFont>();
-
-			for (auto& tf : texture_name_array)
-			{
-				auto t = miGetTexture(tf.data());
-				newFont->m_textures.push_back(t);
-			}
-
-			v2f tsz((f32)newFont->m_textures[0]->GetWidth(), (f32)newFont->m_textures[0]->GetHeight());
-
-			f32 mulX = 1.f / (f32)tsz.x;
-			f32 mulY = 1.f / (f32)tsz.y;
-
-			for (auto& ci : char_info_array)
-			{
-				auto glyph = newFont->GetGlyph(ci.symbol);
-				glyph->symbol = ci.symbol;
-
-				/*glyph->lb.set(ci.rect.x * uvPerPixel_x, (ci.rect.w) * uvPerPixel_y);
-				glyph->lt.set(ci.rect.x * uvPerPixel_x, (ci.rect.y) * uvPerPixel_y);
-				glyph->rb.set((ci.rect.z) * uvPerPixel_x, (ci.rect.w) * uvPerPixel_y);
-				glyph->rt.set((ci.rect.z) * uvPerPixel_x, (ci.rect.y) * uvPerPixel_y);*/
-
-				glyph->lt.x = ci.rect.x * mulX;
-				glyph->lt.y = ci.rect.y * mulY;
-				glyph->rb.x = (ci.rect.z + 0.f) * mulX;
-				glyph->rb.y = (ci.rect.w + 0.f) * mulY;
-
-				glyph->width = ci.rect.z - ci.rect.x;
-				glyph->height = ci.rect.w - ci.rect.y;
-
-				if (glyph->height > newFont->m_maxHeight)
-					newFont->m_maxHeight = glyph->height;
-
-				glyph->overhang = ci.overhang;
-				glyph->underhang = ci.underhang;
-				glyph->textureID = ci.textureSlot;
-
-				//	printf("[%c] [%f]\n", ci.symbol, glyph->height);
-			}
-
-			g_lib->m_fonts.push_back(newFont);
-
-			return newFont;
-		}
-		return nullptr;
-	}
+		VideoDriverAPI* m_gpu = 0;
+		InputContext* m_input = 0;
+	};
 }
 
-
-void miLib::GUIDestroyFont(miGUIFont* f)
-{
-	assert(f);
-	miDestroy(f);
-}
-
+#endif

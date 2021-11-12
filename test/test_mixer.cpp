@@ -6,6 +6,8 @@
 
 #include <filesystem>
 
+#include "demo.inl"
+
 void window_onCLose(miWindow* window) {
 	miQuit();
 }
@@ -16,6 +18,33 @@ void log_onError(const char* message) {
 
 void log_onInfo(const char* message) {
 	fprintf(stdout, message);
+}
+
+miVideoDriver* g_gpu = 0;
+
+migui::Texture gui_createTexture(migui::Image* img)
+{
+	migui::Texture newTexture = 0;
+	
+	miImage image;
+	image.m_data = img->m_data;
+	image.m_dataSize = img->m_dataSize;
+	image.m_width = img->m_width;
+	image.m_height = img->m_height;
+	image.m_pitch = image.m_width * 4;
+
+	miGPUTextureInfo ti;
+	ti.m_imagePtr = &image;
+	
+	newTexture = g_gpu->CreateTexture(&ti);
+
+	return newTexture;
+}
+
+void  gui_destroyTexture(migui::Texture t)
+{
+	miGPUTexture* texture = (miGPUTexture*)t;
+	texture->Release();
 }
 
 int main(int argc, char* argv[])
@@ -78,8 +107,17 @@ int main(int argc, char* argv[])
 vidOk:
 
 	miVideoDriver* m_gpu = miGetVideoDriver();
+	g_gpu = m_gpu;
 	m_gpu->SetClearColor(0.3f, 0.3f, 0.74f, 1.f);
 	m_window->SetTitle(m_gpu->GetVideoDriverName());
+
+	migui::VideoDriverAPI gui_gpu;
+	gui_gpu.m_createTexture = gui_createTexture;
+	gui_gpu.m_destroyTexture = gui_destroyTexture;
+	migui::InputContext gui_input;
+
+	Demo demo;
+	demo.Init(&gui_gpu, &gui_input);
 
 	f32 m_dt = 0.f;
 	miEvent currentEvent;
@@ -114,7 +152,7 @@ vidOk:
 			m_gpu->ClearAll();
 			m_gpu->UseDepth(true);
 
-			m_gpu->DrawRectangle(v4f(0.f, 0.f, 40.f, 15.f), ColorRed, ColorBlue);
+		//	m_gpu->DrawRectangle(v4f(0.f, 0.f, 40.f, 15.f), ColorRed, ColorBlue);
 
 			m_gpu->BeginDrawGUI();
 			//m_guiContext->DrawAll();
