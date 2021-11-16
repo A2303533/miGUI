@@ -45,7 +45,7 @@ typedef struct mgColor_s {
 	int r, g, b, a;
 } mgColor;
 
-// RGBA
+/* RGBA */
 typedef struct mgImage_s {
 	unsigned int width;
 	unsigned int height;
@@ -55,24 +55,23 @@ typedef struct mgImage_s {
 
 typedef void* mgTexture;
 
-// Before creating GUI context you must create this objects.
-// VideoDriverAPI - callbacks for drawing.
-// InputContext - information about pressed buttons, cursor position and other
+/* Before creating GUI context you must create this objects.
+ VideoDriverAPI - callbacks for drawing.
+ InputContext - information about pressed buttons, cursor position and other*/
 typedef struct mgVideoDriverAPI_s {
-	// Create GPU texture using RGBA data.
-	// Library can generate fonts, fonts is a textures.
+	/* Create GPU texture using RGBA data.
+	 Library can generate fonts, fonts is a textures.*/
 	mgTexture(*createTexture)(mgImage*);
 
-	// Destroy texture. For fonts.
+	/* Destroy texture.For fonts. */
 	void(*destroyTexture)(mgTexture);
 
 	void(*drawRectangle)(mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2, mgTexture optionalTexture, mgVec4* optionalUVRegion);
 } mgVideoDriverAPI;
 
-// You must update states by yourself
-typedef struct mgInputContext_s
-{
-	...
+/* You must update states by yourself */
+typedef struct mgInputContext_s {
+	int j;
 } mgInputContext;
 
 typedef struct mgGUIContext_s {
@@ -80,5 +79,17 @@ typedef struct mgGUIContext_s {
 	mgInputContext* m_input;
 } mgGUIContext;
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+
+mgGUIContext* mgCreateContext(void);
+void mgDestroyContext(mgGUIContext*);
+
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif
