@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 	miLogSetInfoOutput(log_onInfo);
 	miLogSetWarningOutput(log_onError);
 
-	u32 windowStyle = 0;
+	u32 windowStyle = miWindowFlags::miWindowFlag_popupResize;
 	miWindow* m_window = miCreateWindow(800, 600, windowStyle, 0);
 	m_window->m_onClose = window_onCLose;
 

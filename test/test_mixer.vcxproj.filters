@@ -15,10 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test_mixer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\miGUI.cpp">
+    <ClCompile Include="..\src\miGUI.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
