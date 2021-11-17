@@ -29,6 +29,24 @@
 #ifndef _MI_GUI_H_
 #define _MI_GUI_H_
 
+#if defined(WIN32)
+#define MG_PLATFORM_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#define MG_LOAD_LIB LoadLibraryA
+#define MG_FREE_LIB FreeLibrary
+#define MG_GET_PROC_ADDRESS GetProcAddress
+#define MG_LIB_HANDLE HMODULE
+#define MG_C_DECL _cdecl
+#ifdef MG_DLL
+#define MG_API _declspec(dllexport) 
+#else
+#define MG_API _declspec(dllimport) 
+#endif
+#else
+#error Please write code for other OS
+#endif
+
 typedef struct mgPoint_s {
 	int x, y;
 } mgPoint;
@@ -55,6 +73,20 @@ typedef struct mgImage_s {
 
 typedef void* mgTexture;
 
+enum {
+	MG_TYPE_RECTANGLE = 1,
+	MG_TYPE_TEXT,
+	MG_TYPE_BUTTON
+};
+
+/* base data for all GUI widgets*/
+typedef struct mgElement_s {
+	unsigned int type; /*MG_TYPE...*/
+	void* implementation;
+
+	int id; 
+} mgElement;
+
 /* Before creating GUI context you must create this objects.
  VideoDriverAPI - callbacks for drawing.
  InputContext - information about pressed buttons, cursor position and other*/
@@ -66,27 +98,42 @@ typedef struct mgVideoDriverAPI_s {
 	/* Destroy texture.For fonts. */
 	void(*destroyTexture)(mgTexture);
 
-	void(*drawRectangle)(mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2, mgTexture optionalTexture, mgVec4* optionalUVRegion);
+	void(*drawRectangle)(
+		mgElement* element,
+		mgPoint* position, 
+		mgPoint* size, 
+		mgColor* color1, 
+		mgColor* color2, 
+		mgTexture optionalTexture, 
+		mgVec4* optionalUVRegion);
+
 } mgVideoDriverAPI;
 
-/* You must update states by yourself */
-typedef struct mgInputContext_s {
-	int j;
-} mgInputContext;
+#include "mgInputContex.h"
 
-typedef struct mgGUIContext_s {
+typedef struct mgContext_s {
 	mgVideoDriverAPI* m_gpu;
 	mgInputContext* m_input;
-} mgGUIContext;
+} mgContext;
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 
-mgGUIContext* mgCreateContext(void);
-void mgDestroyContext(mgGUIContext*);
+typedef mgContext* (*PFNMGCREATECONTEXTPROC)(mgVideoDriverAPI*, mgInputContext*);
+extern PFNMGCREATECONTEXTPROC mgCreateContext_p;
+#define mgCreateContext mgCreateContext_p
 
+typedef void (*PFNMGDESTROYCONTEXTPROC)(mgContext*);
+extern PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
+#define mgDestroyContext mgDestroyContext_p
+
+
+/*Load DLL. You must call mgUnload for unloading.*/
+MG_LIB_HANDLE mgLoad();
+/*Unload DLL*/
+void mgUnload(MG_LIB_HANDLE);
 
 #if defined(__cplusplus)
 }

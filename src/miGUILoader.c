@@ -27,31 +27,46 @@
 */
 
 #include "miGUI.h"
-
-#include <stdlib.h>
 #include <assert.h>
 
-MG_API 
-mgContext* MG_C_DECL
-mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
-{
-	assert(gpu);
-	assert(input);
+PFNMGCREATECONTEXTPROC mgCreateContext_p;
+PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
 
-	mgContext* c = malloc(sizeof(mgContext));
-	c->m_gpu = gpu;
-	c->m_input = input;
-	return c;
+void* 
+mgGetProc(MG_LIB_HANDLE lib, const char* proc)
+{
+	void* res = 0;
+
+#ifdef MG_PLATFORM_WINDOWS
+	res = GetProcAddress(lib, proc);
+#else
+#error Need implementation
+#endif
+	return res;
 }
 
-MG_API 
-void MG_C_DECL
-mgDestroyContext_f(mgContext* c)
+MG_LIB_HANDLE
+mgLoad()
 {
-	assert(c);
+#ifdef MG_PLATFORM_WINDOWS
+	const char* lib_name = "migui.dll";
+#else
+#error Need implementation
+#endif
 
-	/*destroy everything here*/
-	/*...*/
+	MG_LIB_HANDLE lib = MG_LOAD_LIB(lib_name);
+	if(!lib)
+		return lib;
 
-	free(c);
+	mgCreateContext_p = mgGetProc(lib, "mgCreateContext_f");
+	mgDestroyContext_p = mgGetProc(lib, "mgDestroyContext_f");
+
+	return lib;
+}
+
+void
+mgUnload(MG_LIB_HANDLE lib)
+{
+	assert(lib);
+	MG_FREE_LIB(lib);
 }

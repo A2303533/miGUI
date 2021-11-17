@@ -4,6 +4,8 @@
 #include "framework.h"
 #include "win32_test.h"
 
+#include "miGUI.h"
+
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -40,6 +42,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WIN32TEST));
 
+    HMODULE gui_lib = mgLoad();
+    if (!gui_lib)
+    {
+        MessageBoxA(0, "Can't load migui.dll", "Error", MB_OK);
+        return 0;
+    }
+
+    mgVideoDriverAPI gui_gpu;
+    mgInputContext input;
+    mgContext* gui_context = mgCreateContext(&gui_gpu, &input);
+
     MSG msg;
 
     // Main message loop:
@@ -51,6 +64,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
     }
+
+    mgDestroyContext(gui_context);
+    mgUnload(gui_lib);
 
     return (int) msg.wParam;
 }
