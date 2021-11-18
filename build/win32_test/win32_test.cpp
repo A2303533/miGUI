@@ -13,6 +13,8 @@ HDC g_dc = 0;
 HWND g_hwnd = 0;
 RECT g_windowRect;
 
+mgPoint borderSize;
+
 /*double buffering*/
 HDC hdcMem = 0;
 HBITMAP hbmMem = 0, hbmOld = 0;
@@ -44,6 +46,11 @@ void gui_beginDraw()
     r.right = g_windowRect.right - g_windowRect.left;
     r.bottom =  g_windowRect.bottom - g_windowRect.top;
     FillRect(hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
+
+    UINT dpi = GetDpiForWindow(g_hwnd);
+    int padding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+    borderSize.x = GetSystemMetricsForDpi(SM_CXFRAME, dpi) + padding;
+    borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
 }
 
 void gui_endDraw()
@@ -72,13 +79,9 @@ void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColo
     mgColor* color2,mgTexture texture,mgVec4* UVRegion)
 {
 
-    UINT dpi = GetDpiForWindow(g_hwnd);
-    int padding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
-
-
     RECT r;
-    r.left = position->x + GetSystemMetricsForDpi(SM_CXFRAME, dpi) + padding;
-    r.top = position->y + (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
+    r.left = position->x + borderSize.x;
+    r.top = position->y + borderSize.y;
     r.right = r.left + size->x;
     r.bottom = r.top + size->y;
 
@@ -130,11 +133,10 @@ void gui_drawText(
     mgColor* color,
     mgFont* font)
 {
-    MoveToEx(hdcMem, position->x, position->y, 0);
     SelectObject(hdcMem, font->implementation);
     SetTextColor(hdcMem, mgColorGetAsIntegerARGB(color));
     SetBkMode(hdcMem, TRANSPARENT);
-    TextOutW(hdcMem, 30, 50, text, textLen);
+    TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, text, textLen);
 }
 
 mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
@@ -183,7 +185,7 @@ void draw_gui()
     g_gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
 
     mgPoint textPosition;
-    mgPointSet(&textPosition, 30, 10);
+    mgPointSet(&textPosition, 30, 50);
     mgColor textColor;
     mgColorSetAsIntegerRGB(&textColor, 0xFF000000);
     gui_drawText(&textPosition, L"Text", 4, &textColor, g_win32font);
