@@ -47,45 +47,19 @@
 #error Please write code for other OS
 #endif
 
-typedef struct mgPoint_s {
-	int x, y;
-} mgPoint;
+#define MG_MAKEFOURCC( ch0, ch1, ch2, ch3 )\
+	((unsigned int)(unsigned char)(ch0)|((unsigned int)(unsigned char)(ch1)<<8)|\
+	((unsigned int)(unsigned char)(ch2)<<16)|((unsigned int)(unsigned char)(ch3)<<24))
 
-typedef struct mgRect_s {
-	int left, top, right, bottom;
-} mgRect;
-
-typedef struct mgVec4_s {
-	float x, y, z, w;
-} mgVec4;
-
-typedef struct mgColor_s {
-	int r, g, b, a;
-} mgColor;
-
-/* RGBA */
-typedef struct mgImage_s {
-	unsigned int width;
-	unsigned int height;
-	unsigned int dataSize;
-	unsigned char* data;
-} mgImage;
+#include "mgPoint.h"
+#include "mgRect.h"
+#include "mgVec4.h"
+#include "mgColor.h"
+#include "mgImage.h"
 
 typedef void* mgTexture;
 
-enum {
-	MG_TYPE_RECTANGLE = 1,
-	MG_TYPE_TEXT,
-	MG_TYPE_BUTTON
-};
-
-/* base data for all GUI widgets*/
-typedef struct mgElement_s {
-	unsigned int type; /*MG_TYPE...*/
-	void* implementation;
-
-	int id; 
-} mgElement;
+#include "mgElement.h"
 
 /* Before creating GUI context you must create this objects.
  VideoDriverAPI - callbacks for drawing.
@@ -98,14 +72,18 @@ typedef struct mgVideoDriverAPI_s {
 	/* Destroy texture.For fonts. */
 	void(*destroyTexture)(mgTexture);
 
+	void(*beginDraw)(); /*prepare for drawing, set shaders and other things*/
+	void(*endDraw)();
+
 	void(*drawRectangle)(
-		mgElement* element,
-		mgPoint* position, 
+		mgElement* element, /*current element, can be null*/
+		mgPoint* position,  /*left top corner*/
 		mgPoint* size, 
 		mgColor* color1, 
 		mgColor* color2, 
-		mgTexture optionalTexture, 
-		mgVec4* optionalUVRegion);
+		mgTexture texture, /*optional*/
+		mgVec4* UVRegion); /*optional*/
+
 
 } mgVideoDriverAPI;
 
