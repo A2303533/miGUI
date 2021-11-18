@@ -55,6 +55,7 @@
 #include "mgRect.h"
 #include "mgVec4.h"
 #include "mgColor.h"
+#include "mgFont.h"
 #include "mgImage.h"
 
 typedef void* mgTexture;
@@ -89,9 +90,17 @@ typedef struct mgVideoDriverAPI_s {
 
 #include "mgInputContex.h"
 
+/*Main interface*/
 typedef struct mgContext_s {
 	mgVideoDriverAPI* m_gpu;
 	mgInputContext* m_input;
+
+	/*Create bitmap font or load from file. 
+	* You can create your own fonts (like winapi fonts),
+	* don't forget to delete them...
+	*/
+	mgFont* (*createFont)(const char*, unsigned int flags, int size);
+
 } mgContext;
 
 #if defined(__cplusplus)

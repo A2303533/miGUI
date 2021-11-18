@@ -28,33 +28,7 @@
 
 #include "miGUI.h"
 
-#include <stdlib.h>
-#include <assert.h>
-
-MG_API 
-mgContext* MG_C_DECL
-mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
+mgFont* mgCreateFont(const char* fn, unsigned int flags, int size)
 {
-	assert(gpu);
-	assert(input);
-
-	mgContext* c = malloc(sizeof(mgContext));
-	c->m_gpu = gpu;
-	c->m_input = input;
-
-	c->createFont = mgCreateFont;
-
-	return c;
-}
-
-MG_API 
-void MG_C_DECL
-mgDestroyContext_f(mgContext* c)
-{
-	assert(c);
-
-	/*destroy everything here*/
-	/*...*/
-
-	free(c);
+	return 0;
 }

@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\mgFont.c" />
     <ClCompile Include="..\src\miGUI.c" />
   </ItemGroup>
   <ItemGroup>

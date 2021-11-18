@@ -26,35 +26,35 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "miGUI.h"
+#ifndef _MG_FONT_H_
+#define _MG_FONT_H_
 
-#include <stdlib.h>
-#include <assert.h>
+enum {
+	MG_FNTFL_BOLD = 1,
+	MG_FNTFL_ITALIC = 2,
+	MG_FNTFL_UNDERLINE = 4,
+	MG_FNTFL_STRIKEOUT = 8,
+};
 
-MG_API 
-mgContext* MG_C_DECL
-mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
-{
-	assert(gpu);
-	assert(input);
+/*bitmap fonts implementation
+* It must be inside mgFont_s
+*/
+struct mgFontBitmap_s {
+	int xxx;
+};
 
-	mgContext* c = malloc(sizeof(mgContext));
-	c->m_gpu = gpu;
-	c->m_input = input;
+typedef struct mgFont_s {
 
-	c->createFont = mgCreateFont;
+	/*miGUI will create mgFontBitmap_s and will put address here.
+	* 
+	* but you can create your own font inside your app, just put
+	* address here, and then use it as you wish (don't forget to
+	* delete your own font).
+	*/
+	void* implementation;
 
-	return c;
-}
+} mgFont;
 
-MG_API 
-void MG_C_DECL
-mgDestroyContext_f(mgContext* c)
-{
-	assert(c);
+extern mgFont* mgCreateFont(const char*, unsigned int flags, int size);
 
-	/*destroy everything here*/
-	/*...*/
-
-	free(c);
-}
+#endif
