@@ -6,6 +6,9 @@
 
 #include "miGUI.h"
 
+mgContext* g_gui_context = 0;
+mgFont* g_win32font = 0;
+
 HDC g_dc = 0;
 HWND g_hwnd = 0;
 RECT g_windowRect;
@@ -16,8 +19,8 @@ HBITMAP hbmMem = 0, hbmOld = 0;
 void DeleteBackBuffer() {
     if (hdcMem)
         DeleteDC(hdcMem);
-    if (CreateCompatibleBitmap)
-        DeleteObject(CreateCompatibleBitmap);
+    if (hbmMem)
+        DeleteObject(hbmMem);
 }
 void UpdateBackBuffer() {
     DeleteBackBuffer();
@@ -120,6 +123,20 @@ void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColo
     SelectClipRgn(hdcMem, 0);
 }
 
+void gui_drawText(
+    mgPoint* position,
+    const wchar_t* text,
+    int textLen,
+    mgColor* color,
+    mgFont* font)
+{
+    MoveToEx(hdcMem, position->x, position->y, 0);
+    SelectObject(hdcMem, font->implementation);
+    SetTextColor(hdcMem, mgColorGetAsIntegerARGB(color));
+    SetBkMode(hdcMem, TRANSPARENT);
+    TextOutW(hdcMem, 30, 50, text, textLen);
+}
+
 mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
 {
     mgFont* f = (mgFont*)malloc(sizeof(mgFont));
@@ -139,6 +156,39 @@ mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
    /* f->implementation = CreateFont(48, 0, 0, 0, FW_DONTCARE, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS,
         CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, TEXT("Impact"));*/
     return f;
+}
+
+void draw_gui()
+{
+    if (!g_gui_context)
+        return;
+
+    g_gui_context->m_gpu->beginDraw();
+    mgPoint point;
+    mgPointSet(&point, 0, 0);
+
+    mgPoint size;
+    mgPointSet(&size, 100, 100);
+
+    mgColor color1;
+    mgColor color2;
+    mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
+    mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
+
+    g_gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
+
+    mgPointSet(&point, 200, 100);
+    mgColorSetAsIntegerRGB(&color1, 0xFF004242);
+    mgColorSetAsIntegerRGB(&color2, 0xFF00FFE2);
+    g_gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
+
+    mgPoint textPosition;
+    mgPointSet(&textPosition, 30, 10);
+    mgColor textColor;
+    mgColorSetAsIntegerRGB(&textColor, 0xFF000000);
+    gui_drawText(&textPosition, L"Text", 4, &textColor, g_win32font);
+
+    g_gui_context->m_gpu->endDraw();
 }
 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -186,9 +236,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     gui_gpu.drawRectangle = gui_drawRectangle;
 
     mgInputContext input;
-    mgContext* gui_context = mgCreateContext(&gui_gpu, &input);
+    g_gui_context = mgCreateContext(&gui_gpu, &input);
     
-    mgFont* win32font = gui_createFont("Impact", 0, 22);
+    g_win32font = gui_createFont("Impact", 0, 22);
 
     UpdateBackBuffer();
     MSG msg;
@@ -199,37 +249,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-
-        gui_context->m_gpu->beginDraw();
-        mgPoint point;
-        mgPointSet(&point, 0, 0);
-
-        mgPoint size;
-        mgPointSet(&size, 100, 100);
-
-        mgColor color1;
-        mgColor color2;
-        mgColorSetAsIntegerRGB(&color1, 0xFFFF0000);
-        mgColorSetAsIntegerRGB(&color2, 0xFF0000FF);
-        
-        gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
-
-        mgPointSet(&point, 200, 100);
-        mgColorSetAsIntegerRGB(&color1, 0xFF004242);
-        mgColorSetAsIntegerRGB(&color2, 0xFF00FFE2);
-        gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
-
-        SelectObject(hdcMem, win32font->implementation);
-        SetTextColor(hdcMem, RGB(0, 0, 0));
-        SetBkMode(hdcMem, TRANSPARENT);
-        TextOut(hdcMem, 30, 50, L"Hello", 5);
-
-        gui_context->m_gpu->endDraw();
     }
-    DeleteObject(win32font->implementation);
+    
+    DeleteObject(g_win32font->implementation);
+    free(g_win32font);
+
     DeleteBackBuffer();
 
-    mgDestroyContext(gui_context);
+    mgDestroyContext(g_gui_context);
     mgUnload(gui_lib);
 
     return (int) msg.wParam;
@@ -238,6 +265,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+
     switch (message)
     {
     case WM_SIZE:
@@ -258,8 +286,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+
+    case WM_ERASEBKGND:
+    case WM_ACTIVATE:
     case WM_PAINT:
     {
+        draw_gui();
             //PAINTSTRUCT ps;
             //HDC hdc = BeginPaint(hWnd, &ps);
             ////// TODO: Add any drawing code that uses hdc here...

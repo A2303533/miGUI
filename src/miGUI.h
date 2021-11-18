@@ -85,6 +85,12 @@ typedef struct mgVideoDriverAPI_s {
 		mgTexture texture, /*optional*/
 		mgVec4* UVRegion); /*optional*/
 
+	void(*drawText)(
+		mgPoint* position,
+		const wchar_t*,
+		int textLen,
+		mgColor*,
+		mgFont*);
 
 } mgVideoDriverAPI;
 

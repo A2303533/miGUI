@@ -53,6 +53,9 @@ typedef struct mgFont_s {
 	*/
 	void* implementation;
 
+	int characterSpacing;
+	int spaceSize;
+	int tabSize;
 } mgFont;
 
 extern mgFont* mgCreateFont(const char*, unsigned int flags, int size);
