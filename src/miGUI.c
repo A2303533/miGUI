@@ -31,6 +31,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+void miGUI_update(mgContext*);
+void miGUI_startFrame(mgContext*);
+
 MG_API 
 mgContext* MG_C_DECL
 mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
@@ -43,6 +46,8 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->m_input = input;
 
 	c->createFont = mgCreateFont;
+	c->update = miGUI_update;
+	c->startFrame = miGUI_startFrame;
 
 	return c;
 }
@@ -57,4 +62,21 @@ mgDestroyContext_f(mgContext* c)
 	/*...*/
 
 	free(c);
+}
+
+void 
+miGUI_update(mgContext* c)
+{
+	assert(c);
+
+}
+
+void 
+miGUI_startFrame(mgContext* c)
+{
+	assert(c);
+	
+	c->m_input->mouseMoveDeltaOld = c->m_input->mouseMoveDelta;
+	c->m_input->mouseWheelDeltaOld = c->m_input->mouseWheelDelta;
+	c->m_input->mousePositionOld = c->m_input->mousePosition;
 }

@@ -58,6 +58,6 @@ typedef struct mgFont_s {
 	int tabSize;
 } mgFont;
 
-extern mgFont* mgCreateFont(const char*, unsigned int flags, int size);
+extern mgFont* mgCreateFont(struct mgContext_s*, const char*, unsigned int flags, int size);
 
 #endif

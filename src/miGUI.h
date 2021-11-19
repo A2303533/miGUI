@@ -29,14 +29,10 @@
 #ifndef _MI_GUI_H_
 #define _MI_GUI_H_
 
+#include <stddef.h>
+
 #if defined(WIN32)
 #define MG_PLATFORM_WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#define MG_LOAD_LIB LoadLibraryA
-#define MG_FREE_LIB FreeLibrary
-#define MG_GET_PROC_ADDRESS GetProcAddress
-#define MG_LIB_HANDLE HMODULE
 #define MG_C_DECL _cdecl
 #ifdef MG_DLL
 #define MG_API _declspec(dllexport) 
@@ -50,6 +46,8 @@
 #define MG_MAKEFOURCC( ch0, ch1, ch2, ch3 )\
 	((unsigned int)(unsigned char)(ch0)|((unsigned int)(unsigned char)(ch1)<<8)|\
 	((unsigned int)(unsigned char)(ch2)<<16)|((unsigned int)(unsigned char)(ch3)<<24))
+
+struct mgContext_s;
 
 #include "mgPoint.h"
 #include "mgRect.h"
@@ -85,12 +83,7 @@ typedef struct mgVideoDriverAPI_s {
 		mgTexture texture, /*optional*/
 		mgVec4* UVRegion); /*optional*/
 
-	void(*drawText)(
-		mgPoint* position,
-		const wchar_t*,
-		int textLen,
-		mgColor*,
-		mgFont*);
+	void(*drawText)( mgPoint* position, wchar_t* text, int textLen, mgColor*, mgFont*);
 
 } mgVideoDriverAPI;
 
@@ -105,7 +98,13 @@ typedef struct mgContext_s {
 	* You can create your own fonts (like winapi fonts),
 	* don't forget to delete them...
 	*/
-	mgFont* (*createFont)(const char*, unsigned int flags, int size);
+	mgFont* (*createFont)(struct mgContext_s*, const char*, unsigned int flags, int size);
+
+	/*call before event loop*/
+	void (*startFrame)(struct mgContext_s*);
+
+	/*do work*/
+	void (*update)(struct mgContext_s*);
 
 } mgContext;
 
@@ -121,12 +120,6 @@ extern PFNMGCREATECONTEXTPROC mgCreateContext_p;
 typedef void (*PFNMGDESTROYCONTEXTPROC)(mgContext*);
 extern PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
 #define mgDestroyContext mgDestroyContext_p
-
-
-/*Load DLL. You must call mgUnload for unloading.*/
-MG_LIB_HANDLE mgLoad();
-/*Unload DLL*/
-void mgUnload(MG_LIB_HANDLE);
 
 #if defined(__cplusplus)
 }

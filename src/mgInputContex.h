@@ -145,8 +145,13 @@ enum {
 /* You must update states by yourself */
 typedef struct mgInputContext_s {
 	mgPoint mousePosition;
+	mgPoint mousePositionOld;
+
 	mgPoint mouseMoveDelta;
+	mgPoint mouseMoveDeltaOld;
+
 	float   mouseWheelDelta;
+	float   mouseWheelDeltaOld;
 } mgInputContext;
 
 #endif

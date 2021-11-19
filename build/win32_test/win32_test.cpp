@@ -5,8 +5,14 @@
 #include "win32_test.h"
 
 #include "miGUI.h"
+#include "miGUILoader.h"
+
+#include <time.h>
 
 mgContext* g_gui_context = 0;
+mgInputContext g_input;
+HRAWINPUT g_rawInputData[0xff];
+
 mgFont* g_win32font = 0;
 
 HDC g_dc = 0;
@@ -185,10 +191,19 @@ void draw_gui()
     g_gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
 
     mgPoint textPosition;
-    mgPointSet(&textPosition, 30, 50);
+    mgPointSet(&textPosition, 10, 10);
     mgColor textColor;
-    mgColorSetAsIntegerRGB(&textColor, 0xFF000000);
-    gui_drawText(&textPosition, L"Text", 4, &textColor, g_win32font);
+    mgColorSetAsIntegerRGB(&textColor, 0xFF005000);
+    wchar_t textBuffer[200];
+    swprintf_s(textBuffer, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
+    mgPointSet(&textPosition, 10, 10);
+    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
+    mgPointSet(&textPosition, 10, 30);
+    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    swprintf_s(textBuffer, L"mouseWheelDelta: %f", g_input.mouseWheelDelta);
+    mgPointSet(&textPosition, 10, 50);
+    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
     g_gui_context->m_gpu->endDraw();
 }
@@ -222,6 +237,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     ShowWindow(g_hwnd, nCmdShow);
     UpdateWindow(g_hwnd);
 
+    RAWINPUTDEVICE device;
+    device.usUsagePage = 0x01;
+    device.usUsage = 0x02;
+    device.dwFlags = 0;
+    device.hwndTarget = 0;
+    RegisterRawInputDevices(&device, 1, sizeof device);
+
 
     MG_LIB_HANDLE gui_lib = mgLoad();
     if (!gui_lib)
@@ -237,20 +259,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     gui_gpu.endDraw = gui_endDraw;
     gui_gpu.drawRectangle = gui_drawRectangle;
 
-    mgInputContext input;
-    g_gui_context = mgCreateContext(&gui_gpu, &input);
+    g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     
     g_win32font = gui_createFont("Impact", 0, 22);
 
     UpdateBackBuffer();
     MSG msg;
-    while (GetMessage(&msg, 0, 0, 0))
+    int run = 1;
+    
+    Sleep(100);
+    while (run)
     {
+        g_gui_context->startFrame(g_gui_context);
+
+        run = GetMessage(&msg, 0, 0, 0);
         if (!TranslateAccelerator(msg.hwnd, 0, &msg))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
+        g_gui_context->update(g_gui_context);
+        draw_gui();
     }
     
     DeleteObject(g_win32font->implementation);
@@ -298,8 +328,46 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //HDC hdc = BeginPaint(hWnd, &ps);
             ////// TODO: Add any drawing code that uses hdc here...
             //EndPaint(hWnd, &ps);
+    }break;
+    case WM_INPUT:
+    {
+        HRAWINPUT hRawInput = (HRAWINPUT)lParam;
+        UINT dataSize;
+        GetRawInputData(hRawInput, RID_INPUT, NULL, &dataSize, sizeof(RAWINPUTHEADER));
+
+        if (dataSize == 0 || dataSize > 0xff)
+            break;
+
+        void* dataBuf = &g_rawInputData[0];
+        GetRawInputData(hRawInput, RID_INPUT, dataBuf, &dataSize, sizeof(RAWINPUTHEADER));
+
+        const RAWINPUT* raw = (const RAWINPUT*)dataBuf;
+        if (raw->header.dwType == RIM_TYPEMOUSE)
+        {
+            HANDLE deviceHandle = raw->header.hDevice;
+
+            const RAWMOUSE& mouseData = raw->data.mouse;
+
+            USHORT flags = mouseData.usButtonFlags;
+            short wheelDelta = (short)mouseData.usButtonData;
+            LONG x = mouseData.lLastX, y = mouseData.lLastY;
+
+            /*wprintf(
+                L"Mouse: Device=0x%08X, Flags=%04x, WheelDelta=%d, X=%d, Y=%d\n",
+                deviceHandle, flags, wheelDelta, x, y);*/
+
+            g_input.mouseMoveDelta.x = x;
+            g_input.mouseMoveDelta.y = y;
+            if (wheelDelta)
+                g_input.mouseWheelDelta = (float)wheelDelta / (float)WHEEL_DELTA;
+
+            POINT cursorPoint;
+            GetCursorPos(&cursorPoint);
+            ScreenToClient(hWnd, &cursorPoint);
+            g_input.mousePosition.x = cursorPoint.x;
+            g_input.mousePosition.y = cursorPoint.y;
         }
-        break;
+    }break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

@@ -26,9 +26,32 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "miGUI.h"
+#ifndef _MI_GUI_LOADER_H_
+#define _MI_GUI_LOADER_H_
 
-mgFont* mgCreateFont(mgContext* c, const char* fn, unsigned int flags, int size)
-{
-	return 0;
+#if defined(MG_PLATFORM_WINDOWS)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#define MG_LOAD_LIB LoadLibraryA
+#define MG_FREE_LIB FreeLibrary
+#define MG_GET_PROC_ADDRESS GetProcAddress
+#define MG_LIB_HANDLE HMODULE
+#else
+#error Please write code for other OS
+#endif
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+/*Load DLL. You must call mgUnload for unloading.*/
+MG_LIB_HANDLE mgLoad();
+
+/*Unload DLL*/
+void mgUnload(MG_LIB_HANDLE);
+
+#if defined(__cplusplus)
 }
+#endif
+
+#endif

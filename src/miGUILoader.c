@@ -27,6 +27,7 @@
 */
 
 #include "miGUI.h"
+#include "miGUILoader.h"
 #include <assert.h>
 
 PFNMGCREATECONTEXTPROC mgCreateContext_p;
