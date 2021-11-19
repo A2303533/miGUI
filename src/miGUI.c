@@ -79,4 +79,27 @@ miGUI_startFrame(mgContext* c)
 	c->m_input->mouseMoveDeltaOld = c->m_input->mouseMoveDelta;
 	c->m_input->mouseWheelDeltaOld = c->m_input->mouseWheelDelta;
 	c->m_input->mousePositionOld = c->m_input->mousePosition;
+
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_LMBDOWN) == MG_MBFL_LMBDOWN)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_LMBDOWN;
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_RMBDOWN) == MG_MBFL_RMBDOWN)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_RMBDOWN;
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_MMBDOWN) == MG_MBFL_MMBDOWN)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_MMBDOWN;
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_X1MBDOWN) == MG_MBFL_X1MBDOWN)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_X1MBDOWN;
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_X2MBDOWN) == MG_MBFL_X2MBDOWN)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_X2MBDOWN;
+
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_LMBUP) == MG_MBFL_LMBUP)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_LMBUP;
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_RMBUP) == MG_MBFL_RMBUP)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_RMBUP;
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_MMBUP) == MG_MBFL_MMBUP)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_MMBUP;
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_X1MBUP) == MG_MBFL_X1MBUP)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_X1MBUP;
+	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_X2MBUP) == MG_MBFL_X2MBUP)
+		c->m_input->mouseButtonFlags1 ^= MG_MBFL_X2MBUP;
+	
 }

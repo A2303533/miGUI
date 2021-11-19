@@ -142,6 +142,25 @@ enum {
 	MG_KEY_end__,
 };
 
+enum {
+	MG_MBFL_LMBDOWN = 0x1,
+	MG_MBFL_LMBUP = 0x2,
+	MG_MBFL_RMBDOWN = 0x4,
+	MG_MBFL_RMBUP = 0x8,
+	MG_MBFL_MMBDOWN = 0x10,
+	MG_MBFL_MMBUP = 0x20,
+	MG_MBFL_X1MBDOWN = 0x40,
+	MG_MBFL_X1MBUP = 0x80,
+	MG_MBFL_X2MBDOWN = 0x100,
+	MG_MBFL_X2MBUP = 0x200,
+
+	MG_MBFL_LMBHOLD = 0x400,
+	MG_MBFL_RMBHOLD = 0x800,
+	MG_MBFL_MMBHOLD = 0x1000,
+	MG_MBFL_X1MBHOLD = 0x2000,
+	MG_MBFL_X2MBHOLD = 0x4000,
+};
+
 /* You must update states by yourself */
 typedef struct mgInputContext_s {
 	mgPoint mousePosition;
@@ -152,6 +171,10 @@ typedef struct mgInputContext_s {
 
 	float   mouseWheelDelta;
 	float   mouseWheelDeltaOld;
+
+	unsigned int mouseButtonFlags1;/*MG_MBFL...*/
+	unsigned int mouseButtonFlags2;/*MG_MBFL... HOLD*/
+
 } mgInputContext;
 
 #endif

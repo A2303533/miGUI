@@ -176,18 +176,13 @@ void draw_gui()
     mgPointSet(&point, 0, 0);
 
     mgPoint size;
-    mgPointSet(&size, 100, 100);
+    mgPointSet(&size, 220, 100);
 
     mgColor color1;
     mgColor color2;
     mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
     mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
 
-    g_gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
-
-    mgPointSet(&point, 200, 100);
-    mgColorSetAsIntegerRGB(&color1, 0xFF004242);
-    mgColorSetAsIntegerRGB(&color2, 0xFF00FFE2);
     g_gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
 
     mgPoint textPosition;
@@ -199,10 +194,13 @@ void draw_gui()
     mgPointSet(&textPosition, 10, 10);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
+    mgPointSet(&textPosition, 10, 20);
+    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    swprintf_s(textBuffer, L"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
     mgPointSet(&textPosition, 10, 30);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-    swprintf_s(textBuffer, L"mouseWheelDelta: %f", g_input.mouseWheelDelta);
-    mgPointSet(&textPosition, 10, 50);
+    swprintf_s(textBuffer, L"mouseButtons: %x %x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
+    mgPointSet(&textPosition, 10, 40);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
     g_gui_context->m_gpu->endDraw();
@@ -261,7 +259,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     
-    g_win32font = gui_createFont("Impact", 0, 22);
+    g_win32font = gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
 
     UpdateBackBuffer();
     MSG msg;
@@ -366,6 +364,73 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ScreenToClient(hWnd, &cursorPoint);
             g_input.mousePosition.x = cursorPoint.x;
             g_input.mousePosition.y = cursorPoint.y;
+
+            g_input.mouseButtonFlags1 = 0;
+
+            if (flags)
+            {
+                if ((flags & 0x1) == 0x1)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_LMBDOWN;
+                    g_input.mouseButtonFlags2 |= MG_MBFL_LMBHOLD;
+                }
+
+                if ((flags & 0x2) == 0x2)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_LMBUP;
+                    if((g_input.mouseButtonFlags2 & MG_MBFL_LMBHOLD) == MG_MBFL_LMBHOLD)
+                        g_input.mouseButtonFlags2 ^= MG_MBFL_LMBHOLD;
+                }
+
+                if ((flags & 0x4) == 0x4)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_RMBDOWN;
+                    g_input.mouseButtonFlags2 |= MG_MBFL_RMBHOLD;
+                }
+                if ((flags & 0x8) == 0x8)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_RMBUP;
+                    if ((g_input.mouseButtonFlags2 & MG_MBFL_RMBHOLD) == MG_MBFL_RMBHOLD)
+                        g_input.mouseButtonFlags2 ^= MG_MBFL_RMBHOLD;
+                }
+
+                if ((flags & 0x10) == 0x10)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_MMBDOWN;
+                    g_input.mouseButtonFlags2 |= MG_MBFL_MMBHOLD;
+                }
+                if ((flags & 0x20) == 0x20)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_MMBUP;
+                    if ((g_input.mouseButtonFlags2 & MG_MBFL_MMBHOLD) == MG_MBFL_MMBHOLD)
+                        g_input.mouseButtonFlags2 ^= MG_MBFL_MMBHOLD;
+                }
+
+                if ((flags & 0x100) == 0x100)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_X1MBDOWN;
+                    g_input.mouseButtonFlags2 |= MG_MBFL_X1MBHOLD;
+                }
+                if ((flags & 0x200) == 0x200)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_X1MBUP;
+                    if ((g_input.mouseButtonFlags2 & MG_MBFL_X1MBHOLD) == MG_MBFL_X1MBHOLD)
+                        g_input.mouseButtonFlags2 ^= MG_MBFL_X1MBHOLD;
+                }
+
+                if ((flags & 0x40) == 0x40)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_X2MBDOWN;
+                    g_input.mouseButtonFlags2 |= MG_MBFL_X2MBHOLD;
+                }
+                if ((flags & 0x80) == 0x80)
+                {
+                    g_input.mouseButtonFlags1 |= MG_MBFL_X2MBUP;
+                    if ((g_input.mouseButtonFlags2 & MG_MBFL_X2MBHOLD) == MG_MBFL_X2MBHOLD)
+                        g_input.mouseButtonFlags2 ^= MG_MBFL_X2MBHOLD;
+                }
+
+            }
         }
     }break;
     case WM_DESTROY:
