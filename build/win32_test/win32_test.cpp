@@ -18,6 +18,8 @@ mgFont* g_win32font = 0;
 HDC g_dc = 0;
 HWND g_hwnd = 0;
 RECT g_windowRect;
+HKL KEYBOARD_INPUT_HKL = 0;
+unsigned int KEYBOARD_INPUT_CODEPAGE = 0;
 
 mgPoint borderSize;
 
@@ -176,7 +178,7 @@ void draw_gui()
     mgPointSet(&point, 0, 0);
 
     mgPoint size;
-    mgPointSet(&size, 220, 100);
+    mgPointSet(&size, 220, 180);
 
     mgColor color1;
     mgColor color2;
@@ -190,21 +192,56 @@ void draw_gui()
     mgColor textColor;
     mgColorSetAsIntegerRGB(&textColor, 0xFF005000);
     wchar_t textBuffer[200];
+    
     swprintf_s(textBuffer, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
     mgPointSet(&textPosition, 10, 10);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    
     swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
     mgPointSet(&textPosition, 10, 20);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    
     swprintf_s(textBuffer, L"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
     mgPointSet(&textPosition, 10, 30);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-    swprintf_s(textBuffer, L"mouseButtons: %x %x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
+    
+    swprintf_s(textBuffer, L"mouseButtons: 0x%x 0x%x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
     mgPointSet(&textPosition, 10, 40);
+    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+
+    swprintf_s(textBuffer, L"key char: %c 0x%x", g_input.character, g_input.character);
+    mgPointSet(&textPosition, 10, 50);
+    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+
+    if (mgIsKeyHit(&g_input, MG_KEY_ENTER))
+    {
+        swprintf_s(textBuffer, L"Hit ENTER");
+        mgPointSet(&textPosition, 10, 60);
+        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    }
+
+    if (mgIsKeyHold(&g_input, MG_KEY_ENTER))
+    {
+        swprintf_s(textBuffer, L"Hold ENTER");
+        mgPointSet(&textPosition, 10, 70);
+        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    }
+
+    if (mgIsKeyRelease(&g_input, MG_KEY_ENTER))
+    {
+        swprintf_s(textBuffer, L"Release ENTER");
+        mgPointSet(&textPosition, 10, 80);
+        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    }
+
+    swprintf_s(textBuffer, L"KB modifier 0x%x\n", g_input.keyboardModifier);
+    mgPointSet(&textPosition, 10, 90);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
     g_gui_context->m_gpu->endDraw();
 }
+
+static unsigned int LocaleIdToCodepage(unsigned int lcid);
 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -436,8 +473,253 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+    case WM_SYSKEYDOWN:
+    case WM_SYSKEYUP:
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    {
+        bool isPress = true;
+
+        unsigned char key = (unsigned char)wParam;
+
+        if (message == WM_SYSKEYUP) isPress = false;
+        if (message == WM_KEYUP) isPress = false;
+
+        const UINT MY_MAPVK_VSC_TO_VK_EX = 3;
+
+        if (key == MG_KEY_SHIFT)
+        { // shift -> lshift rshift
+            key = static_cast<unsigned char>(MapVirtualKey((static_cast<UINT>(lParam >> 16) & 255u), MY_MAPVK_VSC_TO_VK_EX));
+        }
+        if (key == MG_KEY_CTRL)
+        { // ctrl -> lctrl rctrl
+            key = static_cast<unsigned char>(MapVirtualKey((static_cast<UINT>(lParam >> 16) & 255), MY_MAPVK_VSC_TO_VK_EX));
+            if (lParam & 0x1000000)
+                key = static_cast<unsigned char>(163);
+        }
+
+        if (key == MG_KEY_ALT)
+        { // alt -> lalt ralt
+            key = static_cast<unsigned char>(MapVirtualKey((static_cast<UINT>(lParam >> 16) & 255), MY_MAPVK_VSC_TO_VK_EX));
+            if (lParam & 0x1000000)
+                key = static_cast<unsigned char>(165);
+            //printf("alt = %i\n",(int)ev.keyboardEvent.key);
+        }
+
+        static unsigned char keys[256u];
+        GetKeyboardState(keys);
+        WORD chars[2];
+
+        if (ToAsciiEx((UINT)wParam, HIWORD(lParam), keys, chars, 0, KEYBOARD_INPUT_HKL) == 1)
+        {
+            MultiByteToWideChar(KEYBOARD_INPUT_CODEPAGE, MB_PRECOMPOSED, (LPCSTR)chars,
+                sizeof(chars), (WCHAR*)&g_input.character, 1);
+        }
+
+        if (isPress)
+        {
+            if (key < 256)
+            {
+                g_input.keyFlags[key] |= MG_KEYFL_HOLD;
+                g_input.keyFlags[key] |= MG_KEYFL_HIT;
+            }
+        }
+        else
+        {
+            if (key < 256)
+            {
+                if((g_input.keyFlags[key] & MG_KEYFL_HOLD) == MG_KEYFL_HOLD)
+                    g_input.keyFlags[key] ^= MG_KEYFL_HOLD;
+                
+                g_input.keyFlags[key] |= MG_KEYFL_RELEASE;
+            }
+        }
+
+        if (message == WM_SYSKEYDOWN || message == WM_SYSKEYUP)
+        {
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+        else
+        {
+            return 0;
+        }
+    }break;
+
+    case WM_INPUTLANGCHANGE:
+        KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
+        KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
+        return 0;
+    case WM_SYSCOMMAND:
+        if ((wParam & 0xFFF0) == SC_SCREENSAVE ||
+            (wParam & 0xFFF0) == SC_MONITORPOWER ||
+            (wParam & 0xFFF0) == SC_KEYMENU
+            )
+        {
+            return 0;
+        }
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
+}
+
+// IrrLicht
+// Get the codepage from the locale language id
+// Based on the table from http://www.science.co.il/Language/Locale-Codes.asp?s=decimal
+static unsigned int LocaleIdToCodepage(unsigned int lcid)
+{
+    switch (lcid)
+    {
+    case 1098:  // Telugu
+    case 1095:  // Gujarati
+    case 1094:  // Punjabi
+    case 1103:  // Sanskrit
+    case 1111:  // Konkani
+    case 1114:  // Syriac
+    case 1099:  // Kannada
+    case 1102:  // Marathi
+    case 1125:  // Divehi
+    case 1067:  // Armenian
+    case 1081:  // Hindi
+    case 1079:  // Georgian
+    case 1097:  // Tamil
+        return 0;
+    case 1054:  // Thai
+        return 874;
+    case 1041:  // Japanese
+        return 932;
+    case 2052:  // Chinese (PRC)
+    case 4100:  // Chinese (Singapore)
+        return 936;
+    case 1042:  // Korean
+        return 949;
+    case 5124:  // Chinese (Macau S.A.R.)
+    case 3076:  // Chinese (Hong Kong S.A.R.)
+    case 1028:  // Chinese (Taiwan)
+        return 950;
+    case 1048:  // Romanian
+    case 1060:  // Slovenian
+    case 1038:  // Hungarian
+    case 1051:  // Slovak
+    case 1045:  // Polish
+    case 1052:  // Albanian
+    case 2074:  // Serbian (Latin)
+    case 1050:  // Croatian
+    case 1029:  // Czech
+        return 1250;
+    case 1104:  // Mongolian (Cyrillic)
+    case 1071:  // FYRO Macedonian
+    case 2115:  // Uzbek (Cyrillic)
+    case 1058:  // Ukrainian
+    case 2092:  // Azeri (Cyrillic)
+    case 1092:  // Tatar
+    case 1087:  // Kazakh
+    case 1059:  // Belarusian
+    case 1088:  // Kyrgyz (Cyrillic)
+    case 1026:  // Bulgarian
+    case 3098:  // Serbian (Cyrillic)
+    case 1049:  // Russian
+        return 1251;
+    case 8201:  // English (Jamaica)
+    case 3084:  // French (Canada)
+    case 1036:  // French (France)
+    case 5132:  // French (Luxembourg)
+    case 5129:  // English (New Zealand)
+    case 6153:  // English (Ireland)
+    case 1043:  // Dutch (Netherlands)
+    case 9225:  // English (Caribbean)
+    case 4108:  // French (Switzerland)
+    case 4105:  // English (Canada)
+    case 1110:  // Galician
+    case 10249:  // English (Belize)
+    case 3079:  // German (Austria)
+    case 6156:  // French (Monaco)
+    case 12297:  // English (Zimbabwe)
+    case 1069:  // Basque
+    case 2067:  // Dutch (Belgium)
+    case 2060:  // French (Belgium)
+    case 1035:  // Finnish
+    case 1080:  // Faroese
+    case 1031:  // German (Germany)
+    case 3081:  // English (Australia)
+    case 1033:  // English (United States)
+    case 2057:  // English (United Kingdom)
+    case 1027:  // Catalan
+    case 11273:  // English (Trinidad)
+    case 7177:  // English (South Africa)
+    case 1030:  // Danish
+    case 13321:  // English (Philippines)
+    case 15370:  // Spanish (Paraguay)
+    case 9226:  // Spanish (Colombia)
+    case 5130:  // Spanish (Costa Rica)
+    case 7178:  // Spanish (Dominican Republic)
+    case 12298:  // Spanish (Ecuador)
+    case 17418:  // Spanish (El Salvador)
+    case 4106:  // Spanish (Guatemala)
+    case 18442:  // Spanish (Honduras)
+    case 3082:  // Spanish (International Sort)
+    case 13322:  // Spanish (Chile)
+    case 19466:  // Spanish (Nicaragua)
+    case 2058:  // Spanish (Mexico)
+    case 10250:  // Spanish (Peru)
+    case 20490:  // Spanish (Puerto Rico)
+    case 1034:  // Spanish (Traditional Sort)
+    case 14346:  // Spanish (Uruguay)
+    case 8202:  // Spanish (Venezuela)
+    case 1089:  // Swahili
+    case 1053:  // Swedish
+    case 2077:  // Swedish (Finland)
+    case 5127:  // German (Liechtenstein)
+    case 1078:  // Afrikaans
+    case 6154:  // Spanish (Panama)
+    case 4103:  // German (Luxembourg)
+    case 16394:  // Spanish (Bolivia)
+    case 2055:  // German (Switzerland)
+    case 1039:  // Icelandic
+    case 1057:  // Indonesian
+    case 1040:  // Italian (Italy)
+    case 2064:  // Italian (Switzerland)
+    case 2068:  // Norwegian (Nynorsk)
+    case 11274:  // Spanish (Argentina)
+    case 1046:  // Portuguese (Brazil)
+    case 1044:  // Norwegian (Bokmal)
+    case 1086:  // Malay (Malaysia)
+    case 2110:  // Malay (Brunei Darussalam)
+    case 2070:  // Portuguese (Portugal)
+        return 1252;
+    case 1032:  // Greek
+        return 1253;
+    case 1091:  // Uzbek (Latin)
+    case 1068:  // Azeri (Latin)
+    case 1055:  // Turkish
+        return 1254;
+    case 1037:  // Hebrew
+        return 1255;
+    case 5121:  // Arabic (Algeria)
+    case 15361:  // Arabic (Bahrain)
+    case 9217:  // Arabic (Yemen)
+    case 3073:  // Arabic (Egypt)
+    case 2049:  // Arabic (Iraq)
+    case 11265:  // Arabic (Jordan)
+    case 13313:  // Arabic (Kuwait)
+    case 12289:  // Arabic (Lebanon)
+    case 4097:  // Arabic (Libya)
+    case 6145:  // Arabic (Morocco)
+    case 8193:  // Arabic (Oman)
+    case 16385:  // Arabic (Qatar)
+    case 1025:  // Arabic (Saudi Arabia)
+    case 10241:  // Arabic (Syria)
+    case 14337:  // Arabic (U.A.E.)
+    case 1065:  // Farsi
+    case 1056:  // Urdu
+    case 7169:  // Arabic (Tunisia)
+        return 1256;
+    case 1061:  // Estonian
+    case 1062:  // Latvian
+    case 1063:  // Lithuanian
+        return 1257;
+    case 1066:  // Vietnamese
+        return 1258;
+    }
+    return 65001;   // utf-8
 }

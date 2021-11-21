@@ -69,6 +69,29 @@ miGUI_update(mgContext* c)
 {
 	assert(c);
 
+	unsigned int ctrl_shift_alt = 0;
+	if (mgIsKeyHold(c->m_input, MG_KEY_LALT) || mgIsKeyHold(c->m_input, MG_KEY_RALT))
+		ctrl_shift_alt |= 1;
+
+	if (mgIsKeyHold(c->m_input, MG_KEY_LSHIFT) || mgIsKeyHold(c->m_input, MG_KEY_RSHIFT))
+		ctrl_shift_alt |= 2;
+
+	if (mgIsKeyHold(c->m_input, MG_KEY_LCTRL) || mgIsKeyHold(c->m_input, MG_KEY_RCTRL))
+		ctrl_shift_alt |= 4;
+
+	switch (ctrl_shift_alt)
+	{
+	default:
+	case 0:  c->m_input->keyboardModifier = MG_KBMOD_clear;         break;
+	case 1:  c->m_input->keyboardModifier = MG_KBMOD_ALT;           break;
+	case 2:  c->m_input->keyboardModifier = MG_KBMOD_SHIFT;         break;
+	case 3:  c->m_input->keyboardModifier = MG_KBMOD_SHIFTALT;      break;
+	case 4:  c->m_input->keyboardModifier = MG_KBMOD_CTRL;          break;
+	case 5:  c->m_input->keyboardModifier = MG_KBMOD_CTRLALT;       break;
+	case 6:  c->m_input->keyboardModifier = MG_KBMOD_CTRLSHIFT;     break;
+	case 7:  c->m_input->keyboardModifier = MG_KBMOD_CTRLSHIFTALT;  break;
+	}
+
 }
 
 void 
@@ -102,4 +125,12 @@ miGUI_startFrame(mgContext* c)
 	if ((c->m_input->mouseButtonFlags1 & MG_MBFL_X2MBUP) == MG_MBFL_X2MBUP)
 		c->m_input->mouseButtonFlags1 ^= MG_MBFL_X2MBUP;
 	
+	for (int i = 0; i < 256; ++i)
+	{
+		if ((c->m_input->keyFlags[i] & MG_KEYFL_HIT) == MG_KEYFL_HIT)
+			c->m_input->keyFlags[i] ^= MG_KEYFL_HIT;
+
+		if ((c->m_input->keyFlags[i] & MG_KEYFL_RELEASE) == MG_KEYFL_RELEASE)
+			c->m_input->keyFlags[i] ^= MG_KEYFL_RELEASE;
+	}
 }

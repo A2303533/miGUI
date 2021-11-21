@@ -161,6 +161,23 @@ enum {
 	MG_MBFL_X2MBHOLD = 0x4000,
 };
 
+enum {
+	MG_KEYFL_HOLD = 0x1,
+	MG_KEYFL_HIT = 0x2,
+	MG_KEYFL_RELEASE = 0x4,
+};
+
+enum {
+	MG_KBMOD_clear = 0x0,
+	MG_KBMOD_CTRL = 0x1,
+	MG_KBMOD_SHIFT = 0x2,
+	MG_KBMOD_ALT = 0x4,
+	MG_KBMOD_CTRLSHIFT = 0x8,
+	MG_KBMOD_CTRLALT = 0x10,
+	MG_KBMOD_SHIFTALT = 0x20,
+	MG_KBMOD_CTRLSHIFTALT = 0x40
+};
+
 /* You must update states by yourself */
 typedef struct mgInputContext_s {
 	mgPoint mousePosition;
@@ -175,6 +192,26 @@ typedef struct mgInputContext_s {
 	unsigned int mouseButtonFlags1;/*MG_MBFL...*/
 	unsigned int mouseButtonFlags2;/*MG_MBFL... HOLD*/
 
+	wchar_t character;
+	unsigned char keyFlags[256]; /**/
+
+	unsigned int keyboardModifier; /*MG_KBMOD...*/
+
 } mgInputContext;
+
+inline
+int mgIsKeyHit(mgInputContext* c, unsigned char key) {
+	return (c->keyFlags[key] & MG_KEYFL_HIT) == MG_KEYFL_HIT;
+}
+
+inline
+int mgIsKeyHold(mgInputContext* c, unsigned char key) {
+	return (c->keyFlags[key] & MG_KEYFL_HOLD) == MG_KEYFL_HOLD;
+}
+
+inline
+int mgIsKeyRelease(mgInputContext* c, unsigned char key) {
+	return (c->keyFlags[key] & MG_KEYFL_RELEASE) == MG_KEYFL_RELEASE;
+}
 
 #endif
