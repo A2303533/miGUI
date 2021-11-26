@@ -89,23 +89,10 @@ typedef struct mgVideoDriverAPI_s {
 
 #include "mgInputContex.h"
 
-/*Main interface*/
 typedef struct mgContext_s {
-	mgVideoDriverAPI* m_gpu;
-	mgInputContext* m_input;
-
-	/*Create bitmap font or load from file. 
-	* You can create your own fonts (like winapi fonts),
-	* don't forget to delete them...
-	*/
-	mgFont* (*createFont)(struct mgContext_s*, const char*, unsigned int flags, int size);
-
-	/*call before event loop*/
-	void (*startFrame)(struct mgContext_s*);
-
-	/*do work*/
-	void (*update)(struct mgContext_s*);
-
+	mgVideoDriverAPI* gpu;
+	mgInputContext* input;
+	mgElement* rootElement;
 } mgContext;
 
 #if defined(__cplusplus)
@@ -120,6 +107,25 @@ extern PFNMGCREATECONTEXTPROC mgCreateContext_p;
 typedef void (*PFNMGDESTROYCONTEXTPROC)(mgContext*);
 extern PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
 #define mgDestroyContext mgDestroyContext_p
+
+/*Create bitmap font or load from file.*/
+typedef mgFont* (*PFNMGCREATEFONTPROC)(struct mgContext_s*, const char*, unsigned int flags, int size);
+extern PFNMGCREATEFONTPROC mgCreateFont_p;
+#define mgCreateFont mgCreateFont_p
+
+/*call before event loop*/
+typedef void (*PFNMGSTARTFRAMEPROC)(struct mgContext_s*);
+extern PFNMGSTARTFRAMEPROC mgStartFrame_p;
+#define mgStartFrame mgStartFrame_p
+
+/*do work*/
+typedef void (*PFNMGUPDATEPROC)(struct mgContext_s*);
+extern PFNMGUPDATEPROC mgUpdate_p;
+#define mgUpdate mgUpdate_p
+
+typedef void (*PFNMGSETPARENTPROC)(struct mgContext_s* c, mgElement* object, mgElement* parent);
+extern PFNMGSETPARENTPROC mgSetParent_p;
+#define mgSetParent mgSetParent_p
 
 #if defined(__cplusplus)
 }

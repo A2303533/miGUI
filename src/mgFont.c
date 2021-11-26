@@ -28,7 +28,9 @@
 
 #include "miGUI.h"
 
-mgFont* mgCreateFont(mgContext* c, const char* fn, unsigned int flags, int size)
+MG_API
+mgFont* MG_C_DECL
+mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size)
 {
 	return 0;
 }

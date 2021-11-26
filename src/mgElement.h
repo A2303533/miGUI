@@ -35,12 +35,25 @@ enum {
 	MG_TYPE_BUTTON
 };
 
+struct mgElement_s;
+
+/*I don't want to use manystars** magic*/
+struct mgElementNode_s {
+	struct mgElement_s* pointer;
+};
+
+
 /* base data for all GUI widgets*/
 typedef struct mgElement_s {
 	unsigned int type; /*MG_TYPE...*/
 	void* implementation;
 
 	int id;
+	
+	struct mgElement_s* parent;
+	struct mgElementNode_s* children;
+	int childrenCount;
+
 } mgElement;
 
 #endif

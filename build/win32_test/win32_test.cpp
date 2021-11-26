@@ -173,7 +173,7 @@ void draw_gui()
     if (!g_gui_context)
         return;
 
-    g_gui_context->m_gpu->beginDraw();
+    g_gui_context->gpu->beginDraw();
     mgPoint point;
     mgPointSet(&point, 0, 0);
 
@@ -185,7 +185,7 @@ void draw_gui()
     mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
     mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
 
-    g_gui_context->m_gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
+    g_gui_context->gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
 
     mgPoint textPosition;
     mgPointSet(&textPosition, 10, 10);
@@ -238,7 +238,7 @@ void draw_gui()
     mgPointSet(&textPosition, 10, 90);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
-    g_gui_context->m_gpu->endDraw();
+    g_gui_context->gpu->endDraw();
 }
 
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
@@ -305,7 +305,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     Sleep(100);
     while (run)
     {
-        g_gui_context->startFrame(g_gui_context);
+        mgStartFrame(g_gui_context);
 
         run = GetMessage(&msg, 0, 0, 0);
         if (!TranslateAccelerator(msg.hwnd, 0, &msg))
@@ -314,7 +314,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
 
-        g_gui_context->update(g_gui_context);
+        mgUpdate(g_gui_context);
         draw_gui();
     }
     

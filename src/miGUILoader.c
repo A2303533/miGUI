@@ -32,6 +32,10 @@
 
 PFNMGCREATECONTEXTPROC mgCreateContext_p;
 PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
+PFNMGCREATEFONTPROC mgCreateFont_p;
+PFNMGSTARTFRAMEPROC mgStartFrame_p;
+PFNMGUPDATEPROC mgUpdate_p;
+PFNMGSETPARENTPROC mgSetParent_p;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -61,6 +65,10 @@ mgLoad()
 
 	mgCreateContext_p = mgGetProc(lib, "mgCreateContext_f");
 	mgDestroyContext_p = mgGetProc(lib, "mgDestroyContext_f");
+	mgCreateFont_p = mgGetProc(lib, "mgCreateFont_f");
+	mgStartFrame_p = mgGetProc(lib, "mgStartFrame_f");
+	mgUpdate_p = mgGetProc(lib, "mgUpdate_f");
+	mgSetParent_p = mgGetProc(lib, "mgSetParent_f");
 
 	return lib;
 }
