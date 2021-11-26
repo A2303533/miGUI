@@ -31,6 +31,23 @@
 #include <stdlib.h>
 #include <assert.h>
 
+void miGUI_onDraw_rectangle(mgElement* e);
+void miGUI_onUpdate_rectangle(mgElement* e);
+
+void 
+mgDestroyElement_f(mgElement* e)
+{
+	assert(e);
+	for (int i = 0; i < e->childrenCount; ++i)
+	{
+		mgDestroyElement_f(e->children[i].pointer);
+	}
+
+	if (e->implementation)
+		free(e->implementation);
+	free(e);
+}
+
 MG_API 
 mgContext* MG_C_DECL
 mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
@@ -38,9 +55,12 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	assert(gpu);
 	assert(input);
 
-	mgContext* c = malloc(sizeof(mgContext));
+	mgContext* c = calloc(1, sizeof(mgContext));
 	c->gpu = gpu;
 	c->input = input;
+	c->rootElement = calloc(1, sizeof(mgElement));
+	c->rootElement->context = c;
+	c->rootElement->visible = 1;
 
 	return c;
 }
@@ -53,8 +73,21 @@ mgDestroyContext_f(mgContext* c)
 
 	/*destroy everything here*/
 	/*...*/
+	if (c->rootElement)
+		mgDestroyElement_f(c->rootElement);
 
 	free(c);
+}
+
+void
+mgUpdateElement(mgElement* e) 
+{
+	if (e->onUpdate)
+		e->onUpdate(e);
+	for (int i = 0; i < e->childrenCount; ++i)
+	{
+		mgUpdateElement(e->children[i].pointer);
+	}
 }
 
 MG_API
@@ -86,6 +119,7 @@ mgUpdate_f(mgContext* c)
 	case 7:  c->input->keyboardModifier = MG_KBMOD_CTRLSHIFTALT;  break;
 	}
 
+	mgUpdateElement(c->rootElement);
 }
 
 MG_API
@@ -133,10 +167,9 @@ mgStartFrame_f(mgContext* c)
 
 MG_API
 void MG_C_DECL
-mgSetParent_f(mgContext* c, mgElement* object, mgElement* parent)
+mgSetParent_f(mgElement* object, mgElement* parent)
 {
 	assert(object);
-	assert(parent);
 
 	if (object->parent)
 	{
@@ -173,7 +206,7 @@ mgSetParent_f(mgContext* c, mgElement* object, mgElement* parent)
 
 	object->parent = parent;
 	if (!parent)
-		object->parent = c->rootElement;
+		object->parent = object->context->rootElement;
 
 	{
 		int chCount = object->parent->childrenCount + 1;
@@ -193,4 +226,70 @@ mgSetParent_f(mgContext* c, mgElement* object, mgElement* parent)
 
 		object->parent->children = newChildren;
 	}
+}
+
+MG_API
+mgElement* MG_C_DECL
+mgCreateRectangle_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2)
+{
+	assert(c);
+	assert(position);
+	assert(size);
+	assert(color1);
+	assert(color2);
+	mgElement* newElement = calloc(1, sizeof(mgElement));
+	newElement->type = MG_TYPE_RECTANGLE;
+	newElement->buildArea.left = position->x;
+	newElement->buildArea.top = position->y;
+	newElement->buildArea.right = position->x + size->x;
+	newElement->buildArea.bottom = position->y + size->y;
+	newElement->clipArea = newElement->buildArea;
+	newElement->context = c;
+	newElement->visible = 1;
+	newElement->onDraw = miGUI_onDraw_rectangle;
+	newElement->onUpdate = miGUI_onUpdate_rectangle;
+
+	newElement->implementation = calloc(1, sizeof(mgElementRectangle));
+	mgElementRectangle* impl = (mgElementRectangle*)newElement->implementation;
+	impl->color1 = *color1;
+	impl->color2 = *color2;
+
+	mgSetParent_f(newElement, 0);
+
+	return newElement;
+}
+
+MG_API
+void MG_C_DECL
+mgSetVisible_f(mgElement* e, int v)
+{
+	assert(e);
+	e->visible = v;
+	for (int i = 0; i < e->childrenCount; ++i)
+	{
+		mgSetVisible_f(e->children[i].pointer, v);
+	}
+}
+
+void 
+mgDrawElement(mgElement* e)
+{
+	if (!e->visible)
+		return;
+
+	if (e->onDraw)
+		e->onDraw(e);
+
+	for (int i = 0; i < e->childrenCount; ++i)
+	{
+		mgDrawElement(e->children[i].pointer);
+	}
+}
+
+MG_API
+void MG_C_DECL
+mgDraw_f(mgContext* c)
+{
+	assert(c);
+	mgDrawElement(c->rootElement);
 }

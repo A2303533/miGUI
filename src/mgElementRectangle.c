@@ -26,49 +26,28 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_ELEMENT_H_
-#define _MG_ELEMENT_H_
+#include "miGUI.h"
 
-enum {
-	MG_TYPE_RECTANGLE = 1,
-	MG_TYPE_TEXT,
-	MG_TYPE_BUTTON
-};
+void 
+miGUI_onUpdate_rectangle(mgElement* e)
+{
+	e->buildAreaFinal = e->buildArea;
+	e->clipAreaFinal = e->clipArea;
+}
 
-struct mgElement_s;
+void 
+miGUI_onDraw_rectangle(mgElement* e)
+{
+	mgPoint pos;
+	pos.x = e->buildAreaFinal.left;
+	pos.y = e->buildAreaFinal.top;
 
-/*I don't want to use manystars** magic*/
-struct mgElementNode_s {
-	struct mgElement_s* pointer;
-};
+	mgPoint sz;
+	sz.x = e->buildAreaFinal.right - e->buildAreaFinal.left;
+	sz.y = e->buildAreaFinal.bottom - e->buildAreaFinal.top;
 
+	mgElementRectangle* impl = (mgElementRectangle*)e->implementation;
 
-/* base data for all GUI widgets*/
-typedef struct mgElement_s {
-	unsigned int type; /*MG_TYPE...*/
-	void* implementation;
-
-	struct mgContext_s* context;
-
-	int id;
-	void* userData;
-
-	int visible;/* != 0 - visible*/
-	
-	struct mgElement_s* parent;
-	struct mgElementNode_s* children;
-	int childrenCount;
-
-	mgRect buildArea;
-	mgRect clipArea;
-	mgRect buildAreaFinal;
-	mgRect clipAreaFinal;
-
-	void(*onDraw)(struct mgElement_s* e);
-	void(*onUpdate)(struct mgElement_s* e);
-
-} mgElement;
-
-#include "mgElementRectangle.h"
-
-#endif
+	e->context->gpu->setClipRect(&e->clipAreaFinal);
+	e->context->gpu->drawRectangle(e, &pos, &sz, &impl->color1, &impl->color2, 0, 0);
+}

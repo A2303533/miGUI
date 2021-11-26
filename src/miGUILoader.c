@@ -36,6 +36,9 @@ PFNMGCREATEFONTPROC mgCreateFont_p;
 PFNMGSTARTFRAMEPROC mgStartFrame_p;
 PFNMGUPDATEPROC mgUpdate_p;
 PFNMGSETPARENTPROC mgSetParent_p;
+PFNMGSETVISIBLEPROC mgSetVisible_p;
+PFNMGDRAWPROC mgDraw_p;
+PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -69,6 +72,9 @@ mgLoad()
 	mgStartFrame_p = mgGetProc(lib, "mgStartFrame_f");
 	mgUpdate_p = mgGetProc(lib, "mgUpdate_f");
 	mgSetParent_p = mgGetProc(lib, "mgSetParent_f");
+	mgSetVisible_p = mgGetProc(lib, "mgSetVisible_f");
+	mgDraw_p = mgGetProc(lib, "mgDraw_f");
+	mgCreateRectangle_p = mgGetProc(lib, "mgCreateRectangle_f");
 
 	return lib;
 }

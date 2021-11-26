@@ -76,7 +76,7 @@ typedef struct mgVideoDriverAPI_s {
 
 	void(*drawRectangle)(
 		mgElement* element, /*current element, can be null*/
-		mgPoint* position,  /*left top corner*/
+		mgPoint* position,
 		mgPoint* size, 
 		mgColor* color1, 
 		mgColor* color2, 
@@ -84,6 +84,9 @@ typedef struct mgVideoDriverAPI_s {
 		mgVec4* UVRegion); /*optional*/
 
 	void(*drawText)( mgPoint* position, wchar_t* text, int textLen, mgColor*, mgFont*);
+
+	/*set new and return old clip rect*/
+	mgRect(*setClipRect)(mgRect*);
 
 } mgVideoDriverAPI;
 
@@ -123,9 +126,23 @@ typedef void (*PFNMGUPDATEPROC)(struct mgContext_s*);
 extern PFNMGUPDATEPROC mgUpdate_p;
 #define mgUpdate mgUpdate_p
 
-typedef void (*PFNMGSETPARENTPROC)(struct mgContext_s* c, mgElement* object, mgElement* parent);
+typedef void (*PFNMGSETPARENTPROC)(mgElement* object, mgElement* parent);
 extern PFNMGSETPARENTPROC mgSetParent_p;
 #define mgSetParent mgSetParent_p
+
+typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
+extern PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
+#define mgCreateRectangle mgCreateRectangle_p
+
+/*set visible include all children*/
+typedef void (*PFNMGSETVISIBLEPROC)(mgElement*, int);
+extern PFNMGSETVISIBLEPROC mgSetVisible_p;
+#define mgSetVisible mgSetVisible_p
+
+/*draw all*/
+typedef void (*PFNMGDRAWPROC)(mgContext*);
+extern PFNMGDRAWPROC mgDraw_p;
+#define mgDraw mgDraw_p
 
 #if defined(__cplusplus)
 }

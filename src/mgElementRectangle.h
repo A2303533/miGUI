@@ -26,49 +26,14 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_ELEMENT_H_
-#define _MG_ELEMENT_H_
+#ifndef _MG_ELEMENTRECTANGLE_H_
+#define _MG_ELEMENTRECTANGLE_H_
 
-enum {
-	MG_TYPE_RECTANGLE = 1,
-	MG_TYPE_TEXT,
-	MG_TYPE_BUTTON
-};
-
-struct mgElement_s;
-
-/*I don't want to use manystars** magic*/
-struct mgElementNode_s {
-	struct mgElement_s* pointer;
-};
+typedef struct mgElementRectangle_s {
+	mgColor color1;
+	mgColor color2;
+} mgElementRectangle;
 
 
-/* base data for all GUI widgets*/
-typedef struct mgElement_s {
-	unsigned int type; /*MG_TYPE...*/
-	void* implementation;
-
-	struct mgContext_s* context;
-
-	int id;
-	void* userData;
-
-	int visible;/* != 0 - visible*/
-	
-	struct mgElement_s* parent;
-	struct mgElementNode_s* children;
-	int childrenCount;
-
-	mgRect buildArea;
-	mgRect clipArea;
-	mgRect buildAreaFinal;
-	mgRect clipAreaFinal;
-
-	void(*onDraw)(struct mgElement_s* e);
-	void(*onUpdate)(struct mgElement_s* e);
-
-} mgElement;
-
-#include "mgElementRectangle.h"
 
 #endif

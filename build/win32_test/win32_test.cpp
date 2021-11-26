@@ -83,6 +83,15 @@ void gui_destroyTexture(mgTexture t)
 
 }
 
+mgRect gui_setClipRect(mgRect* r)
+{
+    static mgRect old;
+
+    mgRect ret = old;
+    old = *r;
+    return ret;
+}
+
 void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColor* color1,
     mgColor* color2,mgTexture texture,mgVec4* UVRegion)
 {
@@ -238,6 +247,9 @@ void draw_gui()
     mgPointSet(&textPosition, 10, 90);
     gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
+    /*draw elements*/
+    mgDraw(g_gui_context);
+
     g_gui_context->gpu->endDraw();
 }
 
@@ -293,10 +305,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     gui_gpu.beginDraw = gui_beginDraw;
     gui_gpu.endDraw = gui_endDraw;
     gui_gpu.drawRectangle = gui_drawRectangle;
+    gui_gpu.setClipRect = gui_setClipRect;
 
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     
     g_win32font = gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
+
+    {
+        mgPoint pos, sz;
+        mgColor c1, c2;
+        pos.x = 300;
+        pos.y = 0;
+        sz.x = 100;
+        sz.y = 20;
+        c1.setAsIntegerRGB(0xFF0000);
+        c2.setAsIntegerRGB(0x0000FF);
+        mgElement* rectangle = mgCreateRectangle(g_gui_context, &pos, &sz, &c1, &c2);
+    }
 
     UpdateBackBuffer();
     MSG msg;
