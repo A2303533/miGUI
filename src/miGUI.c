@@ -28,12 +28,6 @@
 
 #include "miGUI.h"
 
-#include <stdlib.h>
-#include <assert.h>
-
-void miGUI_onDraw_rectangle(mgElement* e);
-void miGUI_onUpdate_rectangle(mgElement* e);
-
 void 
 mgDestroyElement_f(mgElement* e)
 {
@@ -48,6 +42,8 @@ mgDestroyElement_f(mgElement* e)
 	free(e);
 }
 
+void mgrootobject_cb(mgElement*e) {}
+
 MG_API 
 mgContext* MG_C_DECL
 mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
@@ -58,9 +54,13 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgContext* c = calloc(1, sizeof(mgContext));
 	c->gpu = gpu;
 	c->input = input;
+	c->needUpdateTransform = 1;
 	c->rootElement = calloc(1, sizeof(mgElement));
 	c->rootElement->context = c;
 	c->rootElement->visible = 1;
+	c->rootElement->onDraw = mgrootobject_cb;
+	c->rootElement->onUpdate = mgrootobject_cb;
+	c->rootElement->onUpdateTransform = mgrootobject_cb;
 
 	return c;
 }
@@ -82,11 +82,23 @@ mgDestroyContext_f(mgContext* c)
 void
 mgUpdateElement(mgElement* e) 
 {
-	if (e->onUpdate)
-		e->onUpdate(e);
+	e->onUpdate(e);
 	for (int i = 0; i < e->childrenCount; ++i)
 	{
 		mgUpdateElement(e->children[i].pointer);
+	}
+}
+
+void
+mgUpdateTransformElement(mgElement* e)
+{
+	if (!e->visible)
+		return;
+
+	e->onUpdateTransform(e);
+	for (int i = 0; i < e->childrenCount; ++i)
+	{
+		mgUpdateTransformElement(e->children[i].pointer);
 	}
 }
 
@@ -120,6 +132,12 @@ mgUpdate_f(mgContext* c)
 	}
 
 	mgUpdateElement(c->rootElement);
+
+	if (c->needUpdateTransform)
+	{
+		mgUpdateTransformElement(c->rootElement);
+		c->needUpdateTransform = 0;
+	}
 }
 
 MG_API
@@ -229,37 +247,6 @@ mgSetParent_f(mgElement* object, mgElement* parent)
 }
 
 MG_API
-mgElement* MG_C_DECL
-mgCreateRectangle_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2)
-{
-	assert(c);
-	assert(position);
-	assert(size);
-	assert(color1);
-	assert(color2);
-	mgElement* newElement = calloc(1, sizeof(mgElement));
-	newElement->type = MG_TYPE_RECTANGLE;
-	newElement->buildArea.left = position->x;
-	newElement->buildArea.top = position->y;
-	newElement->buildArea.right = position->x + size->x;
-	newElement->buildArea.bottom = position->y + size->y;
-	newElement->clipArea = newElement->buildArea;
-	newElement->context = c;
-	newElement->visible = 1;
-	newElement->onDraw = miGUI_onDraw_rectangle;
-	newElement->onUpdate = miGUI_onUpdate_rectangle;
-
-	newElement->implementation = calloc(1, sizeof(mgElementRectangle));
-	mgElementRectangle* impl = (mgElementRectangle*)newElement->implementation;
-	impl->color1 = *color1;
-	impl->color2 = *color2;
-
-	mgSetParent_f(newElement, 0);
-
-	return newElement;
-}
-
-MG_API
 void MG_C_DECL
 mgSetVisible_f(mgElement* e, int v)
 {
@@ -277,8 +264,7 @@ mgDrawElement(mgElement* e)
 	if (!e->visible)
 		return;
 
-	if (e->onDraw)
-		e->onDraw(e);
+	e->onDraw(e);
 
 	for (int i = 0; i < e->childrenCount; ++i)
 	{

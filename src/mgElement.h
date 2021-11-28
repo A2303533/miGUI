@@ -66,9 +66,15 @@ typedef struct mgElement_s {
 
 	void(*onDraw)(struct mgElement_s* e);
 	void(*onUpdate)(struct mgElement_s* e);
+	void(*onUpdateTransform)(struct mgElement_s* e);
+	
+	void(*onMouseEnter)(struct mgElement_s* e);
+	void(*onMouseLeave)(struct mgElement_s* e);
+	int cursorInRect; /*1 when cursor in buildAreaFinal*/
 
 } mgElement;
 
 #include "mgElementRectangle.h"
+#include "mgElementText.h"
 
 #endif

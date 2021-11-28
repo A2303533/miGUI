@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\mgElementRectangle.c" />
+    <ClCompile Include="..\src\mgElementText.c" />
     <ClCompile Include="..\src\mgFont.c" />
     <ClCompile Include="..\src\miGUI.c" />
   </ItemGroup>

@@ -30,86 +30,69 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 MG_API
 void MG_C_DECL
 mgSetParent_f(mgElement* object, mgElement* parent);
 
 void
-miGUI_onUpdateTransform_rectangle(mgElement* e)
+miGUI_onUpdateTransform_text(mgElement* e)
 {
 	e->buildAreaFinal = e->buildArea;
 	e->clipAreaFinal = e->clipArea;
 }
 
 void 
-miGUI_onUpdate_rectangle(mgElement* e)
+miGUI_onUpdate_text(mgElement* e)
 {
-	int inRect = mgPointInRect(&e->buildAreaFinal, &e->context->input->mousePosition);
-
-	if (inRect)
-	{
-		if (!e->cursorInRect)
-		{
-			if (e->onMouseEnter)
-				e->onMouseEnter(e);
-		}
-	}
-	else
-	{
-		if (e->cursorInRect)
-		{
-			if (e->onMouseLeave)
-				e->onMouseLeave(e);
-		}
-	}
-
-	e->cursorInRect = inRect;
 }
 
 void 
-miGUI_onDraw_rectangle(mgElement* e)
+miGUI_onDraw_text(mgElement* e)
 {
 	mgPoint pos;
 	pos.x = e->buildAreaFinal.left;
 	pos.y = e->buildAreaFinal.top;
 
-	mgPoint sz;
-	sz.x = e->buildAreaFinal.right - e->buildAreaFinal.left;
-	sz.y = e->buildAreaFinal.bottom - e->buildAreaFinal.top;
+	mgElementText* impl = (mgElementText*)e->implementation;
 
-	mgElementRectangle* impl = (mgElementRectangle*)e->implementation;
-
-	e->context->gpu->setClipRect(&e->clipAreaFinal);
-	e->context->gpu->drawRectangle(e, &pos, &sz, &impl->color1, &impl->color2, 0, 0);
+	if (impl->text && impl->textLen)
+	{
+		e->context->gpu->setClipRect(&e->clipAreaFinal);
+		e->context->gpu->drawText(&pos, impl->text, impl->textLen, &impl->color, impl->font);
+	}
 }
 
 MG_API
 mgElement* MG_C_DECL
-mgCreateRectangle_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2)
+mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font)
 {
 	assert(c);
 	assert(position);
-	assert(size);
-	assert(color1);
-	assert(color2);
+	assert(text);
+	assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
-	newElement->type = MG_TYPE_RECTANGLE;
+	newElement->type = MG_TYPE_TEXT;
 	newElement->buildArea.left = position->x;
 	newElement->buildArea.top = position->y;
-	newElement->buildArea.right = position->x + size->x;
-	newElement->buildArea.bottom = position->y + size->y;
+	newElement->buildArea.right = position->x;
+	newElement->buildArea.bottom = position->y;
 	newElement->clipArea = newElement->buildArea;
 	newElement->context = c;
 	newElement->visible = 1;
-	newElement->onDraw = miGUI_onDraw_rectangle;
-	newElement->onUpdate = miGUI_onUpdate_rectangle;
-	newElement->onUpdateTransform = miGUI_onUpdateTransform_rectangle;
+	newElement->onDraw = miGUI_onDraw_text;
+	newElement->onUpdate = miGUI_onUpdate_text;
+	newElement->onUpdateTransform = miGUI_onUpdateTransform_text;
 
-	newElement->implementation = calloc(1, sizeof(mgElementRectangle));
-	mgElementRectangle* impl = (mgElementRectangle*)newElement->implementation;
-	impl->color1 = *color1;
-	impl->color2 = *color2;
+	newElement->implementation = calloc(1, sizeof(mgElementText));
+	mgElementText* impl = (mgElementText*)newElement->implementation;
+	impl->color.r = 0.f;
+	impl->color.g = 0.f;
+	impl->color.b = 0.f;
+	impl->font = font;
+	impl->text = text;
+	impl->textLen = wcslen(text);
 
 	mgSetParent_f(newElement, 0);
 

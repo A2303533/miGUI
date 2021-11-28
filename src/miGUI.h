@@ -30,6 +30,8 @@
 #define _MI_GUI_H_
 
 #include <stddef.h>
+#include <stdlib.h>
+#include <assert.h>
 
 #if defined(WIN32)
 #define MG_PLATFORM_WINDOWS
@@ -83,7 +85,7 @@ typedef struct mgVideoDriverAPI_s {
 		mgTexture texture, /*optional*/
 		mgVec4* UVRegion); /*optional*/
 
-	void(*drawText)( mgPoint* position, wchar_t* text, int textLen, mgColor*, mgFont*);
+	void(*drawText)( mgPoint* position, const wchar_t* text, int textLen, mgColor*, mgFont*);
 
 	/*set new and return old clip rect*/
 	mgRect(*setClipRect)(mgRect*);
@@ -96,6 +98,7 @@ typedef struct mgContext_s {
 	mgVideoDriverAPI* gpu;
 	mgInputContext* input;
 	mgElement* rootElement;
+	int needUpdateTransform;
 } mgContext;
 
 #if defined(__cplusplus)
@@ -133,6 +136,10 @@ extern PFNMGSETPARENTPROC mgSetParent_p;
 typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
 extern PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
 #define mgCreateRectangle mgCreateRectangle_p
+
+typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
+extern PFNMGCREATETEXTPROC mgCreateText_p;
+#define mgCreateText mgCreateText_p
 
 /*set visible include all children*/
 typedef void (*PFNMGSETVISIBLEPROC)(mgElement*, int);

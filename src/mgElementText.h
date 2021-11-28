@@ -26,64 +26,16 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "miGUI.h"
-#include "miGUILoader.h"
-#include <assert.h>
+#ifndef _MG_ELEMENTTEXT_H_
+#define _MG_ELEMENTTEXT_H_
 
-PFNMGCREATECONTEXTPROC mgCreateContext_p;
-PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
-PFNMGCREATEFONTPROC mgCreateFont_p;
-PFNMGSTARTFRAMEPROC mgStartFrame_p;
-PFNMGUPDATEPROC mgUpdate_p;
-PFNMGSETPARENTPROC mgSetParent_p;
-PFNMGSETVISIBLEPROC mgSetVisible_p;
-PFNMGDRAWPROC mgDraw_p;
-PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
-PFNMGCREATETEXTPROC mgCreateText_p;
+typedef struct mgElementText_s {
+	mgColor color;
+	mgFont* font;
+	const wchar_t* text;
+	int textLen;
+} mgElementText;
 
-void* 
-mgGetProc(MG_LIB_HANDLE lib, const char* proc)
-{
-	void* res = 0;
 
-#ifdef MG_PLATFORM_WINDOWS
-	res = GetProcAddress(lib, proc);
-#else
-#error Need implementation
+
 #endif
-	return res;
-}
-
-MG_LIB_HANDLE
-mgLoad()
-{
-#ifdef MG_PLATFORM_WINDOWS
-	const char* lib_name = "migui.dll";
-#else
-#error Need implementation
-#endif
-
-	MG_LIB_HANDLE lib = MG_LOAD_LIB(lib_name);
-	if(!lib)
-		return lib;
-
-	mgCreateContext_p = mgGetProc(lib, "mgCreateContext_f");
-	mgDestroyContext_p = mgGetProc(lib, "mgDestroyContext_f");
-	mgCreateFont_p = mgGetProc(lib, "mgCreateFont_f");
-	mgStartFrame_p = mgGetProc(lib, "mgStartFrame_f");
-	mgUpdate_p = mgGetProc(lib, "mgUpdate_f");
-	mgSetParent_p = mgGetProc(lib, "mgSetParent_f");
-	mgSetVisible_p = mgGetProc(lib, "mgSetVisible_f");
-	mgDraw_p = mgGetProc(lib, "mgDraw_f");
-	mgCreateRectangle_p = mgGetProc(lib, "mgCreateRectangle_f");
-	mgCreateText_p = mgGetProc(lib, "mgCreateText_f");
-
-	return lib;
-}
-
-void
-mgUnload(MG_LIB_HANDLE lib)
-{
-	assert(lib);
-	MG_FREE_LIB(lib);
-}

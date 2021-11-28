@@ -253,6 +253,18 @@ void draw_gui()
     g_gui_context->gpu->endDraw();
 }
 
+
+void rect_onMouseEnter(struct mgElement_s* e){
+    mgElementText* text = (mgElementText*)e->userData;
+    text->text = L"Mouse enter";
+    text->textLen = wcslen(text->text);
+}
+void rect_onMouseLeave(struct mgElement_s* e){
+    mgElementText* text = (mgElementText*)e->userData;
+    text->text = L"Mouse leave";
+    text->textLen = wcslen(text->text);
+}
+
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -305,12 +317,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     gui_gpu.beginDraw = gui_beginDraw;
     gui_gpu.endDraw = gui_endDraw;
     gui_gpu.drawRectangle = gui_drawRectangle;
+    gui_gpu.drawText = gui_drawText;
     gui_gpu.setClipRect = gui_setClipRect;
 
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     
     g_win32font = gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
-
     {
         mgPoint pos, sz;
         mgColor c1, c2;
@@ -321,6 +333,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         c1.setAsIntegerRGB(0xFF0000);
         c2.setAsIntegerRGB(0x0000FF);
         mgElement* rectangle = mgCreateRectangle(g_gui_context, &pos, &sz, &c1, &c2);
+        mgElement* text = mgCreateText(g_gui_context, &pos, L"Text", g_win32font);
+        rectangle->userData = text->implementation;
+        rectangle->onMouseEnter = rect_onMouseEnter;
+        rectangle->onMouseLeave = rect_onMouseLeave;
     }
 
     UpdateBackBuffer();

@@ -64,4 +64,11 @@ void mgRectSet(mgRect* r, int Left, int Top, int Right, int Bottom)
 	r->bottom = Bottom;
 }
 
+inline
+int mgPointInRect(mgRect* r, mgPoint* p)
+{
+	if (p->x >= r->left) { if (p->x <= r->right) { if (p->y >= r->top) { if (p->y <= r->bottom) { return 1; } } } }
+	return 0;
+}
+
 #endif
