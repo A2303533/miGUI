@@ -151,7 +151,7 @@ void gui_drawText(
     mgFont* font)
 {
     SelectObject(hdcMem, font->implementation);
-    SetTextColor(hdcMem, mgColorGetAsIntegerARGB(color));
+    SetTextColor(hdcMem, mgColorGetAsIntegerRGB(color));
     SetBkMode(hdcMem, TRANSPARENT);
     TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, text, textLen);
 }
@@ -264,6 +264,14 @@ void rect_onMouseLeave(struct mgElement_s* e){
     text->text = L"Mouse leave";
     text->textLen = wcslen(text->text);
 }
+void rect_onClickLMB(struct mgElement_s* e) {
+    mgElementText* text = (mgElementText*)e->userData;
+    text->color.setAsIntegerBGR(0xFF0000);
+}
+void rect_onReleaseLMB(struct mgElement_s* e) {
+    mgElementText* text = (mgElementText*)e->userData;
+    text->color.setAsIntegerBGR(0xFFFFFF);
+}
 
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 
@@ -334,9 +342,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         c2.setAsIntegerRGB(0x0000FF);
         mgElement* rectangle = mgCreateRectangle(g_gui_context, &pos, &sz, &c1, &c2);
         mgElement* text = mgCreateText(g_gui_context, &pos, L"Text", g_win32font);
+        ((mgElementText*)text->implementation)->color.setAsIntegerBGR(0xFFFFFF);
         rectangle->userData = text->implementation;
         rectangle->onMouseEnter = rect_onMouseEnter;
         rectangle->onMouseLeave = rect_onMouseLeave;
+        rectangle->onClickLMB = rect_onClickLMB;
+        rectangle->onReleaseLMB = rect_onReleaseLMB;
     }
 
     UpdateBackBuffer();

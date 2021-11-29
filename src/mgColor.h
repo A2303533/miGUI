@@ -76,6 +76,13 @@ typedef struct mgColor_s {
 		b = float(unsigned char(rgb)) * 0.00392156862745f;
 	}
 
+	void setAsIntegerBGR(unsigned int rgb)
+	{
+		b = float(unsigned char(rgb >> 16u)) * 0.00392156862745f;
+		g = float(unsigned char(rgb >> 8u)) * 0.00392156862745f;
+		r = float(unsigned char(rgb)) * 0.00392156862745f;
+	}
+
 	const unsigned char getAsByteRed() const { return static_cast<unsigned char>(r * 255.); }
 	const unsigned char getAsByteGreen() const { return static_cast<unsigned char>(g * 255.); }
 	const unsigned char getAsByteBlue() const { return static_cast<unsigned char>(b * 255.); }
@@ -130,6 +137,17 @@ unsigned int mgColorGetAsIntegerARGB(mgColor* c)
 		c->g * 255.,
 		c->r * 255.,
 		c->a * 255.
+	);
+}
+
+inline
+unsigned int mgColorGetAsIntegerRGB(mgColor* c)
+{
+	return MG_MAKEFOURCC(
+		c->b * 255.,
+		c->g * 255.,
+		c->r * 255.,
+		0
 	);
 }
 

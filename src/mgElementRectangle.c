@@ -49,22 +49,120 @@ miGUI_onUpdate_rectangle(mgElement* e)
 
 	if (inRect)
 	{
-		if (!e->cursorInRect)
+		if (!e->elementState & 0x1)
 		{
 			if (e->onMouseEnter)
 				e->onMouseEnter(e);
 		}
+
+		if (e->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+		{
+			e->elementState |= 0x2;
+
+			if (e->onClickLMB)
+				e->onClickLMB(e);
+		}
+		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+		{
+			if (e->onReleaseLMB)
+				e->onReleaseLMB(e);
+		}
+
+		if (e->context->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+		{
+			e->elementState |= 0x4;
+
+			if (e->onClickRMB)
+				e->onClickRMB(e);
+		}
+		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_RMBUP)
+		{
+			if (e->onReleaseRMB)
+				e->onReleaseRMB(e);
+		}
+
+		if (e->context->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
+		{
+			e->elementState |= 0x8;
+
+			if (e->onClickMMB)
+				e->onClickMMB(e);
+		}
+		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_MMBUP)
+		{
+			if (e->onReleaseMMB)
+				e->onReleaseMMB(e);
+		}
+
+		if (e->context->input->mouseButtonFlags1 & MG_MBFL_X1MBDOWN)
+		{
+			e->elementState |= 0x10;
+
+			if (e->onClickX1MB)
+				e->onClickX1MB(e);
+		}
+		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_X1MBUP)
+		{
+			if (e->onReleaseX1MB)
+				e->onReleaseX1MB(e);
+		}
+
+		if (e->context->input->mouseButtonFlags1 & MG_MBFL_X2MBDOWN)
+		{
+			e->elementState |= 0x20;
+
+			if (e->onClickX2MB)
+				e->onClickX2MB(e);
+		}
+		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_X2MBUP)
+		{
+			if (e->onReleaseX2MB)
+				e->onReleaseX2MB(e);
+		}
 	}
 	else
 	{
-		if (e->cursorInRect)
+		if (e->elementState & 0x1)
 		{
 			if (e->onMouseLeave)
 				e->onMouseLeave(e);
 		}
 	}
 
-	e->cursorInRect = inRect;
+	if (e->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+	{
+		if (e->elementState & 0x2)
+			e->elementState ^= 0x2;
+	}
+
+	if (e->context->input->mouseButtonFlags1 & MG_MBFL_RMBUP)
+	{
+		if (e->elementState & 0x4)
+			e->elementState ^= 0x4;
+	}
+
+	if (e->context->input->mouseButtonFlags1 & MG_MBFL_MMBUP)
+	{
+		if (e->elementState & 0x8)
+			e->elementState ^= 0x8;
+	}
+
+	if (e->context->input->mouseButtonFlags1 & MG_MBFL_X1MBUP)
+	{
+		if (e->elementState & 0x10)
+			e->elementState ^= 0x10;
+	}
+
+	if (e->context->input->mouseButtonFlags1 & MG_MBFL_X2MBUP)
+	{
+		if (e->elementState & 0x20)
+			e->elementState ^= 0x20;
+	}
+
+	if (inRect)
+		e->elementState |= 0x1;
+	else if(e->elementState & 0x1)
+		e->elementState ^= 0x1;
 }
 
 void 

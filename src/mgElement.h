@@ -70,7 +70,27 @@ typedef struct mgElement_s {
 	
 	void(*onMouseEnter)(struct mgElement_s* e);
 	void(*onMouseLeave)(struct mgElement_s* e);
-	int cursorInRect; /*1 when cursor in buildAreaFinal*/
+	
+	void(*onClickLMB)(struct mgElement_s* e);
+	void(*onClickRMB)(struct mgElement_s* e);
+	void(*onClickMMB)(struct mgElement_s* e);
+	void(*onClickX1MB)(struct mgElement_s* e);
+	void(*onClickX2MB)(struct mgElement_s* e);
+	void(*onReleaseLMB)(struct mgElement_s* e);
+	void(*onReleaseRMB)(struct mgElement_s* e);
+	void(*onReleaseMMB)(struct mgElement_s* e);
+	void(*onReleaseX1MB)(struct mgElement_s* e);
+	void(*onReleaseX2MB)(struct mgElement_s* e);
+	
+	/* 
+	*  0x1 when cursor in buildAreaFinal
+	*  0x2 LMB click
+	*  0x4 RMB click
+	*  0x8 MMB click
+	*  0x10 X1MB click
+	*  0x20 X2MB click
+	*/
+	int elementState;
 
 } mgElement;
 

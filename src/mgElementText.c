@@ -90,6 +90,7 @@ mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mg
 	impl->color.r = 0.f;
 	impl->color.g = 0.f;
 	impl->color.b = 0.f;
+	impl->color.a = 1.f;
 	impl->font = font;
 	impl->text = text;
 	impl->textLen = wcslen(text);
