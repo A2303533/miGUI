@@ -40,6 +40,7 @@ PFNMGSETVISIBLEPROC mgSetVisible_p;
 PFNMGDRAWPROC mgDraw_p;
 PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
 PFNMGCREATETEXTPROC mgCreateText_p;
+PFNMGCREATEBUTTONPROC mgCreateButton_p;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -77,6 +78,7 @@ mgLoad()
 	mgDraw_p = mgGetProc(lib, "mgDraw_f");
 	mgCreateRectangle_p = mgGetProc(lib, "mgCreateRectangle_f");
 	mgCreateText_p = mgGetProc(lib, "mgCreateText_f");
+	mgCreateButton_p = mgGetProc(lib, "mgCreateButton_f");
 
 	return lib;
 }

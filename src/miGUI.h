@@ -99,6 +99,7 @@ typedef struct mgContext_s {
 	mgInputContext* input;
 	mgElement* rootElement;
 	int needUpdateTransform;
+	int needRebuild;
 } mgContext;
 
 #if defined(__cplusplus)
@@ -140,6 +141,10 @@ extern PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
 typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
 extern PFNMGCREATETEXTPROC mgCreateText_p;
 #define mgCreateText mgCreateText_p
+
+typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
+extern PFNMGCREATEBUTTONPROC mgCreateButton_p;
+#define mgCreateButton mgCreateButton_p
 
 /*set visible include all children*/
 typedef void (*PFNMGSETVISIBLEPROC)(mgElement*, int);

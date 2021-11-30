@@ -37,67 +37,68 @@ void MG_C_DECL
 mgSetParent_f(mgElement* object, mgElement* parent);
 
 void
-miGUI_onUpdateTransform_text(mgElement* e)
+miGUI_onUpdateTransform_button(mgElement* e)
 {
 	e->buildAreaFinal = e->buildArea;
 	e->clipAreaFinal = e->clipArea;
 }
 
 void 
-miGUI_onUpdate_text(mgElement* e)
+miGUI_onUpdate_button(mgElement* e)
 {
 }
 
 void 
-miGUI_onDraw_text(mgElement* e)
+miGUI_onDraw_button(mgElement* e)
 {
 	mgPoint pos;
 	pos.x = e->buildAreaFinal.left;
 	pos.y = e->buildAreaFinal.top;
 
-	mgElementText* impl = (mgElementText*)e->implementation;
+	mgPoint sz;
+	sz.x = e->buildAreaFinal.right - e->buildAreaFinal.left;
+	sz.y = e->buildAreaFinal.bottom - e->buildAreaFinal.top;
 
-	if (impl->text && impl->textLen)
+	mgElementButton* impl = (mgElementButton*)e->implementation;
+	e->context->gpu->setClipRect(&e->clipAreaFinal);
+	e->context->gpu->drawRectangle(e, &pos, &sz, &impl->color1, &impl->color2, 0, 0);
+
+	/*if (impl->text && impl->textLen)
 	{
 		e->context->gpu->setClipRect(&e->clipAreaFinal);
 		e->context->gpu->drawText(&pos, impl->text, impl->textLen, &impl->color, impl->font);
-	}
+	}*/
 }
 
 void
-miGUI_onRebuild_text(mgElement* e) {}
+miGUI_onRebuild_button(mgElement* e) {}
 
 MG_API
 mgElement* MG_C_DECL
-mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font)
+mgCreateButton_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font)
 {
 	assert(c);
 	assert(position);
 	assert(text);
 	assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
-	newElement->type = MG_TYPE_TEXT;
+	newElement->type = MG_TYPE_BUTTON;
 	newElement->buildArea.left = position->x;
 	newElement->buildArea.top = position->y;
-	newElement->buildArea.right = position->x;
-	newElement->buildArea.bottom = position->y;
+	newElement->buildArea.right = position->x + size->x;
+	newElement->buildArea.bottom = position->y + size->y;
 	newElement->clipArea = newElement->buildArea;
 	newElement->context = c;
 	newElement->visible = 1;
-	newElement->onDraw = miGUI_onDraw_text;
-	newElement->onUpdate = miGUI_onUpdate_text;
-	newElement->onUpdateTransform = miGUI_onUpdateTransform_text;
-	newElement->onRebuild = miGUI_onRebuild_text;
+	newElement->onDraw = miGUI_onDraw_button;
+	newElement->onUpdate = miGUI_onUpdate_button;
+	newElement->onUpdateTransform = miGUI_onUpdateTransform_button;
+	newElement->onRebuild = miGUI_onRebuild_button;
 
-	newElement->implementation = calloc(1, sizeof(mgElementText));
-	mgElementText* impl = (mgElementText*)newElement->implementation;
-	impl->color.r = 0.f;
-	impl->color.g = 0.f;
-	impl->color.b = 0.f;
-	impl->color.a = 1.f;
-	impl->font = font;
-	impl->text = text;
-	impl->textLen = wcslen(text);
+	newElement->implementation = calloc(1, sizeof(mgElementButton));
+	mgElementButton* impl = (mgElementButton*)newElement->implementation;
+	mgColorSetAsIntegerRGB(&impl->color1, 0x999999);
+	mgColorSetAsIntegerRGB(&impl->color2, 0x666666);
 
 	mgSetParent_f(newElement, 0);
 

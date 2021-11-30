@@ -348,6 +348,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         rectangle->onMouseLeave = rect_onMouseLeave;
         rectangle->onClickLMB = rect_onClickLMB;
         rectangle->onReleaseLMB = rect_onReleaseLMB;
+     
+        pos.y += 30;
+        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_win32font);
     }
 
     UpdateBackBuffer();
@@ -390,6 +393,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
     {
         UpdateBackBuffer();
+        if(g_gui_context)
+            g_gui_context->needRebuild = 1;
     }return DefWindowProc(hWnd, message, wParam, lParam);
     case WM_COMMAND:
         {

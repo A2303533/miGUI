@@ -61,6 +61,7 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->rootElement->onDraw = mgrootobject_cb;
 	c->rootElement->onUpdate = mgrootobject_cb;
 	c->rootElement->onUpdateTransform = mgrootobject_cb;
+	c->rootElement->onRebuild = mgrootobject_cb;
 
 	return c;
 }
@@ -102,6 +103,19 @@ mgUpdateTransformElement(mgElement* e)
 	}
 }
 
+void
+mgRebuildElement(mgElement* e)
+{
+	/*if (!e->visible)
+		return;*/
+
+	e->onRebuild(e);
+	for (int i = 0; i < e->childrenCount; ++i)
+	{
+		mgRebuildElement(e->children[i].pointer);
+	}
+}
+
 MG_API
 void MG_C_DECL
 mgUpdate_f(mgContext* c)
@@ -137,6 +151,12 @@ mgUpdate_f(mgContext* c)
 	{
 		mgUpdateTransformElement(c->rootElement);
 		c->needUpdateTransform = 0;
+	}
+
+	if (c->needRebuild)
+	{
+		mgRebuildElement(c->rootElement);
+		c->needRebuild = 0;
 	}
 }
 

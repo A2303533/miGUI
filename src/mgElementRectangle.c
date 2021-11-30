@@ -64,7 +64,7 @@ miGUI_onUpdate_rectangle(mgElement* e)
 		}
 		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
 		{
-			if (e->onReleaseLMB)
+			if (e->onReleaseLMB && e->elementState & 0x2)
 				e->onReleaseLMB(e);
 		}
 
@@ -77,7 +77,7 @@ miGUI_onUpdate_rectangle(mgElement* e)
 		}
 		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_RMBUP)
 		{
-			if (e->onReleaseRMB)
+			if (e->onReleaseRMB && e->elementState & 0x4)
 				e->onReleaseRMB(e);
 		}
 
@@ -90,7 +90,7 @@ miGUI_onUpdate_rectangle(mgElement* e)
 		}
 		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_MMBUP)
 		{
-			if (e->onReleaseMMB)
+			if (e->onReleaseMMB && e->elementState & 0x8)
 				e->onReleaseMMB(e);
 		}
 
@@ -103,7 +103,7 @@ miGUI_onUpdate_rectangle(mgElement* e)
 		}
 		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_X1MBUP)
 		{
-			if (e->onReleaseX1MB)
+			if (e->onReleaseX1MB && e->elementState & 0x10)
 				e->onReleaseX1MB(e);
 		}
 
@@ -116,7 +116,7 @@ miGUI_onUpdate_rectangle(mgElement* e)
 		}
 		else if (e->context->input->mouseButtonFlags1 & MG_MBFL_X2MBUP)
 		{
-			if (e->onReleaseX2MB)
+			if (e->onReleaseX2MB && e->elementState & 0x20)
 				e->onReleaseX2MB(e);
 		}
 	}
@@ -182,6 +182,9 @@ miGUI_onDraw_rectangle(mgElement* e)
 	e->context->gpu->drawRectangle(e, &pos, &sz, &impl->color1, &impl->color2, 0, 0);
 }
 
+void
+miGUI_onRebuild_rectangle(mgElement* e) {}
+
 MG_API
 mgElement* MG_C_DECL
 mgCreateRectangle_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2)
@@ -203,6 +206,7 @@ mgCreateRectangle_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgC
 	newElement->onDraw = miGUI_onDraw_rectangle;
 	newElement->onUpdate = miGUI_onUpdate_rectangle;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_rectangle;
+	newElement->onRebuild = miGUI_onRebuild_rectangle;
 
 	newElement->implementation = calloc(1, sizeof(mgElementRectangle));
 	mgElementRectangle* impl = (mgElementRectangle*)newElement->implementation;

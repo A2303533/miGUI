@@ -67,7 +67,8 @@ typedef struct mgElement_s {
 	void(*onDraw)(struct mgElement_s* e);
 	void(*onUpdate)(struct mgElement_s* e);
 	void(*onUpdateTransform)(struct mgElement_s* e);
-	
+	void(*onRebuild)(struct mgElement_s* e);/*must call when change window size*/
+
 	void(*onMouseEnter)(struct mgElement_s* e);
 	void(*onMouseLeave)(struct mgElement_s* e);
 	
@@ -96,5 +97,6 @@ typedef struct mgElement_s {
 
 #include "mgElementRectangle.h"
 #include "mgElementText.h"
+#include "mgElementButton.h"
 
 #endif

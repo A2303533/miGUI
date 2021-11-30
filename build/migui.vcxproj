@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\mgElementButton.c" />
     <ClCompile Include="..\src\mgElementRectangle.c" />
     <ClCompile Include="..\src\mgElementText.c" />
     <ClCompile Include="..\src\mgFont.c" />
