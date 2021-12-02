@@ -111,7 +111,7 @@ void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColo
     /*RoundRect(hdcMem, r.left, r.top, r.right, r.bottom, 6, 6);*/
     /*or with clip region*/
     
-    HRGN rgn = CreateRoundRectRgn(r.left, r.top, r.right, r.bottom, 6, 6);
+    HRGN rgn = CreateRoundRectRgn(r.left, r.top, r.right, r.bottom, 7, 7);
     SelectClipRgn(hdcMem, rgn);
 
     /*FillRect(hdcMem, &r, brsh);*/
@@ -154,6 +154,18 @@ void gui_drawText(
     SetTextColor(hdcMem, mgColorGetAsIntegerRGB(color));
     SetBkMode(hdcMem, TRANSPARENT);
     TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, text, textLen);
+}
+
+void gui_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
+{
+    SelectObject(hdcMem, font->implementation);
+    int c = wcslen(text);
+    if (!c)
+        return;
+    SIZE s;
+    GetTextExtentPoint32W(hdcMem, text, c, &s);
+    sz->x = s.cx;
+    sz->y = s.cy;
 }
 
 mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
@@ -329,6 +341,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     gui_gpu.setClipRect = gui_setClipRect;
 
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
+    g_gui_context->getTextSize = gui_getTextSize;
     
     g_win32font = gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
     {

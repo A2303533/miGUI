@@ -55,6 +55,7 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->gpu = gpu;
 	c->input = input;
 	c->needUpdateTransform = 1;
+	c->needRebuild = 1;
 	c->rootElement = calloc(1, sizeof(mgElement));
 	c->rootElement->context = c;
 	c->rootElement->visible = 1;

@@ -100,6 +100,12 @@ typedef struct mgContext_s {
 	mgElement* rootElement;
 	int needUpdateTransform;
 	int needRebuild;
+
+	/* Get text size in pixels
+	* optional
+	* need to know text size.
+	*/
+	void(*getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
 } mgContext;
 
 #if defined(__cplusplus)
