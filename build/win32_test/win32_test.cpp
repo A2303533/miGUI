@@ -270,11 +270,13 @@ void rect_onMouseEnter(struct mgElement_s* e){
     mgElementText* text = (mgElementText*)e->userData;
     text->text = L"Mouse enter";
     text->textLen = wcslen(text->text);
+    mgSetCursor(g_gui_context, g_gui_context->defaultCursors[mgCursorType_Hand], mgCursorType_Arrow);
 }
 void rect_onMouseLeave(struct mgElement_s* e){
     mgElementText* text = (mgElementText*)e->userData;
     text->text = L"Mouse leave";
     text->textLen = wcslen(text->text);
+    mgSetCursor(g_gui_context, g_gui_context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 }
 void rect_onClickLMB(struct mgElement_s* e) {
     mgElementText* text = (mgElementText*)e->userData;
@@ -543,6 +545,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+    case WM_SETCURSOR: {
+        auto id = LOWORD(lParam);
+        switch (id)
+        {
+        default:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+            return TRUE;
+        case HTLEFT:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_SizeWE], mgCursorType_SizeWE);
+            return TRUE;
+        case HTRIGHT:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_SizeWE], mgCursorType_SizeWE);
+            return TRUE;
+        case HTTOP:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_SizeNS], mgCursorType_SizeNS);
+            return TRUE;
+        case HTBOTTOM:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_SizeNS], mgCursorType_SizeNS);
+            return TRUE;
+        case HTTOPLEFT:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_SizeNWSE], mgCursorType_SizeNWSE);
+            return TRUE;
+        case HTBOTTOMRIGHT:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_SizeNWSE], mgCursorType_SizeNWSE);
+            return TRUE;
+        case HTBOTTOMLEFT:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_SizeNESW], mgCursorType_SizeNESW);
+            return TRUE;
+        case HTTOPRIGHT:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_SizeNESW], mgCursorType_SizeNESW);
+            return TRUE;
+        case HTHELP:
+            mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_Help], mgCursorType_Help);
+            return TRUE;
+        }
+    }break;
     case WM_SYSKEYDOWN:
     case WM_SYSKEYUP:
     case WM_KEYDOWN:

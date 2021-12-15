@@ -41,6 +41,9 @@ PFNMGDRAWPROC mgDraw_p;
 PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
 PFNMGCREATETEXTPROC mgCreateText_p;
 PFNMGCREATEBUTTONPROC mgCreateButton_p;
+PFNMGCREATECURSORPROC mgCreateCursor_p;
+PFNMGDESTROYCURSORPROC mgDestroyCursor_p;
+PFNMGSETCURSORPROC mgSetCursor_p;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -79,6 +82,9 @@ mgLoad()
 	mgCreateRectangle_p = mgGetProc(lib, "mgCreateRectangle_f");
 	mgCreateText_p = mgGetProc(lib, "mgCreateText_f");
 	mgCreateButton_p = mgGetProc(lib, "mgCreateButton_f");
+	mgCreateCursor_p = mgGetProc(lib, "mgCreateCursor_f");
+	mgDestroyCursor_p = mgGetProc(lib, "mgDestroyCursor_f");
+	mgSetCursor_p = mgGetProc(lib, "mgSetCursor_f");
 
 	return lib;
 }

@@ -93,6 +93,7 @@ typedef struct mgVideoDriverAPI_s {
 } mgVideoDriverAPI;
 
 #include "mgInputContex.h"
+#include "mgCursor.h"
 
 typedef struct mgContext_s {
 	mgVideoDriverAPI* gpu;
@@ -100,6 +101,9 @@ typedef struct mgContext_s {
 	mgElement* rootElement;
 	int needUpdateTransform;
 	int needRebuild;
+
+	mgCursor* defaultCursors[mgCursorType__count];
+	mgCursor* currentCursors[mgCursorType__count];
 
 	/* Get text size in pixels
 	* optional
@@ -161,6 +165,20 @@ extern PFNMGSETVISIBLEPROC mgSetVisible_p;
 typedef void (*PFNMGDRAWPROC)(mgContext*);
 extern PFNMGDRAWPROC mgDraw_p;
 #define mgDraw mgDraw_p
+
+/*don't forget to destroy cursor with mgDestroyCursor*/
+typedef mgCursor*(*PFNMGCREATECURSORPROC)(const wchar_t* fileName);
+extern PFNMGCREATECURSORPROC mgCreateCursor_p;
+#define mgCreateCursor mgCreateCursor_p
+
+typedef void (*PFNMGDESTROYCURSORPROC)(mgCursor*);
+extern PFNMGDESTROYCURSORPROC mgDestroyCursor_p;
+#define mgDestroyCursor mgDestroyCursor_p
+
+/*if cursor == 0 then set default*/
+typedef void (*PFNMGSETCURSORPROC)(mgContext*, mgCursor* cursor, unsigned int type);
+extern PFNMGSETCURSORPROC mgSetCursor_p;
+#define mgSetCursor mgSetCursor_p
 
 #if defined(__cplusplus)
 }

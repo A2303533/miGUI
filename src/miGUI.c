@@ -28,6 +28,9 @@
 
 #include "miGUI.h"
 
+void mgInitDefaultCursors(mgContext* c);
+void mgDestroyDefaultCursors(mgContext* c);
+
 void 
 mgDestroyElement_f(mgElement* e)
 {
@@ -64,6 +67,8 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->rootElement->onUpdateTransform = mgrootobject_cb;
 	c->rootElement->onRebuild = mgrootobject_cb;
 
+	mgInitDefaultCursors(c);
+
 	return c;
 }
 
@@ -72,6 +77,8 @@ void MG_C_DECL
 mgDestroyContext_f(mgContext* c)
 {
 	assert(c);
+
+	mgDestroyDefaultCursors(c);
 
 	/*destroy everything here*/
 	/*...*/
