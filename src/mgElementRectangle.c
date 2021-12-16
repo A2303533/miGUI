@@ -27,13 +27,10 @@
 */
 
 #include "miGUI.h"
+#include "mgFunctions.h"
 
 #include <assert.h>
 #include <stdlib.h>
-
-MG_API
-void MG_C_DECL
-mgSetParent_f(mgElement* object, mgElement* parent);
 
 void
 miGUI_onUpdateTransform_rectangle(mgElement* e)

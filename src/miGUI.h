@@ -95,33 +95,18 @@ typedef struct mgVideoDriverAPI_s {
 #include "mgInputContex.h"
 #include "mgCursor.h"
 
-typedef struct mgContext_s {
-	mgVideoDriverAPI* gpu;
-	mgInputContext* input;
-	mgElement* rootElement;
-	int needUpdateTransform;
-	int needRebuild;
-
-	mgCursor* defaultCursors[mgCursorType__count];
-	mgCursor* currentCursors[mgCursorType__count];
-
-	/* Get text size in pixels
-	* optional
-	* need to know text size.
-	*/
-	void(*getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
-} mgContext;
+struct mgContext_s;
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 
-typedef mgContext* (*PFNMGCREATECONTEXTPROC)(mgVideoDriverAPI*, mgInputContext*);
+typedef struct mgContext_s* (*PFNMGCREATECONTEXTPROC)(mgVideoDriverAPI*, mgInputContext*);
 extern PFNMGCREATECONTEXTPROC mgCreateContext_p;
 #define mgCreateContext mgCreateContext_p
 
-typedef void (*PFNMGDESTROYCONTEXTPROC)(mgContext*);
+typedef void (*PFNMGDESTROYCONTEXTPROC)(struct mgContext_s*);
 extern PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
 #define mgDestroyContext mgDestroyContext_p
 
@@ -162,7 +147,7 @@ extern PFNMGSETVISIBLEPROC mgSetVisible_p;
 #define mgSetVisible mgSetVisible_p
 
 /*draw all*/
-typedef void (*PFNMGDRAWPROC)(mgContext*);
+typedef void (*PFNMGDRAWPROC)(struct mgContext_s*);
 extern PFNMGDRAWPROC mgDraw_p;
 #define mgDraw mgDraw_p
 
@@ -176,12 +161,52 @@ extern PFNMGDESTROYCURSORPROC mgDestroyCursor_p;
 #define mgDestroyCursor mgDestroyCursor_p
 
 /*if cursor == 0 then set default*/
-typedef void (*PFNMGSETCURSORPROC)(mgContext*, mgCursor* cursor, unsigned int type);
+typedef void (*PFNMGSETCURSORPROC)(struct mgContext_s*, mgCursor* cursor, unsigned int type);
 extern PFNMGSETCURSORPROC mgSetCursor_p;
 #define mgSetCursor mgSetCursor_p
 
 #if defined(__cplusplus)
 }
 #endif
+
+/*All functions must be here too.
+* Idea is: you load migui.dll in your exe,
+*   and then you can use functions in your dlls.
+*/
+struct mgFunctions_s {
+	PFNMGCREATECONTEXTPROC CreateContext_p;
+	PFNMGDESTROYCONTEXTPROC DestroyContext_p;
+	PFNMGCREATEFONTPROC CreateFont_p;
+	PFNMGSTARTFRAMEPROC StartFrame_p;
+	PFNMGUPDATEPROC Update_p;
+	PFNMGSETPARENTPROC SetParent_p;
+	PFNMGSETVISIBLEPROC SetVisible_p;
+	PFNMGDRAWPROC Draw_p;
+	PFNMGCREATERECTANGLEPROC CreateRectangle_p;
+	PFNMGCREATETEXTPROC CreateText_p;
+	PFNMGCREATEBUTTONPROC CreateButton_p;
+	PFNMGCREATECURSORPROC CreateCursor_p;
+	PFNMGDESTROYCURSORPROC DestroyCursor_p;
+	PFNMGSETCURSORPROC SetCursor_p;
+};
+
+typedef struct mgContext_s {
+	mgVideoDriverAPI* gpu;
+	mgInputContext* input;
+	mgElement* rootElement;
+	int needUpdateTransform;
+	int needRebuild;
+
+	mgCursor* defaultCursors[mgCursorType__count];
+	mgCursor* currentCursors[mgCursorType__count];
+
+	/* Get text size in pixels
+	* optional
+	* need to know text size.
+	*/
+	void(*getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
+
+	struct mgFunctions_s functions;
+} mgContext;
 
 #endif

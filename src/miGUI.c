@@ -27,6 +27,7 @@
 */
 
 #include "miGUI.h"
+#include "mgFunctions.h"
 
 void mgInitDefaultCursors(mgContext* c);
 void mgDestroyDefaultCursors(mgContext* c);
@@ -66,6 +67,21 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->rootElement->onUpdate = mgrootobject_cb;
 	c->rootElement->onUpdateTransform = mgrootobject_cb;
 	c->rootElement->onRebuild = mgrootobject_cb;
+
+	c->functions.CreateButton_p = mgCreateButton_f;
+	c->functions.CreateContext_p = mgCreateContext_f;
+	c->functions.CreateCursor_p = mgCreateCursor_f;
+	c->functions.CreateFont_p = mgCreateFont_f;
+	c->functions.CreateRectangle_p = mgCreateRectangle_f;
+	c->functions.CreateText_p = mgCreateText_f;
+	c->functions.DestroyContext_p = mgDestroyContext_f;
+	c->functions.DestroyCursor_p = mgDestroyCursor_f;
+	c->functions.Draw_p = mgDraw_f;
+	c->functions.SetCursor_p = mgSetCursor_f;
+	c->functions.SetParent_p = mgSetParent_f;
+	c->functions.SetVisible_p = mgSetVisible_f;
+	c->functions.StartFrame_p = mgStartFrame_f;
+	c->functions.Update_p = mgUpdate_f;
 
 	mgInitDefaultCursors(c);
 

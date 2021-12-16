@@ -36,3 +36,5 @@ test/Debug
 build/.vs
 build/Debug
 build/win32_test/Debug
+build/Release
+build/win32_test/Release
