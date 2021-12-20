@@ -342,6 +342,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     gui_gpu.drawText = gui_drawText;
     gui_gpu.setClipRect = gui_setClipRect;
 
+    memset(&g_input, 0, sizeof(g_input));
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     g_gui_context->getTextSize = gui_getTextSize;
     

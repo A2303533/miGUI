@@ -38,3 +38,5 @@ build/Debug
 build/win32_test/Debug
 build/Release
 build/win32_test/Release
+build/d3d11_demo/Debug
+build/d3d11_demo/Release
