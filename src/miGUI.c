@@ -76,6 +76,7 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->functions.CreateText_p = mgCreateText_f;
 	c->functions.DestroyContext_p = mgDestroyContext_f;
 	c->functions.DestroyCursor_p = mgDestroyCursor_f;
+	c->functions.DestroyFont_p = mgDestroyFont_f;
 	c->functions.Draw_p = mgDraw_f;
 	c->functions.SetCursor_p = mgSetCursor_f;
 	c->functions.SetParent_p = mgSetParent_f;

@@ -43,6 +43,17 @@ struct mgFontBitmap_s {
 	int xxx;
 };
 
+typedef struct mgFontGlyph_s
+{
+	wchar_t symbol;
+	mgVec4 UV;
+	mgRect rect;
+	int underhang;
+	int overhang;
+	int width;
+	int   textureSlot;
+} mgFontGlyph;
+
 typedef struct mgFont_s {
 
 	/*miGUI will create mgFontBitmap_s and will put address here.
@@ -56,6 +67,9 @@ typedef struct mgFont_s {
 	int characterSpacing;
 	int spaceSize;
 	int tabSize;
+
+	int glyphNum; /*how many chars in this font*/
+	mgFontGlyph* glyphs;
 } mgFont;
 
 extern mgFont* mgCreateFont(struct mgContext_s*, const char*, unsigned int flags, int size);

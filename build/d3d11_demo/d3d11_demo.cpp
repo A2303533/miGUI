@@ -26,6 +26,28 @@ struct Mat4 {
     mgVec4 m_data[4];
 };
 
+Mat4 g_proj;
+Mat4 UpdateGUIProjection(float x, float y)
+{
+    Mat4 m;
+    float L = 0;
+    float R = x;
+    float T = 0;
+    float B = y;
+
+    /*m.m_data[0] = mgVec4(2.0f / x, 0.0f, 0.0f, 0.0f);
+    m.m_data[1] = mgVec4(0.0f, 2.0f / -y, 0.0f, 0.0f);
+    m.m_data[2] = mgVec4(0.0f, 0.0f, 0.5f, 0.0f);
+    m.m_data[3] = mgVec4(-1.f, 1.f, 0.5f, 1.0f);*/
+
+    m.m_data[0] = mgVec4(2.0f / (R - L), 0.0f, 0.0f, 0.0f);
+    m.m_data[1] = mgVec4(0.0f, 2.0f / (T - B), 0.0f, 0.0f);
+    m.m_data[2] = mgVec4(0.0f, 0.0f, 0.5f, 0.0f);
+    m.m_data[3] = mgVec4((R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f);
+
+    return m;
+}
+
 class MyD3D11Texture {
 public:
     MyD3D11Texture() {}
@@ -54,8 +76,8 @@ class MyD3D11{
     struct cbVertex {
         Mat4 m_ProjMtx;
         mgVec4 m_Corners;
-        mgVec4 m_Color1;
-        mgVec4 m_Color2;
+        mgColor m_Color1;
+        mgColor m_Color2;
         mgVec4 m_UVs;
     }
     m_cbVertex_impl;
@@ -220,22 +242,22 @@ class MyD3D11{
 
             "	Out.pos   = float4(v2.x, v1.y, 0.f, 1.f);\n"
             "	Out.uv = float2(UVs.z,UVs.y);\n"
-            "	Out.color = Color1;\n"
+            "	Out.color = Color2;\n"
             "	TriStream.Append(Out);\n"
 
             "	Out.pos   = float4(v2.x, v2.y, 0.f, 1.f);\n"
             "	Out.uv = float2(UVs.z,UVs.w);\n"
-            "	Out.color = Color2;\n"
+            "	Out.color = Color1;\n"
             "	TriStream.Append(Out);\n"
 
             "	Out.pos   = float4(v1.x, v1.y, 0.f, 1.f);\n"
             "	Out.uv = float2(UVs.x,UVs.y);\n"
-            "	Out.color = Color1;\n"
+            "	Out.color = Color2;\n"
             "	TriStream.Append(Out);\n"
 
             "	Out.pos   = float4(v1.x, v2.y, 0.f, 1.f);\n"
             "	Out.uv = float2(UVs.x,UVs.w);\n"
-            "	Out.color = Color2;\n"
+            "	Out.color = Color1;\n"
             "	TriStream.Append(Out);\n"
 
             "	TriStream.RestartStrip();\n"
@@ -507,9 +529,9 @@ public:
 
         m_d3d11DevCon->OMSetDepthStencilState(m_depthStencilStateEnabled, 0);
         
-        m_clearColor[0] = 0.4f;
-        m_clearColor[1] = 0.4f;
-        m_clearColor[2] = 0.7f;
+        m_clearColor[0] = 1.f;
+        m_clearColor[1] = 1.f;
+        m_clearColor[2] = 1.f;
         m_clearColor[3] = 1.f;
 
         m_whiteTexture = this->CreateWhiteTexture();
@@ -572,11 +594,11 @@ public:
     {
         MyD3D11Texture* t = 0;
         mgImage img;
-        img.height = 1;
-        img.width = 1;
+        img.height = 2;
+        img.width = 2;
         img.dataSize = (img.width * 4) * img.height;
         img.data = (unsigned char*)malloc(img.dataSize);
-        memset(img.data, 0, img.dataSize);
+        memset(img.data, 255, img.dataSize);
         t = CreateTexture(&img);
         free(img.data);
         return t;
@@ -632,7 +654,7 @@ public:
         }
 
         D3D11_TEXTURE_ADDRESS_MODE addressMode = D3D11_TEXTURE_ADDRESS_WRAP;
-        D3D11_COMPARISON_FUNC cmpFunc = D3D11_COMPARISON_ALWAYS;
+        D3D11_COMPARISON_FUNC cmpFunc = D3D11_COMPARISON_NEVER;
 
         {
             D3D11_SAMPLER_DESC samplerDesc;
@@ -644,7 +666,7 @@ public:
             samplerDesc.AddressV = addressMode;
             samplerDesc.AddressW = addressMode;
 
-            samplerDesc.ComparisonFunc = cmpFunc; //D3D11_COMPARISON_ALWAYS;
+            samplerDesc.ComparisonFunc = cmpFunc;
             samplerDesc.MinLOD = 0;
             samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
@@ -662,8 +684,8 @@ public:
 
     void DrawRectangle(
         const mgVec4& corners,
-        const mgVec4& color1,
-        const mgVec4& color2,
+        const mgColor& color1,
+        const mgColor& color2,
         Mat4* proj,
         MyD3D11Texture* texture,
         mgVec4* UVs)
@@ -684,9 +706,6 @@ public:
         m_d3d11DevCon->VSSetShader(m_vShader, 0, 0);
         m_d3d11DevCon->GSSetShader(m_gShader, 0, 0);
         m_d3d11DevCon->PSSetShader(m_pShader, 0, 0);
-
-        m_d3d11DevCon->VSSetConstantBuffers(0, 1, &m_cbVertex);
-        m_d3d11DevCon->GSSetConstantBuffers(0, 1, &m_cbVertex);
 
         {
             D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -737,6 +756,8 @@ public:
 
         m_SwapChain->ResizeBuffers(0, m_windowSize.x, m_windowSize.y, DXGI_FORMAT_UNKNOWN, 0);
         _createBackBuffer(m_windowSize.x, m_windowSize.y);
+
+        SetViewport(0.f, 0.f, (float)(m_windowSize.x), (float)(m_windowSize.y));
     }
 
     mgPoint m_windowSize;
@@ -787,8 +808,14 @@ mgRect gui_setClipRect(mgRect* r)
 }
 
 void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColor* color1,
-    mgColor* color2,mgTexture texture,mgVec4* UVRegion)
+    mgColor* color2, mgTexture texture, mgVec4* UVRegion)
 {
+    mgVec4 corners;
+    corners.x = position->x;
+    corners.y = position->y;
+    corners.z = corners.x + size->x;
+    corners.w = corners.y + size->y;
+    g_d3d11->DrawRectangle(corners, *color1, *color2, &g_proj, 0, 0);
 }
 
 void gui_drawText(
@@ -974,7 +1001,7 @@ int main()
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     g_gui_context->getTextSize = gui_getTextSize;
     
-    g_font = mgCreateFont(g_gui_context, "../fonts/1", 0, 12); //gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
+    g_font = mgCreateFont(g_gui_context, "Impact", 0, 22, "Impact"); //gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
     {
         mgPoint pos, sz;
         mgColor c1, c2;
@@ -985,7 +1012,7 @@ int main()
         c1.setAsIntegerRGB(0xFF0000);
         c2.setAsIntegerRGB(0x0000FF);
         mgElement* rectangle = mgCreateRectangle(g_gui_context, &pos, &sz, &c1, &c2);
-        mgElement* text = mgCreateText(g_gui_context, &pos, L"Text", g_font);
+        /*mgElement* text = mgCreateText(g_gui_context, &pos, L"Text", g_font);
         ((mgElementText*)text->implementation)->color.setAsIntegerBGR(0xFFFFFF);
         rectangle->userData = text->implementation;
         rectangle->onMouseEnter = rect_onMouseEnter;
@@ -994,15 +1021,17 @@ int main()
         rectangle->onReleaseLMB = rect_onReleaseLMB;
      
         pos.y += 30;
-        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_font);
+        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_font);*/
     }
 
     MSG msg;
     
+    g_proj = UpdateGUIProjection(800.f, 600.f);
+
     Sleep(100);
     while (g_run)
     {
-       // mgStartFrame(g_gui_context);
+        mgStartFrame(g_gui_context);
 
         while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
@@ -1011,11 +1040,13 @@ int main()
             DispatchMessage(&msg);
         }
 
-      //  mgUpdate(g_gui_context);
+        mgUpdate(g_gui_context);
 
         d3d11.ClearAll();
 
-        //draw_gui();
+        draw_gui();
+
+      //  d3d11.DrawRectangle(mgVec4(0.f, 0.f, 100.f, 100.f), mgColor(1.f, 0.f, 0.f, 1.f), mgColor(0.f, 0.f, 1.f, 1.f), &g_proj, 0, 0);
 
         d3d11.SwapBuffers();
     }
@@ -1046,7 +1077,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             GetClientRect(hWnd, &rc);
             
             ClientResize(hWnd, rc.right - rc.left, rc.bottom - rc.top);
-           // g_d3d11->UpdateBackBuffer(rc.right - rc.left, rc.bottom - rc.top);
+            g_d3d11->UpdateBackBuffer(rc.right - rc.left, rc.bottom - rc.top);
+            g_proj = UpdateGUIProjection((float)(rc.right - rc.left), (float)(rc.bottom - rc.top));
 
             if (g_gui_context)
                 g_gui_context->needRebuild = 1;
