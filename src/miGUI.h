@@ -119,7 +119,7 @@ typedef mgFont* (*PFNMGCREATEFONTPROC)(struct mgContext_s*, const char* filename
 extern PFNMGCREATEFONTPROC mgCreateFont_p;
 #define mgCreateFont mgCreateFont_p
 
-typedef void (*PFNMGDESTROYFONTPROC)(mgFont*);
+typedef void (*PFNMGDESTROYFONTPROC)(struct mgContext_s*, mgFont*);
 extern PFNMGDESTROYFONTPROC mgDestroyFont_p;
 #define mgDestroyFont mgDestroyFont_p
 

@@ -173,7 +173,8 @@ mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
     mgFont* f = (mgFont*)malloc(sizeof(mgFont));
     
     f->implementation = CreateFontA(
-        size, 0, 0, 0,
+        -MulDiv(size, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
+        0, 0, 0,
         (flags & MG_FNTFL_BOLD) ? FW_BOLD : FW_NORMAL,
         (flags & MG_FNTFL_ITALIC) ? 1 : 0,
         (flags & MG_FNTFL_UNDERLINE) ? 1 : 0,
@@ -346,7 +347,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     g_gui_context->getTextSize = gui_getTextSize;
     
-    g_win32font = gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
+    g_win32font = gui_createFont("Segoe", MG_FNTFL_BOLD, 10);
     {
         mgPoint pos, sz;
         mgColor c1, c2;

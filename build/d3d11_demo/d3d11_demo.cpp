@@ -30,20 +30,11 @@ Mat4 g_proj;
 Mat4 UpdateGUIProjection(float x, float y)
 {
     Mat4 m;
-    float L = 0;
-    float R = x;
-    float T = 0;
-    float B = y;
 
-    /*m.m_data[0] = mgVec4(2.0f / x, 0.0f, 0.0f, 0.0f);
+    m.m_data[0] = mgVec4(2.0f / x, 0.0f, 0.0f, 0.0f);
     m.m_data[1] = mgVec4(0.0f, 2.0f / -y, 0.0f, 0.0f);
     m.m_data[2] = mgVec4(0.0f, 0.0f, 0.5f, 0.0f);
-    m.m_data[3] = mgVec4(-1.f, 1.f, 0.5f, 1.0f);*/
-
-    m.m_data[0] = mgVec4(2.0f / (R - L), 0.0f, 0.0f, 0.0f);
-    m.m_data[1] = mgVec4(0.0f, 2.0f / (T - B), 0.0f, 0.0f);
-    m.m_data[2] = mgVec4(0.0f, 0.0f, 0.5f, 0.0f);
-    m.m_data[3] = mgVec4((R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f);
+    m.m_data[3] = mgVec4(-1.f, 1.f, 0.5f, 1.0f);
 
     return m;
 }
@@ -604,11 +595,16 @@ public:
         return t;
     }
 
+    void DestroyTexture(MyD3D11Texture* t)
+    {
+        delete t;
+    }
+
     MyD3D11Texture* CreateTexture(mgImage* img)
     {
         MyD3D11Texture* t = new MyD3D11Texture;
 
-        D3D11_FILTER filter = D3D11_FILTER::D3D11_FILTER_ANISOTROPIC;
+        D3D11_FILTER filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_POINT;
 
         D3D11_TEXTURE2D_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
@@ -790,12 +786,12 @@ void gui_endDraw()
 
 mgTexture gui_createTexture(mgImage* img)
 {
-    return 0;
+    return (mgTexture)g_d3d11->CreateTexture(img);
 }
 
 void gui_destroyTexture(mgTexture t)
 {
-
+    g_d3d11->DestroyTexture((MyD3D11Texture*)t);
 }
 
 mgRect gui_setClipRect(mgRect* r)
@@ -825,6 +821,31 @@ void gui_drawText(
     mgColor* color,
     mgFont* font)
 {
+    mgPoint _position = *position;
+    
+    for (int i = 0; i < textLen; ++i)
+    {
+        wchar_t character = text[i];
+        auto glyph = font->glyphMap[character];
+        if (glyph)
+        {
+            mgVec4 corners;
+            corners.x = _position.x;
+            corners.y = _position.y;
+
+            corners.z = corners.x + glyph->width;
+            corners.w = corners.y + glyph->height;
+
+            MyD3D11Texture* texture = (MyD3D11Texture*)((mgFontBitmap*)font->implementation)[glyph->textureSlot].gpuTexture;
+            g_d3d11->DrawRectangle(corners, *color, *color, &g_proj, texture, &glyph->UV);
+
+            _position.x += glyph->width + glyph->overhang + glyph->underhang + font->characterSpacing;
+            if (character == L' ')
+                _position.x += font->spaceSize;
+            if (character == L'\t')
+                _position.x += font->tabSize;
+        }
+    }
 }
 
 void gui_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
@@ -1001,7 +1022,8 @@ int main()
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     g_gui_context->getTextSize = gui_getTextSize;
     
-    g_font = mgCreateFont(g_gui_context, "Impact", 0, 22, "Impact"); //gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
+    // destroy g_font at the end using mgDestroyFont
+    g_font = mgCreateFont(g_gui_context, "Segoe", MG_FNTFL_BOLD, 10, "Segoe"); //gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
     {
         mgPoint pos, sz;
         mgColor c1, c2;
@@ -1012,7 +1034,7 @@ int main()
         c1.setAsIntegerRGB(0xFF0000);
         c2.setAsIntegerRGB(0x0000FF);
         mgElement* rectangle = mgCreateRectangle(g_gui_context, &pos, &sz, &c1, &c2);
-        /*mgElement* text = mgCreateText(g_gui_context, &pos, L"Text", g_font);
+        mgElement* text = mgCreateText(g_gui_context, &pos, L"Text", g_font);
         ((mgElementText*)text->implementation)->color.setAsIntegerBGR(0xFFFFFF);
         rectangle->userData = text->implementation;
         rectangle->onMouseEnter = rect_onMouseEnter;
@@ -1021,7 +1043,7 @@ int main()
         rectangle->onReleaseLMB = rect_onReleaseLMB;
      
         pos.y += 30;
-        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_font);*/
+        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_font);
     }
 
     MSG msg;
@@ -1052,10 +1074,7 @@ int main()
     }
     
     if (g_font)
-    {
-        DeleteObject(g_font->implementation);
-        free(g_font);
-    }
+        mgDestroyFont(g_gui_context, g_font);
 
     mgDestroyContext(g_gui_context);
     mgUnload(gui_lib);

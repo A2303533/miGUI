@@ -39,9 +39,9 @@ enum {
 /*bitmap fonts implementation
 * It must be inside mgFont_s
 */
-struct mgFontBitmap_s {
-	int xxx;
-};
+typedef struct mgFontBitmap_s {
+	void * gpuTexture;
+} mgFontBitmap;
 
 typedef struct mgFontGlyph_s
 {
@@ -51,18 +51,21 @@ typedef struct mgFontGlyph_s
 	int underhang;
 	int overhang;
 	int width;
-	int   textureSlot;
+	int height;
+	int textureSlot;
 } mgFontGlyph;
 
 typedef struct mgFont_s {
 
 	/*miGUI will create mgFontBitmap_s and will put address here.
+	* (this is array, textureCount for size)
 	* 
 	* but you can create your own font inside your app, just put
 	* address here, and then use it as you wish (don't forget to
 	* delete your own font).
 	*/
-	void* implementation;
+	void* implementation; /*it can be HFONT from windows*/
+	int textureCount;
 
 	int characterSpacing;
 	int spaceSize;
@@ -70,6 +73,8 @@ typedef struct mgFont_s {
 
 	int glyphNum; /*how many chars in this font*/
 	mgFontGlyph* glyphs;
+
+	mgFontGlyph* glyphMap[0xFFFF];
 } mgFont;
 
 extern mgFont* mgCreateFont(struct mgContext_s*, const char*, unsigned int flags, int size);

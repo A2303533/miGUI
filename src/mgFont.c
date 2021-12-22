@@ -179,8 +179,8 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 		OEM_CHARSET, // iCharSet
 		OUT_DEFAULT_PRECIS, // iOutPrecision
 		CLIP_DEFAULT_PRECIS, // iClipPrecision
-		ANTIALIASED_QUALITY, // iQuality
-		DEFAULT_PITCH | FF_DONTCARE, // iPitchAndFamily
+		CLEARTYPE_QUALITY, // iQuality
+		VARIABLE_PITCH | FF_DONTCARE, // iPitchAndFamily
 		fn);
 
 	if (!font)
@@ -277,6 +277,7 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			currGlyph->overhang = abc.abcA;
 			currGlyph->underhang = abc.abcC;
 			currGlyph->width = abc.abcB;
+			currGlyph->height = size.cy;
 			currGlyph->symbol = ch;
 			currGlyph->textureSlot = textureSlot;
 
@@ -285,10 +286,10 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			currGlyph->rect.right = curPosX + size.cx;
 			currGlyph->rect.bottom = curPosY + size.cy;
 
-			currGlyph->UV.x = currGlyph->rect.left * uvPerPixel;
-			currGlyph->UV.y = currGlyph->rect.top * uvPerPixel;
-			currGlyph->UV.z = currGlyph->rect.right * uvPerPixel;
-			currGlyph->UV.w = currGlyph->rect.bottom * uvPerPixel;
+			currGlyph->UV.x = (float)currGlyph->rect.left * uvPerPixel;
+			currGlyph->UV.y = (float)currGlyph->rect.top * uvPerPixel;
+			currGlyph->UV.z = (float)currGlyph->rect.right * uvPerPixel;
+			currGlyph->UV.w = (float)currGlyph->rect.bottom * uvPerPixel;
 
 			curPosX += size.cx + 1;
 
@@ -299,6 +300,12 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			currGlyph++;
 		}
 	}
+	newFont = calloc(1, sizeof(mgFont));
+	newFont->glyphNum = numOfChars;
+	newFont->glyphs = fontGlyphs;
+	newFont->implementation = malloc(textureInfoCount * sizeof(mgFontBitmap));
+	newFont->textureCount = textureInfoCount;
+	
 
 	for (int i = 0; i < textureInfoCount; ++i)
 	{
@@ -324,6 +331,7 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 		for (int j = 0; j < textureInfoArray[i].num; ++j)
 		{
 			mgFontGlyph* currGlyph = &textureInfoArray[i].fromThis[j];
+			newFont->glyphMap[currGlyph->symbol] = currGlyph;
 
 			TextOutW(
 				bmpdc, 
@@ -423,6 +431,8 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			mgSaveImageToFile(pathBuffer, &image);
 		}
 
+		((mgFontBitmap*)newFont->implementation)[i].gpuTexture = c->gpu->createTexture(&image);
+
 		LocalFree(pbmi);
 		GlobalFree(lpBits);
 		DeleteDC(bmpdc);
@@ -430,10 +440,6 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 		DeleteObject(pen);
 		DeleteObject(bmp);
 	}
-
-	newFont = calloc(1, sizeof(mgFont));
-	newFont->glyphNum = numOfChars;
-	newFont->glyphs = fontGlyphs;
 
 end:
 	/*if (images)
@@ -502,19 +508,26 @@ mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size, const
 	if (f)
 	{
 		fclose(f);
-		mgCreateFont_from_file(c, fn, flags, size, saveIt);
+		return mgCreateFont_from_file(c, fn, flags, size, saveIt);
 	}
 	else
 	{
-		mgCreateFont_generate(c, fn, flags, size, saveIt);
+		return mgCreateFont_generate(c, fn, flags, size, saveIt);
 	}
-
-	return 0;
 }
 
 MG_API
 void MG_C_DECL
-mgDestroyFont_f(mgFont* f)
+mgDestroyFont_f(struct mgContext_s* c, mgFont* f)
 {
-	
+	assert(f);
+	if (f->glyphs) free(f->glyphs);
+	if (f->implementation)
+	{
+		for (int i = 0; i < f->textureCount; ++i)
+		{
+			c->gpu->destroyTexture(((mgFontBitmap*)f->implementation)[i].gpuTexture);
+		}
+		free(f->implementation);
+	}
 }
