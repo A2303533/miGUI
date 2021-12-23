@@ -829,17 +829,19 @@ void gui_drawText(
         auto glyph = font->glyphMap[character];
         if (glyph)
         {
+            _position.x += glyph->underhang;
+
             mgVec4 corners;
             corners.x = _position.x;
             corners.y = _position.y;
 
             corners.z = corners.x + glyph->width;
             corners.w = corners.y + glyph->height;
-
+            
             MyD3D11Texture* texture = (MyD3D11Texture*)((mgFontBitmap*)font->implementation)[glyph->textureSlot].gpuTexture;
             g_d3d11->DrawRectangle(corners, *color, *color, &g_proj, texture, &glyph->UV);
 
-            _position.x += glyph->width + glyph->overhang + glyph->underhang + font->characterSpacing;
+            _position.x += glyph->width + glyph->overhang + font->characterSpacing;
             if (character == L' ')
                 _position.x += font->spaceSize;
             if (character == L'\t')
@@ -850,6 +852,27 @@ void gui_drawText(
 
 void gui_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 {
+    sz->x = 0;
+    sz->y = 0;
+    int c = wcslen(text);
+    if (!c)
+        return;
+    for (int i = 0; i < c; ++i)
+    {
+        wchar_t character = text[i];
+        auto glyph = font->glyphMap[character];
+        if (glyph)
+        {
+            if (glyph->height > sz->y)
+                sz->y = glyph->height;
+
+            sz->x += glyph->width + glyph->overhang + glyph->underhang + font->characterSpacing;
+            if (character == L' ')
+                sz->x += font->spaceSize;
+            if (character == L'\t')
+                sz->x += font->tabSize;
+        }
+    }
 }
 
 mgFont* gui_createFont(const char* fn, unsigned int flags, int size)

@@ -151,7 +151,7 @@ void gui_drawText(
     mgFont* font)
 {
     SelectObject(hdcMem, font->implementation);
-    SetTextColor(hdcMem, mgColorGetAsIntegerRGB(color));
+    SetTextColor(hdcMem, mgColorGetAsIntegerBGR(color));
     SetBkMode(hdcMem, TRANSPARENT);
     TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, text, textLen);
 }

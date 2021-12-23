@@ -113,6 +113,12 @@ void mgColorSet(mgColor* c, float R, float G, float B, float A)
 	c->a = A;
 }
 
+/* I DON"T KNOW ABOUT RIGHT ORDER BGR OR RGB
+* Idea is: 0xff0000 must be red
+*          0x00ff00 green
+*          0x0000ff blue
+*/
+
 /*0xFF112233*/
 inline
 void mgColorSetAsIntegerARGB(mgColor* c, unsigned int argb)
@@ -150,6 +156,17 @@ unsigned int mgColorGetAsIntegerRGB(mgColor* c)
 		c->b * 255.,
 		c->g * 255.,
 		c->r * 255.,
+		0
+	);
+}
+
+inline
+unsigned int mgColorGetAsIntegerBGR(mgColor* c)
+{
+	return MG_MAKEFOURCC(
+		c->r * 255.,
+		c->g * 255.,
+		c->b * 255.,
 		0
 	);
 }

@@ -172,10 +172,10 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 		0, // cWidth
 		0, // cEscapement
 		0, // cOrientation
-		((flags & MG_FNTFL_BOLD) == MG_FNTFL_BOLD) ? FW_BOLD : 0, // cWeight
-		((flags & MG_FNTFL_ITALIC) == MG_FNTFL_ITALIC) ? 1 : 0, // bItalic
-		((flags & MG_FNTFL_UNDERLINE) == MG_FNTFL_UNDERLINE) ? 1 : 0, // bUnderline
-		((flags & MG_FNTFL_STRIKEOUT) == MG_FNTFL_STRIKEOUT) ? 1 : 0, // bStrikeOut
+		(flags & MG_FNTFL_BOLD) ? FW_BOLD : FW_NORMAL,
+		(flags & MG_FNTFL_ITALIC) ? 1 : 0,
+		(flags & MG_FNTFL_UNDERLINE) ? 1 : 0,
+		(flags & MG_FNTFL_STRIKEOUT) ? 1 : 0,
 		OEM_CHARSET, // iCharSet
 		OUT_DEFAULT_PRECIS, // iOutPrecision
 		CLIP_DEFAULT_PRECIS, // iClipPrecision
@@ -257,6 +257,8 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			GetTextExtentPoint32W(hDC, &ch, 1, &size);
 			if (size.cy < 1)
 				continue;
+			
+			size.cx = abc.abcB;
 
 			if (curPosX + size.cx > textureSize)
 			{
@@ -273,13 +275,14 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 				maxY = 0;
 			}
 
-			size.cx = abc.abcB;
-			currGlyph->overhang = abc.abcA;
-			currGlyph->underhang = abc.abcC;
+			currGlyph->underhang = abc.abcA;
+			currGlyph->overhang = abc.abcC;
 			currGlyph->width = abc.abcB;
 			currGlyph->height = size.cy;
 			currGlyph->symbol = ch;
 			currGlyph->textureSlot = textureSlot;
+			//if (ch == L'K')
+			//	printf(".");
 
 			currGlyph->rect.left = curPosX;
 			currGlyph->rect.top = curPosY;
@@ -366,9 +369,6 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 				WriteINT(currGlyph->overhang, textFile);
 				WriteWCHAR(L' ', textFile);
 
-				WriteINT(currGlyph->underhang, textFile);
-				WriteWCHAR(L' ', textFile);
-
 				WriteINT(currGlyph->textureSlot, textFile);
 				WriteWCHAR(L' ', textFile);
 				
@@ -411,16 +411,11 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 
 			for (LPBYTE m = lpBits; m < lpBits + pbih->biSizeImage; m += 4)
 			{
-				*imageData = m[0]; ++imageData;  /*R*/
-				*imageData = m[1]; ++imageData;
-				*imageData = m[2]; ++imageData;
+				*imageData = 255; ++imageData;
+				*imageData = 255; ++imageData;
+				*imageData = 255; ++imageData;
 
-				unsigned char A = 0;
-
-				if (m[0] > 0)
-					A = 255 - (255 - m[0]);
-
-				*imageData = A; ++imageData; /*A*/
+				*imageData = m[0]; ++imageData; /*A*/
 			}
 		}
 
@@ -442,16 +437,6 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 	}
 
 end:
-	/*if (images)
-	{
-		for (int i = 0; i < imgCount; ++i)
-		{
-			if (images[i]->data)
-				free(images[i]->data);
-			free(images[i]);
-		}
-		free(images);
-	}*/
 	if (image.data) free(image.data);
 	if (textureInfoArray) free(textureInfoArray);
 	if (fontGlyphs && !newFont) free(fontGlyphs);
