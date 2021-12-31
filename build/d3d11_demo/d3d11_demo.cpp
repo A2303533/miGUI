@@ -1046,7 +1046,7 @@ int main()
     g_gui_context->getTextSize = gui_getTextSize;
     
     // destroy g_font at the end using mgDestroyFont
-    g_font = mgCreateFont(g_gui_context, "Segoe", MG_FNTFL_BOLD, 10, "Segoe"); //gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
+    g_font = mgCreateFont(g_gui_context, "Noto Sans", 0, 10, "Noto Sans"); //gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
     {
         mgPoint pos, sz;
         mgColor c1, c2;

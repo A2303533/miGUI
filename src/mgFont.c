@@ -179,7 +179,7 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 		OEM_CHARSET, // iCharSet
 		OUT_DEFAULT_PRECIS, // iOutPrecision
 		CLIP_DEFAULT_PRECIS, // iClipPrecision
-		CLEARTYPE_QUALITY, // iQuality
+		ANTIALIASED_QUALITY, // iQuality
 		VARIABLE_PITCH | FF_DONTCARE, // iPitchAndFamily
 		fn);
 
@@ -206,8 +206,12 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			if (IsDBCSLeadByte((BYTE)ch))
 				continue;
 
+			SIZE size;
 			ABC abc;
-			if (GetCharABCWidthsW(hDC, ch, ch, &abc))
+			wchar_t currentChar = ch;
+
+			GetTextExtentPoint32W(hDC, &currentChar, 1, &size);
+			if (GetCharABCWidthsW(hDC, currentChar, currentChar, &abc))
 			{
 				if (abc.abcB - abc.abcA + abc.abcC < 1)
 					continue;
@@ -215,8 +219,6 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 					maxWidth = abc.abcB;*/
 			}
 			
-			SIZE size;
-			GetTextExtentPoint32W(hDC, &ch, 1, &size);
 			if (size.cy < 1)
 				continue;
 
@@ -243,21 +245,25 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 		WCRANGE* currentRange = &glyphset->ranges[range];
 		for (WCHAR ch = currentRange->wcLow; ch < currentRange->wcLow + currentRange->cGlyphs; ++ch)
 		{
+			wchar_t currentChar = ch;
+			SIZE size;
+			ABC abc;
+
+			if (ch == L'.')
+				printf("a");
+
 			if (IsDBCSLeadByte((BYTE)ch))
 				continue;
 
-			ABC abc;
-			if (GetCharABCWidthsW(hDC, ch, ch, &abc))
+			GetTextExtentPoint32W(hDC, &currentChar, 1, &size);
+			if (GetCharABCWidthsW(hDC, currentChar, currentChar, &abc))
 			{
 				if (abc.abcB - abc.abcA + abc.abcC < 1)
 					continue;
 			}
-
-			SIZE size;
-			GetTextExtentPoint32W(hDC, &ch, 1, &size);
 			if (size.cy < 1)
 				continue;
-			
+
 			size.cx = abc.abcB;
 
 			if (curPosX + size.cx > textureSize)
