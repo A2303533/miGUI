@@ -48,7 +48,7 @@ typedef struct mgElement_s {
 	unsigned int type; /*MG_TYPE...*/
 	void* implementation;
 
-	struct mgContext_s* context;
+	struct mgWindow_s* window;
 
 	int id;
 	void* userData;
@@ -59,10 +59,10 @@ typedef struct mgElement_s {
 	struct mgElementNode_s* children;
 	int childrenCount;
 
-	mgRect buildArea;
+	/*mgRect buildArea;
 	mgRect clipArea;
 	mgRect buildAreaFinal;
-	mgRect clipAreaFinal;
+	mgRect clipAreaFinal;*/
 
 	void(*onDraw)(struct mgElement_s* e);
 	void(*onUpdate)(struct mgElement_s* e);

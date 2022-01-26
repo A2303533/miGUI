@@ -77,6 +77,5 @@ typedef struct mgFont_s {
 	mgFontGlyph* glyphMap[0xFFFF];
 } mgFont;
 
-extern mgFont* mgCreateFont(struct mgContext_s*, const char*, unsigned int flags, int size);
 
 #endif

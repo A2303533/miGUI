@@ -35,14 +35,14 @@
 void
 miGUI_onUpdateTransform_rectangle(mgElement* e)
 {
-	e->buildAreaFinal = e->buildArea;
-	e->clipAreaFinal = e->clipArea;
+	/*e->buildAreaFinal = e->buildArea;
+	e->clipAreaFinal = e->clipArea;*/
 }
 
 void 
 miGUI_onUpdate_rectangle(mgElement* e)
 {
-	int inRect = mgPointInRect(&e->buildAreaFinal, &e->context->input->mousePosition);
+	/*int inRect = mgPointInRect(&e->buildAreaFinal, &e->context->input->mousePosition);
 
 	if (inRect)
 	{
@@ -159,13 +159,13 @@ miGUI_onUpdate_rectangle(mgElement* e)
 	if (inRect)
 		e->elementState |= 0x1;
 	else if(e->elementState & 0x1)
-		e->elementState ^= 0x1;
+		e->elementState ^= 0x1;*/
 }
 
 void 
 miGUI_onDraw_rectangle(mgElement* e)
 {
-	mgPoint pos;
+	/*mgPoint pos;
 	pos.x = e->buildAreaFinal.left;
 	pos.y = e->buildAreaFinal.top;
 
@@ -176,7 +176,7 @@ miGUI_onDraw_rectangle(mgElement* e)
 	mgElementRectangle* impl = (mgElementRectangle*)e->implementation;
 
 	e->context->gpu->setClipRect(&e->clipAreaFinal);
-	e->context->gpu->drawRectangle(e, &pos, &sz, &impl->color1, &impl->color2, 0, 0);
+	e->context->gpu->drawRectangle(e, &pos, &sz, &impl->color1, &impl->color2, 0, 0);*/
 }
 
 void
@@ -192,7 +192,7 @@ mgCreateRectangle_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgC
 	assert(color1);
 	assert(color2);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
-	newElement->type = MG_TYPE_RECTANGLE;
+	/*newElement->type = MG_TYPE_RECTANGLE;
 	newElement->buildArea.left = position->x;
 	newElement->buildArea.top = position->y;
 	newElement->buildArea.right = position->x + size->x;
@@ -210,7 +210,7 @@ mgCreateRectangle_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgC
 	impl->color1 = *color1;
 	impl->color2 = *color2;
 
-	mgSetParent_f(newElement, 0);
+	mgSetParent_f(newElement, 0);*/
 
 	return newElement;
 }

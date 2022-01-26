@@ -92,8 +92,15 @@ mgRect gui_setClipRect(mgRect* r)
     return ret;
 }
 
-void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColor* color1,
-    mgColor* color2,mgTexture texture,mgVec4* UVRegion)
+void gui_drawRectangle(
+    int reason,
+    mgPoint* position,
+    mgPoint* size,
+    mgColor* color1,
+    mgColor* color2,
+    mgElement* element, /*current element, can be null*/
+    mgTexture texture, /*optional*/
+    mgVec4* UVRegion)
 {
 
     RECT r;
@@ -111,8 +118,14 @@ void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColo
     /*RoundRect(hdcMem, r.left, r.top, r.right, r.bottom, 6, 6);*/
     /*or with clip region*/
     
-    HRGN rgn = CreateRoundRectRgn(r.left, r.top, r.right, r.bottom, 7, 7);
+    int roundRectBtm = r.bottom;
+    if (reason == mgDrawRectangleReason_windowTitlebar)
+        roundRectBtm += 7;
+
+    HRGN rgn = CreateRoundRectRgn(r.left, r.top, r.right, roundRectBtm, 7, 7);
+    
     SelectClipRgn(hdcMem, rgn);
+    
 
     /*FillRect(hdcMem, &r, brsh);*/
     /*or gradient*/
@@ -144,6 +157,7 @@ void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColo
 }
 
 void gui_drawText(
+    int reason,
     mgPoint* position,
     const wchar_t* text,
     int textLen,
@@ -171,7 +185,7 @@ void gui_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
 {
     mgFont* f = (mgFont*)malloc(sizeof(mgFont));
-    
+    g_dc = GetWindowDC(g_hwnd);
     f->implementation = CreateFontA(
         -MulDiv(size, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
         0, 0, 0,
@@ -187,6 +201,7 @@ mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
         fn);
    /* f->implementation = CreateFont(48, 0, 0, 0, FW_DONTCARE, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS,
         CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, TEXT("Impact"));*/
+    ReleaseDC(g_hwnd, g_dc);
     return f;
 }
 
@@ -207,7 +222,7 @@ void draw_gui()
     mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
     mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
 
-    g_gui_context->gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
+    g_gui_context->gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0, 0);
 
     mgPoint textPosition;
     mgPointSet(&textPosition, 10, 10);
@@ -217,48 +232,48 @@ void draw_gui()
     
     swprintf_s(textBuffer, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
     mgPointSet(&textPosition, 10, 10);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     
     swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
     mgPointSet(&textPosition, 10, 20);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     
     swprintf_s(textBuffer, L"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
     mgPointSet(&textPosition, 10, 30);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     
     swprintf_s(textBuffer, L"mouseButtons: 0x%x 0x%x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
     mgPointSet(&textPosition, 10, 40);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
     swprintf_s(textBuffer, L"key char: %c 0x%x", g_input.character, g_input.character);
     mgPointSet(&textPosition, 10, 50);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
     if (mgIsKeyHit(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Hit ENTER");
         mgPointSet(&textPosition, 10, 60);
-        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     }
 
     if (mgIsKeyHold(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Hold ENTER");
         mgPointSet(&textPosition, 10, 70);
-        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     }
 
     if (mgIsKeyRelease(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Release ENTER");
         mgPointSet(&textPosition, 10, 80);
-        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     }
 
     swprintf_s(textBuffer, L"KB modifier 0x%x\n", g_input.keyboardModifier);
     mgPointSet(&textPosition, 10, 90);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
     /*draw elements*/
     mgDraw(g_gui_context);
@@ -347,9 +362,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     g_gui_context->getTextSize = gui_getTextSize;
     
-    g_win32font = gui_createFont("Segoe", MG_FNTFL_BOLD, 10);
+    g_win32font = gui_createFont("Segoe", 0, 10);
     {
-        mgPoint pos, sz;
+        mgWindow* guiWindow = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
+        guiWindow->titlebarFont = g_win32font;
+        mgSetWindowTitle(guiWindow, L"Window");
+
+        /*mgPoint pos, sz;
         mgColor c1, c2;
         pos.x = 300;
         pos.y = 0;
@@ -367,7 +386,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         rectangle->onReleaseLMB = rect_onReleaseLMB;
      
         pos.y += 30;
-        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_win32font);
+        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_win32font);*/
     }
 
     UpdateBackBuffer();

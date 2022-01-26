@@ -233,22 +233,22 @@ class MyD3D11{
 
             "	Out.pos   = float4(v2.x, v1.y, 0.f, 1.f);\n"
             "	Out.uv = float2(UVs.z,UVs.y);\n"
-            "	Out.color = Color2;\n"
+            "	Out.color = Color1;\n"
             "	TriStream.Append(Out);\n"
 
             "	Out.pos   = float4(v2.x, v2.y, 0.f, 1.f);\n"
             "	Out.uv = float2(UVs.z,UVs.w);\n"
-            "	Out.color = Color1;\n"
+            "	Out.color = Color2;\n"
             "	TriStream.Append(Out);\n"
 
             "	Out.pos   = float4(v1.x, v1.y, 0.f, 1.f);\n"
             "	Out.uv = float2(UVs.x,UVs.y);\n"
-            "	Out.color = Color2;\n"
+            "	Out.color = Color1;\n"
             "	TriStream.Append(Out);\n"
 
             "	Out.pos   = float4(v1.x, v2.y, 0.f, 1.f);\n"
             "	Out.uv = float2(UVs.x,UVs.w);\n"
-            "	Out.color = Color1;\n"
+            "	Out.color = Color2;\n"
             "	TriStream.Append(Out);\n"
 
             "	TriStream.RestartStrip();\n"
@@ -798,13 +798,27 @@ mgRect gui_setClipRect(mgRect* r)
 {
     static mgRect old;
 
+    D3D11_RECT _r;
+    _r.left = (LONG)r->left;
+    _r.top = (LONG)r->top;
+    _r.right = (LONG)r->right;
+    _r.bottom = (LONG)r->bottom;
+    g_d3d11->m_d3d11DevCon->RSSetScissorRects(1, &_r);
+
     mgRect ret = old;
     old = *r;
     return ret;
 }
 
-void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColor* color1,
-    mgColor* color2, mgTexture texture, mgVec4* UVRegion)
+void gui_drawRectangle(
+    int reason,
+    mgPoint* position,
+    mgPoint* size,
+    mgColor* color1,
+    mgColor* color2,
+    mgElement* element, /*current element, can be null*/
+    mgTexture texture, /*optional*/
+    mgVec4* UVRegion)
 {
     mgVec4 corners;
     corners.x = position->x;
@@ -815,6 +829,7 @@ void gui_drawRectangle(mgElement* element,mgPoint* position,mgPoint* size,mgColo
 }
 
 void gui_drawText(
+    int reason,
     mgPoint* position,
     const wchar_t* text,
     int textLen,
@@ -897,7 +912,7 @@ void draw_gui()
     mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
     mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
 
-    g_gui_context->gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0);
+    g_gui_context->gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0, 0);
 
     mgPoint textPosition;
     mgPointSet(&textPosition, 10, 10);
@@ -907,48 +922,48 @@ void draw_gui()
     
     swprintf(textBuffer, 200, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
     mgPointSet(&textPosition, 10, 10);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     
     swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
     mgPointSet(&textPosition, 10, 20);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     
     swprintf_s(textBuffer, L"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
     mgPointSet(&textPosition, 10, 30);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     
     swprintf_s(textBuffer, L"mouseButtons: 0x%x 0x%x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
     mgPointSet(&textPosition, 10, 40);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
 
     swprintf_s(textBuffer, L"key char: %c 0x%x", g_input.character, g_input.character);
     mgPointSet(&textPosition, 10, 50);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
 
     if (mgIsKeyHit(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Hit ENTER");
         mgPointSet(&textPosition, 10, 60);
-        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     }
 
     if (mgIsKeyHold(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Hold ENTER");
         mgPointSet(&textPosition, 10, 70);
-        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     }
 
     if (mgIsKeyRelease(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Release ENTER");
         mgPointSet(&textPosition, 10, 80);
-        gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     }
 
     swprintf_s(textBuffer, L"KB modifier 0x%x\n", g_input.keyboardModifier);
     mgPointSet(&textPosition, 10, 90);
-    gui_drawText(&textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
 
     /*draw elements*/
     mgDraw(g_gui_context);
@@ -1048,7 +1063,7 @@ int main()
     // destroy g_font at the end using mgDestroyFont
     g_font = mgCreateFont(g_gui_context, "Noto Sans", 0, 10, "Noto Sans"); //gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
     {
-        mgPoint pos, sz;
+        /*mgPoint pos, sz;
         mgColor c1, c2;
         pos.x = 300;
         pos.y = 0;
@@ -1066,7 +1081,10 @@ int main()
         rectangle->onReleaseLMB = rect_onReleaseLMB;
      
         pos.y += 30;
-        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_font);
+        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_font);*/
+        mgWindow* guiWindow = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
+        guiWindow->titlebarFont = g_font;
+        mgSetWindowTitle(guiWindow, L"Window");
     }
 
     MSG msg;

@@ -38,8 +38,8 @@ void miGUI_onUpdate_rectangle(mgElement* e);
 void
 miGUI_onUpdateTransform_button(mgElement* e)
 {
-	e->buildAreaFinal = e->buildArea;
-	e->clipAreaFinal = e->clipArea;
+	/*e->buildAreaFinal = e->buildArea;
+	e->clipAreaFinal = e->clipArea;*/
 }
 
 void 
@@ -53,7 +53,7 @@ miGUI_onUpdate_button(mgElement* e)
 void 
 miGUI_onDraw_button(mgElement* e)
 {
-	mgPoint pos;
+	/*mgPoint pos;
 	pos.x = e->buildAreaFinal.left;
 	pos.y = e->buildAreaFinal.top;
 
@@ -111,13 +111,13 @@ miGUI_onDraw_button(mgElement* e)
 		pos.x += impl->textIndentInternal.x;
 		pos.y += impl->textIndentInternal.y;
 		e->context->gpu->drawText(&pos, impl->text, impl->textLen, &impl->textColorFinal, impl->font);
-	}
+	}*/
 }
 
 void
 miGUI_onRebuild_button(mgElement* e) 
 {
-	mgElementButton* impl = (mgElementButton*)e->implementation;
+	/*mgElementButton* impl = (mgElementButton*)e->implementation;
 	
 	impl->textIndentInternal.x = 0;
 	impl->textIndentInternal.y = 0;
@@ -137,7 +137,7 @@ miGUI_onRebuild_button(mgElement* e)
 
 		impl->textIndentInternal.x += buttonCenter.x - textHalfLen.x;
 		impl->textIndentInternal.y += buttonCenter.y - textHalfLen.y;
-	}
+	}*/
 }
 
 MG_API
@@ -149,7 +149,7 @@ mgCreateButton_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, const 
 	assert(text);
 	assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
-	newElement->type = MG_TYPE_BUTTON;
+	/*newElement->type = MG_TYPE_BUTTON;
 	newElement->buildArea.left = position->x;
 	newElement->buildArea.top = position->y;
 	newElement->buildArea.right = position->x + size->x;
@@ -184,7 +184,7 @@ mgCreateButton_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, const 
 
 	mgSetParent_f(newElement, 0);
 
-	miGUI_onRebuild_button(newElement);
+	miGUI_onRebuild_button(newElement);*/
 
 	return newElement;
 }

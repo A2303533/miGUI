@@ -26,29 +26,37 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_FUNCTIONS_H_
-#define _MG_FUNCTIONS_H_
+#ifndef _MG_WINDOW_H_
+#define _MG_WINDOW_H_
 
-/*
-* For DLL
-*/
+struct mgElementNode_s;
 
-MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
-MG_API mgContext* MG_C_DECL mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input);
-MG_API mgCursor* MG_C_DECL mgCreateCursor_f(const wchar_t* fileName);
-MG_API struct mgWindow_s* MG_C_DECL mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy);
-MG_API void MG_C_DECL mgDestroyWindow_f(struct mgWindow_s* w);
-MG_API mgFont* MG_C_DECL mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size, const char* saveIt);
-MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
-MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
-MG_API void MG_C_DECL mgDestroyContext_f(mgContext* c);
-MG_API void MG_C_DECL mgDestroyCursor_f(mgCursor* c);
-MG_API void MG_C_DECL mgDestroyFont_f(struct mgContext_s* c, mgFont* f);
-MG_API void MG_C_DECL mgDraw_f(mgContext* c);
-MG_API void MG_C_DECL mgSetCursor_f(mgContext* ctx, mgCursor* c, unsigned int type);
-MG_API void MG_C_DECL mgSetParent_f(mgElement* object, mgElement* parent);
-MG_API void MG_C_DECL mgSetVisible_f(mgElement* e, int v);
-MG_API void MG_C_DECL mgStartFrame_f(mgContext* c);
-MG_API void MG_C_DECL mgUpdate_f(mgContext* c);
+enum mgWindowFlag
+{
+	mgWindowFlag_withTitlebar = 0x1 /*default*/
+};
+
+typedef struct mgWindow_s {
+	mgStyle* userStyle; /*optional*/
+
+	mgPoint position;
+	mgPoint size;
+
+	int flags;
+	int titlebarHeight; /*10*/
+
+	struct mgContext_s* context;
+	struct mgElement_s* rootElement;
+	/*struct mgElementNode_s* children;
+	int childrenCount;*/
+
+	struct mgFont_s* titlebarFont; /*titlebar text active only with font*/
+	wchar_t* titlebarText; /*use mgSetWindowTitle function*/
+	int titlebarTextLen;
+
+	struct mgWindow_s* left;
+	struct mgWindow_s* right;
+} mgWindow;
+
 
 #endif

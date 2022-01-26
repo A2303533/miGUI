@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -60,7 +60,22 @@ struct mgContext_s;
 
 typedef void* mgTexture;
 
+#include "mgStyle.h"
+#include "mgWindow.h"
 #include "mgElement.h"
+
+enum mgDrawRectangleReason
+{
+	mgDrawRectangleReason_user,
+	mgDrawRectangleReason_windowBG,
+	mgDrawRectangleReason_windowTitlebar,
+};
+
+enum mgDrawTextReason
+{
+	mgDrawTextReason_user,
+	mgDrawTextReason_windowTitlebar,
+};
 
 /* Before creating GUI context you must create this objects.
  VideoDriverAPI - callbacks for drawing.
@@ -77,15 +92,16 @@ typedef struct mgVideoDriverAPI_s {
 	void(*endDraw)();
 
 	void(*drawRectangle)(
-		mgElement* element, /*current element, can be null*/
+		int reason,
 		mgPoint* position,
 		mgPoint* size, 
 		mgColor* color1, 
 		mgColor* color2, 
+		mgElement* element, /*current element, can be null*/
 		mgTexture texture, /*optional*/
 		mgVec4* UVRegion); /*optional*/
 
-	void(*drawText)( mgPoint* position, const wchar_t* text, int textLen, mgColor*, mgFont*);
+	void(*drawText)( int reason, mgPoint* position, const wchar_t* text, int textLen, mgColor*, mgFont*);
 
 	/*set new and return old clip rect*/
 	mgRect(*setClipRect)(mgRect*);
@@ -103,12 +119,19 @@ extern "C" {
 
 
 typedef struct mgContext_s* (*PFNMGCREATECONTEXTPROC)(mgVideoDriverAPI*, mgInputContext*);
-extern PFNMGCREATECONTEXTPROC mgCreateContext_p;
-#define mgCreateContext mgCreateContext_p
+extern PFNMGCREATECONTEXTPROC mgCreateContext;
 
 typedef void (*PFNMGDESTROYCONTEXTPROC)(struct mgContext_s*);
-extern PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
-#define mgDestroyContext mgDestroyContext_p
+extern PFNMGDESTROYCONTEXTPROC mgDestroyContext;
+
+typedef struct mgWindow_s* (*PFNMGCREATEWINDOWPROC)(struct mgContext_s*, int px, int py, int sx, int sy);
+extern PFNMGCREATEWINDOWPROC mgCreateWindow;
+
+typedef void (*PFNMGDESTROYWINDOWPROC)(struct mgWindow_s*);
+extern PFNMGDESTROYWINDOWPROC mgDestroyWindow;
+
+typedef void (*PFNMGSETWINDOWTITLEPROC)(struct mgWindow_s*, const wchar_t*);
+extern PFNMGSETWINDOWTITLEPROC mgSetWindowTitle;
 
 /* Create bitmap font or load from file.
 * If filename exist load from file. If not then try to generate from installed system font.
@@ -116,95 +139,72 @@ extern PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
 * saveIt (optional) - save .txt and images dds rgba in ../data/fonts/$saveIt/
 */
 typedef mgFont* (*PFNMGCREATEFONTPROC)(struct mgContext_s*, const char* filename, unsigned int flags, int size, const char* saveIt);
-extern PFNMGCREATEFONTPROC mgCreateFont_p;
-#define mgCreateFont mgCreateFont_p
+extern PFNMGCREATEFONTPROC mgCreateFont;
 
 typedef void (*PFNMGDESTROYFONTPROC)(struct mgContext_s*, mgFont*);
-extern PFNMGDESTROYFONTPROC mgDestroyFont_p;
-#define mgDestroyFont mgDestroyFont_p
+extern PFNMGDESTROYFONTPROC mgDestroyFont;
 
 /*call before event loop*/
 typedef void (*PFNMGSTARTFRAMEPROC)(struct mgContext_s*);
-extern PFNMGSTARTFRAMEPROC mgStartFrame_p;
-#define mgStartFrame mgStartFrame_p
+extern PFNMGSTARTFRAMEPROC mgStartFrame;
 
 /*do work*/
 typedef void (*PFNMGUPDATEPROC)(struct mgContext_s*);
-extern PFNMGUPDATEPROC mgUpdate_p;
-#define mgUpdate mgUpdate_p
+extern PFNMGUPDATEPROC mgUpdate;
 
 typedef void (*PFNMGSETPARENTPROC)(mgElement* object, mgElement* parent);
-extern PFNMGSETPARENTPROC mgSetParent_p;
-#define mgSetParent mgSetParent_p
+extern PFNMGSETPARENTPROC mgSetParent;
 
-typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
-extern PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
-#define mgCreateRectangle mgCreateRectangle_p
-
-typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
-extern PFNMGCREATETEXTPROC mgCreateText_p;
-#define mgCreateText mgCreateText_p
-
-typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
-extern PFNMGCREATEBUTTONPROC mgCreateButton_p;
-#define mgCreateButton mgCreateButton_p
+//typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
+//extern PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
+//#define mgCreateRectangle mgCreateRectangle_p
+//
+//typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
+//extern PFNMGCREATETEXTPROC mgCreateText_p;
+//#define mgCreateText mgCreateText_p
+//
+//typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
+//extern PFNMGCREATEBUTTONPROC mgCreateButton_p;
+//#define mgCreateButton mgCreateButton_p
 
 /*set visible include all children*/
 typedef void (*PFNMGSETVISIBLEPROC)(mgElement*, int);
-extern PFNMGSETVISIBLEPROC mgSetVisible_p;
-#define mgSetVisible mgSetVisible_p
+extern PFNMGSETVISIBLEPROC mgSetVisible;
 
 /*draw all*/
 typedef void (*PFNMGDRAWPROC)(struct mgContext_s*);
-extern PFNMGDRAWPROC mgDraw_p;
-#define mgDraw mgDraw_p
+extern PFNMGDRAWPROC mgDraw;
 
 /*don't forget to destroy cursor with mgDestroyCursor*/
 typedef mgCursor*(*PFNMGCREATECURSORPROC)(const wchar_t* fileName);
-extern PFNMGCREATECURSORPROC mgCreateCursor_p;
-#define mgCreateCursor mgCreateCursor_p
+extern PFNMGCREATECURSORPROC mgCreateCursor;
 
 typedef void (*PFNMGDESTROYCURSORPROC)(mgCursor*);
-extern PFNMGDESTROYCURSORPROC mgDestroyCursor_p;
-#define mgDestroyCursor mgDestroyCursor_p
+extern PFNMGDESTROYCURSORPROC mgDestroyCursor;
 
 /*if cursor == 0 then set default*/
 typedef void (*PFNMGSETCURSORPROC)(struct mgContext_s*, mgCursor* cursor, unsigned int type);
-extern PFNMGSETCURSORPROC mgSetCursor_p;
-#define mgSetCursor mgSetCursor_p
+extern PFNMGSETCURSORPROC mgSetCursor;
 
 #if defined(__cplusplus)
 }
 #endif
 
-/*All functions must be here too.
+/*
 * Idea is: you load migui.dll in your exe,
 *   and then you can use functions in your dlls.
 */
 struct mgFunctions_s {
-	PFNMGCREATECONTEXTPROC CreateContext_p;
-	PFNMGDESTROYCONTEXTPROC DestroyContext_p;
-	PFNMGCREATEFONTPROC CreateFont_p;
-	PFNMGDESTROYFONTPROC DestroyFont_p;
-	PFNMGSTARTFRAMEPROC StartFrame_p;
-	PFNMGUPDATEPROC Update_p;
-	PFNMGSETPARENTPROC SetParent_p;
-	PFNMGSETVISIBLEPROC SetVisible_p;
-	PFNMGDRAWPROC Draw_p;
-	PFNMGCREATERECTANGLEPROC CreateRectangle_p;
-	PFNMGCREATETEXTPROC CreateText_p;
-	PFNMGCREATEBUTTONPROC CreateButton_p;
-	PFNMGCREATECURSORPROC CreateCursor_p;
-	PFNMGDESTROYCURSORPROC DestroyCursor_p;
 	PFNMGSETCURSORPROC SetCursor_p;
 };
 
 typedef struct mgContext_s {
 	mgVideoDriverAPI* gpu;
 	mgInputContext* input;
-	mgElement* rootElement;
 	int needUpdateTransform;
 	int needRebuild;
+
+	mgWindow* firstWindow;
 
 	mgCursor* defaultCursors[mgCursorType__count];
 	mgCursor* currentCursors[mgCursorType__count];
@@ -216,6 +216,10 @@ typedef struct mgContext_s {
 	void(*getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
 
 	struct mgFunctions_s functions;
+
+	mgStyle styleLight;
+	mgStyle styleDark;
+	mgStyle* activeStyle;
 } mgContext;
 
 #endif

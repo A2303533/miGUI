@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -30,21 +30,24 @@
 #include "miGUILoader.h"
 #include <assert.h>
 
-PFNMGCREATECONTEXTPROC mgCreateContext_p;
-PFNMGDESTROYCONTEXTPROC mgDestroyContext_p;
-PFNMGCREATEFONTPROC mgCreateFont_p;
-PFNMGDESTROYFONTPROC mgDestroyFont_p;
-PFNMGSTARTFRAMEPROC mgStartFrame_p;
-PFNMGUPDATEPROC mgUpdate_p;
-PFNMGSETPARENTPROC mgSetParent_p;
-PFNMGSETVISIBLEPROC mgSetVisible_p;
-PFNMGDRAWPROC mgDraw_p;
-PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
-PFNMGCREATETEXTPROC mgCreateText_p;
-PFNMGCREATEBUTTONPROC mgCreateButton_p;
-PFNMGCREATECURSORPROC mgCreateCursor_p;
-PFNMGDESTROYCURSORPROC mgDestroyCursor_p;
-PFNMGSETCURSORPROC mgSetCursor_p;
+PFNMGCREATECONTEXTPROC mgCreateContext;
+PFNMGDESTROYCONTEXTPROC mgDestroyContext;
+PFNMGCREATEFONTPROC mgCreateFont;
+PFNMGDESTROYFONTPROC mgDestroyFont;
+PFNMGSTARTFRAMEPROC mgStartFrame;
+PFNMGUPDATEPROC mgUpdate;
+PFNMGSETPARENTPROC mgSetParent;
+PFNMGSETVISIBLEPROC mgSetVisible;
+PFNMGDRAWPROC mgDraw;
+//PFNMGCREATERECTANGLEPROC mgCreateRectangle;
+//PFNMGCREATETEXTPROC mgCreateText;
+//PFNMGCREATEBUTTONPROC mgCreateButton;
+PFNMGCREATEWINDOWPROC mgCreateWindow;
+PFNMGDESTROYWINDOWPROC mgDestroyWindow;
+PFNMGSETWINDOWTITLEPROC mgSetWindowTitle;
+PFNMGCREATECURSORPROC mgCreateCursor;
+PFNMGDESTROYCURSORPROC mgDestroyCursor;
+PFNMGSETCURSORPROC mgSetCursor;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -72,21 +75,24 @@ mgLoad()
 	if(!lib)
 		return lib;
 
-	mgCreateContext_p = mgGetProc(lib, "mgCreateContext_f");
-	mgDestroyContext_p = mgGetProc(lib, "mgDestroyContext_f");
-	mgCreateFont_p = mgGetProc(lib, "mgCreateFont_f");
-	mgDestroyFont_p = mgGetProc(lib, "mgDestroyFont_f");
-	mgStartFrame_p = mgGetProc(lib, "mgStartFrame_f");
-	mgUpdate_p = mgGetProc(lib, "mgUpdate_f");
-	mgSetParent_p = mgGetProc(lib, "mgSetParent_f");
-	mgSetVisible_p = mgGetProc(lib, "mgSetVisible_f");
-	mgDraw_p = mgGetProc(lib, "mgDraw_f");
-	mgCreateRectangle_p = mgGetProc(lib, "mgCreateRectangle_f");
-	mgCreateText_p = mgGetProc(lib, "mgCreateText_f");
-	mgCreateButton_p = mgGetProc(lib, "mgCreateButton_f");
-	mgCreateCursor_p = mgGetProc(lib, "mgCreateCursor_f");
-	mgDestroyCursor_p = mgGetProc(lib, "mgDestroyCursor_f");
-	mgSetCursor_p = mgGetProc(lib, "mgSetCursor_f");
+	mgCreateContext = mgGetProc(lib, "mgCreateContext_f");
+	mgDestroyContext = mgGetProc(lib, "mgDestroyContext_f");
+	mgCreateFont = mgGetProc(lib, "mgCreateFont_f");
+	mgDestroyFont = mgGetProc(lib, "mgDestroyFont_f");
+	mgStartFrame = mgGetProc(lib, "mgStartFrame_f");
+	mgUpdate = mgGetProc(lib, "mgUpdate_f");
+	mgSetParent = mgGetProc(lib, "mgSetParent_f");
+	mgSetVisible = mgGetProc(lib, "mgSetVisible_f");
+	mgDraw = mgGetProc(lib, "mgDraw_f");
+	/*mgCreateRectangle = mgGetProc(lib, "mgCreateRectangle_f");
+	mgCreateText = mgGetProc(lib, "mgCreateText_f");
+	mgCreateButton = mgGetProc(lib, "mgCreateButton_f");*/
+	mgCreateWindow = mgGetProc(lib, "mgCreateWindow_f");
+	mgDestroyWindow = mgGetProc(lib, "mgDestroyWindow_f");
+	mgSetWindowTitle = mgGetProc(lib, "mgSetWindowTitle_f");
+	mgCreateCursor = mgGetProc(lib, "mgCreateCursor_f");
+	mgDestroyCursor = mgGetProc(lib, "mgDestroyCursor_f");
+	mgSetCursor = mgGetProc(lib, "mgSetCursor_f");
 
 	return lib;
 }

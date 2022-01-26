@@ -36,8 +36,8 @@
 void
 miGUI_onUpdateTransform_text(mgElement* e)
 {
-	e->buildAreaFinal = e->buildArea;
-	e->clipAreaFinal = e->clipArea;
+	/*e->buildAreaFinal = e->buildArea;
+	e->clipAreaFinal = e->clipArea;*/
 }
 
 void 
@@ -48,7 +48,7 @@ miGUI_onUpdate_text(mgElement* e)
 void 
 miGUI_onDraw_text(mgElement* e)
 {
-	mgPoint pos;
+	/*mgPoint pos;
 	pos.x = e->buildAreaFinal.left;
 	pos.y = e->buildAreaFinal.top;
 
@@ -58,7 +58,7 @@ miGUI_onDraw_text(mgElement* e)
 	{
 		e->context->gpu->setClipRect(&e->clipAreaFinal);
 		e->context->gpu->drawText(&pos, impl->text, impl->textLen, &impl->color, impl->font);
-	}
+	}*/
 }
 
 void
@@ -73,7 +73,7 @@ mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mg
 	assert(text);
 	assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
-	newElement->type = MG_TYPE_TEXT;
+	/*newElement->type = MG_TYPE_TEXT;
 	newElement->buildArea.left = position->x;
 	newElement->buildArea.top = position->y;
 	newElement->buildArea.right = position->x;
@@ -96,7 +96,7 @@ mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mg
 	impl->text = text;
 	impl->textLen = wcslen(text);
 
-	mgSetParent_f(newElement, 0);
+	mgSetParent_f(newElement, 0);*/
 
 	return newElement;
 }

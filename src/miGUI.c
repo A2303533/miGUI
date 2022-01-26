@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -31,6 +31,8 @@
 
 void mgInitDefaultCursors(mgContext* c);
 void mgDestroyDefaultCursors(mgContext* c);
+void mgDrawWindow(struct mgWindow_s* w);
+void mgUpdateWindow(struct mgWindow_s* w);
 
 void 
 mgDestroyElement_f(mgElement* e)
@@ -46,8 +48,6 @@ mgDestroyElement_f(mgElement* e)
 	free(e);
 }
 
-void mgrootobject_cb(mgElement*e) {}
-
 MG_API 
 mgContext* MG_C_DECL
 mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
@@ -60,29 +60,15 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->input = input;
 	c->needUpdateTransform = 1;
 	c->needRebuild = 1;
-	c->rootElement = calloc(1, sizeof(mgElement));
-	c->rootElement->context = c;
-	c->rootElement->visible = 1;
-	c->rootElement->onDraw = mgrootobject_cb;
-	c->rootElement->onUpdate = mgrootobject_cb;
-	c->rootElement->onUpdateTransform = mgrootobject_cb;
-	c->rootElement->onRebuild = mgrootobject_cb;
+	c->activeStyle = &c->styleLight;
 
-	c->functions.CreateButton_p = mgCreateButton_f;
-	c->functions.CreateContext_p = mgCreateContext_f;
-	c->functions.CreateCursor_p = mgCreateCursor_f;
-	c->functions.CreateFont_p = mgCreateFont_f;
-	c->functions.CreateRectangle_p = mgCreateRectangle_f;
-	c->functions.CreateText_p = mgCreateText_f;
-	c->functions.DestroyContext_p = mgDestroyContext_f;
-	c->functions.DestroyCursor_p = mgDestroyCursor_f;
-	c->functions.DestroyFont_p = mgDestroyFont_f;
-	c->functions.Draw_p = mgDraw_f;
+	mgColorSetAsIntegerRGB(&c->styleLight.windowBGColor, 0xE8EDFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColor, 0xB5CCFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarTextColor, 0x0);
+	
+	
+	
 	c->functions.SetCursor_p = mgSetCursor_f;
-	c->functions.SetParent_p = mgSetParent_f;
-	c->functions.SetVisible_p = mgSetVisible_f;
-	c->functions.StartFrame_p = mgStartFrame_f;
-	c->functions.Update_p = mgUpdate_f;
 
 	mgInitDefaultCursors(c);
 
@@ -97,10 +83,19 @@ mgDestroyContext_f(mgContext* c)
 
 	mgDestroyDefaultCursors(c);
 
-	/*destroy everything here*/
-	/*...*/
-	if (c->rootElement)
-		mgDestroyElement_f(c->rootElement);
+	mgWindow* cw = c->firstWindow;
+	if (cw)
+	{
+		mgWindow* lw = cw->left;
+		while (1)
+		{
+			mgWindow* nw = cw->right;
+			mgDestroyWindow_f(cw);
+			if (cw == lw)
+				break;
+			cw = nw;
+		}
+	}
 
 	free(c);
 }
@@ -170,18 +165,33 @@ mgUpdate_f(mgContext* c)
 	case 7:  c->input->keyboardModifier = MG_KBMOD_CTRLSHIFTALT;  break;
 	}
 
-	mgUpdateElement(c->rootElement);
 
-	if (c->needUpdateTransform)
+	mgWindow* cw = c->firstWindow;
+	if (cw)
 	{
-		mgUpdateTransformElement(c->rootElement);
-		c->needUpdateTransform = 0;
-	}
+		mgUpdateWindow(cw);
 
-	if (c->needRebuild)
-	{
-		mgRebuildElement(c->rootElement);
-		c->needRebuild = 0;
+		mgWindow* lw = cw->left;
+		while (1)
+		{
+			mgUpdateElement(cw->rootElement);
+	
+			if (c->needUpdateTransform)
+			{
+				mgUpdateTransformElement(cw->rootElement);
+				c->needUpdateTransform = 0;
+			}
+
+			if (c->needRebuild)
+			{
+				mgRebuildElement(cw->rootElement);
+				c->needRebuild = 0;
+			}
+
+			if (cw == lw)
+				break;
+			cw = cw->right;
+		}
 	}
 }
 
@@ -269,7 +279,7 @@ mgSetParent_f(mgElement* object, mgElement* parent)
 
 	object->parent = parent;
 	if (!parent)
-		object->parent = object->context->rootElement;
+		object->parent = object->window->rootElement;
 
 	{
 		int chCount = object->parent->childrenCount + 1;
@@ -322,5 +332,18 @@ void MG_C_DECL
 mgDraw_f(mgContext* c)
 {
 	assert(c);
-	mgDrawElement(c->rootElement);
+	mgWindow* cw = c->firstWindow;
+	if (cw)
+	{
+		mgWindow* lw = cw->left;
+		while (1)
+		{
+			mgDrawWindow(cw);
+			//mgDrawElement(cw->rootElement);
+			if (cw == lw)
+				break;
+			cw = cw->right;
+		}
+	}
+
 }

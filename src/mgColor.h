@@ -129,6 +129,7 @@ void mgColorSetAsIntegerARGB(mgColor* c, unsigned int argb)
 	c->a = (float)((unsigned char)(argb >> 24u)) * 0.00392156862745f;
 }
 
+/*100% correct*/
 inline
 void mgColorSetAsIntegerRGB(mgColor* c, unsigned int rgb)
 {
@@ -142,9 +143,9 @@ inline
 unsigned int mgColorGetAsIntegerARGB(mgColor* c)
 {
 	return MG_MAKEFOURCC(
-		c->b * 255.,
-		c->g * 255.,
 		c->r * 255.,
+		c->g * 255.,
+		c->b * 255.,
 		c->a * 255.
 	);
 }
