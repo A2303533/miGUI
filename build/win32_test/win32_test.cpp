@@ -23,6 +23,10 @@ unsigned int KEYBOARD_INPUT_CODEPAGE = 0;
 
 mgPoint borderSize;
 
+int g_fps = 0;
+int g_run = 1;
+
+
 /*double buffering*/
 HDC hdcMem = 0;
 HBITMAP hbmMem = 0, hbmOld = 0;
@@ -229,6 +233,10 @@ void draw_gui()
     mgColor textColor;
     mgColorSetAsIntegerRGB(&textColor, 0xFF005000);
     wchar_t textBuffer[200];
+
+    swprintf_s(textBuffer, L"FPS: %i", g_fps);
+    mgPointSet(&textPosition, 0, 0);
+    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     
     swprintf_s(textBuffer, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
     mgPointSet(&textPosition, 10, 10);
@@ -375,6 +383,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         mgWindow* guiWindow = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
         guiWindow->titlebarFont = g_win32font;
         mgSetWindowTitle(guiWindow, L"Window");
+        //guiWindow->flags ^= mgWindowCursorInfo_titlebar;
+        //guiWindow->flags ^= mgWindowFlag_canMove;
 
         /*mgPoint pos, sz;
         mgColor c1, c2;
@@ -399,18 +409,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     UpdateBackBuffer();
     MSG msg;
-    int run = 1;
     
+    int fps_counter = 0;
+    float fps_time = 0.f;
+
     Sleep(100);
-    while (run)
+    while (g_run)
     {
         mgStartFrame(g_gui_context);
 
-        run = GetMessage(&msg, 0, 0, 0);
-        if (!TranslateAccelerator(msg.hwnd, 0, &msg))
+        while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
+            GetMessage(&msg, NULL, 0, 0);
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+        }
+
+        Sleep(1);
+
+        fps_counter += 1;
+        fps_time += g_gui_context->deltaTime;
+        if (fps_time > 1.f)
+        {
+            fps_time = 0.f;
+            g_fps = fps_counter;
+            fps_counter = 0;
         }
 
         mgUpdate(g_gui_context);
@@ -576,6 +599,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
     }break;
     case WM_DESTROY:
+        g_run = 0;
         PostQuitMessage(0);
         break;
     case WM_SETCURSOR: {
@@ -701,7 +725,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
-    return 0;
+    return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
 // IrrLicht

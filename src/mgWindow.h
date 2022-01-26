@@ -33,7 +33,8 @@ struct mgElementNode_s;
 
 enum mgWindowFlag
 {
-	mgWindowFlag_withTitlebar = 0x1 /*default*/
+	mgWindowFlag_withTitlebar = 0x1, /*default*/
+	mgWindowFlag_canMove = 0x2, /*default*/
 };
 
 enum mgWindowCursorInfo

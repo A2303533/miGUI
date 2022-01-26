@@ -55,7 +55,7 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	newWindow->size.x = sx;
 	newWindow->size.y = sy;
 	newWindow->context = ctx;
-	newWindow->flags = mgWindowFlag_withTitlebar;
+	newWindow->flags = mgWindowFlag_withTitlebar | mgWindowFlag_canMove;
 	newWindow->titlebarHeight = 15;
 	
 	newWindow->left = newWindow;
@@ -149,9 +149,12 @@ mgUpdateWindow(struct mgWindow_s* w)
 		{
 			w->cursorInfo = mgWindowCursorInfo_client;
 
-			if (w->context->input->mousePosition.y < (w->position.y + w->titlebarHeight))
+			if (w->flags & mgWindowFlag_withTitlebar)
 			{
-				w->cursorInfo = mgWindowCursorInfo_titlebar;
+				if (w->context->input->mousePosition.y < (w->position.y + w->titlebarHeight))
+				{
+					w->cursorInfo = mgWindowCursorInfo_titlebar;
+				}
 			}
 		}
 	}
@@ -173,7 +176,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 	mgPoint oldPosition = w->position;
 
-	if (isMove)
+	if (isMove && (w->flags & mgWindowFlag_canMove))
 	{
 		if (w->context->input->mouseButtonFlags2 & MG_MBFL_LMBHOLD)
 		{

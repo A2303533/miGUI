@@ -1100,6 +1100,7 @@ int main()
     
     g_proj = UpdateGUIProjection(800.f, 600.f);
 
+
     Sleep(100);
     while (g_run)
     {
