@@ -362,6 +362,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     g_gui_context->getTextSize = gui_getTextSize;
     
+    {
+        RECT rc;
+        GetClientRect(g_hwnd, &rc);
+        g_gui_context->needRebuild = 1;
+        g_gui_context->windowSize.x = rc.right - rc.left;
+        g_gui_context->windowSize.y = rc.bottom - rc.top;
+    }
+
     g_win32font = gui_createFont("Segoe", 0, 10);
     {
         mgWindow* guiWindow = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
@@ -429,8 +437,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
     {
         UpdateBackBuffer();
-        if(g_gui_context)
+        if (g_gui_context)
+        {
+            RECT rc;
+            GetClientRect(hWnd, &rc);
             g_gui_context->needRebuild = 1;
+            g_gui_context->windowSize.x = rc.right - rc.left;
+            g_gui_context->windowSize.y = rc.bottom - rc.top;
+        }
     }return DefWindowProc(hWnd, message, wParam, lParam);
     case WM_COMMAND:
         {
@@ -484,8 +498,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 L"Mouse: Device=0x%08X, Flags=%04x, WheelDelta=%d, X=%d, Y=%d\n",
                 deviceHandle, flags, wheelDelta, x, y);*/
 
-            g_input.mouseMoveDelta.x = x;
-            g_input.mouseMoveDelta.y = y;
+            //g_input.mouseMoveDelta.x = x;
+            //g_input.mouseMoveDelta.y = y;
             if (wheelDelta)
                 g_input.mouseWheelDelta = (float)wheelDelta / (float)WHEEL_DELTA;
 
@@ -494,8 +508,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ScreenToClient(hWnd, &cursorPoint);
             g_input.mousePosition.x = cursorPoint.x;
             g_input.mousePosition.y = cursorPoint.y;
-
-            g_input.mouseButtonFlags1 = 0;
 
             if (flags)
             {

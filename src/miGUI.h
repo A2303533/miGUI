@@ -204,6 +204,9 @@ typedef struct mgContext_s {
 	int needUpdateTransform;
 	int needRebuild;
 
+	float deltaTime;
+	mgPoint windowSize;/*system window size*/
+
 	mgWindow* firstWindow;
 
 	mgCursor* defaultCursors[mgCursorType__count];

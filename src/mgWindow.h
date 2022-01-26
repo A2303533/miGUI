@@ -36,6 +36,13 @@ enum mgWindowFlag
 	mgWindowFlag_withTitlebar = 0x1 /*default*/
 };
 
+enum mgWindowCursorInfo
+{
+	mgWindowCursorInfo_out,
+	mgWindowCursorInfo_titlebar,
+	mgWindowCursorInfo_client,
+};
+
 typedef struct mgWindow_s {
 	mgStyle* userStyle; /*optional*/
 
@@ -44,6 +51,8 @@ typedef struct mgWindow_s {
 
 	int flags;
 	int titlebarHeight; /*10*/
+
+	int cursorInfo;
 
 	struct mgContext_s* context;
 	struct mgElement_s* rootElement;

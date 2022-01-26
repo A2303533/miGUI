@@ -754,6 +754,18 @@ public:
         _createBackBuffer(m_windowSize.x, m_windowSize.y);
 
         SetViewport(0.f, 0.f, (float)(m_windowSize.x), (float)(m_windowSize.y));
+        
+        SetClipRect(0, 0, m_windowSize.x, m_windowSize.y);
+    }
+
+    void SetClipRect(LONG l, LONG t, LONG r, LONG b)
+    {
+        D3D11_RECT _r;
+        _r.left = l;
+        _r.top = t;
+        _r.right = r;
+        _r.bottom = b;
+        m_d3d11DevCon->RSSetScissorRects(1, &_r);
     }
 
     mgPoint m_windowSize;
@@ -797,14 +809,7 @@ void gui_destroyTexture(mgTexture t)
 mgRect gui_setClipRect(mgRect* r)
 {
     static mgRect old;
-
-    D3D11_RECT _r;
-    _r.left = (LONG)r->left;
-    _r.top = (LONG)r->top;
-    _r.right = (LONG)r->right;
-    _r.bottom = (LONG)r->bottom;
-    g_d3d11->m_d3d11DevCon->RSSetScissorRects(1, &_r);
-
+    g_d3d11->SetClipRect(r->left, r->top, r->right, r->bottom);
     mgRect ret = old;
     old = *r;
     return ret;
@@ -1036,8 +1041,7 @@ int main()
     if (!d3d11.init(hwnd))
         return 0;
 
-    g_d3d11 = &d3d11;
-    ClientResize(hwnd, 800, 600);
+   
 
 
     MG_LIB_HANDLE gui_lib = mgLoad();
@@ -1060,6 +1064,11 @@ int main()
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     g_gui_context->getTextSize = gui_getTextSize;
     
+    g_d3d11 = &d3d11;
+    ClientResize(hwnd, 800, 600); // instead this vvv
+    // g_gui_context->windowSize.x = rc.right - rc.left;
+    // g_gui_context->windowSize.y = rc.bottom - rc.top;
+
     // destroy g_font at the end using mgDestroyFont
     g_font = mgCreateFont(g_gui_context, "Noto Sans", 0, 10, "Noto Sans"); //gui_createFont("Segoe", MG_FNTFL_BOLD, 14);
     {
@@ -1141,7 +1150,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             g_proj = UpdateGUIProjection((float)(rc.right - rc.left), (float)(rc.bottom - rc.top));
 
             if (g_gui_context)
+            {
                 g_gui_context->needRebuild = 1;
+                g_gui_context->windowSize.x = rc.right - rc.left;
+                g_gui_context->windowSize.y = rc.bottom - rc.top;
+            }
         }
     }return DefWindowProc(hWnd, message, wParam, lParam);
 
@@ -1172,8 +1185,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 L"Mouse: Device=0x%08X, Flags=%04x, WheelDelta=%d, X=%d, Y=%d\n",
                 deviceHandle, flags, wheelDelta, x, y);*/
 
-            g_input.mouseMoveDelta.x = x;
-            g_input.mouseMoveDelta.y = y;
             if (wheelDelta)
                 g_input.mouseWheelDelta = (float)wheelDelta / (float)WHEEL_DELTA;
 
@@ -1182,8 +1193,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ScreenToClient(hWnd, &cursorPoint);
             g_input.mousePosition.x = cursorPoint.x;
             g_input.mousePosition.y = cursorPoint.y;
-
-            g_input.mouseButtonFlags1 = 0;
 
             if (flags)
             {

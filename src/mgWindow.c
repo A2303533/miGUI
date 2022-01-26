@@ -37,6 +37,12 @@ void mgDestroyElement_f(mgElement* e);
 void mgrootobject_cb(mgElement*e) {}
 void mgDrawElement(mgElement* e);
 
+float 
+lerp(float v0, float v1, float t) 
+{
+	return (1.f - t) * v0 + t * v1;
+}
+
 MG_API
 struct mgWindow_s*
 MG_C_DECL
@@ -129,7 +135,81 @@ mgUpdateWindow(struct mgWindow_s* w)
 {
 	assert(w);
 
+	static int isMove = 0;
 
+	static float posX = 0;
+	static float posXlerp = 0;
+	static float posY = 0;
+	static float posYlerp = 0;
+
+	w->cursorInfo = mgWindowCursorInfo_out;
+	if ((w->context->input->mousePosition.x > w->position.x) && (w->context->input->mousePosition.x < (w->position.x + w->size.x)))
+	{
+		if ((w->context->input->mousePosition.y > w->position.y) && (w->context->input->mousePosition.y < (w->position.y + w->size.y)))
+		{
+			w->cursorInfo = mgWindowCursorInfo_client;
+
+			if (w->context->input->mousePosition.y < (w->position.y + w->titlebarHeight))
+			{
+				w->cursorInfo = mgWindowCursorInfo_titlebar;
+			}
+		}
+	}
+
+	if (w->cursorInfo == mgWindowCursorInfo_titlebar)
+	{
+		if (!isMove)
+		{
+			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			{
+				isMove = 1;
+				posX = w->position.x;
+				posY = w->position.y;
+				posXlerp = posX;
+				posYlerp = posY;
+			}
+		}
+	}
+
+	mgPoint oldPosition = w->position;
+
+	if (isMove)
+	{
+		if (w->context->input->mouseButtonFlags2 & MG_MBFL_LMBHOLD)
+		{
+
+			posXlerp += w->context->input->mouseMoveDelta.x;
+			posX = lerp((float)w->position.x, posXlerp, w->context->deltaTime * 30.f);
+			w->position.x = (int)posX;
+
+			posYlerp += w->context->input->mouseMoveDelta.y;
+			posY = lerp((float)w->position.y, posYlerp, w->context->deltaTime * 30.f);
+			w->position.y = (int)posY;
+
+			//printf("%f %f %i\n", posXlerp, posX, w->position.x);
+			//w->position.x = w->position.x + w->context->input->mouseMoveDelta.x;
+			//w->position.y = w->position.y + w->context->input->mouseMoveDelta.y;
+		}
+
+		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+		{
+			isMove = 0;
+		}
+	}
+
+	if (w->position.x + w->size.x < 30)
+		w->position.x += 30 - (w->position.x + w->size.x);
+	
+	if (w->position.x > w->context->windowSize.x - 30)
+		w->position.x = w->context->windowSize.x - 30;
+
+	if (w->position.y < 0)
+		w->position.y = 0;
+
+	if (w->position.y > w->context->windowSize.y - w->titlebarHeight)
+		w->position.y = w->context->windowSize.y - w->titlebarHeight;
+
+	//printf("%i %i\n", w->position.x, w->context->windowSize.x);
 }
 
 MG_API

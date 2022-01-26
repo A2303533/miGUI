@@ -29,6 +29,8 @@
 #include "miGUI.h"
 #include "mgFunctions.h"
 
+#include <time.h>
+
 void mgInitDefaultCursors(mgContext* c);
 void mgDestroyDefaultCursors(mgContext* c);
 void mgDrawWindow(struct mgWindow_s* w);
@@ -61,6 +63,7 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->needUpdateTransform = 1;
 	c->needRebuild = 1;
 	c->activeStyle = &c->styleLight;
+	c->deltaTime = 0.f;
 
 	mgColorSetAsIntegerRGB(&c->styleLight.windowBGColor, 0xE8EDFF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColor, 0xB5CCFF);
@@ -165,6 +168,14 @@ mgUpdate_f(mgContext* c)
 	case 7:  c->input->keyboardModifier = MG_KBMOD_CTRLSHIFTALT;  break;
 	}
 
+	c->input->mouseMoveDelta.x = c->input->mousePosition.x - c->input->mousePositionOld.x;
+	c->input->mouseMoveDelta.y = c->input->mousePosition.y - c->input->mousePositionOld.y;
+
+	static clock_t then = 0;
+	clock_t now = clock();
+
+	c->deltaTime = (float)(now - then) / CLOCKS_PER_SEC;
+	then = now;
 
 	mgWindow* cw = c->firstWindow;
 	if (cw)
@@ -204,6 +215,7 @@ mgStartFrame_f(mgContext* c)
 	c->input->mouseMoveDeltaOld = c->input->mouseMoveDelta;
 	c->input->mouseWheelDeltaOld = c->input->mouseWheelDelta;
 	c->input->mousePositionOld = c->input->mousePosition;
+	c->input->mouseButtonFlags1 = 0;
 
 	if ((c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN) == MG_MBFL_LMBDOWN)
 		c->input->mouseButtonFlags1 ^= MG_MBFL_LMBDOWN;
