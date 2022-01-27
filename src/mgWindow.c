@@ -144,14 +144,17 @@ mgDrawWindow(struct mgWindow_s* w)
 
 	mgStyle* style = w->userStyle ? w->userStyle : w->context->activeStyle;
 
-	w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->position, &w->size, &style->windowBGColor, &style->windowBGColor, 0, 0, 0);
+	mgColor clrbg = w->context->firstWindow->left == w ? style->windowBGColorTopWindow : style->windowBGColor;
+	mgColor clrttl = w->context->firstWindow->left == w ? style->windowTitlebarColorTopWindow : style->windowTitlebarColor;
+
+	w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->position, &w->size, &clrbg, &clrbg, 0, 0, 0);
 
 	if (w->flags & mgWindowFlag_withTitlebar)
 	{
 		mgPoint sz;
 		sz.x = w->size.x;
 		sz.y = w->titlebarHeight;
-		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, &w->position, &sz, &style->windowTitlebarColor, &style->windowTitlebarColor, 0, 0, 0);
+		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, &w->position, &sz, &clrttl, &clrttl, 0, 0, 0);
 		
 		if (w->titlebarFont && w->titlebarText)
 		{

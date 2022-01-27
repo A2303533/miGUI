@@ -65,8 +65,10 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->activeStyle = &c->styleLight;
 	c->deltaTime = 0.f;
 
-	mgColorSetAsIntegerRGB(&c->styleLight.windowBGColor, 0xE8EDFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColor, 0xB5CCFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowBGColor, 0xE1E6F7);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColor, 0xC9D6F2);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowBGColorTopWindow, 0xE8EDFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColorTopWindow, 0xB5CCFF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarTextColor, 0x0);
 	
 	
