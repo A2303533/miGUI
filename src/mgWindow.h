@@ -35,6 +35,7 @@ enum mgWindowFlag
 {
 	mgWindowFlag_withTitlebar = 0x1, /*default*/
 	mgWindowFlag_canMove = 0x2, /*default*/
+	mgWindowFlag_closeButton = 0x4,
 };
 
 enum mgWindowCursorInfo
@@ -63,6 +64,11 @@ typedef struct mgWindow_s {
 	struct mgFont_s* titlebarFont; /*titlebar text active only with font*/
 	wchar_t* titlebarText; /*use mgSetWindowTitle function*/
 	int titlebarTextLen;
+
+	int visible;
+	
+	int isMove;
+	/*int uniqueID;/*internal*/
 
 	struct mgWindow_s* left;
 	struct mgWindow_s* right;

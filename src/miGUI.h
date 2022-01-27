@@ -133,6 +133,9 @@ extern PFNMGDESTROYWINDOWPROC mgDestroyWindow;
 typedef void (*PFNMGSETWINDOWTITLEPROC)(struct mgWindow_s*, const wchar_t*);
 extern PFNMGSETWINDOWTITLEPROC mgSetWindowTitle;
 
+typedef void (*PFNMGBRINGWINDOWTOTOPPROC)(struct mgWindow_s*);
+extern PFNMGBRINGWINDOWTOTOPPROC mgBringWindowToTop;
+
 /* Create bitmap font or load from file.
 * If filename exist load from file. If not then try to generate from installed system font.
 * Destroy it by yourself (call mgDestroyFont).
@@ -208,6 +211,8 @@ typedef struct mgContext_s {
 	mgPoint windowSize;/*system window size*/
 
 	mgWindow* firstWindow;
+	mgWindow* windowUnderCursor;
+
 
 	mgCursor* defaultCursors[mgCursorType__count];
 	mgCursor* currentCursors[mgCursorType__count];

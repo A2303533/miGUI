@@ -45,6 +45,7 @@ PFNMGDRAWPROC mgDraw;
 PFNMGCREATEWINDOWPROC mgCreateWindow;
 PFNMGDESTROYWINDOWPROC mgDestroyWindow;
 PFNMGSETWINDOWTITLEPROC mgSetWindowTitle;
+PFNMGBRINGWINDOWTOTOPPROC mgBringWindowToTop;
 PFNMGCREATECURSORPROC mgCreateCursor;
 PFNMGDESTROYCURSORPROC mgDestroyCursor;
 PFNMGSETCURSORPROC mgSetCursor;
@@ -90,6 +91,7 @@ mgLoad()
 	mgCreateWindow = mgGetProc(lib, "mgCreateWindow_f");
 	mgDestroyWindow = mgGetProc(lib, "mgDestroyWindow_f");
 	mgSetWindowTitle = mgGetProc(lib, "mgSetWindowTitle_f");
+	mgBringWindowToTop = mgGetProc(lib, "mgBringWindowToTop_f");
 	mgCreateCursor = mgGetProc(lib, "mgCreateCursor_f");
 	mgDestroyCursor = mgGetProc(lib, "mgDestroyCursor_f");
 	mgSetCursor = mgGetProc(lib, "mgSetCursor_f");

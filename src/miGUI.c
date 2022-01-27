@@ -177,31 +177,39 @@ mgUpdate_f(mgContext* c)
 	c->deltaTime = (float)(now - then) / CLOCKS_PER_SEC;
 	then = now;
 
+	c->windowUnderCursor = 0;
+
 	mgWindow* cw = c->firstWindow;
 	if (cw)
 	{
-		mgUpdateWindow(cw);
-
-		mgWindow* lw = cw->left;
+		cw = cw->left;
+		
+		mgWindow* lw = cw->right;
 		while (1)
 		{
-			mgUpdateElement(cw->rootElement);
-	
-			if (c->needUpdateTransform)
+			if (cw->visible)
 			{
-				mgUpdateTransformElement(cw->rootElement);
-				c->needUpdateTransform = 0;
-			}
+				if(!c->windowUnderCursor)
+					mgUpdateWindow(cw);
 
-			if (c->needRebuild)
-			{
-				mgRebuildElement(cw->rootElement);
-				c->needRebuild = 0;
+				mgUpdateElement(cw->rootElement);
+
+				if (c->needUpdateTransform)
+				{
+					mgUpdateTransformElement(cw->rootElement);
+					c->needUpdateTransform = 0;
+				}
+
+				if (c->needRebuild)
+				{
+					mgRebuildElement(cw->rootElement);
+					c->needRebuild = 0;
+				}
 			}
 
 			if (cw == lw)
 				break;
-			cw = cw->right;
+			cw = cw->left;
 		}
 	}
 }
@@ -350,8 +358,9 @@ mgDraw_f(mgContext* c)
 		mgWindow* lw = cw->left;
 		while (1)
 		{
-			mgDrawWindow(cw);
-			//mgDrawElement(cw->rootElement);
+			if(cw->visible)
+				mgDrawWindow(cw);
+
 			if (cw == lw)
 				break;
 			cw = cw->right;

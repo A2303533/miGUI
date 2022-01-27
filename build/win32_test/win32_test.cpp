@@ -380,9 +380,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_win32font = gui_createFont("Segoe", 0, 10);
     {
-        mgWindow* guiWindow = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
-        guiWindow->titlebarFont = g_win32font;
-        mgSetWindowTitle(guiWindow, L"Window");
+        mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
+        guiWindow1->titlebarFont = g_win32font;
+        mgSetWindowTitle(guiWindow1, L"Window1");
+
+        mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
+        guiWindow2->titlebarFont = g_win32font;
+        mgSetWindowTitle(guiWindow2, L"Window2");
         //guiWindow->flags ^= mgWindowCursorInfo_titlebar;
         //guiWindow->flags ^= mgWindowFlag_canMove;
 
