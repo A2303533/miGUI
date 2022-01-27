@@ -9,6 +9,12 @@
 
 #include <time.h>
 
+#include <objidl.h>
+#include <gdiplus.h>
+#pragma comment (lib,"Gdiplus.lib")
+Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+ULONG_PTR           gdiplusToken;
+
 mgContext* g_gui_context = 0;
 mgInputContext g_input;
 HRAWINPUT g_rawInputData[0xff];
@@ -25,6 +31,21 @@ mgPoint borderSize;
 
 int g_fps = 0;
 int g_run = 1;
+
+class MyImage
+{
+public:
+    MyImage() {}
+    ~MyImage() {
+    }
+    void load(const wchar_t* f)
+    {
+        m_gdiimage = new Gdiplus::Image(f);
+    }
+
+    Gdiplus::Image * m_gdiimage = 0;
+};
+MyImage g_icons;
 
 
 /*double buffering*/
@@ -67,6 +88,10 @@ void gui_beginDraw()
 
 void gui_endDraw()
 {
+    /*Gdiplus::Graphics graphics(hdcMem);
+    Gdiplus::Pen      pen(Gdiplus::Color(255, 0, 0, 255));
+    graphics.DrawLine(&pen, 0, 0, 200, 100);*/
+    
     g_dc = GetWindowDC(g_hwnd);
     BitBlt(g_dc,
         0, 0,
@@ -106,6 +131,18 @@ void gui_drawRectangle(
     mgTexture texture, /*optional*/
     mgVec4* UVRegion)
 {
+    if (texture)
+    {
+        Gdiplus::Graphics graphics(hdcMem);
+        Gdiplus::Pen      pen(Gdiplus::Color(255, 255, 255, 255));
+        Gdiplus::Rect gdirct;
+        gdirct.X = 100;
+        gdirct.Y = 100;
+        gdirct.Width = 13;
+        gdirct.Height = 13;
+        graphics.DrawImage(g_icons.m_gdiimage, gdirct, 0, 0, 13, 13, Gdiplus::UnitPixel);
+        return;
+    }
 
     RECT r;
     r.left = position->x + borderSize.x;
@@ -319,6 +356,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
     WNDCLASSEXW wcex;
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -378,6 +417,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         g_gui_context->windowSize.y = rc.bottom - rc.top;
     }
 
+    g_icons.load(L"../data/icons.png");
     g_win32font = gui_createFont("Segoe", 0, 10);
     {
         mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
@@ -452,6 +492,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     mgDestroyContext(g_gui_context);
     mgUnload(gui_lib);
 
+    Gdiplus::GdiplusShutdown(gdiplusToken);
     return (int) msg.wParam;
 }
 

@@ -26,54 +26,22 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_WINDOW_H_
-#define _MG_WINDOW_H_
+#ifndef _MG_ICONS_H_
+#define _MG_ICONS_H_
 
-struct mgElementNode_s;
-
-enum mgWindowFlag
-{
-	mgWindowFlag_withTitlebar = 0x1, /*default*/
-	mgWindowFlag_canMove = 0x2, /*default*/
-	mgWindowFlag_closeButton = 0x4,
-	mgWindowFlag_drawBG = 0x8,
-};
-
-enum mgWindowCursorInfo
-{
-	mgWindowCursorInfo_out,
-	mgWindowCursorInfo_titlebar,
-	mgWindowCursorInfo_client,
-};
-
-typedef struct mgWindow_s {
-	mgStyle* userStyle; /*optional*/
-
-	mgPoint position;
-	mgPoint size;
-
-	int flags;
-	int titlebarHeight; /*10*/
-
-	int cursorInfo;
-
-	struct mgContext_s* context;
-	struct mgElement_s* rootElement;
-	/*struct mgElementNode_s* children;
-	int childrenCount;*/
-
-	struct mgFont_s* titlebarFont; /*titlebar text active only with font*/
-	wchar_t* titlebarText; /*use mgSetWindowTitle function*/
-	int titlebarTextLen;
-
-	int visible;
+typedef struct mgIconsNode_s {
+	mgPoint lt; /*in pixels*/
+	mgPoint rb;
 	
-	int isMove;
-	/*int uniqueID;/*internal*/
+	mgVec4 uv;
+} mgIconsNode;
 
-	struct mgWindow_s* left;
-	struct mgWindow_s* right;
-} mgWindow;
+typedef struct mgIcons_s {
+	mgTexture texture;
+	mgPoint textureSize;
+	mgIconsNode* icons;
+	int iconsSize;
+} mgIcons;
 
 
 #endif

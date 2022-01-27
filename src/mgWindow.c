@@ -58,7 +58,7 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	newWindow->size.x = sx;
 	newWindow->size.y = sy;
 	newWindow->context = ctx;
-	newWindow->flags = mgWindowFlag_withTitlebar | mgWindowFlag_canMove;
+	newWindow->flags = mgWindowFlag_withTitlebar | mgWindowFlag_canMove | mgWindowFlag_drawBG;
 	newWindow->titlebarHeight = 15;
 	newWindow->visible = 1;
 	/*newWindow->uniqueID = uniqueID++;*/
@@ -147,7 +147,8 @@ mgDrawWindow(struct mgWindow_s* w)
 	mgColor clrbg = w->context->firstWindow->left == w ? style->windowBGColorTopWindow : style->windowBGColor;
 	mgColor clrttl = w->context->firstWindow->left == w ? style->windowTitlebarColorTopWindow : style->windowTitlebarColor;
 
-	w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->position, &w->size, &clrbg, &clrbg, 0, 0, 0);
+	if (w->flags & mgWindowFlag_drawBG)
+		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->position, &w->size, &clrbg, &clrbg, 0, 0, 0);
 
 	if (w->flags & mgWindowFlag_withTitlebar)
 	{

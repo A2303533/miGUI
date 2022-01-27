@@ -368,5 +368,52 @@ mgDraw_f(mgContext* c)
 			cw = cw->right;
 		}
 	}
+}
 
+MG_API
+mgIcons* MG_C_DECL
+mgCreateIcons_f(mgTexture t, int textureSizeX, int textureSizeY, int iconNum)
+{
+	assert(t);
+	assert(textureSizeX > 0);
+	assert(textureSizeY > 0);
+	assert(iconNum > 0);
+	mgIcons* newIc = calloc(1, sizeof(mgIcons));
+	newIc->textureSize.x = textureSizeX;
+	newIc->textureSize.y = textureSizeY;
+	newIc->iconsSize = iconNum;
+	newIc->icons = malloc(iconNum * sizeof(mgIconsNode));
+	return newIc;
+}
+
+MG_API
+void MG_C_DECL
+mgDestroyIcons_f(mgIcons* ic)
+{
+	assert(ic);
+	if (ic->icons)
+		free(ic->icons);
+	free(ic);
+}
+
+MG_API
+void MG_C_DECL
+mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy)
+{
+	assert(ic);
+	assert(ic->iconsSize);
+	assert(id >= 0);
+	assert(id < ic->iconsSize);
+	ic->icons[id].lt.x = px;
+	ic->icons[id].lt.y = py;
+	ic->icons[id].rb.x = sx;
+	ic->icons[id].rb.y = sy;
+	
+	float mx = 1.f / ic->textureSize.x;
+	float my = 1.f / ic->textureSize.y;
+	
+	ic->icons[id].uv.x = px * mx;
+	ic->icons[id].uv.y = py * my;
+	ic->icons[id].uv.z = (px + sx) * mx;
+	ic->icons[id].uv.w = (py + sy) * my;
 }

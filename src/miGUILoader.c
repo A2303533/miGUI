@@ -49,6 +49,9 @@ PFNMGBRINGWINDOWTOTOPPROC mgBringWindowToTop;
 PFNMGCREATECURSORPROC mgCreateCursor;
 PFNMGDESTROYCURSORPROC mgDestroyCursor;
 PFNMGSETCURSORPROC mgSetCursor;
+PFNMGCREATEICONSPROC mgCreateIcons;
+PFNMGDESTROYICONSPROC mgDestroyIcons;
+PFNMGSETICONPROC mgSetIcon;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -95,6 +98,9 @@ mgLoad()
 	mgCreateCursor = mgGetProc(lib, "mgCreateCursor_f");
 	mgDestroyCursor = mgGetProc(lib, "mgDestroyCursor_f");
 	mgSetCursor = mgGetProc(lib, "mgSetCursor_f");
+	mgCreateIcons = mgGetProc(lib, "mgCreateIcons_f");
+	mgDestroyIcons = mgGetProc(lib, "mgDestroyIcons_f");
+	mgSetIcon = mgGetProc(lib, "mgSetIcon_f");
 
 	return lib;
 }

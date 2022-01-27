@@ -60,6 +60,7 @@ struct mgContext_s;
 
 typedef void* mgTexture;
 
+#include "mgIcons.h"
 #include "mgStyle.h"
 #include "mgWindow.h"
 #include "mgElement.h"
@@ -188,6 +189,19 @@ extern PFNMGDESTROYCURSORPROC mgDestroyCursor;
 /*if cursor == 0 then set default*/
 typedef void (*PFNMGSETCURSORPROC)(struct mgContext_s*, mgCursor* cursor, unsigned int type);
 extern PFNMGSETCURSORPROC mgSetCursor;
+
+typedef mgIcons* (*PFNMGCREATEICONSPROC)(mgTexture, int textureSizeX, int textureSizeY, int iconNum);
+extern PFNMGCREATEICONSPROC mgCreateIcons;
+
+typedef void (*PFNMGDESTROYICONSPROC)(mgIcons*);
+extern PFNMGDESTROYICONSPROC mgDestroyIcons;
+
+/*
+* px, py - left top corner of rect
+* sx, sy - size
+*/
+typedef void (*PFNMGSETICONPROC)(mgIcons*, int id, int px, int py, int sx, int sy);
+extern PFNMGSETICONPROC mgSetIcon;
 
 #if defined(__cplusplus)
 }
