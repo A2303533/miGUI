@@ -45,7 +45,7 @@ public:
 
     Gdiplus::Image * m_gdiimage = 0;
 };
-MyImage g_icons;
+MyImage g_iconsImage;
 
 
 /*double buffering*/
@@ -133,14 +133,23 @@ void gui_drawRectangle(
 {
     if (texture)
     {
-        Gdiplus::Graphics graphics(hdcMem);
-        Gdiplus::Pen      pen(Gdiplus::Color(255, 255, 255, 255));
-        Gdiplus::Rect gdirct;
-        gdirct.X = 100;
-        gdirct.Y = 100;
-        gdirct.Width = 13;
-        gdirct.Height = 13;
-        graphics.DrawImage(g_icons.m_gdiimage, gdirct, 0, 0, 13, 13, Gdiplus::UnitPixel);
+        if (reason == mgDrawRectangleReason_windowCloseButton)
+        {
+            MyImage* myimg = (MyImage*)texture;
+            Gdiplus::Graphics graphics(hdcMem);
+            //Gdiplus::Pen      pen(Gdiplus::Color(0, 0, 0, 255));
+            Gdiplus::Rect gdirct;
+            gdirct.X = position->x + borderSize.x;
+            gdirct.Y = position->y + borderSize.y;
+            gdirct.Width = size->x;
+            gdirct.Height = size->y;
+            graphics.DrawImage(myimg->m_gdiimage, gdirct, 
+                g_gui_context->currentIcon.left, 
+                g_gui_context->currentIcon.top, 
+                g_gui_context->currentIcon.right, 
+                g_gui_context->currentIcon.bottom, 
+                Gdiplus::UnitPixel);
+        }
         return;
     }
 
@@ -417,14 +426,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         g_gui_context->windowSize.y = rc.bottom - rc.top;
     }
 
-    g_icons.load(L"../data/icons.png");
+    g_iconsImage.load(L"../data/icons.png");
+    
+    mgIcons* icons = mgCreateIcons(&g_iconsImage, 512, 512, 3);
+    mgSetIcon(icons, 0, 15, 2, 11, 11);
+    mgSetIcon(icons, 1, 2, 2, 11, 11);
+    mgSetIcon(icons, 2, 29, 2, 11, 11);
+
+
     g_win32font = gui_createFont("Segoe", 0, 10);
     {
         mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
+        guiWindow1->icons = icons;
+        guiWindow1->iconCloseButton = 0;
+        guiWindow1->iconCloseButtonMouseHover = 1;
+        guiWindow1->iconCloseButtonPress = 2;
         guiWindow1->titlebarFont = g_win32font;
+        guiWindow1->titlebarHeight = 20;
         mgSetWindowTitle(guiWindow1, L"Window1");
 
         mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
+        guiWindow2->icons = icons;
+        guiWindow2->iconCloseButton = 0;
+        guiWindow2->iconCloseButtonMouseHover = 1;
+        guiWindow2->iconCloseButtonPress = 2;
         guiWindow2->titlebarFont = g_win32font;
         mgSetWindowTitle(guiWindow2, L"Window2");
         //guiWindow->flags ^= mgWindowCursorInfo_titlebar;
@@ -484,6 +509,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         draw_gui();
     }
     
+    if (icons)
+        mgDestroyIcons(icons);
+
     DeleteObject(g_win32font->implementation);
     free(g_win32font);
 

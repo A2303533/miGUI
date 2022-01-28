@@ -70,6 +70,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_user,
 	mgDrawRectangleReason_windowBG,
 	mgDrawRectangleReason_windowTitlebar,
+	mgDrawRectangleReason_windowCloseButton,
 };
 
 enum mgDrawTextReason
@@ -238,6 +239,8 @@ typedef struct mgContext_s {
 	void(*getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
 
 	struct mgFunctions_s functions;
+
+	mgRect currentIcon;
 
 	mgStyle styleLight;
 	mgStyle styleDark;

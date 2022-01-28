@@ -58,9 +58,9 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	newWindow->size.x = sx;
 	newWindow->size.y = sy;
 	newWindow->context = ctx;
-	newWindow->flags = mgWindowFlag_withTitlebar | mgWindowFlag_canMove | mgWindowFlag_drawBG;
+	newWindow->flags = mgWindowFlag_withTitlebar | mgWindowFlag_canMove | mgWindowFlag_drawBG | mgWindowFlag_closeButton;
 	newWindow->titlebarHeight = 15;
-	newWindow->visible = 1;
+	newWindow->flags |= mgWindowFlag_internal_visible;
 	/*newWindow->uniqueID = uniqueID++;*/
 	
 	newWindow->left = newWindow;
@@ -166,6 +166,46 @@ mgDrawWindow(struct mgWindow_s* w)
 				&style->windowTitlebarTextColor,
 				w->titlebarFont);
 		}
+
+		if (w->flags & mgWindowFlag_closeButton)
+		{
+			if (w->icons)
+			{
+				mgColor wh;
+				mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
+				sz = w->icons->icons[w->iconCloseButton].sz;
+				mgPoint pos;
+				pos.x = w->position.x + w->size.x - sz.x-3;
+				pos.y = w->position.y;
+
+				{
+					float ichalfsz = (float)sz.y * 0.5f;
+					float tbhalfsz = (float)w->titlebarHeight * 0.5f;
+					pos.y += (int)(tbhalfsz - ichalfsz);
+				}
+
+				int iconID = w->iconCloseButton;
+
+				w->closeButtonRect.left = pos.x;
+				w->closeButtonRect.top = pos.y;
+				w->closeButtonRect.right = w->closeButtonRect.left + sz.x;
+				w->closeButtonRect.bottom = w->closeButtonRect.top + sz.y;
+
+				if (w->cursorInfo == mgWindowCursorInfo_closeButton)
+				{
+					iconID = w->iconCloseButtonMouseHover;
+
+				}
+				if (w->flags & mgWindowFlag_internal_isCloseButton)
+					iconID = w->iconCloseButtonPress;
+
+				w->context->currentIcon.left = w->icons->icons[iconID].lt.x;
+				w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
+				w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
+				w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
+				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, &pos, &sz, &wh, &wh, 0, w->icons->texture, 0);
+			}
+		}
 	}
 
 	mgDrawElement(w->rootElement);
@@ -199,6 +239,14 @@ mgUpdateWindow(struct mgWindow_s* w)
 				if (w->context->input->mousePosition.y < (w->position.y + w->titlebarHeight))
 				{
 					w->cursorInfo = mgWindowCursorInfo_titlebar;
+
+					if ((w->context->input->mousePosition.x > w->closeButtonRect.left) && (w->context->input->mousePosition.x < (w->closeButtonRect.right)))
+					{
+						if ((w->context->input->mousePosition.y > w->closeButtonRect.top) && (w->context->input->mousePosition.y < (w->closeButtonRect.bottom)))
+						{
+							w->cursorInfo = mgWindowCursorInfo_closeButton;
+						}
+					}
 				}
 			}
 		}
@@ -206,11 +254,11 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 	if (w->cursorInfo == mgWindowCursorInfo_titlebar)
 	{
-		if (!w->isMove)
+		if (!(w->flags & mgWindowFlag_internal_isMove))
 		{
 			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 			{
-				w->isMove = 1;
+				w->flags |= mgWindowFlag_internal_isMove;
 				posX = (float)w->position.x;
 				posY = (float)w->position.y;
 				posXlerp = posX;
@@ -218,10 +266,32 @@ mgUpdateWindow(struct mgWindow_s* w)
 			}
 		}
 	}
+	else if (w->cursorInfo == mgWindowCursorInfo_closeButton)
+	{
+		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+		{
+			w->flags |= mgWindowFlag_internal_isCloseButton;
+		}
+		else if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+		{
+			if (w->flags & mgWindowFlag_internal_isCloseButton)
+			{
+				w->flags ^= mgWindowFlag_internal_visible;
+				if (w->onClose)
+					w->onClose(w);
+			}
+		}
+	}
+	
+	if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+	{
+		if(w->flags & mgWindowFlag_internal_isCloseButton)
+			w->flags ^= mgWindowFlag_internal_isCloseButton;
+	}
 
 	mgPoint oldPosition = w->position;
 
-	if (w->isMove && (w->flags & mgWindowFlag_canMove))
+	if ((w->flags & mgWindowFlag_internal_isMove) && (w->flags & mgWindowFlag_canMove))
 	{
 		if (w->context->input->mouseButtonFlags2 & MG_MBFL_LMBHOLD)
 		{
@@ -241,7 +311,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
 		{
-			w->isMove = 0;
+			w->flags ^= mgWindowFlag_internal_isMove;
 		}
 	}
 

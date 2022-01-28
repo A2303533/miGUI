@@ -32,6 +32,7 @@
 typedef struct mgIconsNode_s {
 	mgPoint lt; /*in pixels*/
 	mgPoint rb;
+	mgPoint sz;
 	
 	mgVec4 uv;
 } mgIconsNode;

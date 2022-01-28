@@ -189,7 +189,7 @@ mgUpdate_f(mgContext* c)
 		mgWindow* lw = cw->right;
 		while (1)
 		{
-			if (cw->visible)
+			if (cw->flags & mgWindowFlag_internal_visible)
 			{
 				if(!c->windowUnderCursor)
 					mgUpdateWindow(cw);
@@ -360,7 +360,7 @@ mgDraw_f(mgContext* c)
 		mgWindow* lw = cw->left;
 		while (1)
 		{
-			if(cw->visible)
+			if (cw->flags & mgWindowFlag_internal_visible)
 				mgDrawWindow(cw);
 
 			if (cw == lw)
@@ -379,6 +379,7 @@ mgCreateIcons_f(mgTexture t, int textureSizeX, int textureSizeY, int iconNum)
 	assert(textureSizeY > 0);
 	assert(iconNum > 0);
 	mgIcons* newIc = calloc(1, sizeof(mgIcons));
+	newIc->texture = t;
 	newIc->textureSize.x = textureSizeX;
 	newIc->textureSize.y = textureSizeY;
 	newIc->iconsSize = iconNum;
@@ -406,8 +407,11 @@ mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy)
 	assert(id < ic->iconsSize);
 	ic->icons[id].lt.x = px;
 	ic->icons[id].lt.y = py;
-	ic->icons[id].rb.x = sx;
-	ic->icons[id].rb.y = sy;
+	ic->icons[id].rb.x = px + sx;
+	ic->icons[id].rb.y = py + sy;
+
+	ic->icons[id].sz.x = sx;
+	ic->icons[id].sz.y = sy;
 	
 	float mx = 1.f / ic->textureSize.x;
 	float my = 1.f / ic->textureSize.y;

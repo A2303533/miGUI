@@ -37,6 +37,10 @@ enum mgWindowFlag
 	mgWindowFlag_canMove = 0x2, /*default*/
 	mgWindowFlag_closeButton = 0x4,
 	mgWindowFlag_drawBG = 0x8,
+
+	mgWindowFlag_internal_isCloseButton = 0x20000000,
+	mgWindowFlag_internal_isMove = 0x40000000,
+	mgWindowFlag_internal_visible = 0x80000000
 };
 
 enum mgWindowCursorInfo
@@ -44,6 +48,7 @@ enum mgWindowCursorInfo
 	mgWindowCursorInfo_out,
 	mgWindowCursorInfo_titlebar,
 	mgWindowCursorInfo_client,
+	mgWindowCursorInfo_closeButton,
 };
 
 typedef struct mgWindow_s {
@@ -66,10 +71,16 @@ typedef struct mgWindow_s {
 	wchar_t* titlebarText; /*use mgSetWindowTitle function*/
 	int titlebarTextLen;
 
-	int visible;
-	
-	int isMove;
-	/*int uniqueID;/*internal*/
+	//int visible;
+	//int isMove;
+
+	mgIcons* icons;
+	int iconCloseButton;
+	int iconCloseButtonMouseHover;
+	int iconCloseButtonPress;
+	mgRect closeButtonRect;
+
+	void(*onClose)(struct mgWindow_s*);
 
 	struct mgWindow_s* left;
 	struct mgWindow_s* right;
