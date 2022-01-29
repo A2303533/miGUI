@@ -37,7 +37,9 @@ enum mgWindowFlag
 	mgWindowFlag_canMove = 0x2, /*default*/
 	mgWindowFlag_closeButton = 0x4,
 	mgWindowFlag_drawBG = 0x8,
+	mgWindowFlag_collapseButton = 0x10,  /*default*/
 
+	mgWindowFlag_internal_isExpand = 0x10000000,
 	mgWindowFlag_internal_isCloseButton = 0x20000000,
 	mgWindowFlag_internal_isMove = 0x40000000,
 	mgWindowFlag_internal_visible = 0x80000000
@@ -49,6 +51,7 @@ enum mgWindowCursorInfo
 	mgWindowCursorInfo_titlebar,
 	mgWindowCursorInfo_client,
 	mgWindowCursorInfo_closeButton,
+	mgWindowCursorInfo_collapseButton,
 };
 
 typedef struct mgWindow_s {
@@ -78,9 +81,13 @@ typedef struct mgWindow_s {
 	int iconCloseButton;
 	int iconCloseButtonMouseHover;
 	int iconCloseButtonPress;
+	int iconCollapseButton;
+	int iconExpandButton;
 	mgRect closeButtonRect;
+	mgRect collapseButtonRect;
 
-	void(*onClose)(struct mgWindow_s*);
+	/*must return != 0 for hide*/
+	int(*onClose)(struct mgWindow_s*);
 
 	struct mgWindow_s* left;
 	struct mgWindow_s* right;

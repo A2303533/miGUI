@@ -133,7 +133,8 @@ void gui_drawRectangle(
 {
     if (texture)
     {
-        if (reason == mgDrawRectangleReason_windowCloseButton)
+        if (reason == mgDrawRectangleReason_windowCloseButton
+            || reason == mgDrawRectangleReason_windowCollapseButton)
         {
             MyImage* myimg = (MyImage*)texture;
             Gdiplus::Graphics graphics(hdcMem);
@@ -428,10 +429,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_iconsImage.load(L"../data/icons.png");
     
-    mgIcons* icons = mgCreateIcons(&g_iconsImage, 512, 512, 3);
-    mgSetIcon(icons, 0, 15, 2, 11, 11);
-    mgSetIcon(icons, 1, 2, 2, 11, 11);
-    mgSetIcon(icons, 2, 29, 2, 11, 11);
+    mgIcons* icons = mgCreateIcons(&g_iconsImage, 512, 512, 5);
+    mgSetIcon(icons, 0, 15, 2, 11, 11); //close wnd
+    mgSetIcon(icons, 1, 2, 2, 11, 11); // close wnd mouse hover
+    mgSetIcon(icons, 2, 29, 2, 11, 11); // close wnd push
+    mgSetIcon(icons, 3, 42, 2, 11, 11); // collapse wnd
+    mgSetIcon(icons, 4, 53, 2, 11, 11); // expand wnd
 
 
     g_win32font = gui_createFont("Segoe", 0, 10);
@@ -441,8 +444,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         guiWindow1->iconCloseButton = 0;
         guiWindow1->iconCloseButtonMouseHover = 1;
         guiWindow1->iconCloseButtonPress = 2;
+        guiWindow1->iconCollapseButton = 3;
+        guiWindow1->iconExpandButton = 4;
         guiWindow1->titlebarFont = g_win32font;
         guiWindow1->titlebarHeight = 20;
+        guiWindow1->flags ^= mgWindowFlag_closeButton;
         mgSetWindowTitle(guiWindow1, L"Window1");
 
         mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
@@ -451,9 +457,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         guiWindow2->iconCloseButtonMouseHover = 1;
         guiWindow2->iconCloseButtonPress = 2;
         guiWindow2->titlebarFont = g_win32font;
+        guiWindow2->flags ^= mgWindowFlag_collapseButton;
         mgSetWindowTitle(guiWindow2, L"Window2");
-        //guiWindow->flags ^= mgWindowCursorInfo_titlebar;
-        //guiWindow->flags ^= mgWindowFlag_canMove;
+        //guiWindow2->flags ^= mgWindowFlag_withTitlebar;
+        //guiWindow2->flags ^= mgWindowFlag_canMove;
 
         /*mgPoint pos, sz;
         mgColor c1, c2;

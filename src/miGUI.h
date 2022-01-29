@@ -71,6 +71,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_windowBG,
 	mgDrawRectangleReason_windowTitlebar,
 	mgDrawRectangleReason_windowCloseButton,
+	mgDrawRectangleReason_windowCollapseButton,
 };
 
 enum mgDrawTextReason

@@ -58,9 +58,18 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	newWindow->size.x = sx;
 	newWindow->size.y = sy;
 	newWindow->context = ctx;
-	newWindow->flags = mgWindowFlag_withTitlebar | mgWindowFlag_canMove | mgWindowFlag_drawBG | mgWindowFlag_closeButton;
+	
+	newWindow->flags 
+		= mgWindowFlag_withTitlebar 
+		| mgWindowFlag_canMove 
+		| mgWindowFlag_drawBG 
+		| mgWindowFlag_closeButton
+		| mgWindowFlag_collapseButton;
+
 	newWindow->titlebarHeight = 15;
-	newWindow->flags |= mgWindowFlag_internal_visible;
+	newWindow->flags 
+		|= mgWindowFlag_internal_visible
+		| mgWindowFlag_internal_isExpand;
 	/*newWindow->uniqueID = uniqueID++;*/
 	
 	newWindow->left = newWindow;
@@ -147,20 +156,66 @@ mgDrawWindow(struct mgWindow_s* w)
 	mgColor clrbg = w->context->firstWindow->left == w ? style->windowBGColorTopWindow : style->windowBGColor;
 	mgColor clrttl = w->context->firstWindow->left == w ? style->windowTitlebarColorTopWindow : style->windowTitlebarColor;
 
-	if (w->flags & mgWindowFlag_drawBG)
+	if ((w->flags & mgWindowFlag_drawBG) && (w->flags & mgWindowFlag_internal_isExpand))
 		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->position, &w->size, &clrbg, &clrbg, 0, 0, 0);
 
 	if (w->flags & mgWindowFlag_withTitlebar)
 	{
+		float tbhalfsz = (float)w->titlebarHeight * 0.5f;
+
 		mgPoint sz;
+
 		sz.x = w->size.x;
 		sz.y = w->titlebarHeight;
 		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, &w->position, &sz, &clrttl, &clrttl, 0, 0, 0);
 		
+		int text_move = 0;
+		if (w->flags & mgWindowFlag_collapseButton)
+		{
+			if (w->icons)
+			{
+				mgPoint pos;
+				pos.x = w->position.x + 3;
+				pos.y = w->position.y;
+				int iconID = w->iconExpandButton;
+
+				if (w->flags & mgWindowFlag_internal_isExpand)
+					iconID = w->iconCollapseButton;
+
+				sz = w->icons->icons[iconID].sz;
+
+
+				text_move = sz.x + 3;
+
+				mgColor wh;
+				mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
+
+				{
+					float ichalfsz = (float)sz.y * 0.5f;
+					pos.y += (int)(tbhalfsz - ichalfsz);
+				}
+
+				w->collapseButtonRect.left = pos.x;
+				w->collapseButtonRect.top = pos.y;
+				w->collapseButtonRect.right = w->collapseButtonRect.left + sz.x;
+				w->collapseButtonRect.bottom = w->collapseButtonRect.top + sz.y;
+
+				w->context->currentIcon.left = w->icons->icons[iconID].lt.x;
+				w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
+				w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
+				w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
+				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, &pos, &sz, &wh, &wh, 0, w->icons->texture, 0);
+			}
+		}
+
 		if (w->titlebarFont && w->titlebarText)
 		{
+			mgPoint pos;
+			pos.x = w->position.x + text_move + 3;
+			pos.y = w->position.y;
+
 			w->context->gpu->drawText(mgDrawTextReason_windowTitlebar,
-				&w->position,
+				&pos,
 				w->titlebarText,
 				w->titlebarTextLen,
 				&style->windowTitlebarTextColor,
@@ -180,7 +235,6 @@ mgDrawWindow(struct mgWindow_s* w)
 
 				{
 					float ichalfsz = (float)sz.y * 0.5f;
-					float tbhalfsz = (float)w->titlebarHeight * 0.5f;
 					pos.y += (int)(tbhalfsz - ichalfsz);
 				}
 
@@ -208,7 +262,8 @@ mgDrawWindow(struct mgWindow_s* w)
 		}
 	}
 
-	mgDrawElement(w->rootElement);
+	if (w->flags & mgWindowFlag_internal_isExpand)
+		mgDrawElement(w->rootElement);
 }
 
 void
@@ -247,6 +302,13 @@ mgUpdateWindow(struct mgWindow_s* w)
 							w->cursorInfo = mgWindowCursorInfo_closeButton;
 						}
 					}
+					else if ((w->context->input->mousePosition.x > w->collapseButtonRect.left) && (w->context->input->mousePosition.x < (w->collapseButtonRect.right)))
+					{
+						if ((w->context->input->mousePosition.y > w->collapseButtonRect.top) && (w->context->input->mousePosition.y < (w->collapseButtonRect.bottom)))
+						{
+							w->cursorInfo = mgWindowCursorInfo_collapseButton;
+						}
+					}
 				}
 			}
 		}
@@ -276,10 +338,26 @@ mgUpdateWindow(struct mgWindow_s* w)
 		{
 			if (w->flags & mgWindowFlag_internal_isCloseButton)
 			{
-				w->flags ^= mgWindowFlag_internal_visible;
 				if (w->onClose)
-					w->onClose(w);
+				{
+					if(w->onClose(w))
+						w->flags ^= mgWindowFlag_internal_visible;
+				}
+				else
+				{
+					w->flags ^= mgWindowFlag_internal_visible;
+				}
 			}
+		}
+	}
+	else if (w->cursorInfo == mgWindowCursorInfo_collapseButton)
+	{
+		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+		{
+			if (w->flags & mgWindowFlag_internal_isExpand)
+				w->flags ^= mgWindowFlag_internal_isExpand;
+			else
+				w->flags |= mgWindowFlag_internal_isExpand;
 		}
 	}
 	
