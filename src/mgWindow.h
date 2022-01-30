@@ -35,11 +35,13 @@ enum mgWindowFlag
 {
 	mgWindowFlag_withTitlebar = 0x1, /*default*/
 	mgWindowFlag_canMove = 0x2, /*default*/
-	mgWindowFlag_closeButton = 0x4,
-	mgWindowFlag_drawBG = 0x8,
+	mgWindowFlag_closeButton = 0x4,  /*default*/
+	mgWindowFlag_drawBG = 0x8,  /*default*/
 	mgWindowFlag_collapseButton = 0x10,  /*default*/
+	mgWindowFlag_canResize = 0x20,  /*default*/
 
-	mgWindowFlag_internal_isExpand = 0x10000000,
+	mgWindowFlag_internal_isResizeRB = 0x8000000,
+	mgWindowFlag_internal_isExpand   = 0x10000000,
 	mgWindowFlag_internal_isCloseButton = 0x20000000,
 	mgWindowFlag_internal_isMove = 0x40000000,
 	mgWindowFlag_internal_visible = 0x80000000
@@ -52,6 +54,7 @@ enum mgWindowCursorInfo
 	mgWindowCursorInfo_client,
 	mgWindowCursorInfo_closeButton,
 	mgWindowCursorInfo_collapseButton,
+	mgWindowCursorInfo_resizeRB,
 };
 
 typedef struct mgWindow_s {
@@ -59,6 +62,9 @@ typedef struct mgWindow_s {
 
 	mgPoint position;
 	mgPoint size;
+	mgRect  rect; /*auto calculation in mgUpdateWindow*/
+
+	mgPoint sizeMinimum;
 
 	int flags;
 	int titlebarHeight; /*10*/
@@ -85,6 +91,7 @@ typedef struct mgWindow_s {
 	int iconExpandButton;
 	mgRect closeButtonRect;
 	mgRect collapseButtonRect;
+	mgRect resizeRBRect;
 
 	/*must return != 0 for hide*/
 	int(*onClose)(struct mgWindow_s*);

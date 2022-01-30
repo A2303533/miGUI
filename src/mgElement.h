@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -29,6 +29,19 @@
 #ifndef _MG_ELEMENT_H_
 #define _MG_ELEMENT_H_
 
+enum mgAlignment
+{
+	mgAlignment_leftTop,
+	mgAlignment_top,
+	mgAlignment_rightTop,
+	mgAlignment_right,
+	mgAlignment_rightBottom,
+	mgAlignment_bottom,
+	mgAlignment_leftBottom,
+	mgAlignment_left,
+	mgAlignment_center
+};
+
 enum {
 	MG_TYPE_RECTANGLE = 1,
 	MG_TYPE_TEXT,
@@ -42,6 +55,11 @@ struct mgElementNode_s {
 	struct mgElement_s* pointer;
 };
 
+struct mgElementTransform_s {
+	mgRect buildArea;
+	mgRect clipArea;
+	mgPoint sz;/*set when create or resize*/
+};
 
 /* base data for all GUI widgets*/
 typedef struct mgElement_s {
@@ -49,6 +67,8 @@ typedef struct mgElement_s {
 	void* implementation;
 
 	struct mgWindow_s* window;
+
+	int align; /*mgAlignment*/
 
 	int id;
 	void* userData;
@@ -59,10 +79,8 @@ typedef struct mgElement_s {
 	struct mgElementNode_s* children;
 	int childrenCount;
 
-	/*mgRect buildArea;
-	mgRect clipArea;
-	mgRect buildAreaFinal;
-	mgRect clipAreaFinal;*/
+	struct mgElementTransform_s transformLocal;
+	struct mgElementTransform_s transformWorld; /*transformLocal + parent->transformLocal*/
 
 	void(*onDraw)(struct mgElement_s* e);
 	void(*onUpdate)(struct mgElement_s* e);

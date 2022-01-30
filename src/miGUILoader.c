@@ -39,7 +39,7 @@ PFNMGUPDATEPROC mgUpdate;
 PFNMGSETPARENTPROC mgSetParent;
 PFNMGSETVISIBLEPROC mgSetVisible;
 PFNMGDRAWPROC mgDraw;
-//PFNMGCREATERECTANGLEPROC mgCreateRectangle;
+PFNMGCREATERECTANGLEPROC mgCreateRectangle;
 //PFNMGCREATETEXTPROC mgCreateText;
 //PFNMGCREATEBUTTONPROC mgCreateButton;
 PFNMGCREATEWINDOWPROC mgCreateWindow;
@@ -88,8 +88,8 @@ mgLoad()
 	mgSetParent = mgGetProc(lib, "mgSetParent_f");
 	mgSetVisible = mgGetProc(lib, "mgSetVisible_f");
 	mgDraw = mgGetProc(lib, "mgDraw_f");
-	/*mgCreateRectangle = mgGetProc(lib, "mgCreateRectangle_f");
-	mgCreateText = mgGetProc(lib, "mgCreateText_f");
+	mgCreateRectangle = mgGetProc(lib, "mgCreateRectangle_f");
+	/*mgCreateText = mgGetProc(lib, "mgCreateText_f");
 	mgCreateButton = mgGetProc(lib, "mgCreateButton_f");*/
 	mgCreateWindow = mgGetProc(lib, "mgCreateWindow_f");
 	mgDestroyWindow = mgGetProc(lib, "mgDestroyWindow_f");

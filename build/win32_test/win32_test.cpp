@@ -112,10 +112,14 @@ void gui_destroyTexture(mgTexture t)
 
 }
 
+RECT g_clipRect;
 mgRect gui_setClipRect(mgRect* r)
 {
     static mgRect old;
-
+    g_clipRect.left = r->left;
+    g_clipRect.top = r->top;
+    g_clipRect.right = r->right;
+    g_clipRect.bottom = r->bottom;
     mgRect ret = old;
     old = *r;
     return ret;
@@ -163,43 +167,60 @@ void gui_drawRectangle(
     unsigned int c1 = mgColorGetAsIntegerARGB(color1);
     unsigned int c2 = mgColorGetAsIntegerARGB(color2);
 
-    HBRUSH brsh = CreateSolidBrush(c1);
+    HBRUSH brsh = CreateSolidBrush(RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
     SelectObject(hdcMem, brsh);
-
-    /*RoundRect(hdcMem, r.left, r.top, r.right, r.bottom, 6, 6);*/
-    /*or with clip region*/
-    
-    int roundRectBtm = r.bottom;
-    if (reason == mgDrawRectangleReason_windowTitlebar)
-        roundRectBtm += 7;
-
-    HRGN rgn = CreateRoundRectRgn(r.left, r.top, r.right, roundRectBtm, 7, 7);
-    
-    SelectClipRgn(hdcMem, rgn);
-    
-
-    /*FillRect(hdcMem, &r, brsh);*/
-    /*or gradient*/
+    HRGN rgn = 0;
+    if (reason == mgDrawRectangleReason_rectangle)
     {
-        TRIVERTEX vertex[2];
-        vertex[0].x = r.left;
-        vertex[0].y = r.top;
-        vertex[0].Red = (c1 & 0x000000ff) << 8;
-        vertex[0].Green = (c1 & 0x0000ff00);
-        vertex[0].Blue = (c1 & 0x00ff0000) >> 8;
-        vertex[0].Alpha = (c1 & 0xff000000) >> 16;
+        rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
+        SelectClipRgn(hdcMem, rgn);
+        FillRect(hdcMem, &r, brsh);
+       /* Gdiplus::Graphics graphics(hdcMem);
+        Gdiplus::SolidBrush br(Gdiplus::Color(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
+        Gdiplus::Rect gdirct;
+        gdirct.X = r.left;
+        gdirct.Y = r.top;
+        gdirct.Width = size->x;
+        gdirct.Height = size->y;
+        graphics.FillRectangle(&br, gdirct);*/
+    }
+    else
+    {
+        /*RoundRect(hdcMem, r.left, r.top, r.right, r.bottom, 6, 6);*/
+        /*or with clip region*/
 
-        vertex[1].x = r.right;
-        vertex[1].y = r.bottom;
-        vertex[1].Red = (c2 & 0x000000ff) << 8;
-        vertex[1].Green = (c2 & 0x0000ff00);
-        vertex[1].Blue = (c2 & 0x00ff0000) >> 8;
-        vertex[1].Alpha = (c2 & 0xff000000) >> 16;
+        int roundRectBtm = r.bottom;
+        if (reason == mgDrawRectangleReason_windowTitlebar)
+            roundRectBtm += 7;
 
-        GRADIENT_RECT gRect;
-        gRect.UpperLeft = 0;
-        gRect.LowerRight = 1;
-        GradientFill(hdcMem, vertex, 2, &gRect, 1, GRADIENT_FILL_RECT_V);
+        rgn = CreateRoundRectRgn(r.left, r.top, r.right, roundRectBtm, 7, 7);
+
+        SelectClipRgn(hdcMem, rgn);
+
+
+        /*FillRect(hdcMem, &r, brsh);*/
+        /*or gradient*/
+        {
+            TRIVERTEX vertex[2];
+            vertex[0].x = r.left;
+            vertex[0].y = r.top;
+            vertex[0].Red = (c1 & 0x000000ff) << 8;
+            vertex[0].Green = (c1 & 0x0000ff00);
+            vertex[0].Blue = (c1 & 0x00ff0000) >> 8;
+            vertex[0].Alpha = (c1 & 0xff000000) >> 16;
+
+            vertex[1].x = r.right;
+            vertex[1].y = r.bottom;
+            vertex[1].Red = (c2 & 0x000000ff) << 8;
+            vertex[1].Green = (c2 & 0x0000ff00);
+            vertex[1].Blue = (c2 & 0x00ff0000) >> 8;
+            vertex[1].Alpha = (c2 & 0xff000000) >> 16;
+
+            GRADIENT_RECT gRect;
+            gRect.UpperLeft = 0;
+            gRect.LowerRight = 1;
+            GradientFill(hdcMem, vertex, 2, &gRect, 1, GRADIENT_FILL_RECT_V);
+        }
     }
 
     DeleteObject(rgn);
@@ -450,6 +471,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         guiWindow1->titlebarHeight = 20;
         guiWindow1->flags ^= mgWindowFlag_closeButton;
         mgSetWindowTitle(guiWindow1, L"Window1");
+        
+        mgPoint pos, sz;
+        mgColor c1, c2;
+        mgPointSet(&pos, 30, 30);
+        mgPointSet(&sz, 50, 500);
+        c1.setAsIntegerRGB(0xff0000);
+        c2.setAsIntegerRGB(0x0000FF);
+        mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
 
         mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
         guiWindow2->icons = icons;
@@ -500,8 +529,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-
-        Sleep(1);
 
         fps_counter += 1;
         fps_time += g_gui_context->deltaTime;

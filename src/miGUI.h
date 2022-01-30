@@ -72,6 +72,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_windowTitlebar,
 	mgDrawRectangleReason_windowCloseButton,
 	mgDrawRectangleReason_windowCollapseButton,
+	mgDrawRectangleReason_rectangle,
 };
 
 enum mgDrawTextReason
@@ -161,17 +162,14 @@ extern PFNMGUPDATEPROC mgUpdate;
 typedef void (*PFNMGSETPARENTPROC)(mgElement* object, mgElement* parent);
 extern PFNMGSETPARENTPROC mgSetParent;
 
-//typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
-//extern PFNMGCREATERECTANGLEPROC mgCreateRectangle_p;
-//#define mgCreateRectangle mgCreateRectangle_p
-//
+typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
+extern PFNMGCREATERECTANGLEPROC mgCreateRectangle;
+
 //typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
 //extern PFNMGCREATETEXTPROC mgCreateText_p;
-//#define mgCreateText mgCreateText_p
-//
+
 //typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
 //extern PFNMGCREATEBUTTONPROC mgCreateButton_p;
-//#define mgCreateButton mgCreateButton_p
 
 /*set visible include all children*/
 typedef void (*PFNMGSETVISIBLEPROC)(mgElement*, int);

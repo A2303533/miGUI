@@ -201,7 +201,6 @@ mgUpdate_f(mgContext* c)
 					if (c->needUpdateTransform)
 					{
 						mgUpdateTransformElement(cw->rootElement);
-						c->needUpdateTransform = 0;
 					}
 
 					if (c->needRebuild)
@@ -216,6 +215,7 @@ mgUpdate_f(mgContext* c)
 				break;
 			cw = cw->left;
 		}
+		c->needUpdateTransform = 0;
 	}
 }
 
