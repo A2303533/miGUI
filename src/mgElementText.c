@@ -33,11 +33,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+void miGUI_onUpdateTransform_rectangle(mgElement* e);
+
 void
 miGUI_onUpdateTransform_text(mgElement* e)
 {
-	/*e->buildAreaFinal = e->buildArea;
-	e->clipAreaFinal = e->clipArea;*/
+	miGUI_onUpdateTransform_rectangle(e);
+	e->transformLocal.clipArea = e->transformLocal.buildArea;
+	e->transformLocal.clipArea.right = e->transformLocal.clipArea.left + e->transformLocal.sz.x;
+	e->transformLocal.clipArea.bottom = e->transformLocal.clipArea.top + e->transformLocal.sz.y;
+	
+	e->transformWorld.clipArea.right = e->transformWorld.clipArea.left + e->transformLocal.sz.x;
+	e->transformWorld.clipArea.bottom = e->transformWorld.clipArea.top + e->transformLocal.sz.y;
 }
 
 void 
@@ -48,38 +55,57 @@ miGUI_onUpdate_text(mgElement* e)
 void 
 miGUI_onDraw_text(mgElement* e)
 {
-	/*mgPoint pos;
-	pos.x = e->buildAreaFinal.left;
-	pos.y = e->buildAreaFinal.top;
+	mgPoint pos;
+	pos.x = e->transformWorld.buildArea.left;
+	pos.y = e->transformWorld.buildArea.top;
 
 	mgElementText* impl = (mgElementText*)e->implementation;
 
 	if (impl->text && impl->textLen)
 	{
-		e->context->gpu->setClipRect(&e->clipAreaFinal);
-		e->context->gpu->drawText(&pos, impl->text, impl->textLen, &impl->color, impl->font);
-	}*/
+		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
+		e->window->context->gpu->drawText(mgDrawTextReason_text, &pos, impl->text, impl->textLen, &impl->color, impl->font);
+	}
 }
 
 void
-miGUI_onRebuild_text(mgElement* e) {}
+miGUI_onRebuild_text(mgElement* e) {
+	mgElementText* impl = (mgElementText*)e->implementation;
+	if (impl->text && e->window->context->getTextSize)
+	{
+		mgPoint p;
+		e->window->context->getTextSize(impl->text, impl->font, &p);
+		e->transformLocal.sz = p;
+
+		miGUI_onUpdateTransform_rectangle(e);
+	}
+}
 
 MG_API
 mgElement* MG_C_DECL
-mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font)
+mgCreateText_f(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgFont* font)
 {
-	assert(c);
+	assert(w);
 	assert(position);
 	assert(text);
 	assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
-	/*newElement->type = MG_TYPE_TEXT;
-	newElement->buildArea.left = position->x;
+	newElement->type = MG_TYPE_TEXT;
+	
+	/*newElement->buildArea.left = position->x;
 	newElement->buildArea.top = position->y;
 	newElement->buildArea.right = position->x;
 	newElement->buildArea.bottom = position->y;
-	newElement->clipArea = newElement->buildArea;
-	newElement->context = c;
+	newElement->clipArea = newElement->buildArea;*/
+	newElement->transformLocal.buildArea.left = position->x;
+	newElement->transformLocal.buildArea.top = position->y;
+	newElement->transformLocal.buildArea.right = position->x;
+	newElement->transformLocal.buildArea.bottom = position->y;
+	newElement->transformLocal.clipArea = newElement->transformLocal.buildArea;
+	/*newElement->transformLocal.sz = *size;*/
+	newElement->creationRect = newElement->transformLocal.buildArea;
+	
+	newElement->window = w;
 	newElement->visible = 1;
 	newElement->onDraw = miGUI_onDraw_text;
 	newElement->onUpdate = miGUI_onUpdate_text;
@@ -96,7 +122,8 @@ mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mg
 	impl->text = text;
 	impl->textLen = wcslen(text);
 
-	mgSetParent_f(newElement, 0);*/
+	mgSetParent_f(newElement, 0);
+	miGUI_onRebuild_text(newElement);
 
 	return newElement;
 }

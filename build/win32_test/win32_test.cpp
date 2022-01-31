@@ -489,14 +489,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         mgPointSet(&sz, 50, 500);
         c1.setAsIntegerRGB(0xff0000);
         c2.setAsIntegerRGB(0x0000FF);
-      //  mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
-       // er->align = mgAlignment_center;
+        mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
+        er->align = mgAlignment_center;
 
         mgPointSet(&pos, 100, 60);
         mgPointSet(&sz, 100, 40);
-
         mgElement* eb = mgCreateButton(guiWindow1, &pos, &sz, L"Button", g_win32font);
-        eb->align = mgAlignment_center;
+        eb->align = mgAlignment_rightBottom;
+
+        mgPointSet(&pos, 100, 100);
+        mgElement* et = mgCreateText(guiWindow1, &pos, L"Text", g_win32font);
+        et->align = mgAlignment_rightBottom;
 
         mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
         guiWindow2->icons = icons;

@@ -81,6 +81,7 @@ enum mgDrawTextReason
 	mgDrawTextReason_user,
 	mgDrawTextReason_windowTitlebar,
 	mgDrawTextReason_buttonText,
+	mgDrawTextReason_text,
 };
 
 /* Before creating GUI context you must create this objects.
@@ -167,8 +168,8 @@ extern PFNMGSETPARENTPROC mgSetParent;
 typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
 extern PFNMGCREATERECTANGLEPROC mgCreateRectangle;
 
-//typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
-//extern PFNMGCREATETEXTPROC mgCreateText_p;
+typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgWindow_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
+extern PFNMGCREATETEXTPROC mgCreateText;
 
 typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
 extern PFNMGCREATEBUTTONPROC mgCreateButton;
