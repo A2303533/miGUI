@@ -80,6 +80,12 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	newWindow->sizeMinimum.x = 100;
 	newWindow->sizeMinimum.y = 50;
 
+	newWindow->rect.left = newWindow->position.x;
+	newWindow->rect.top = newWindow->position.y;
+	newWindow->rect.right = newWindow->rect.left + newWindow->size.x;
+	newWindow->rect.bottom = newWindow->rect.top + newWindow->size.y;
+
+
 	newWindow->rootElement = calloc(1, sizeof(mgElement));
 	newWindow->rootElement->window = newWindow;
 	newWindow->rootElement->visible = 1;
@@ -87,6 +93,12 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	newWindow->rootElement->onUpdate = mgrootobject_cb;
 	newWindow->rootElement->onUpdateTransform = mgrootobject_cb;
 	newWindow->rootElement->onRebuild = mgrootobject_cb;
+
+	newWindow->rootElement->transformLocal.buildArea = newWindow->rect;
+	newWindow->rootElement->transformLocal.clipArea = newWindow->rect;
+	newWindow->rootElement->transformWorld = newWindow->rootElement->transformLocal;
+	newWindow->rootElement->creationRect = newWindow->rootElement->transformLocal.buildArea;
+	newWindow->rootElement->transformLocal.clipArea.top += newWindow->titlebarHeight;
 
 	if (ctx->firstWindow)
 	{
@@ -284,10 +296,15 @@ mgUpdateWindow(struct mgWindow_s* w)
 	static mgPoint firstClick;
 	static mgPoint saveSize;
 
+
 	w->cursorInfo = mgWindowCursorInfo_out;
 	int windowBtm = w->position.y + w->size.y;
 
 	int needUpdateTransform = 0;
+	{
+	begin:;
+		needUpdateTransform = 1;
+	}
 
 	if (w->flags & mgWindowFlag_collapseButton)
 	{
@@ -295,10 +312,10 @@ mgUpdateWindow(struct mgWindow_s* w)
 			windowBtm = w->position.y + w->titlebarHeight;
 	}
 
-	w->rect.left = w->position.x;
+	/*w->rect.left = w->position.x;
 	w->rect.top = w->position.y;
 	w->rect.right = w->rect.left + w->size.x;
-	w->rect.bottom = windowBtm;
+	w->rect.bottom = windowBtm;*/
 
 	if (mgPointInRect(&w->rect, &w->context->input->mousePosition))
 	{
@@ -405,10 +422,11 @@ mgUpdateWindow(struct mgWindow_s* w)
 	}
 	else
 	{
-		if(!(w->flags & mgWindowFlag_internal_isResizeRB))
-			mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 	}
-	
+
+	if (!(w->cursorInfo & mgWindowCursorInfo_resizeRB) && (w->cursorInfoOld & mgWindowCursorInfo_resizeRB))
+		mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+
 	if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
 	{
 		if(w->flags & mgWindowFlag_internal_isCloseButton)
@@ -464,6 +482,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 				if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
 				{
 					w->flags ^= mgWindowFlag_internal_isResizeRB;
+					goto begin;/*fix some sht*/
 				}
 			}
 		}
@@ -487,6 +506,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 	w->rect.bottom = windowBtm;
 	w->rootElement->transformLocal.buildArea = w->rect;
 	w->rootElement->transformLocal.clipArea = w->rect;
+	w->rootElement->transformLocal.clipArea.top += w->titlebarHeight;
 	w->rootElement->transformWorld = w->rootElement->transformLocal;
 
 	if (w->flags & mgWindowFlag_internal_isMove)
@@ -495,6 +515,8 @@ mgUpdateWindow(struct mgWindow_s* w)
 	if(needUpdateTransform)
 		mgUpdateTransformElement(w->rootElement);
 	//printf("%i %i\n", w->position.x, w->context->windowSize.x);
+
+	w->cursorInfoOld = w->cursorInfo;
 }
 
 MG_API

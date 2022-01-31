@@ -67,9 +67,11 @@ typedef struct mgWindow_s {
 	mgPoint sizeMinimum;
 
 	int flags;
+	/*int flagsOld;*/
 	int titlebarHeight; /*10*/
 
 	int cursorInfo;
+	int cursorInfoOld;
 
 	struct mgContext_s* context;
 	struct mgElement_s* rootElement;

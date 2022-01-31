@@ -58,7 +58,7 @@ struct mgElementNode_s {
 struct mgElementTransform_s {
 	mgRect buildArea;
 	mgRect clipArea;
-	mgPoint sz;/*set when create or resize*/
+	mgPoint sz; /*can change*/
 };
 
 /* base data for all GUI widgets*/
@@ -79,6 +79,7 @@ typedef struct mgElement_s {
 	struct mgElementNode_s* children;
 	int childrenCount;
 
+	mgRect creationRect;
 	struct mgElementTransform_s transformLocal;
 	struct mgElementTransform_s transformWorld; /*transformLocal + parent->transformLocal*/
 

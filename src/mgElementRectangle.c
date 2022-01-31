@@ -47,6 +47,125 @@ miGUI_onUpdateTransform_rectangle(mgElement* e)
 	e->transformWorld.clipArea.right += e->parent->transformWorld.clipArea.left;
 	e->transformWorld.clipArea.bottom += e->parent->transformWorld.clipArea.top;
 
+	float parentRectSizeX_1 = 1.f / (e->parent->transformWorld.buildArea.right - e->parent->transformWorld.buildArea.left);
+	float parentRectSizeY_1 = 1.f / (e->parent->transformWorld.buildArea.bottom - e->parent->transformWorld.buildArea.top);
+
+	float parentCreationCenter_X = e->parent->creationRect.left +
+		((e->parent->creationRect.right - e->parent->creationRect.left) * 0.5f);
+	float parentCreationCenter_Y = e->parent->creationRect.top +
+		((e->parent->creationRect.bottom - e->parent->creationRect.top) * 0.5f);
+
+	float parentCurrentCenter_X = e->parent->transformWorld.buildArea.left +
+		((e->parent->transformWorld.buildArea.right - e->parent->transformWorld.buildArea.left) * 0.5f);
+	float parentCurrentCenter_Y = e->parent->transformWorld.buildArea.top +
+		((e->parent->transformWorld.buildArea.bottom - e->parent->transformWorld.buildArea.top) * 0.5f);
+
+	float parentRectSizeDiff_X = parentCurrentCenter_X - parentCreationCenter_X;
+	float parentRectSizeDiff_Y = parentCurrentCenter_Y - parentCreationCenter_Y;
+
+	switch (e->align)
+	{
+	case mgAlignment_leftTop:
+		break;
+	case mgAlignment_rightTop:
+	_rightTop:;
+		e->transformWorld.buildArea.left  = 
+			e->parent->transformWorld.buildArea.right - 
+			(e->parent->creationRect.right - e->creationRect.left);
+
+		e->transformWorld.buildArea.right = 
+			e->parent->transformWorld.buildArea.right - 
+			(e->parent->creationRect.right - e->creationRect.right);
+
+		e->transformWorld.clipArea.left  = e->transformWorld.buildArea.left;
+		e->transformWorld.clipArea.right = e->transformWorld.buildArea.right;
+		break;
+	case mgAlignment_leftBottom:
+	_leftBottom:;
+		e->transformWorld.buildArea.top =
+			e->parent->transformWorld.buildArea.bottom -
+			(e->parent->creationRect.bottom - e->creationRect.top);
+
+		e->transformWorld.buildArea.bottom =
+			e->parent->transformWorld.buildArea.bottom -
+			(e->parent->creationRect.bottom - e->creationRect.bottom);
+
+		e->transformWorld.clipArea.top = e->transformWorld.buildArea.top;
+		e->transformWorld.clipArea.bottom = e->transformWorld.buildArea.bottom;
+		break;
+	case mgAlignment_rightBottom:
+		e->transformWorld.buildArea.left =
+			e->parent->transformWorld.buildArea.right -
+			(e->parent->creationRect.right - e->creationRect.left);
+
+		e->transformWorld.buildArea.right =
+			e->parent->transformWorld.buildArea.right -
+			(e->parent->creationRect.right - e->creationRect.right);
+
+		e->transformWorld.clipArea.left = e->transformWorld.buildArea.left;
+		e->transformWorld.clipArea.right = e->transformWorld.buildArea.right;
+
+		e->transformWorld.buildArea.top =
+			e->parent->transformWorld.buildArea.bottom -
+			(e->parent->creationRect.bottom - e->creationRect.top);
+
+		e->transformWorld.buildArea.bottom =
+			e->parent->transformWorld.buildArea.bottom -
+			(e->parent->creationRect.bottom - e->creationRect.bottom);
+
+		e->transformWorld.clipArea.top = e->transformWorld.buildArea.top;
+		e->transformWorld.clipArea.bottom = e->transformWorld.buildArea.bottom;
+
+		break;
+	case mgAlignment_top:
+		e->transformWorld.buildArea.left = e->transformLocal.buildArea.left + parentRectSizeDiff_X;
+		e->transformWorld.buildArea.right = e->transformLocal.buildArea.right + parentRectSizeDiff_X;
+
+		e->transformWorld.clipArea.left = e->transformWorld.buildArea.left;
+		e->transformWorld.clipArea.right = e->transformWorld.buildArea.right;
+		break;
+	case mgAlignment_left:
+		e->transformWorld.buildArea.top = e->transformLocal.buildArea.top + parentRectSizeDiff_Y;
+		e->transformWorld.buildArea.bottom = e->transformLocal.buildArea.bottom + parentRectSizeDiff_Y;
+
+		e->transformWorld.clipArea.top = e->transformWorld.buildArea.top;
+		e->transformWorld.clipArea.bottom = e->transformWorld.buildArea.bottom;
+		break;
+	case mgAlignment_right:
+		e->transformWorld.buildArea.top = e->transformLocal.buildArea.top + parentRectSizeDiff_Y;
+		e->transformWorld.buildArea.bottom = e->transformLocal.buildArea.bottom + parentRectSizeDiff_Y;
+
+		e->transformWorld.clipArea.top = e->transformWorld.buildArea.top;
+		e->transformWorld.clipArea.bottom = e->transformWorld.buildArea.bottom;
+		/*+rightTop*/
+		goto _rightTop;
+	case mgAlignment_bottom:
+		e->transformWorld.buildArea.left = e->transformLocal.buildArea.left + parentRectSizeDiff_X;
+		e->transformWorld.buildArea.right = e->transformLocal.buildArea.right + parentRectSizeDiff_X;
+
+		e->transformWorld.clipArea.left = e->transformWorld.buildArea.left;
+		e->transformWorld.clipArea.right = e->transformWorld.buildArea.right;
+
+		/*+leftBottom*/
+		goto _leftBottom;
+	case mgAlignment_center:
+	default:
+		/*Right*/
+		e->transformWorld.buildArea.top = e->transformLocal.buildArea.top + parentRectSizeDiff_Y;
+		e->transformWorld.buildArea.bottom = e->transformLocal.buildArea.bottom + parentRectSizeDiff_Y;
+
+		e->transformWorld.clipArea.top = e->transformWorld.buildArea.top;
+		e->transformWorld.clipArea.bottom = e->transformWorld.buildArea.bottom;
+
+		/*bottom*/
+		e->transformWorld.buildArea.left = e->transformLocal.buildArea.left + parentRectSizeDiff_X;
+		e->transformWorld.buildArea.right = e->transformLocal.buildArea.right + parentRectSizeDiff_X;
+
+		e->transformWorld.clipArea.left = e->transformWorld.buildArea.left;
+		e->transformWorld.clipArea.right = e->transformWorld.buildArea.right;
+		break;
+	}
+
 	if (e->transformWorld.clipArea.left < e->parent->transformWorld.clipArea.left)
 		e->transformWorld.clipArea.left = e->parent->transformWorld.clipArea.left;
 	if (e->transformWorld.clipArea.top < e->parent->transformWorld.clipArea.top)
@@ -55,7 +174,6 @@ miGUI_onUpdateTransform_rectangle(mgElement* e)
 		e->transformWorld.clipArea.right = e->parent->transformWorld.clipArea.right;
 	if (e->transformWorld.clipArea.bottom > e->parent->transformWorld.clipArea.bottom)
 		e->transformWorld.clipArea.bottom = e->parent->transformWorld.clipArea.bottom;
-
 }
 
 void 
@@ -214,11 +332,13 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgCo
 	mgElement* newElement = calloc(1, sizeof(mgElement));
 	newElement->type = MG_TYPE_RECTANGLE;
 
+
 	newElement->transformLocal.buildArea.left = position->x;
 	newElement->transformLocal.buildArea.top = position->y;
 	newElement->transformLocal.buildArea.right = position->x + size->x;
 	newElement->transformLocal.buildArea.bottom = position->y + size->y;
 	newElement->transformLocal.clipArea = newElement->transformLocal.buildArea;
+
 	newElement->transformLocal.sz = *size;
 	newElement->window = w;
 
@@ -234,6 +354,8 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgCo
 	impl->color2 = *color2;
 
 	mgSetParent_f(newElement, 0);
+
+	newElement->creationRect = newElement->transformLocal.buildArea;
 
 	return newElement;
 }

@@ -479,6 +479,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         c1.setAsIntegerRGB(0xff0000);
         c2.setAsIntegerRGB(0x0000FF);
         mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
+        er->align = mgAlignment_center;
 
         mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
         guiWindow2->icons = icons;
