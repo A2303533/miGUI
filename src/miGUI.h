@@ -73,12 +73,14 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_windowCloseButton,
 	mgDrawRectangleReason_windowCollapseButton,
 	mgDrawRectangleReason_rectangle,
+	mgDrawRectangleReason_buttonBG,
 };
 
 enum mgDrawTextReason
 {
 	mgDrawTextReason_user,
 	mgDrawTextReason_windowTitlebar,
+	mgDrawTextReason_buttonText,
 };
 
 /* Before creating GUI context you must create this objects.
@@ -168,8 +170,8 @@ extern PFNMGCREATERECTANGLEPROC mgCreateRectangle;
 //typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
 //extern PFNMGCREATETEXTPROC mgCreateText_p;
 
-//typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgContext_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
-//extern PFNMGCREATEBUTTONPROC mgCreateButton_p;
+typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
+extern PFNMGCREATEBUTTONPROC mgCreateButton;
 
 /*set visible include all children*/
 typedef void (*PFNMGSETVISIBLEPROC)(mgElement*, int);

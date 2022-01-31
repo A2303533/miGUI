@@ -338,8 +338,9 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgCo
 	newElement->transformLocal.buildArea.right = position->x + size->x;
 	newElement->transformLocal.buildArea.bottom = position->y + size->y;
 	newElement->transformLocal.clipArea = newElement->transformLocal.buildArea;
-
 	newElement->transformLocal.sz = *size;
+	newElement->creationRect = newElement->transformLocal.buildArea;
+
 	newElement->window = w;
 
 	newElement->visible = 1;
@@ -355,7 +356,6 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgCo
 
 	mgSetParent_f(newElement, 0);
 
-	newElement->creationRect = newElement->transformLocal.buildArea;
 
 	return newElement;
 }

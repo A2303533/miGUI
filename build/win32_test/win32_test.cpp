@@ -184,6 +184,12 @@ void gui_drawRectangle(
         gdirct.Height = size->y;
         graphics.FillRectangle(&br, gdirct);*/
     }
+    else if (reason == mgDrawRectangleReason_buttonBG)
+    {
+        rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
+        SelectClipRgn(hdcMem, rgn);
+        FillRect(hdcMem, &r, brsh);
+    }
     else
     {
         /*RoundRect(hdcMem, r.left, r.top, r.right, r.bottom, 6, 6);*/
@@ -239,7 +245,12 @@ void gui_drawText(
     SelectObject(hdcMem, font->implementation);
     SetTextColor(hdcMem, mgColorGetAsIntegerBGR(color));
     SetBkMode(hdcMem, TRANSPARENT);
+
+    HRGN rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
+    SelectClipRgn(hdcMem, rgn);
     TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, text, textLen);
+    DeleteObject(rgn);
+    SelectClipRgn(hdcMem, 0);
 }
 
 void gui_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
@@ -478,8 +489,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         mgPointSet(&sz, 50, 500);
         c1.setAsIntegerRGB(0xff0000);
         c2.setAsIntegerRGB(0x0000FF);
-        mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
-        er->align = mgAlignment_center;
+      //  mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
+       // er->align = mgAlignment_center;
+
+        mgPointSet(&pos, 100, 60);
+        mgPointSet(&sz, 100, 40);
+
+        mgElement* eb = mgCreateButton(guiWindow1, &pos, &sz, L"Button", g_win32font);
+        eb->align = mgAlignment_center;
 
         mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
         guiWindow2->icons = icons;

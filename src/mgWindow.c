@@ -231,6 +231,7 @@ mgDrawWindow(struct mgWindow_s* w)
 			pos.x = w->position.x + text_move + 3;
 			pos.y = w->position.y;
 
+			w->context->gpu->setClipRect(&w->rect);
 			w->context->gpu->drawText(mgDrawTextReason_windowTitlebar,
 				&pos,
 				w->titlebarText,
