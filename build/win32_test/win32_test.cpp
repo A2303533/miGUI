@@ -293,6 +293,7 @@ void draw_gui()
     if (!g_gui_context)
         return;
 
+
     g_gui_context->gpu->beginDraw();
     mgPoint point;
     mgPointSet(&point, 0, 0);
@@ -304,6 +305,15 @@ void draw_gui()
     mgColor color2;
     mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
     mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
+    
+    {
+        mgRect r;
+        r.left = 0;
+        r.top = 0;
+        r.right = 800;
+        r.bottom = 600;
+        gui_setClipRect(&r);
+    }
 
     g_gui_context->gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0, 0);
 
@@ -312,6 +322,7 @@ void draw_gui()
     mgColor textColor;
     mgColorSetAsIntegerRGB(&textColor, 0xFF005000);
     wchar_t textBuffer[200];
+    
 
     swprintf_s(textBuffer, L"FPS: %i", g_fps);
     mgPointSet(&textPosition, 0, 0);
