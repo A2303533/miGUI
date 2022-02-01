@@ -33,14 +33,14 @@
 * For DLL
 */
 
-MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgContext_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
+MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
 MG_API mgContext* MG_C_DECL mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input);
 MG_API mgCursor* MG_C_DECL mgCreateCursor_f(const wchar_t* fileName);
 MG_API struct mgWindow_s* MG_C_DECL mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy);
 MG_API void MG_C_DECL mgDestroyWindow_f(struct mgWindow_s* w);
 MG_API mgFont* MG_C_DECL mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size, const char* saveIt);
 MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
-MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgContext_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
+MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
 MG_API void MG_C_DECL mgDestroyContext_f(mgContext* c);
 MG_API void MG_C_DECL mgDestroyCursor_f(mgCursor* c);
 MG_API void MG_C_DECL mgDestroyFont_f(struct mgContext_s* c, mgFont* f);

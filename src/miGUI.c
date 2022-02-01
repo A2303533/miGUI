@@ -191,22 +191,24 @@ mgUpdate_f(mgContext* c)
 		{
 			if (cw->flags & mgWindowFlag_internal_visible)
 			{
-				if(!c->windowUnderCursor)
+				if (!c->windowUnderCursor)
+				{
 					mgUpdateWindow(cw);
 
-				if (cw->flags & mgWindowFlag_internal_isExpand)
-				{
-					mgUpdateElement(cw->rootElement);
-
-					if (c->needUpdateTransform)
+					if (cw->flags & mgWindowFlag_internal_isExpand)
 					{
-						mgUpdateTransformElement(cw->rootElement);
-					}
+						mgUpdateElement(cw->rootElement);
 
-					if (c->needRebuild)
-					{
-						mgRebuildElement(cw->rootElement);
-						c->needRebuild = 0;
+						if (c->needUpdateTransform)
+						{
+							mgUpdateTransformElement(cw->rootElement);
+						}
+
+						if (c->needRebuild)
+						{
+							mgRebuildElement(cw->rootElement);
+							c->needRebuild = 0;
+						}
 					}
 				}
 			}
