@@ -482,6 +482,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_win32font = gui_createFont("Segoe", 0, 10);
     {
+        mgInitDockPanel(g_gui_context, 0, 0, 0, 0);
+
         mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
         guiWindow1->icons = icons;
         guiWindow1->iconCloseButton = 0;
@@ -603,9 +605,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             RECT rc;
             GetClientRect(hWnd, &rc);
-            g_gui_context->needRebuild = 1;
+            mgOnWindowSize(g_gui_context, rc.right - rc.left, rc.bottom - rc.top);
+            /*g_gui_context->needRebuild = 1;
             g_gui_context->windowSize.x = rc.right - rc.left;
-            g_gui_context->windowSize.y = rc.bottom - rc.top;
+            g_gui_context->windowSize.y = rc.bottom - rc.top;*/
         }
     }return DefWindowProc(hWnd, message, wParam, lParam);
     case WM_COMMAND:

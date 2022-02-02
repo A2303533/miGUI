@@ -52,6 +52,8 @@ PFNMGSETCURSORPROC mgSetCursor;
 PFNMGCREATEICONSPROC mgCreateIcons;
 PFNMGDESTROYICONSPROC mgDestroyIcons;
 PFNMGSETICONPROC mgSetIcon;
+PFNMGONWINDOWSIZEPROC mgOnWindowSize;
+PFNMGINITDOCKPANELPROC mgInitDockPanel;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -101,6 +103,8 @@ mgLoad()
 	mgCreateIcons = mgGetProc(lib, "mgCreateIcons_f");
 	mgDestroyIcons = mgGetProc(lib, "mgDestroyIcons_f");
 	mgSetIcon = mgGetProc(lib, "mgSetIcon_f");
+	mgOnWindowSize = mgGetProc(lib, "mgOnWindowSize_f");
+	mgInitDockPanel = mgGetProc(lib, "mgInitDockPanel_f");
 
 	return lib;
 }

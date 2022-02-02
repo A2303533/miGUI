@@ -35,6 +35,8 @@ void mgInitDefaultCursors(mgContext* c);
 void mgDestroyDefaultCursors(mgContext* c);
 void mgDrawWindow(struct mgWindow_s* w);
 void mgUpdateWindow(struct mgWindow_s* w);
+void mgDrawDockPanel(struct mgContext_s* c);
+void mgDockPanelOnSize(struct mgContext_s* c);
 
 void 
 mgDestroyElement_f(mgElement* e)
@@ -70,8 +72,7 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.windowBGColorTopWindow, 0xE8EDFF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColorTopWindow, 0xB5CCFF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarTextColor, 0x0);
-	
-	
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelBGColor, 0xF0F0F0);
 	
 	c->functions.SetCursor_p = mgSetCursor_f;
 
@@ -359,6 +360,10 @@ void MG_C_DECL
 mgDraw_f(mgContext* c)
 {
 	assert(c);
+
+	if (c->dockPanel)
+		mgDrawDockPanel(c);
+
 	mgWindow* cw = c->firstWindow;
 	if (cw)
 	{
@@ -425,4 +430,17 @@ mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy)
 	ic->icons[id].uv.y = py * my;
 	ic->icons[id].uv.z = (px + sx) * mx;
 	ic->icons[id].uv.w = (py + sy) * my;
+}
+
+MG_API
+void MG_C_DECL
+mgOnWindowSize_f(struct mgContext_s* c, int x, int y)
+{
+	assert(c);
+	c->needRebuild = 1;
+	c->windowSize.x = x;
+	c->windowSize.y = y;
+
+	if (c->dockPanel)
+		mgDockPanelOnSize(c);
 }

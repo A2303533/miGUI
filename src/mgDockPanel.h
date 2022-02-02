@@ -26,17 +26,18 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_STYLE_H_
-#define _MG_STYLE_H_
+#ifndef _MG_DOCKPANEL_H_
+#define _MG_DOCKPANEL_H_
 
-typedef struct mgStyle_s {
-	mgColor windowBGColor;
-	mgColor windowTitlebarColor;
-	mgColor windowBGColorTopWindow;
-	mgColor windowTitlebarColorTopWindow;
-	mgColor windowTitlebarTextColor;
-	
-	mgColor dockpanelBGColor;
-} mgStyle;
+enum mgDockPanelFlag
+{
+	mgDockPanelFlag_drawBG = 0x1
+};
+
+typedef struct mgDockPanel_s {
+	mgRect indent; /*set this on creation*/
+	mgRect rect; /*update it when resize window*/
+	int flags;
+} mgDockPanel;
 
 #endif

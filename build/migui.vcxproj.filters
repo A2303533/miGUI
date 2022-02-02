@@ -36,6 +36,9 @@
     <ClCompile Include="..\src\mgWindow.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\mgDockPanel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\miGUI.h">

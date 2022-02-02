@@ -62,6 +62,7 @@ typedef void* mgTexture;
 
 #include "mgIcons.h"
 #include "mgStyle.h"
+#include "mgDockPanel.h"
 #include "mgWindow.h"
 #include "mgElement.h"
 
@@ -74,6 +75,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_windowCollapseButton,
 	mgDrawRectangleReason_rectangle,
 	mgDrawRectangleReason_buttonBG,
+	mgDrawRectangleReason_dockBG,
 };
 
 enum mgDrawTextReason
@@ -143,6 +145,9 @@ extern PFNMGSETWINDOWTITLEPROC mgSetWindowTitle;
 typedef void (*PFNMGBRINGWINDOWTOTOPPROC)(struct mgWindow_s*);
 extern PFNMGBRINGWINDOWTOTOPPROC mgBringWindowToTop;
 
+typedef void (*PFNMGONWINDOWSIZEPROC)(struct mgContext_s*, int x, int y);
+extern PFNMGONWINDOWSIZEPROC mgOnWindowSize;
+
 /* Create bitmap font or load from file.
 * If filename exist load from file. If not then try to generate from installed system font.
 * Destroy it by yourself (call mgDestroyFont).
@@ -206,6 +211,11 @@ extern PFNMGDESTROYICONSPROC mgDestroyIcons;
 typedef void (*PFNMGSETICONPROC)(mgIcons*, int id, int px, int py, int sx, int sy);
 extern PFNMGSETICONPROC mgSetIcon;
 
+typedef void (*PFNMGINITDOCKPANELPROC)(struct mgContext_s*, int indentLeft, int indentTop, int indentRight, int indentBottom);
+extern PFNMGINITDOCKPANELPROC mgInitDockPanel;
+
+
+
 #if defined(__cplusplus)
 }
 #endif
@@ -241,6 +251,8 @@ typedef struct mgContext_s {
 	void(*getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
 
 	struct mgFunctions_s functions;
+
+	struct mgDockPanel_s* dockPanel;
 
 	mgRect currentIcon;
 
