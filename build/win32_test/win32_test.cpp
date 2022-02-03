@@ -127,8 +127,7 @@ mgRect gui_setClipRect(mgRect* r)
 
 void gui_drawRectangle(
     int reason,
-    mgPoint* position,
-    mgPoint* size,
+    mgRect* rct,
     mgColor* color1,
     mgColor* color2,
     mgElement* element, /*current element, can be null*/
@@ -144,10 +143,10 @@ void gui_drawRectangle(
             Gdiplus::Graphics graphics(hdcMem);
             //Gdiplus::Pen      pen(Gdiplus::Color(0, 0, 0, 255));
             Gdiplus::Rect gdirct;
-            gdirct.X = position->x + borderSize.x;
-            gdirct.Y = position->y + borderSize.y;
-            gdirct.Width = size->x;
-            gdirct.Height = size->y;
+            gdirct.X = rct->left + borderSize.x;
+            gdirct.Y = rct->top + borderSize.y;
+            gdirct.Width = rct->right - rct->left;
+            gdirct.Height = rct->bottom - rct->top;
             graphics.DrawImage(myimg->m_gdiimage, gdirct, 
                 g_gui_context->currentIcon.left, 
                 g_gui_context->currentIcon.top, 
@@ -159,10 +158,10 @@ void gui_drawRectangle(
     }
 
     RECT r;
-    r.left = position->x + borderSize.x;
-    r.top = position->y + borderSize.y;
-    r.right = r.left + size->x;
-    r.bottom = r.top + size->y;
+    r.left = rct->left + borderSize.x;
+    r.top = rct->top + borderSize.y;
+    r.right = rct->right + borderSize.x;
+    r.bottom = rct->bottom + borderSize.y;
 
     unsigned int c1 = mgColorGetAsIntegerARGB(color1);
     unsigned int c2 = mgColorGetAsIntegerARGB(color2);
@@ -184,7 +183,8 @@ void gui_drawRectangle(
         gdirct.Height = size->y;
         graphics.FillRectangle(&br, gdirct);*/
     }
-    else if (reason == mgDrawRectangleReason_buttonBG)
+    else if (reason == mgDrawRectangleReason_buttonBG
+        || reason == mgDrawRectangleReason_dockElementBG)
     {
         rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
         SelectClipRgn(hdcMem, rgn);
@@ -295,11 +295,8 @@ void draw_gui()
 
 
     g_gui_context->gpu->beginDraw();
-    mgPoint point;
-    mgPointSet(&point, 0, 0);
-
-    mgPoint size;
-    mgPointSet(&size, 220, 180);
+    mgRect rect;
+    mgRectSet(&rect, 0, 0, 220, 180);
 
     mgColor color1;
     mgColor color2;
@@ -315,7 +312,7 @@ void draw_gui()
         gui_setClipRect(&r);
     }
 
-    g_gui_context->gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0, 0);
+    g_gui_context->gpu->drawRectangle(0, &rect, &color1, &color2, 0, 0, 0);
 
     mgPoint textPosition;
     mgPointSet(&textPosition, 10, 10);
@@ -482,7 +479,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_win32font = gui_createFont("Segoe", 0, 10);
     {
-        mgInitDockPanel(g_gui_context, 0, 0, 0, 0);
+        mgDockPanelElementCreationInfo dckElmts[] = {
+            {1, 20, 20},
+            {3, 20, 20},
+            {0, 20, 20},
+            {2, 20, 20},
+            {1, 20, 20},
+            {1, 20, 20},
+        };
+        mgInitDockPanel(g_gui_context, 0, 30, 0, 0, dckElmts, sizeof(dckElmts) / sizeof(mgDockPanelElementCreationInfo));
+
+        mgColorSet(&g_gui_context->activeStyle->dockpanelBGColor, 0.9f, 0.9f, 0.9f, 1.f);
+        g_gui_context->dockPanel->flags |= mgDockPanelFlag_drawBG;
+        for (int i = 0; i < g_gui_context->dockPanel->elementsNum; ++i)
+        {
+            g_gui_context->dockPanel->elements[i].flags |= mgDockPanelElementFlag_drawBG;
+        }
 
         mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
         guiWindow1->icons = icons;

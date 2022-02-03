@@ -173,18 +173,21 @@ mgDrawWindow(struct mgWindow_s* w)
 	mgColor clrbg = w->context->firstWindow->left == w ? style->windowBGColorTopWindow : style->windowBGColor;
 	mgColor clrttl = w->context->firstWindow->left == w ? style->windowTitlebarColorTopWindow : style->windowTitlebarColor;
 
+	w->context->gpu->setClipRect(&w->rect);
+	
 	if ((w->flags & mgWindowFlag_drawBG) && (w->flags & mgWindowFlag_internal_isExpand))
-		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->position, &w->size, &clrbg, &clrbg, 0, 0, 0);
+		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->rect, &clrbg, &clrbg, 0, 0, 0);
 
 	if (w->flags & mgWindowFlag_withTitlebar)
 	{
 		float tbhalfsz = (float)w->titlebarHeight * 0.5f;
 
-		mgPoint sz;
+		w->rectTitlebar.left = w->position.x;
+		w->rectTitlebar.top = w->position.y;
+		w->rectTitlebar.right = w->position.x + w->size.x;
+		w->rectTitlebar.bottom = w->position.y + w->titlebarHeight;
 
-		sz.x = w->size.x;
-		sz.y = w->titlebarHeight;
-		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, &w->position, &sz, &clrttl, &clrttl, 0, 0, 0);
+		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, &w->rectTitlebar, &clrttl, &clrttl, 0, 0, 0);
 		
 		int text_move = 0;
 		if (w->flags & mgWindowFlag_collapseButton)
@@ -199,7 +202,7 @@ mgDrawWindow(struct mgWindow_s* w)
 				if (w->flags & mgWindowFlag_internal_isExpand)
 					iconID = w->iconCollapseButton;
 
-				sz = w->icons->icons[iconID].sz;
+				mgPoint sz = w->icons->icons[iconID].sz;
 
 
 				text_move = sz.x + 3;
@@ -221,7 +224,7 @@ mgDrawWindow(struct mgWindow_s* w)
 				w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
 				w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
 				w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
-				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, &pos, &sz, &wh, &wh, 0, w->icons->texture, 0);
+				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, &w->collapseButtonRect, &wh, &wh, 0, w->icons->texture, 0);
 			}
 		}
 
@@ -246,7 +249,7 @@ mgDrawWindow(struct mgWindow_s* w)
 			{
 				mgColor wh;
 				mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
-				sz = w->icons->icons[w->iconCloseButton].sz;
+				mgPoint sz = w->icons->icons[w->iconCloseButton].sz;
 				mgPoint pos;
 				pos.x = w->position.x + w->size.x - sz.x-3;
 				pos.y = w->position.y;
@@ -275,7 +278,7 @@ mgDrawWindow(struct mgWindow_s* w)
 				w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
 				w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
 				w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
-				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, &pos, &sz, &wh, &wh, 0, w->icons->texture, 0);
+				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, &w->closeButtonRect, &wh, &wh, 0, w->icons->texture, 0);
 			}
 		}
 	}

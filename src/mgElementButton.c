@@ -53,14 +53,6 @@ miGUI_onUpdate_button(mgElement* e)
 void 
 miGUI_onDraw_button(mgElement* e)
 {
-	mgPoint pos;
-	pos.x = e->transformWorld.buildArea.left;
-	pos.y = e->transformWorld.buildArea.top;
-
-	mgPoint sz;
-	sz.x = e->transformWorld.buildArea.right - e->transformWorld.buildArea.left;
-	sz.y = e->transformWorld.buildArea.bottom - e->transformWorld.buildArea.top;
-
 	mgElementButton* impl = (mgElementButton*)e->implementation;
 	
 	if (impl->enabled)
@@ -89,7 +81,7 @@ miGUI_onDraw_button(mgElement* e)
 	}
 
 	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG, &pos, &sz, &impl->colorFinal1, &impl->colorFinal2, e, 0, 0);
+	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG, &e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, e, 0, 0);
 
 	if (impl->text && impl->textLen)
 	{
@@ -108,6 +100,9 @@ miGUI_onDraw_button(mgElement* e)
 			impl->textColorFinal = impl->textColorDisabled;
 		}
 
+		mgPoint pos;
+		pos.x = e->transformWorld.buildArea.left;
+		pos.y = e->transformWorld.buildArea.top;
 		pos.x += impl->textIndentInternal.x;
 		pos.y += impl->textIndentInternal.y;
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);

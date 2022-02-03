@@ -54,6 +54,7 @@ PFNMGDESTROYICONSPROC mgDestroyIcons;
 PFNMGSETICONPROC mgSetIcon;
 PFNMGONWINDOWSIZEPROC mgOnWindowSize;
 PFNMGINITDOCKPANELPROC mgInitDockPanel;
+//PFNMGDOCKPANELSETELEMENTPROC mgDockPanelSetElement;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -105,6 +106,7 @@ mgLoad()
 	mgSetIcon = mgGetProc(lib, "mgSetIcon_f");
 	mgOnWindowSize = mgGetProc(lib, "mgOnWindowSize_f");
 	mgInitDockPanel = mgGetProc(lib, "mgInitDockPanel_f");
+	//mgDockPanelSetElement = mgGetProc(lib, "mgDockPanelSetElement_f");
 
 	return lib;
 }

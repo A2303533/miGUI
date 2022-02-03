@@ -817,8 +817,7 @@ mgRect gui_setClipRect(mgRect* r)
 
 void gui_drawRectangle(
     int reason,
-    mgPoint* position,
-    mgPoint* size,
+    mgRect* rct,
     mgColor* color1,
     mgColor* color2,
     mgElement* element, /*current element, can be null*/
@@ -826,10 +825,10 @@ void gui_drawRectangle(
     mgVec4* UVRegion)
 {
     mgVec4 corners;
-    corners.x = position->x;
-    corners.y = position->y;
-    corners.z = corners.x + size->x;
-    corners.w = corners.y + size->y;
+    corners.x = rct->left;
+    corners.y = rct->top;
+    corners.z = rct->right;
+    corners.w = rct->bottom;
     g_d3d11->DrawRectangle(corners, *color1, *color2, &g_proj, 0, 0);
 }
 
@@ -906,18 +905,16 @@ void draw_gui()
         return;
 
     g_gui_context->gpu->beginDraw();
-    mgPoint point;
-    mgPointSet(&point, 0, 0);
-
-    mgPoint size;
-    mgPointSet(&size, 220, 180);
-
+    mgRect rect;
+    mgRectSet(&rect, 0, 0, 220, 180);
+    gui_setClipRect(&rect);
+    
     mgColor color1;
     mgColor color2;
     mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
     mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
 
-    g_gui_context->gpu->drawRectangle(0, &point, &size, &color1, &color2, 0, 0, 0);
+    g_gui_context->gpu->drawRectangle(0, &rect, &color1, &color2, 0, 0, 0);
 
     mgPoint textPosition;
     mgPointSet(&textPosition, 10, 10);

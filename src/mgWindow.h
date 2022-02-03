@@ -63,6 +63,7 @@ typedef struct mgWindow_s {
 	mgPoint position;
 	mgPoint size;
 	mgRect  rect; /*auto calculation in mgUpdateWindow*/
+	mgRect  rectTitlebar;
 
 	mgPoint sizeMinimum;
 

@@ -76,6 +76,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_rectangle,
 	mgDrawRectangleReason_buttonBG,
 	mgDrawRectangleReason_dockBG,
+	mgDrawRectangleReason_dockElementBG,
 };
 
 enum mgDrawTextReason
@@ -102,8 +103,7 @@ typedef struct mgVideoDriverAPI_s {
 
 	void(*drawRectangle)(
 		int reason,
-		mgPoint* position,
-		mgPoint* size, 
+		mgRect* rect,
 		mgColor* color1, 
 		mgColor* color2, 
 		mgElement* element, /*current element, can be null*/
@@ -211,9 +211,15 @@ extern PFNMGDESTROYICONSPROC mgDestroyIcons;
 typedef void (*PFNMGSETICONPROC)(mgIcons*, int id, int px, int py, int sx, int sy);
 extern PFNMGSETICONPROC mgSetIcon;
 
-typedef void (*PFNMGINITDOCKPANELPROC)(struct mgContext_s*, int indentLeft, int indentTop, int indentRight, int indentBottom);
+typedef void (*PFNMGINITDOCKPANELPROC)(struct mgContext_s*, int indentLeft, int indentTop, int indentRight, int indentBottom, mgDockPanelElementCreationInfo* elements, int elementsSize);
 extern PFNMGINITDOCKPANELPROC mgInitDockPanel;
 
+/*
+* id : 1 or more
+* where : 0 - left, 1 - top, 2 - right, 3 - bottom
+*/
+//typedef void (*PFNMGDOCKPANELSETELEMENTPROC)(struct mgContext_s*, int id, int where, int size);
+//extern PFNMGDOCKPANELSETELEMENTPROC mgDockPanelSetElement;
 
 
 #if defined(__cplusplus)

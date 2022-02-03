@@ -29,6 +29,31 @@
 #ifndef _MG_DOCKPANEL_H_
 #define _MG_DOCKPANEL_H_
 
+typedef struct mgDockPanelElementCreationInfo_s {
+	/*
+	* 0 - left, 1 - top, 2 - right, 3 - bottom
+	*/
+	int where;
+
+	int size;
+	int sizeMinimum;
+} mgDockPanelElementCreationInfo;
+
+enum mgDockPanelElementFlag
+{
+	mgDockPanelElementFlag_drawBG = 0x1
+};
+
+typedef struct mgDockPanelElement_s {
+	/*mgRect indent;*/
+	mgRect rect;
+	int flags;
+
+	mgDockPanelElementCreationInfo info;
+
+	mgColor colorBG;
+} mgDockPanelElement;
+
 enum mgDockPanelFlag
 {
 	mgDockPanelFlag_drawBG = 0x1
@@ -38,6 +63,9 @@ typedef struct mgDockPanel_s {
 	mgRect indent; /*set this on creation*/
 	mgRect rect; /*update it when resize window*/
 	int flags;
+
+	mgDockPanelElement* elements;
+	int elementsNum;
 } mgDockPanel;
 
 #endif

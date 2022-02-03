@@ -302,18 +302,10 @@ miGUI_onUpdate_rectangle(mgElement* e)
 void 
 miGUI_onDraw_rectangle(mgElement* e)
 {
-	mgPoint pos;
-	pos.x = e->transformWorld.buildArea.left;
-	pos.y = e->transformWorld.buildArea.top;
-
-	mgPoint sz;
-	sz.x = e->transformWorld.buildArea.right - e->transformWorld.buildArea.left;
-	sz.y = e->transformWorld.buildArea.bottom - e->transformWorld.buildArea.top;
-
 	mgElementRectangle* impl = (mgElementRectangle*)e->implementation;
 
 	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_rectangle, &pos, &sz, &impl->color1, &impl->color2, 0, 0, 0);
+	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_rectangle, &e->transformWorld.buildArea, &impl->color1, &impl->color2, 0, 0, 0);
 }
 
 void

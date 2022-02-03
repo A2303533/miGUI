@@ -103,6 +103,13 @@ mgDestroyContext_f(mgContext* c)
 		}
 	}
 
+	if (c->dockPanel)
+	{
+		if (c->dockPanel->elements)
+			free(c->dockPanel->elements);
+		free(c->dockPanel);
+	}
+
 	free(c);
 }
 
