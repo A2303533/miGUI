@@ -152,6 +152,9 @@ mgDrawDockPanel(struct mgContext_s* c)
 void
 mgDockPanelUpdate(struct mgContext_s* c)
 {
+	static mgPoint firstClick;
+	static int sizeOnClick = 0;
+
 	if(!g_dockpanel_splitterMode)
 		g_dockpanel_inSplitterRect = 0;
 
@@ -159,6 +162,11 @@ mgDockPanelUpdate(struct mgContext_s* c)
 	{
 		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
 			g_dockpanel_splitterMode = 0;
+	}
+
+	if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+	{
+		firstClick = c->input->mousePosition;
 	}
 
 	for (int i = 0; i < c->dockPanel->elementsNum; ++i)
@@ -183,7 +191,10 @@ mgDockPanelUpdate(struct mgContext_s* c)
 			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 			{
 				if (!g_dockpanel_splitterMode)
+				{
 					g_dockpanel_splitterMode = &c->dockPanel->elements[i];
+					sizeOnClick = g_dockpanel_splitterMode->info.size;
+				}
 			}
 		}
 	}
@@ -196,21 +207,28 @@ mgDockPanelUpdate(struct mgContext_s* c)
 
 	if (g_dockpanel_splitterMode)
 	{
+		int px = c->input->mousePosition.x - firstClick.x;
+		int py = c->input->mousePosition.y - firstClick.y;
+
 		switch (g_dockpanel_splitterMode->info.where)
 		{
 		case 0:
-			g_dockpanel_splitterMode->info.size += c->input->mouseMoveDelta.x;
+			g_dockpanel_splitterMode->info.size = sizeOnClick + px;
 			break;
 		case 1:
-			g_dockpanel_splitterMode->info.size += c->input->mouseMoveDelta.y;
+			g_dockpanel_splitterMode->info.size = sizeOnClick + py;
 			break;
 		case 2:
-			g_dockpanel_splitterMode->info.size -= c->input->mouseMoveDelta.x;
+			g_dockpanel_splitterMode->info.size = sizeOnClick - px;
 			break;
 		case 3:
-			g_dockpanel_splitterMode->info.size -= c->input->mouseMoveDelta.y;
+			g_dockpanel_splitterMode->info.size = sizeOnClick - py;
 			break;
 		}
+		if (g_dockpanel_splitterMode->info.size > g_dockpanel_splitterMode->info.sizeMaximum)
+			g_dockpanel_splitterMode->info.size = g_dockpanel_splitterMode->info.sizeMaximum;
+		if (g_dockpanel_splitterMode->info.size < g_dockpanel_splitterMode->info.sizeMinimum)
+			g_dockpanel_splitterMode->info.size = g_dockpanel_splitterMode->info.sizeMinimum;
 		mgDockPanelRebuild(c);
 	}
 }
