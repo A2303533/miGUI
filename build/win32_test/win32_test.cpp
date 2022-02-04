@@ -184,7 +184,8 @@ void gui_drawRectangle(
         graphics.FillRectangle(&br, gdirct);*/
     }
     else if (reason == mgDrawRectangleReason_buttonBG
-        || reason == mgDrawRectangleReason_dockElementBG)
+        || reason == mgDrawRectangleReason_dockElementBG
+        || reason == mgDrawRectangleReason_dockSplitterBG)
     {
         rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
         SelectClipRgn(hdcMem, rgn);
@@ -480,12 +481,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_win32font = gui_createFont("Segoe", 0, 10);
     {
         mgDockPanelElementCreationInfo dckElmts[] = {
-            {1, 20, 20},
-            {3, 20, 20},
-            {0, 20, 20},
-            {2, 20, 20},
-            {1, 20, 20},
-            {1, 20, 20},
+            {1, 20, 20, 100},
+            {3, 20, 20, 100},
+            {0, 20, 20, 100},
+            {2, 20, 20, 100},
+            {1, 20, 20, 100},
+            {1, 20, 20, 100},
         };
         mgInitDockPanel(g_gui_context, 0, 30, 0, 0, dckElmts, sizeof(dckElmts) / sizeof(mgDockPanelElementCreationInfo));
 

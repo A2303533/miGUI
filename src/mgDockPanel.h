@@ -37,6 +37,7 @@ typedef struct mgDockPanelElementCreationInfo_s {
 
 	int size;
 	int sizeMinimum;
+	int sizeMaximum;
 } mgDockPanelElementCreationInfo;
 
 enum mgDockPanelElementFlag
@@ -49,6 +50,7 @@ typedef struct mgDockPanelElement_s {
 	mgRect rect;
 	int flags;
 
+	mgRect splitterRect;
 	mgDockPanelElementCreationInfo info;
 
 	mgColor colorBG;
@@ -56,7 +58,12 @@ typedef struct mgDockPanelElement_s {
 
 enum mgDockPanelFlag
 {
-	mgDockPanelFlag_drawBG = 0x1
+	mgDockPanelFlag_drawBG = 0x1,
+	mgDockPanelFlag_drawSplitterBG = 0x2,
+
+	/*internal*/
+	mgDockPanelFlag_cursorChanged = 0x40000000,
+	mgDockPanelFlag_onSplitter = 0x80000000,
 };
 
 typedef struct mgDockPanel_s {
@@ -66,6 +73,8 @@ typedef struct mgDockPanel_s {
 
 	mgDockPanelElement* elements;
 	int elementsNum;
+	
+	int splitterWidth; /*3*/
 } mgDockPanel;
 
 #endif

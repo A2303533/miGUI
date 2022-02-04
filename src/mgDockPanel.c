@@ -33,6 +33,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+int g_dockpanel_inSplitterRect = 0;
+struct mgDockPanelElement_s* g_dockpanel_splitterMode = 0;
+
 void
 mgDockPanelRebuild(struct mgContext_s* c)
 {
@@ -43,6 +46,7 @@ mgDockPanelRebuild(struct mgContext_s* c)
 		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
 		{
 			mgRect rect;
+			mgRect splitterRect;
 			switch (c->dockPanel->elements[i].info.where)
 			{
 			default:
@@ -52,6 +56,10 @@ mgDockPanelRebuild(struct mgContext_s* c)
 				rect.bottom = c->dockPanel->elements[0].rect.bottom;
 				rect.right = rect.left + c->dockPanel->elements[i].info.size;
 				c->dockPanel->elements[0].rect.left = rect.right;
+				splitterRect.left = rect.right - c->dockPanel->splitterWidth;
+				splitterRect.right = rect.right + c->dockPanel->splitterWidth;
+				splitterRect.top = rect.top;
+				splitterRect.bottom = rect.bottom;
 				break;
 			case 1:
 				rect.left = c->dockPanel->elements[0].rect.left;
@@ -59,6 +67,10 @@ mgDockPanelRebuild(struct mgContext_s* c)
 				rect.right = c->dockPanel->elements[0].rect.right;
 				rect.bottom = rect.top + c->dockPanel->elements[i].info.size;
 				c->dockPanel->elements[0].rect.top = rect.bottom;
+				splitterRect.left = rect.left;
+				splitterRect.right = rect.right;
+				splitterRect.top = rect.bottom - c->dockPanel->splitterWidth;
+				splitterRect.bottom = rect.bottom + c->dockPanel->splitterWidth;
 				break;
 			case 2:
 				rect.top = c->dockPanel->elements[0].rect.top;
@@ -66,6 +78,10 @@ mgDockPanelRebuild(struct mgContext_s* c)
 				rect.right = c->dockPanel->elements[0].rect.right;
 				rect.left = rect.right - c->dockPanel->elements[i].info.size;
 				c->dockPanel->elements[0].rect.right = rect.left;
+				splitterRect.left = rect.left - c->dockPanel->splitterWidth;
+				splitterRect.right = rect.left + c->dockPanel->splitterWidth;
+				splitterRect.top = rect.top;
+				splitterRect.bottom = rect.bottom;
 				break;
 			case 3:
 				rect.bottom = c->dockPanel->elements[0].rect.bottom;
@@ -73,9 +89,14 @@ mgDockPanelRebuild(struct mgContext_s* c)
 				rect.right = c->dockPanel->elements[0].rect.right;
 				rect.top = rect.bottom - c->dockPanel->elements[i].info.size;
 				c->dockPanel->elements[0].rect.bottom = rect.top;
+				splitterRect.left = rect.left;
+				splitterRect.right = rect.right;
+				splitterRect.top = rect.top - c->dockPanel->splitterWidth;
+				splitterRect.bottom = rect.top + c->dockPanel->splitterWidth;
 				break;
 			}
 			c->dockPanel->elements[i].rect = rect;
+			c->dockPanel->elements[i].splitterRect = splitterRect;
 		}
 	}
 }
@@ -114,6 +135,84 @@ mgDrawDockPanel(struct mgContext_s* c)
 				0, 0, 0);
 		}
 	}
+
+	if (c->dockPanel->flags & mgDockPanelFlag_drawSplitterBG)
+	{
+		for (int i = 0; i < c->dockPanel->elementsNum; ++i)
+		{
+			c->gpu->setClipRect(&c->dockPanel->elements[i].splitterRect);
+			c->gpu->drawRectangle(mgDrawRectangleReason_dockSplitterBG, &c->dockPanel->elements[i].splitterRect,
+				&c->activeStyle->dockpanelSplitterBGColor,
+				&c->activeStyle->dockpanelSplitterBGColor,
+				0, 0, 0);
+		}
+	}
+}
+
+void
+mgDockPanelUpdate(struct mgContext_s* c)
+{
+	if(!g_dockpanel_splitterMode)
+		g_dockpanel_inSplitterRect = 0;
+
+	if (g_dockpanel_splitterMode)
+	{
+		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+			g_dockpanel_splitterMode = 0;
+	}
+
+	for (int i = 0; i < c->dockPanel->elementsNum; ++i)
+	{
+		if (mgPointInRect(&c->dockPanel->elements[i].splitterRect, &c->input->mousePosition))
+		{
+			g_dockpanel_inSplitterRect = 1;
+			switch (c->dockPanel->elements[i].info.where)
+			{
+			case 0:
+			case 2:
+				if (!g_dockpanel_splitterMode)
+					mgSetCursor_f(c, c->defaultCursors[mgCursorType_SizeWE], mgCursorType_Arrow);
+				break;
+			default:
+				if (!g_dockpanel_splitterMode)
+					mgSetCursor_f(c, c->defaultCursors[mgCursorType_SizeNS], mgCursorType_Arrow);
+				break;
+			}
+			c->dockPanel->flags |= mgDockPanelFlag_cursorChanged;
+
+			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			{
+				if (!g_dockpanel_splitterMode)
+					g_dockpanel_splitterMode = &c->dockPanel->elements[i];
+			}
+		}
+	}
+	if (!g_dockpanel_inSplitterRect && (c->dockPanel->flags & mgDockPanelFlag_cursorChanged)
+		&& !g_dockpanel_splitterMode)
+	{
+		mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+		c->dockPanel->flags ^= mgDockPanelFlag_cursorChanged;
+	}
+
+	if (g_dockpanel_splitterMode)
+	{
+		switch (g_dockpanel_splitterMode->info.where)
+		{
+		case 0:
+			g_dockpanel_splitterMode->info.size += c->input->mouseMoveDelta.x;
+			break;
+		case 1:
+			g_dockpanel_splitterMode->info.size += c->input->mouseMoveDelta.y;
+			break;
+		case 2:
+			g_dockpanel_splitterMode->info.size -= c->input->mouseMoveDelta.x;
+			break;
+		case 3:
+			g_dockpanel_splitterMode->info.size -= c->input->mouseMoveDelta.y;
+			break;
+		}
+		mgDockPanelRebuild(c);
+	}
 }
 
 mgColor colors[] = {
@@ -150,6 +249,8 @@ mgInitDockPanel_f(
 	c->dockPanel->indent.top = indentTop;
 	c->dockPanel->indent.right = indentRight;
 	c->dockPanel->indent.bottom = indentBottom;
+	c->dockPanel->flags = mgDockPanelFlag_drawSplitterBG;
+	c->dockPanel->splitterWidth = 3;
 
 	c->dockPanel->elementsNum = elementsSize + 1;
 	c->dockPanel->elements = calloc(1, sizeof(mgDockPanelElement) * c->dockPanel->elementsNum);

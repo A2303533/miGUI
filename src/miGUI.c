@@ -37,6 +37,7 @@ void mgDrawWindow(struct mgWindow_s* w);
 void mgUpdateWindow(struct mgWindow_s* w);
 void mgDrawDockPanel(struct mgContext_s* c);
 void mgDockPanelOnSize(struct mgContext_s* c);
+void mgDockPanelUpdate(struct mgContext_s* c);
 
 void 
 mgDestroyElement_f(mgElement* e)
@@ -187,7 +188,11 @@ mgUpdate_f(mgContext* c)
 	c->deltaTime = (float)(now - then) / CLOCKS_PER_SEC;
 	then = now;
 
+	if (c->dockPanel)
+		mgDockPanelUpdate(c);
+
 	c->windowUnderCursor = 0;
+
 
 	mgWindow* cw = c->firstWindow;
 	if (cw)
