@@ -165,7 +165,6 @@ void gui_drawRectangle(
 
     unsigned int c1 = mgColorGetAsIntegerARGB(color1);
     unsigned int c2 = mgColorGetAsIntegerARGB(color2);
-
     HBRUSH brsh = CreateSolidBrush(RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
     SelectObject(hdcMem, brsh);
     HRGN rgn = 0;
@@ -296,6 +295,10 @@ void draw_gui()
 
 
     g_gui_context->gpu->beginDraw();
+
+    /*draw elements*/
+    mgDraw(g_gui_context);
+
     mgRect rect;
     mgRectSet(&rect, 0, 0, 220, 180);
 
@@ -371,8 +374,7 @@ void draw_gui()
     mgPointSet(&textPosition, 10, 90);
     gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
 
-    /*draw elements*/
-    mgDraw(g_gui_context);
+    
 
     g_gui_context->gpu->endDraw();
 }
@@ -481,12 +483,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_win32font = gui_createFont("Segoe", 0, 10);
     {
         mgDockPanelElementCreationInfo dckElmts[] = {
-            {1, 20, 20, 100},
-            {3, 20, 20, 100},
-            {0, 20, 20, 100},
-            {2, 20, 20, 100},
-            {1, 20, 20, 100},
-            {1, 20, 20, 100},
+            {1, 20, 20, 1000},
+            {3, 20, 20, 1000},
+            {0, 200, 20, 1000},
+            {2, 20, 20, 1000},
+            {1, 20, 20, 1000},
+            {1, 20, 20, 1000},
         };
         mgInitDockPanel(g_gui_context, 0, 30, 0, 0, dckElmts, sizeof(dckElmts) / sizeof(mgDockPanelElementCreationInfo));
 

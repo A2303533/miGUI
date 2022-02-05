@@ -324,6 +324,10 @@ mgUpdateWindow(struct mgWindow_s* w)
 	if (mgPointInRect(&w->rect, &w->context->input->mousePosition))
 	{
 		w->context->windowUnderCursor = w;
+		
+		if(w->cursorInfoOld == mgWindowCursorInfo_out)
+			mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+
 		w->cursorInfo = mgWindowCursorInfo_client;
 
 		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
@@ -443,12 +447,10 @@ mgUpdateWindow(struct mgWindow_s* w)
 		{
 
 			posXlerp += w->context->input->mouseMoveDelta.x;
-			posX = lerp((float)w->position.x, posXlerp, w->context->deltaTime * 30.f);
-			w->position.x = (int)posX;
+			w->position.x = (int)lerp((float)w->position.x, posXlerp, w->context->deltaTime * 30.f);
 
 			posYlerp += w->context->input->mouseMoveDelta.y;
-			posY = lerp((float)w->position.y, posYlerp, w->context->deltaTime * 30.f);
-			w->position.y = (int)posY;
+			w->position.y = (int)lerp((float)w->position.y, posYlerp, w->context->deltaTime * 30.f);
 
 			//printf("%f %f %i\n", posXlerp, posX, w->position.x);
 			//w->position.x = w->position.x + w->context->input->mouseMoveDelta.x;

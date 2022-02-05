@@ -68,13 +68,18 @@ enum mgDockPanelFlag
 
 typedef struct mgDockPanel_s {
 	mgRect indent; /*set this on creation*/
+	
 	mgRect rect; /*update it when resize window*/
+	mgPoint size; /*current rect size*/
+
 	int flags;
 
 	mgDockPanelElement* elements;
 	int elementsNum;
 	
 	int splitterWidth; /*3*/
+	mgPoint mainElementSize;
+	mgPoint mainElementSizeMinimum;/*300 300*/
 } mgDockPanel;
 
 #endif

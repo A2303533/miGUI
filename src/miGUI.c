@@ -188,14 +188,10 @@ mgUpdate_f(mgContext* c)
 	c->deltaTime = (float)(now - then) / CLOCKS_PER_SEC;
 	then = now;
 
-	if (c->dockPanel)
-		mgDockPanelUpdate(c);
-
 	c->windowUnderCursor = 0;
 
-
 	mgWindow* cw = c->firstWindow;
-	if (cw)
+	if (cw && !(c->dockPanel->flags & mgDockPanelFlag_onSplitter))
 	{
 		cw = cw->left;
 		
@@ -232,6 +228,9 @@ mgUpdate_f(mgContext* c)
 		}
 		c->needUpdateTransform = 0;
 	}
+
+	if (c->dockPanel && !c->windowUnderCursor)
+		mgDockPanelUpdate(c);
 }
 
 MG_API
