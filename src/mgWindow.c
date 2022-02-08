@@ -33,6 +33,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+mgDockPanelWindow* g_dockPanelWindow = 0;
+int g_dockElIdOrWhere = 0;
+int g_windowToDockPanelMode = 0;
+mgRect g_windowToDockRect;
+
 void mgDestroyElement_f(mgElement* e);
 void mgrootobject_cb(mgElement*e) {}
 void mgDrawElement(mgElement* e);
@@ -461,6 +466,11 @@ mgUpdateWindow(struct mgWindow_s* w)
 		{
 			w->flags ^= mgWindowFlag_internal_isMove;
 			needUpdateTransform = 1;
+			if (g_windowToDockPanelMode)
+			{
+				g_windowToDockPanelMode = 0;
+				mgDockAddWindow_f(w, g_dockPanelWindow, g_dockElIdOrWhere);
+			}
 		}
 	}
 	else if (w->flags & mgWindowFlag_canResize)
@@ -516,7 +526,51 @@ mgUpdateWindow(struct mgWindow_s* w)
 	w->rootElement->transformWorld = w->rootElement->transformLocal;
 
 	if (w->flags & mgWindowFlag_internal_isMove)
+	{
 		needUpdateTransform = 1;
+		
+		if ((w->flags & mgWindowFlag_canDock) && !w->dockPanelWindow && w->context->dockPanel)
+		{
+			g_windowToDockPanelMode = 0;
+			g_dockPanelWindow = 0;
+			g_dockElIdOrWhere = 0;
+
+			/*first, check if cursor inside mgDockPanelWindow*/
+			/*only after check if cursor in elements[i].addWindowRect*/
+			for (int i = 1; i < w->context->dockPanel->elementsNum; ++i)
+			{
+				if (mgPointInRect(&w->context->dockPanel->elements[i].addWindowRect, &w->context->input->mousePosition))
+				{
+					g_dockElIdOrWhere = i - 1;
+					g_windowToDockPanelMode = 1;
+					g_windowToDockRect = w->context->dockPanel->elements[i].addWindowRect;
+					int rszX = g_windowToDockRect.right - g_windowToDockRect.left;
+					int rszY = g_windowToDockRect.bottom - g_windowToDockRect.top;
+					
+					switch (w->context->dockPanel->elements[i].info.where)
+					{
+					case 0:
+						if (rszX < w->size.x)
+							g_windowToDockRect.right += w->size.x - rszX;
+						break;
+					case 1:
+						if (rszY < w->size.y)
+							g_windowToDockRect.bottom += w->size.y - rszY;
+						break;
+					case 2:
+						if (rszX < w->size.x)
+							g_windowToDockRect.left -= w->size.x - rszX;
+						break;
+					case 3:
+						if (rszY < w->size.y)
+							g_windowToDockRect.top -= w->size.y - rszY;
+						break;
+					}
+					break;
+				}				
+			}
+		}
+	}
 
 	if(needUpdateTransform)
 		mgUpdateTransformElement(w->rootElement);

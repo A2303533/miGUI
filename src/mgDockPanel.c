@@ -35,6 +35,9 @@
 
 #include <Windows.h>
 
+extern int g_windowToDockPanelMode;
+extern mgRect g_windowToDockRect;
+
 float lerp(float v0, float v1, float t);
 
 int g_dockpanel_inSplitterRect = 0;
@@ -50,8 +53,17 @@ _mgDockPanelRebuild(struct mgContext_s* c)
 	{
 		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
 		{
+			int sz = c->dockPanel->elements[i].info.size;
+
+			if (!c->dockPanel->elements[i].firstWindow) sz = 0;
+
+			int addwndSz = 0;
+			if (c->dockPanel->elements[i].info.sizeMinimum < 50)
+				addwndSz = 50;
+
 			mgRect rect;
 			mgRect splitterRect;
+			mgRect addWindowRect;
 			switch (c->dockPanel->elements[i].info.where)
 			{
 			default:
@@ -59,7 +71,12 @@ _mgDockPanelRebuild(struct mgContext_s* c)
 				rect.left = mainElRect.left;
 				rect.top = mainElRect.top;
 				rect.bottom = mainElRect.bottom;
-				rect.right = rect.left + c->dockPanel->elements[i].info.size;
+				rect.right = rect.left + sz;
+				
+				
+				addWindowRect = rect;
+				addWindowRect.right = rect.left + c->dockPanel->elements[i].info.sizeMinimum + addwndSz;
+
 				mainElRect.left = rect.right;
 				splitterRect.left = rect.right - c->dockPanel->splitterWidth;
 				splitterRect.right = rect.right + c->dockPanel->splitterWidth;
@@ -70,7 +87,11 @@ _mgDockPanelRebuild(struct mgContext_s* c)
 				rect.left = mainElRect.left;
 				rect.top = mainElRect.top;
 				rect.right = mainElRect.right;
-				rect.bottom = rect.top + c->dockPanel->elements[i].info.size;
+				rect.bottom = rect.top + sz;
+
+				addWindowRect = rect;
+				addWindowRect.bottom = rect.top + c->dockPanel->elements[i].info.sizeMinimum + addwndSz;
+
 				mainElRect.top = rect.bottom;
 				splitterRect.left = rect.left;
 				splitterRect.right = rect.right;
@@ -81,7 +102,11 @@ _mgDockPanelRebuild(struct mgContext_s* c)
 				rect.top = mainElRect.top;
 				rect.bottom = mainElRect.bottom;
 				rect.right = mainElRect.right;
-				rect.left = rect.right - c->dockPanel->elements[i].info.size;
+				rect.left = rect.right - sz;
+
+				addWindowRect = rect;
+				addWindowRect.left = rect.right - c->dockPanel->elements[i].info.sizeMinimum - addwndSz;
+
 				mainElRect.right = rect.left;
 				splitterRect.left = rect.left - c->dockPanel->splitterWidth;
 				splitterRect.right = rect.left + c->dockPanel->splitterWidth;
@@ -92,7 +117,11 @@ _mgDockPanelRebuild(struct mgContext_s* c)
 				rect.bottom = mainElRect.bottom;
 				rect.left = mainElRect.left;
 				rect.right = mainElRect.right;
-				rect.top = rect.bottom - c->dockPanel->elements[i].info.size;
+				rect.top = rect.bottom - sz;
+
+				addWindowRect = rect;
+				addWindowRect.top = rect.bottom - c->dockPanel->elements[i].info.sizeMinimum - addwndSz;
+
 				mainElRect.bottom = rect.top;
 				splitterRect.left = rect.left;
 				splitterRect.right = rect.right;
@@ -101,6 +130,8 @@ _mgDockPanelRebuild(struct mgContext_s* c)
 				break;
 			}
 
+
+			c->dockPanel->elements[i].addWindowRect = addWindowRect;
 
 			c->dockPanel->elements[i].rect = rect;
 			c->dockPanel->elements[i].splitterRect = splitterRect;
@@ -117,7 +148,6 @@ _mgDockPanelRebuild(struct mgContext_s* c)
 void
 mgDockPanelRebuild(struct mgContext_s* c)
 {
-
 	_mgDockPanelRebuild(c);
 	if (c->dockPanel->elementsNum > 1)
 	{
@@ -209,6 +239,15 @@ mgDrawDockPanel(struct mgContext_s* c)
 				0, 0, 0);
 		}
 	}
+
+	if (g_windowToDockPanelMode)
+	{
+		c->gpu->setClipRect(&g_windowToDockRect);
+		c->gpu->drawRectangle(mgDrawRectangleReason_dockWindowToDock, &g_windowToDockRect,
+			&c->activeStyle->dockpanelWindowToDockColor,
+			&c->activeStyle->dockpanelWindowToDockColor,
+			0, 0, 0);
+	}
 }
 
 void
@@ -228,6 +267,9 @@ mgDockPanelUpdate(struct mgContext_s* c)
 
 	for (int i = 0; i < c->dockPanel->elementsNum; ++i)
 	{
+		if (!c->dockPanel->elements[i].firstWindow)
+			continue;
+
 		if (mgPointInRect(&c->dockPanel->elements[i].splitterRect, &c->input->mousePosition))
 		{
 			g_dockpanel_inSplitterRect = 1;
@@ -362,15 +404,64 @@ mgInitDockPanel_f(
 	mgDockPanelOnSize(c);
 }
 
-//MG_API
-//void MG_C_DECL
-//mgDockPanelSetElement_f(struct mgContext_s* c, int id, int where, int size)
-//{
-//	assert(c);
-//	assert(c->dockPanel);
-//	assert((id > 0) && (id < c->dockPanel->elementsNum));
-//	assert((where >= 0) && (where <= 3));
-//	assert(size > 0);
-//
-//	//c->dockPanel->elements[id].
-//}
+/*
+* Надо добавить массив (чтобы не замарачиваться с проходом по иерархии) и 
+*  обновлять его каждый раз при добавлении\удалении окна
+*/
+MG_API
+struct mgDockPanelWindow_s* MG_C_DECL
+mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
+{
+	assert(w);
+	assert(w->context->dockPanel);
+	
+	mgDockPanel* dck = w->context->dockPanel;
+
+	mgDockPanelWindow* dckWnd = 0;
+	
+
+	if (dw)
+	{
+
+	}
+	else
+	{
+		id++;
+		if ((id > 0) && (id < dck->elementsNum))
+		{
+			mgDockPanelElement* dckEl = &dck->elements[id];
+
+			dckWnd = calloc(1, sizeof(mgDockPanelWindow));
+			
+			dckWnd->firstWindow = calloc(1, sizeof(mgDockPanelWindowNode));
+			dckWnd->firstWindow->window = w;
+			dckWnd->firstWindow->left = w;
+			dckWnd->firstWindow->right = w;
+
+			dckWnd->left = dckWnd;
+			dckWnd->right = dckWnd;
+			
+			dckEl->firstWindow = dckWnd;
+			switch (dckEl->info.where)
+			{
+			case 0:
+			case 2:
+				if(dckEl->info.size < w->size.x)
+					dckEl->info.size = w->size.x;
+				break;
+			case 1:
+			case 3:
+				if (dckEl->info.size < w->size.y)
+					dckEl->info.size = w->size.y;
+				break;
+			}
+
+			w->dockPanelWindow = dckWnd;
+		}
+	}
+
+	if (dckWnd)
+		mgDockPanelRebuild(w->context);
+
+	return dckWnd;
+}

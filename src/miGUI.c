@@ -74,6 +74,8 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColorTopWindow, 0xB5CCFF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarTextColor, 0x0);
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelBGColor, 0xF0F0F0);
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelWindowToDockColor, 0x009BFF);
+	
 	
 	c->functions.SetCursor_p = mgSetCursor_f;
 
@@ -198,6 +200,9 @@ mgUpdate_f(mgContext* c)
 		mgWindow* lw = cw->right;
 		while (1)
 		{
+			if ((cw->flags & mgWindowFlag_canDock) && cw->dockPanelWindow)
+				goto skip;
+
 			if (cw->flags & mgWindowFlag_internal_visible)
 			{
 				if (!c->windowUnderCursor)
@@ -222,6 +227,7 @@ mgUpdate_f(mgContext* c)
 				}
 			}
 
+		skip:;
 			if (cw == lw)
 				break;
 			cw = cw->left;
@@ -381,9 +387,13 @@ mgDraw_f(mgContext* c)
 		mgWindow* lw = cw->left;
 		while (1)
 		{
+			if ((cw->flags & mgWindowFlag_canDock) && cw->dockPanelWindow)
+				goto skip;
+
 			if (cw->flags & mgWindowFlag_internal_visible)
 				mgDrawWindow(cw);
 
+		skip:;
 			if (cw == lw)
 				break;
 			cw = cw->right;

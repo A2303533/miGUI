@@ -78,6 +78,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_dockBG,
 	mgDrawRectangleReason_dockElementBG,
 	mgDrawRectangleReason_dockSplitterBG,
+	mgDrawRectangleReason_dockWindowToDock,
 };
 
 enum mgDrawTextReason
@@ -216,11 +217,11 @@ typedef void (*PFNMGINITDOCKPANELPROC)(struct mgContext_s*, int indentLeft, int 
 extern PFNMGINITDOCKPANELPROC mgInitDockPanel;
 
 /*
-* id : 1 or more
-* where : 0 - left, 1 - top, 2 - right, 3 - bottom
+* if dw 0 then id is id of mgDockPanelElement_s
+* if dw not 0 then id is where (0 - left, 1 - top, 2 - right, 3 - bottom)
 */
-//typedef void (*PFNMGDOCKPANELSETELEMENTPROC)(struct mgContext_s*, int id, int where, int size);
-//extern PFNMGDOCKPANELSETELEMENTPROC mgDockPanelSetElement;
+typedef struct mgDockPanelWindow_s* (*PFNMGDOCKADDWINDOWPROC)(struct mgWindow_s*, struct mgDockPanelWindow_s* dw, int id);
+extern PFNMGDOCKADDWINDOWPROC mgDockAddWindow;
 
 
 #if defined(__cplusplus)

@@ -36,6 +36,8 @@ void
 miGUI_onUpdateTransform_rectangle(mgElement* e)
 {
 	e->transformWorld = e->transformLocal;
+	e->transformWorld.buildArea.top += e->window->titlebarHeight;
+	e->transformWorld.buildArea.bottom += e->window->titlebarHeight;
 
 	e->transformWorld.buildArea.left += e->parent->transformWorld.buildArea.left;
 	e->transformWorld.buildArea.top += e->parent->transformWorld.buildArea.top;

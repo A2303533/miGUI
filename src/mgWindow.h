@@ -39,6 +39,7 @@ enum mgWindowFlag
 	mgWindowFlag_drawBG = 0x8,  /*default*/
 	mgWindowFlag_collapseButton = 0x10,  /*default*/
 	mgWindowFlag_canResize = 0x20,  /*default*/
+	mgWindowFlag_canDock = 0x40,
 
 	mgWindowFlag_internal_isResizeRB = 0x8000000,
 	mgWindowFlag_internal_isExpand   = 0x10000000,
@@ -83,9 +84,6 @@ typedef struct mgWindow_s {
 	wchar_t* titlebarText; /*use mgSetWindowTitle function*/
 	int titlebarTextLen;
 
-	//int visible;
-	//int isMove;
-
 	mgIcons* icons;
 	int iconCloseButton;
 	int iconCloseButtonMouseHover;
@@ -101,6 +99,9 @@ typedef struct mgWindow_s {
 
 	struct mgWindow_s* left;
 	struct mgWindow_s* right;
+
+	struct mgDockPanelWindow_s* dockPanelWindow;
+
 } mgWindow;
 
 
