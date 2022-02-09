@@ -534,14 +534,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         guiWindow2->iconCloseButton = 0;
         guiWindow2->iconCloseButtonMouseHover = 1;
         guiWindow2->iconCloseButtonPress = 2;
+        guiWindow2->iconCollapseButton = 3;
         guiWindow2->titlebarFont = g_win32font;
         guiWindow2->flags ^= mgWindowFlag_collapseButton;
         guiWindow2->flags |= mgWindowFlag_canDock;
         mgSetWindowTitle(guiWindow2, L"_canDock");
         {
             mgPointSet(&pos, 0, 0);
-            mgPointSet(&sz, 60, 20);
-            mgCreateButton(guiWindow2, &pos, &sz, L"Button", g_win32font);
+            mgPointSet(&sz, 160, 20);
+            mgElement* btn = mgCreateButton(guiWindow2, &pos, &sz, L"Button", g_win32font);
+            btn->align = mgAlignment_top;
         }
         //guiWindow2->flags ^= mgWindowFlag_withTitlebar;
         //guiWindow2->flags ^= mgWindowFlag_canMove;

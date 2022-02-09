@@ -180,110 +180,118 @@ mgDrawWindow(struct mgWindow_s* w)
 
 	w->context->gpu->setClipRect(&w->rect);
 	
-	if ((w->flags & mgWindowFlag_drawBG) && (w->flags & mgWindowFlag_internal_isExpand))
-		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->rect, &clrbg, &clrbg, 0, 0, 0);
-
-	if (w->flags & mgWindowFlag_withTitlebar)
+	if ((w->flags & mgWindowFlag_canDock) && w->dockPanelWindow)
 	{
-		float tbhalfsz = (float)w->titlebarHeight * 0.5f;
 
-		w->rectTitlebar.left = w->position.x;
-		w->rectTitlebar.top = w->position.y;
-		w->rectTitlebar.right = w->position.x + w->size.x;
-		w->rectTitlebar.bottom = w->position.y + w->titlebarHeight;
+	}
+	else
+	{
+		if ((w->flags & mgWindowFlag_drawBG)
+			&& (w->flags & mgWindowFlag_internal_isExpand))
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->rect, &clrbg, &clrbg, 0, 0, 0);
 
-		w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, &w->rectTitlebar, &clrttl, &clrttl, 0, 0, 0);
-		
-		int text_move = 0;
-		if (w->flags & mgWindowFlag_collapseButton)
+		if ((w->flags & mgWindowFlag_withTitlebar) && !w->dockPanelWindow)
 		{
-			if (w->icons)
+			float tbhalfsz = (float)w->titlebarHeight * 0.5f;
+
+			w->rectTitlebar.left = w->position.x;
+			w->rectTitlebar.top = w->position.y;
+			w->rectTitlebar.right = w->position.x + w->size.x;
+			w->rectTitlebar.bottom = w->position.y + w->titlebarHeight;
+
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, &w->rectTitlebar, &clrttl, &clrttl, 0, 0, 0);
+
+			int text_move = 0;
+			if (w->flags & mgWindowFlag_collapseButton)
 			{
-				mgPoint pos;
-				pos.x = w->position.x + 3;
-				pos.y = w->position.y;
-				int iconID = w->iconExpandButton;
-
-				if (w->flags & mgWindowFlag_internal_isExpand)
-					iconID = w->iconCollapseButton;
-
-				mgPoint sz = w->icons->icons[iconID].sz;
-
-
-				text_move = sz.x + 3;
-
-				mgColor wh;
-				mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
-
+				if (w->icons)
 				{
-					float ichalfsz = (float)sz.y * 0.5f;
-					pos.y += (int)(tbhalfsz - ichalfsz);
+					mgPoint pos;
+					pos.x = w->position.x + 3;
+					pos.y = w->position.y;
+					int iconID = w->iconExpandButton;
+
+					if (w->flags & mgWindowFlag_internal_isExpand)
+						iconID = w->iconCollapseButton;
+
+					mgPoint sz = w->icons->icons[iconID].sz;
+
+
+					text_move = sz.x + 3;
+
+					mgColor wh;
+					mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
+
+					{
+						float ichalfsz = (float)sz.y * 0.5f;
+						pos.y += (int)(tbhalfsz - ichalfsz);
+					}
+
+					w->collapseButtonRect.left = pos.x;
+					w->collapseButtonRect.top = pos.y;
+					w->collapseButtonRect.right = w->collapseButtonRect.left + sz.x;
+					w->collapseButtonRect.bottom = w->collapseButtonRect.top + sz.y;
+
+					w->context->currentIcon.left = w->icons->icons[iconID].lt.x;
+					w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
+					w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
+					w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
+					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, &w->collapseButtonRect, &wh, &wh, 0, w->icons->texture, 0);
 				}
-
-				w->collapseButtonRect.left = pos.x;
-				w->collapseButtonRect.top = pos.y;
-				w->collapseButtonRect.right = w->collapseButtonRect.left + sz.x;
-				w->collapseButtonRect.bottom = w->collapseButtonRect.top + sz.y;
-
-				w->context->currentIcon.left = w->icons->icons[iconID].lt.x;
-				w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
-				w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
-				w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
-				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, &w->collapseButtonRect, &wh, &wh, 0, w->icons->texture, 0);
 			}
-		}
 
-		if (w->titlebarFont && w->titlebarText)
-		{
-			mgPoint pos;
-			pos.x = w->position.x + text_move + 3;
-			pos.y = w->position.y;
-
-			w->context->gpu->setClipRect(&w->rect);
-			w->context->gpu->drawText(mgDrawTextReason_windowTitlebar,
-				&pos,
-				w->titlebarText,
-				w->titlebarTextLen,
-				&style->windowTitlebarTextColor,
-				w->titlebarFont);
-		}
-
-		if (w->flags & mgWindowFlag_closeButton)
-		{
-			if (w->icons)
+			if (w->titlebarFont && w->titlebarText)
 			{
-				mgColor wh;
-				mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
-				mgPoint sz = w->icons->icons[w->iconCloseButton].sz;
 				mgPoint pos;
-				pos.x = w->position.x + w->size.x - sz.x-3;
+				pos.x = w->position.x + text_move + 3;
 				pos.y = w->position.y;
 
+				w->context->gpu->setClipRect(&w->rect);
+				w->context->gpu->drawText(mgDrawTextReason_windowTitlebar,
+					&pos,
+					w->titlebarText,
+					w->titlebarTextLen,
+					&style->windowTitlebarTextColor,
+					w->titlebarFont);
+			}
+
+			if (w->flags & mgWindowFlag_closeButton)
+			{
+				if (w->icons)
 				{
-					float ichalfsz = (float)sz.y * 0.5f;
-					pos.y += (int)(tbhalfsz - ichalfsz);
+					mgColor wh;
+					mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
+					mgPoint sz = w->icons->icons[w->iconCloseButton].sz;
+					mgPoint pos;
+					pos.x = w->position.x + w->size.x - sz.x - 3;
+					pos.y = w->position.y;
+
+					{
+						float ichalfsz = (float)sz.y * 0.5f;
+						pos.y += (int)(tbhalfsz - ichalfsz);
+					}
+
+					int iconID = w->iconCloseButton;
+
+					w->closeButtonRect.left = pos.x;
+					w->closeButtonRect.top = pos.y;
+					w->closeButtonRect.right = w->closeButtonRect.left + sz.x;
+					w->closeButtonRect.bottom = w->closeButtonRect.top + sz.y;
+
+					if (w->cursorInfo == mgWindowCursorInfo_closeButton)
+					{
+						iconID = w->iconCloseButtonMouseHover;
+
+					}
+					if (w->flags & mgWindowFlag_internal_isCloseButton)
+						iconID = w->iconCloseButtonPress;
+
+					w->context->currentIcon.left = w->icons->icons[iconID].lt.x;
+					w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
+					w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
+					w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
+					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, &w->closeButtonRect, &wh, &wh, 0, w->icons->texture, 0);
 				}
-
-				int iconID = w->iconCloseButton;
-
-				w->closeButtonRect.left = pos.x;
-				w->closeButtonRect.top = pos.y;
-				w->closeButtonRect.right = w->closeButtonRect.left + sz.x;
-				w->closeButtonRect.bottom = w->closeButtonRect.top + sz.y;
-
-				if (w->cursorInfo == mgWindowCursorInfo_closeButton)
-				{
-					iconID = w->iconCloseButtonMouseHover;
-
-				}
-				if (w->flags & mgWindowFlag_internal_isCloseButton)
-					iconID = w->iconCloseButtonPress;
-
-				w->context->currentIcon.left = w->icons->icons[iconID].lt.x;
-				w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
-				w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
-				w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
-				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, &w->closeButtonRect, &wh, &wh, 0, w->icons->texture, 0);
 			}
 		}
 	}
@@ -326,251 +334,269 @@ mgUpdateWindow(struct mgWindow_s* w)
 	w->rect.right = w->rect.left + w->size.x;
 	w->rect.bottom = windowBtm;*/
 
-	if (mgPointInRect(&w->rect, &w->context->input->mousePosition))
+	mgRect rct = w->rect;
+	if (w->dockPanelWindow && (w->flags & mgWindowFlag_canDock))
 	{
-		w->context->windowUnderCursor = w;
-		
-		if(w->cursorInfoOld == mgWindowCursorInfo_out)
-			mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
-
-		w->cursorInfo = mgWindowCursorInfo_client;
-
-		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-		{
-			firstClick = w->context->input->mousePosition;
-			saveSize = w->size;
-		}
-
-		if ((w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-			|| (w->context->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
-			|| (w->context->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN))
-			mgBringWindowToTop_f(w);
-
-		if (w->flags & mgWindowFlag_withTitlebar)
-		{
-			if (w->context->input->mousePosition.y < (w->position.y + w->titlebarHeight))
-			{
-				w->cursorInfo = mgWindowCursorInfo_titlebar;
-					
-				if (mgPointInRect(&w->closeButtonRect, &w->context->input->mousePosition))
-					w->cursorInfo = mgWindowCursorInfo_closeButton;
-				else if (mgPointInRect(&w->collapseButtonRect, &w->context->input->mousePosition))
-					w->cursorInfo = mgWindowCursorInfo_collapseButton;
-			}
-		}
-
-		if (w->flags & mgWindowFlag_canResize)
-		{
-			w->resizeRBRect.right = w->rect.right;
-			w->resizeRBRect.bottom = w->rect.bottom;
-			w->resizeRBRect.left = w->resizeRBRect.right - 20;
-			w->resizeRBRect.top = w->resizeRBRect.bottom - 20;
-			if (mgPointInRect(&w->resizeRBRect, &w->context->input->mousePosition))
-			{
-				w->cursorInfo = mgWindowCursorInfo_resizeRB;
-			}
-		}
-	}
-
-	if (w->cursorInfo == mgWindowCursorInfo_titlebar)
-	{
-		if (!(w->flags & mgWindowFlag_internal_isMove))
-		{
-			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-			{
-				w->flags |= mgWindowFlag_internal_isMove;
-				posX = (float)w->position.x;
-				posY = (float)w->position.y;
-				posXlerp = posX;
-				posYlerp = posY;
-			}
-		}
-	}
-	else if (w->cursorInfo == mgWindowCursorInfo_closeButton)
-	{
-		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-		{
-			w->flags |= mgWindowFlag_internal_isCloseButton;
-		}
-		else if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
-		{
-			if (w->flags & mgWindowFlag_internal_isCloseButton)
-			{
-				if (w->onClose)
-				{
-					if(w->onClose(w))
-						w->flags ^= mgWindowFlag_internal_visible;
-				}
-				else
-				{
-					w->flags ^= mgWindowFlag_internal_visible;
-				}
-			}
-		}
-	}
-	else if (w->cursorInfo == mgWindowCursorInfo_collapseButton)
-	{
-		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-		{
-			if (w->flags & mgWindowFlag_internal_isExpand)
-				w->flags ^= mgWindowFlag_internal_isExpand;
-			else
-			{
-				w->flags |= mgWindowFlag_internal_isExpand;
-				windowBtm = w->position.y + w->size.y;
-			}
-			needUpdateTransform = 1;
-		}
-	}
-	else if (w->cursorInfo == mgWindowCursorInfo_resizeRB)
-	{
-		mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_SizeNWSE], mgCursorType_Arrow);
-		if (!(w->flags & mgWindowFlag_internal_isResizeRB))
-		{
-			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-			{
-				w->flags |= mgWindowFlag_internal_isResizeRB;
-			}
-		}
+	//	rct = w->dockPanelWindow->windowRect;
+		w->rootElement->transformLocal.buildArea = w->dockPanelWindow->windowRect;
+		w->rootElement->transformLocal.clipArea = w->dockPanelWindow->windowRect;
+		w->rootElement->transformWorld = w->rootElement->transformLocal;
 	}
 	else
 	{
-	}
-
-	if (!(w->cursorInfo & mgWindowCursorInfo_resizeRB) && (w->cursorInfoOld & mgWindowCursorInfo_resizeRB))
-		mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
-
-	if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
-	{
-		if(w->flags & mgWindowFlag_internal_isCloseButton)
-			w->flags ^= mgWindowFlag_internal_isCloseButton;
-	}
-
-	if ((w->flags & mgWindowFlag_internal_isMove) && (w->flags & mgWindowFlag_canMove))
-	{
-		if (w->context->input->mouseButtonFlags2 & MG_MBFL_LMBHOLD)
+		if (mgPointInRect(&w->rect, &w->context->input->mousePosition))
 		{
+			w->context->windowUnderCursor = w;
 
-			posXlerp += w->context->input->mouseMoveDelta.x;
-			w->position.x = (int)lerp((float)w->position.x, posXlerp, w->context->deltaTime * 30.f);
+			if (w->cursorInfoOld == mgWindowCursorInfo_out)
+				mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
-			posYlerp += w->context->input->mouseMoveDelta.y;
-			w->position.y = (int)lerp((float)w->position.y, posYlerp, w->context->deltaTime * 30.f);
+			w->cursorInfo = mgWindowCursorInfo_client;
 
-			//printf("%f %f %i\n", posXlerp, posX, w->position.x);
-			//w->position.x = w->position.x + w->context->input->mouseMoveDelta.x;
-			//w->position.y = w->position.y + w->context->input->mouseMoveDelta.y;
-		}
-
-		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
-		{
-			w->flags ^= mgWindowFlag_internal_isMove;
-			needUpdateTransform = 1;
-			if (g_windowToDockPanelMode)
+			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 			{
-				g_windowToDockPanelMode = 0;
-				mgDockAddWindow_f(w, g_dockPanelWindow, g_dockElIdOrWhere);
+				firstClick = w->context->input->mousePosition;
+				saveSize = w->size;
 			}
-		}
-	}
-	else if (w->flags & mgWindowFlag_canResize)
-	{
-		if (w->flags & mgWindowFlag_internal_isResizeRB)
-		{
-			//if (w->flags & mgWindowFlag_internal_isExpand)
+
+			if ((w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+				|| (w->context->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+				|| (w->context->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN))
+				mgBringWindowToTop_f(w);
+
+			if (w->flags & mgWindowFlag_withTitlebar)
 			{
-				int px = w->context->input->mousePosition.x - firstClick.x;
-				int py = w->context->input->mousePosition.y - firstClick.y;
-
-				w->size.x = px + saveSize.x;
-				w->size.y = py + saveSize.y;
-
-				if (w->size.x < w->sizeMinimum.x)
-					w->size.x = w->sizeMinimum.x;
-				if (w->size.y < w->sizeMinimum.y)
-					w->size.y = w->sizeMinimum.y;
-
-				if (w->size.x < 0)
-					w->size.x = 0;
-				if (w->size.y < 0)
-					w->size.y = 0;
-				needUpdateTransform = 1;
-				if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+				if (w->context->input->mousePosition.y < (w->position.y + w->titlebarHeight))
 				{
-					w->flags ^= mgWindowFlag_internal_isResizeRB;
-					goto begin;/*fix some sht*/
+					w->cursorInfo = mgWindowCursorInfo_titlebar;
+
+					if (mgPointInRect(&w->closeButtonRect, &w->context->input->mousePosition))
+						w->cursorInfo = mgWindowCursorInfo_closeButton;
+					else if (mgPointInRect(&w->collapseButtonRect, &w->context->input->mousePosition))
+						w->cursorInfo = mgWindowCursorInfo_collapseButton;
+				}
+			}
+
+			if (w->flags & mgWindowFlag_canResize)
+			{
+				w->resizeRBRect.right = w->rect.right;
+				w->resizeRBRect.bottom = w->rect.bottom;
+				w->resizeRBRect.left = w->resizeRBRect.right - 20;
+				w->resizeRBRect.top = w->resizeRBRect.bottom - 20;
+				if (mgPointInRect(&w->resizeRBRect, &w->context->input->mousePosition))
+				{
+					w->cursorInfo = mgWindowCursorInfo_resizeRB;
 				}
 			}
 		}
-	}
 
-	if (w->position.x + w->size.x < 30)
-		w->position.x += 30 - (w->position.x + w->size.x);
-	
-	if (w->position.x > w->context->windowSize.x - 30)
-		w->position.x = w->context->windowSize.x - 30;
-
-	if (w->position.y < 0)
-		w->position.y = 0;
-
-	if (w->position.y > w->context->windowSize.y - w->titlebarHeight)
-		w->position.y = w->context->windowSize.y - w->titlebarHeight;
-
-	w->rect.left = w->position.x;
-	w->rect.top = w->position.y;
-	w->rect.right = w->rect.left + w->size.x;
-	w->rect.bottom = windowBtm;
-	w->rootElement->transformLocal.buildArea = w->rect;
-	w->rootElement->transformLocal.clipArea = w->rect;
-	w->rootElement->transformLocal.clipArea.top += w->titlebarHeight;
-	w->rootElement->transformWorld = w->rootElement->transformLocal;
-
-	if (w->flags & mgWindowFlag_internal_isMove)
-	{
-		needUpdateTransform = 1;
-		
-		if ((w->flags & mgWindowFlag_canDock) && !w->dockPanelWindow && w->context->dockPanel)
+		if (w->cursorInfo == mgWindowCursorInfo_titlebar)
 		{
-			g_windowToDockPanelMode = 0;
-			g_dockPanelWindow = 0;
-			g_dockElIdOrWhere = 0;
-
-			/*first, check if cursor inside mgDockPanelWindow*/
-			/*only after check if cursor in elements[i].addWindowRect*/
-			for (int i = 1; i < w->context->dockPanel->elementsNum; ++i)
+			if (!(w->flags & mgWindowFlag_internal_isMove))
 			{
-				if (mgPointInRect(&w->context->dockPanel->elements[i].addWindowRect, &w->context->input->mousePosition))
+				if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 				{
-					g_dockElIdOrWhere = i - 1;
-					g_windowToDockPanelMode = 1;
-					g_windowToDockRect = w->context->dockPanel->elements[i].addWindowRect;
-					int rszX = g_windowToDockRect.right - g_windowToDockRect.left;
-					int rszY = g_windowToDockRect.bottom - g_windowToDockRect.top;
-					
-					switch (w->context->dockPanel->elements[i].info.where)
-					{
-					case 0:
-						if (rszX < w->size.x)
-							g_windowToDockRect.right += w->size.x - rszX;
-						break;
-					case 1:
-						if (rszY < w->size.y)
-							g_windowToDockRect.bottom += w->size.y - rszY;
-						break;
-					case 2:
-						if (rszX < w->size.x)
-							g_windowToDockRect.left -= w->size.x - rszX;
-						break;
-					case 3:
-						if (rszY < w->size.y)
-							g_windowToDockRect.top -= w->size.y - rszY;
-						break;
-					}
-					break;
-				}				
+					w->flags |= mgWindowFlag_internal_isMove;
+					posX = (float)w->position.x;
+					posY = (float)w->position.y;
+					posXlerp = posX;
+					posYlerp = posY;
+				}
 			}
 		}
+		else if (w->cursorInfo == mgWindowCursorInfo_closeButton)
+		{
+			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			{
+				w->flags |= mgWindowFlag_internal_isCloseButton;
+			}
+			else if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+			{
+				if (w->flags & mgWindowFlag_internal_isCloseButton)
+				{
+					if (w->onClose)
+					{
+						if (w->onClose(w))
+							w->flags ^= mgWindowFlag_internal_visible;
+					}
+					else
+					{
+						w->flags ^= mgWindowFlag_internal_visible;
+					}
+				}
+			}
+		}
+		else if (w->cursorInfo == mgWindowCursorInfo_collapseButton)
+		{
+			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			{
+				if (w->flags & mgWindowFlag_internal_isExpand)
+					w->flags ^= mgWindowFlag_internal_isExpand;
+				else
+				{
+					w->flags |= mgWindowFlag_internal_isExpand;
+					windowBtm = w->position.y + w->size.y;
+				}
+				needUpdateTransform = 1;
+			}
+		}
+		else if (w->cursorInfo == mgWindowCursorInfo_resizeRB)
+		{
+			mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_SizeNWSE], mgCursorType_Arrow);
+			if (!(w->flags & mgWindowFlag_internal_isResizeRB))
+			{
+				if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+				{
+					w->flags |= mgWindowFlag_internal_isResizeRB;
+				}
+			}
+		}
+		else
+		{
+		}
+
+		if (!(w->cursorInfo & mgWindowCursorInfo_resizeRB) && (w->cursorInfoOld & mgWindowCursorInfo_resizeRB))
+			mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+
+		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+		{
+			if (w->flags & mgWindowFlag_internal_isCloseButton)
+				w->flags ^= mgWindowFlag_internal_isCloseButton;
+		}
+
+		if ((w->flags & mgWindowFlag_internal_isMove) && (w->flags & mgWindowFlag_canMove))
+		{
+			if (w->context->input->mouseButtonFlags2 & MG_MBFL_LMBHOLD)
+			{
+
+				posXlerp += w->context->input->mouseMoveDelta.x;
+				w->position.x = (int)lerp((float)w->position.x, posXlerp, w->context->deltaTime * 30.f);
+
+				posYlerp += w->context->input->mouseMoveDelta.y;
+				w->position.y = (int)lerp((float)w->position.y, posYlerp, w->context->deltaTime * 30.f);
+
+				//printf("%f %f %i\n", posXlerp, posX, w->position.x);
+				//w->position.x = w->position.x + w->context->input->mouseMoveDelta.x;
+				//w->position.y = w->position.y + w->context->input->mouseMoveDelta.y;
+			}
+
+			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+			{
+				w->flags ^= mgWindowFlag_internal_isMove;
+				needUpdateTransform = 1;
+				if (g_windowToDockPanelMode)
+				{
+					g_windowToDockPanelMode = 0;
+					mgDockAddWindow_f(w, g_dockPanelWindow, g_dockElIdOrWhere);
+				}
+			}
+		}
+		else if (w->flags & mgWindowFlag_canResize)
+		{
+			if (w->flags & mgWindowFlag_internal_isResizeRB)
+			{
+				//if (w->flags & mgWindowFlag_internal_isExpand)
+				{
+					int px = w->context->input->mousePosition.x - firstClick.x;
+					int py = w->context->input->mousePosition.y - firstClick.y;
+
+					w->size.x = px + saveSize.x;
+					w->size.y = py + saveSize.y;
+
+					if (w->size.x < w->sizeMinimum.x)
+						w->size.x = w->sizeMinimum.x;
+					if (w->size.y < w->sizeMinimum.y)
+						w->size.y = w->sizeMinimum.y;
+
+					if (w->size.x < 0)
+						w->size.x = 0;
+					if (w->size.y < 0)
+						w->size.y = 0;
+					needUpdateTransform = 1;
+					if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+					{
+						w->flags ^= mgWindowFlag_internal_isResizeRB;
+						goto begin;/*fix some sht*/
+					}
+				}
+			}
+		}
+
+		if (w->position.x + w->size.x < 30)
+			w->position.x += 30 - (w->position.x + w->size.x);
+
+		if (w->position.x > w->context->windowSize.x - 30)
+			w->position.x = w->context->windowSize.x - 30;
+
+		if (w->position.y < 0)
+			w->position.y = 0;
+
+		if (w->position.y > w->context->windowSize.y - w->titlebarHeight)
+			w->position.y = w->context->windowSize.y - w->titlebarHeight;
+
+		w->rect.left = w->position.x;
+		w->rect.top = w->position.y;
+		w->rect.right = w->rect.left + w->size.x;
+		w->rect.bottom = windowBtm;
+		w->rootElement->transformLocal.buildArea = w->rect;
+		w->rootElement->transformLocal.clipArea = w->rect;
+		w->rootElement->transformLocal.clipArea.top += w->titlebarHeight;
+		w->rootElement->transformWorld = w->rootElement->transformLocal;
+
+		if (w->flags & mgWindowFlag_internal_isMove)
+		{
+			needUpdateTransform = 1;
+
+			if ((w->flags & mgWindowFlag_canDock) && !w->dockPanelWindow && w->context->dockPanel)
+			{
+				g_windowToDockPanelMode = 0;
+				g_dockPanelWindow = 0;
+				g_dockElIdOrWhere = 0;
+
+				/*first, check if cursor inside mgDockPanelWindow*/
+				/*only after check if cursor in elements[i].addWindowRect*/
+				for (int i = 1; i < w->context->dockPanel->elementsNum; ++i)
+				{
+					if (mgPointInRect(&w->context->dockPanel->elements[i].addWindowRect, &w->context->input->mousePosition))
+					{
+						g_dockElIdOrWhere = i - 1;
+						g_windowToDockPanelMode = 1;
+						g_windowToDockRect = w->context->dockPanel->elements[i].addWindowRect;
+						int rszX = g_windowToDockRect.right - g_windowToDockRect.left;
+						int rszY = g_windowToDockRect.bottom - g_windowToDockRect.top;
+
+						switch (w->context->dockPanel->elements[i].info.where)
+						{
+						case 0:
+							if (rszX < w->size.x)
+								g_windowToDockRect.right += w->size.x - rszX;
+							break;
+						case 1:
+							if (rszY < w->size.y)
+								g_windowToDockRect.bottom += w->size.y - rszY;
+							break;
+						case 2:
+							if (rszX < w->size.x)
+								g_windowToDockRect.left -= w->size.x - rszX;
+							break;
+						case 3:
+							if (rszY < w->size.y)
+								g_windowToDockRect.top -= w->size.y - rszY;
+							break;
+						}
+						break;
+					}
+				}
+			}
+		}
+	
+		if ((w->flags & mgWindowFlag_withTitlebar))
+		{
+			w->rootElement->transformWorld.buildArea.top += w->titlebarHeight;
+			w->rootElement->transformWorld.buildArea.bottom += w->titlebarHeight;
+		}
 	}
+
 
 	if(needUpdateTransform)
 		mgUpdateTransformElement(w->rootElement);
