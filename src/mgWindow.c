@@ -42,6 +42,7 @@ void mgDestroyElement_f(mgElement* e);
 void mgrootobject_cb(mgElement*e) {}
 void mgDrawElement(mgElement* e);
 void mgUpdateTransformElement(mgElement* e);
+void mgDockPanelUpdateWindow(struct mgContext_s* c);
 
 float 
 lerp(float v0, float v1, float t) 
@@ -73,7 +74,7 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 		| mgWindowFlag_canResize
 		| mgWindowFlag_collapseButton;
 
-	newWindow->titlebarHeight = 15;
+	newWindow->titlebarHeight = 17;
 	newWindow->flags 
 		|= mgWindowFlag_internal_visible
 		| mgWindowFlag_internal_isExpand;
@@ -377,7 +378,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 				}
 			}
 
-			if (w->flags & mgWindowFlag_canResize)
+			if ((w->flags & mgWindowFlag_canResize) && (w->flags & mgWindowFlag_internal_isExpand))
 			{
 				w->resizeRBRect.right = w->rect.right;
 				w->resizeRBRect.bottom = w->rect.bottom;
@@ -488,6 +489,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 				{
 					g_windowToDockPanelMode = 0;
 					mgDockAddWindow_f(w, g_dockPanelWindow, g_dockElIdOrWhere);
+					needUpdateTransform = 2;
 				}
 			}
 		}
@@ -598,8 +600,14 @@ mgUpdateWindow(struct mgWindow_s* w)
 	}
 
 
-	if(needUpdateTransform)
+	if (needUpdateTransform)
+	{
 		mgUpdateTransformElement(w->rootElement);
+		if (needUpdateTransform == 2)
+		{
+			mgDockPanelUpdateWindow(w->context);
+		}
+	}
 	//printf("%i %i\n", w->position.x, w->context->windowSize.x);
 
 	w->cursorInfoOld = w->cursorInfo;

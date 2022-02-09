@@ -507,7 +507,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         guiWindow1->iconCollapseButton = 3;
         guiWindow1->iconExpandButton = 4;
         guiWindow1->titlebarFont = g_win32font;
-        guiWindow1->titlebarHeight = 20;
+        guiWindow1->titlebarHeight = 30;
         guiWindow1->flags ^= mgWindowFlag_closeButton;
         mgSetWindowTitle(guiWindow1, L"Window1");
         
@@ -621,6 +621,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
+    case WM_GETMINMAXINFO:
+    {
+        LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+        lpMMI->ptMinTrackSize.x = 800;
+        lpMMI->ptMinTrackSize.y = 600;
+    }
+    break;
     case WM_SIZE:
     {
         UpdateBackBuffer();

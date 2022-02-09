@@ -579,7 +579,6 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 	if (dckWnd)
 	{
 		mgDockPanelUpdateWindow(w->context);
-		mgDockPanelUpdateWindow(w->context);
 	}
 
 
