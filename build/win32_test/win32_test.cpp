@@ -20,6 +20,7 @@ mgInputContext g_input;
 HRAWINPUT g_rawInputData[0xff];
 
 mgFont* g_win32font = 0;
+mgIcons* g_icons = 0;
 
 HDC g_dc = 0;
 HWND g_hwnd = 0;
@@ -401,6 +402,33 @@ void rect_onReleaseLMB(struct mgElement_s* e) {
     text->color.setAsIntegerBGR(0xFFFFFF);
 }
 
+void btn_newWindow_onClickLMB(struct mgElement_s* e)
+{
+    mgPoint pos, sz;
+    mgWindow* wnd = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
+    wnd->icons = g_icons;
+    wnd->iconCloseButton = 0;
+    wnd->iconCloseButtonMouseHover = 1;
+    wnd->iconCloseButtonPress = 2;
+    wnd->iconCollapseButton = 3;
+    wnd->titlebarFont = g_win32font;
+    wnd->flags ^= mgWindowFlag_collapseButton;
+    wnd->flags |= mgWindowFlag_canDock;
+    
+    static int index = 0;
+    index++;
+    wchar_t text[512];
+    wsprintfW(text, L"Window%i", index);
+
+    mgSetWindowTitle(wnd, text);
+    {
+        mgPointSet(&pos, 0, 0);
+        mgPointSet(&sz, 160, 20);
+        mgElement* btn = mgCreateButton(wnd, &pos, &sz, L"Button", g_win32font);
+        btn->align = mgAlignment_top;
+    }
+}
+
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -472,12 +500,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_iconsImage.load(L"../data/icons.png");
     
-    mgIcons* icons = mgCreateIcons(&g_iconsImage, 512, 512, 5);
-    mgSetIcon(icons, 0, 15, 2, 11, 11); //close wnd
-    mgSetIcon(icons, 1, 2, 2, 11, 11); // close wnd mouse hover
-    mgSetIcon(icons, 2, 29, 2, 11, 11); // close wnd push
-    mgSetIcon(icons, 3, 42, 2, 11, 11); // collapse wnd
-    mgSetIcon(icons, 4, 53, 2, 11, 11); // expand wnd
+    g_icons = mgCreateIcons(&g_iconsImage, 512, 512, 5);
+    mgSetIcon(g_icons, 0, 15, 2, 11, 11); //close wnd
+    mgSetIcon(g_icons, 1, 2, 2, 11, 11); // close wnd mouse hover
+    mgSetIcon(g_icons, 2, 29, 2, 11, 11); // close wnd push
+    mgSetIcon(g_icons, 3, 42, 2, 11, 11); // collapse wnd
+    mgSetIcon(g_icons, 4, 53, 2, 11, 11); // expand wnd
 
 
     g_win32font = gui_createFont("Segoe", 0, 10);
@@ -500,7 +528,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
 
         mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
-        guiWindow1->icons = icons;
+        guiWindow1->icons = g_icons;
         guiWindow1->iconCloseButton = 0;
         guiWindow1->iconCloseButtonMouseHover = 1;
         guiWindow1->iconCloseButtonPress = 2;
@@ -520,17 +548,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
         er->align = mgAlignment_center;
 
-        mgPointSet(&pos, 100, 60);
         mgPointSet(&sz, 100, 40);
+        mgPointSet(&pos, 100, 60);
         mgElement* eb = mgCreateButton(guiWindow1, &pos, &sz, L"Button", g_win32font);
         eb->align = mgAlignment_rightBottom;
+
+        mgPointSet(&pos, 100, 120);
+        eb = mgCreateButton(guiWindow1, &pos, &sz, L"New window", g_win32font);
+        eb->onClickLMB = btn_newWindow_onClickLMB;
 
         mgPointSet(&pos, 100, 100);
         mgElement* et = mgCreateText(guiWindow1, &pos, L"Text", g_win32font);
         et->align = mgAlignment_rightBottom;
 
         mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-        guiWindow2->icons = icons;
+        guiWindow2->icons = g_icons;
         guiWindow2->iconCloseButton = 0;
         guiWindow2->iconCloseButtonMouseHover = 1;
         guiWindow2->iconCloseButtonPress = 2;
@@ -600,8 +632,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         draw_gui();
     }
     
-    if (icons)
-        mgDestroyIcons(icons);
+    if (g_icons)
+        mgDestroyIcons(g_icons);
 
     DeleteObject(g_win32font->implementation);
     free(g_win32font);

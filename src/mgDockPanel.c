@@ -204,6 +204,7 @@ mgDockPanelRebuild(struct mgContext_s* c)
 			{
 				cw->rect = c->dockPanel->elements[i].rect;
 				cw->windowRect = cw->rect;
+				cw->windowRect.top += 25;
 
 				if (cw == lw)
 					break;
@@ -495,27 +496,35 @@ mgDockUpdateArrayWindows(struct mgContext_s* c)
 			cw = cw->right;
 		}
 
-		if (!c->dockPanel->arrayWindowsSize)
-			continue;
-
+	}
+	if (c->dockPanel->arrayWindowsSize)
+	{
 		c->dockPanel->arrayWindows = malloc(c->dockPanel->arrayWindowsSize * sizeof(struct mgWindow_s*));
 		mgWindow** wptr = c->dockPanel->arrayWindows;
 
-		cw = el->firstWindow;
-		lw = cw->left;
-		while (1)
+		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
 		{
-			if (cw->activeWindow)
-			{
-				*wptr = cw->activeWindow;
-				++wptr;
-			}
+			mgDockPanelElement* el = &c->dockPanel->elements[i];
+			if (!el->firstWindow)
+				continue;
 
-			if (cw == lw)
-				break;
-			cw = cw->right;
+			mgDockPanelWindow* cw = el->firstWindow;
+			mgDockPanelWindow* lw = cw->left;
+			while (1)
+			{
+				if (cw->activeWindow)
+				{
+					*wptr = cw->activeWindow;
+					++wptr;
+				}
+
+				if (cw == lw)
+					break;
+				cw = cw->right;
+			}
 		}
 	}
+
 }
 
 MG_API
@@ -577,10 +586,7 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 	mgDockUpdateArrayWindows(w->context);
 
 	if (dckWnd)
-	{
 		mgDockPanelUpdateWindow(w->context);
-	}
-
 
 	return dckWnd;
 }
