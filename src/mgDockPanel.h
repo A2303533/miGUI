@@ -36,18 +36,19 @@ typedef struct mgDockPanelWindowNode_s {
 } mgDockPanelWindowNode;
 
 typedef struct mgDockPanelWindow_s {
+	
 	mgDockPanelWindowNode* firstWindow;
+	int windowCount;
+
 	mgRect rect; /*all area, with tabbar and other*/
 	mgRect windowRect;/*only window*/
+	mgRect tabRect;
 
 	/*
 	* 0 - left, 1 - top, 2 - right, 3 - bottom
 	* 4 - will be for first window...maybe
 	*/
 	int where;
-
-	/*like for tabcontrol*/
-	struct mgDockPanelWindow_s* firstChild;
 
 	struct mgDockPanelWindow_s* left;
 	struct mgDockPanelWindow_s* right;
@@ -78,6 +79,7 @@ typedef struct mgDockPanelElement_s {
 
 	mgRect splitterRect;
 	mgRect addWindowRect;
+	
 	mgDockPanelElementCreationInfo info;
 
 	mgColor colorBG;
@@ -106,12 +108,13 @@ typedef struct mgDockPanel_s {
 	mgDockPanelElement* elements;
 	int elementsNum;
 	
-	int splitterWidth; /*3*/
+	int splitterWidth; /*2*/
+
 	mgPoint mainElementSize;
 	mgPoint mainElementSizeMinimum;/*300 300*/
 
 	/*update and draw only windows in this array*/
-	struct mgWindow_s** arrayWindows;
+	mgDockPanelWindow** arrayWindows;
 	int arrayWindowsSize;
 
 } mgDockPanel;

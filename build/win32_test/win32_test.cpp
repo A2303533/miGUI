@@ -185,7 +185,9 @@ void gui_drawRectangle(
     }
     else if (reason == mgDrawRectangleReason_buttonBG
         || reason == mgDrawRectangleReason_dockElementBG
-        || reason == mgDrawRectangleReason_dockSplitterBG)
+        || reason == mgDrawRectangleReason_dockSplitterBG
+        || reason == mgDrawRectangleReason_dockBG
+        || reason == mgDrawRectangleReason_dockTabBG)
     {
         rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
         SelectClipRgn(hdcMem, rgn);
@@ -520,11 +522,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         };
         mgInitDockPanel(g_gui_context, 0, 30, 0, 0, dckElmts, sizeof(dckElmts) / sizeof(mgDockPanelElementCreationInfo));
 
-        mgColorSet(&g_gui_context->activeStyle->dockpanelBGColor, 0.9f, 0.9f, 0.9f, 1.f);
+       // mgColorSet(&g_gui_context->activeStyle->dockpanelBGColor, 0.9f, 0.9f, 0.9f, 1.f);
         g_gui_context->dockPanel->flags |= mgDockPanelFlag_drawBG;
         for (int i = 0; i < g_gui_context->dockPanel->elementsNum; ++i)
         {
-            g_gui_context->dockPanel->elements[i].flags |= mgDockPanelElementFlag_drawBG;
+            //g_gui_context->dockPanel->elements[i].flags |= mgDockPanelElementFlag_drawBG;
         }
 
         mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);

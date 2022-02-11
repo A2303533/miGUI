@@ -198,13 +198,17 @@ mgDockPanelRebuild(struct mgContext_s* c)
 			if (!c->dockPanel->elements[i].firstWindow)
 				continue;
 
+			
+
 			mgDockPanelWindow* cw = c->dockPanel->elements[i].firstWindow;
 			mgDockPanelWindow* lw = cw->left;
 			while (1)
 			{
 				cw->rect = c->dockPanel->elements[i].rect;
-				cw->windowRect = cw->rect;
+				cw->windowRect = c->dockPanel->elements[i].rect;
 				cw->windowRect.top += 25;
+				cw->tabRect = c->dockPanel->elements[i].rect;
+				cw->tabRect.bottom = cw->windowRect.top;
 
 				if (cw == lw)
 					break;
@@ -221,7 +225,7 @@ mgDockPanelUpdateWindow(struct mgContext_s* c)
 	{
 		for (int i = 0; i < c->dockPanel->arrayWindowsSize; ++i)
 		{
-			mgUpdateWindow(c->dockPanel->arrayWindows[i]);
+			mgUpdateWindow(c->dockPanel->arrayWindows[i]->activeWindow);
 		}
 	}
 }
@@ -268,7 +272,14 @@ mgDrawDockPanel(struct mgContext_s* c)
 	{
 		for (int i = 0; i < c->dockPanel->arrayWindowsSize; ++i)
 		{
-			mgDrawWindow(c->dockPanel->arrayWindows[i]);
+			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->tabRect);
+			c->gpu->drawRectangle(mgDrawRectangleReason_dockTabBG, &c->dockPanel->arrayWindows[i]->tabRect,
+				&c->activeStyle->windowBGColor,
+				&c->activeStyle->windowBGColor,
+				0, 0, 0);
+
+			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->windowRect);
+			mgDrawWindow(c->dockPanel->arrayWindows[i]->activeWindow);
 		}
 	}
 
@@ -399,7 +410,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 		{
 			for (int i = 0; i < c->dockPanel->arrayWindowsSize; ++i)
 			{
-				mgUpdateElement(c->dockPanel->arrayWindows[i]->rootElement);
+				mgUpdateElement(c->dockPanel->arrayWindows[i]->activeWindow->rootElement);
 
 				//mgUpdateWindow(c->dockPanel->arrayWindows[i]);
 			}
@@ -442,7 +453,7 @@ mgInitDockPanel_f(
 	c->dockPanel->indent.right = indentRight;
 	c->dockPanel->indent.bottom = indentBottom;
 	c->dockPanel->flags = mgDockPanelFlag_drawSplitterBG;
-	c->dockPanel->splitterWidth = 3;
+	c->dockPanel->splitterWidth = 2;
 	c->dockPanel->mainElementSizeMinimum.x = 300;
 	c->dockPanel->mainElementSizeMinimum.y = 300;
 
@@ -499,8 +510,8 @@ mgDockUpdateArrayWindows(struct mgContext_s* c)
 	}
 	if (c->dockPanel->arrayWindowsSize)
 	{
-		c->dockPanel->arrayWindows = malloc(c->dockPanel->arrayWindowsSize * sizeof(struct mgWindow_s*));
-		mgWindow** wptr = c->dockPanel->arrayWindows;
+		c->dockPanel->arrayWindows = malloc(c->dockPanel->arrayWindowsSize * sizeof(mgDockPanelWindow*));
+		mgDockPanelWindow** wptr = c->dockPanel->arrayWindows;
 
 		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
 		{
@@ -514,7 +525,7 @@ mgDockUpdateArrayWindows(struct mgContext_s* c)
 			{
 				if (cw->activeWindow)
 				{
-					*wptr = cw->activeWindow;
+					*wptr = cw;
 					++wptr;
 				}
 
@@ -526,6 +537,7 @@ mgDockUpdateArrayWindows(struct mgContext_s* c)
 	}
 
 }
+
 
 MG_API
 struct mgDockPanelWindow_s* MG_C_DECL
@@ -581,7 +593,10 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 	}
 
 	if (dckWnd)
+	{
 		mgDockPanelRebuild(w->context);
+		dckWnd->windowCount++;
+	}
 	
 	mgDockUpdateArrayWindows(w->context);
 
