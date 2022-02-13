@@ -33,6 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Windows.h>
+
 mgDockPanelWindow* g_dockPanelWindow = 0;
 int g_dockElIdOrWhere = 0;
 int g_windowToDockPanelMode = 0;
@@ -557,38 +559,95 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 				/*first, check if cursor inside mgDockPanelWindow*/
 				/*only after check if cursor in elements[i].addWindowRect*/
-				for (int i = 1; i < w->context->dockPanel->elementsNum; ++i)
+				/*for (int i = 1; i < w->context->dockPanel->elementsNum; ++i)
 				{
-					if (mgPointInRect(&w->context->dockPanel->elements[i].addWindowRect, &w->context->input->mousePosition))
+					if (mgPointInRect(&w->context->dockPanel->elements[i].rect, &w->context->input->mousePosition))
 					{
-						g_dockElIdOrWhere = i - 1;
-						g_windowToDockPanelMode = 1;
-						g_windowToDockRect = w->context->dockPanel->elements[i].addWindowRect;
-						int rszX = g_windowToDockRect.right - g_windowToDockRect.left;
-						int rszY = g_windowToDockRect.bottom - g_windowToDockRect.top;
-
-						switch (w->context->dockPanel->elements[i].info.where)
+						if (w->context->dockPanel->elements[i].firstWindow)
 						{
-						case 0:
-							if (rszX < w->size.x)
-								g_windowToDockRect.right += w->size.x - rszX;
-							break;
-						case 1:
-							if (rszY < w->size.y)
-								g_windowToDockRect.bottom += w->size.y - rszY;
-							break;
-						case 2:
-							if (rszX < w->size.x)
-								g_windowToDockRect.left -= w->size.x - rszX;
-							break;
-						case 3:
-							if (rszY < w->size.y)
-								g_windowToDockRect.top -= w->size.y - rszY;
-							break;
+							struct mgDockPanelWindow_s* cw = w->context->dockPanel->elements[i].firstWindow;
+							struct mgDockPanelWindow_s* lw = cw->left;
+							while (1)
+							{
+								if (mgPointInRect(&cw->rect, &w->context->input->mousePosition))
+								{
+									g_dockPanelWindow = cw;
+									i = w->context->dockPanel->elementsNum;
+									break;
+								}
+								if (cw == lw)
+									break;
+								cw = cw->right;
+							}
 						}
 						break;
 					}
+				}*/
+
+				if (g_dockPanelWindow)
+				{
+					/*now find where*/
+					/*g_dockPanelWindow->rect*/
+
+					mgRect rLeft = g_dockPanelWindow->rect;
+					mgRect rTop = g_dockPanelWindow->rect; 
+					mgRect rRight = g_dockPanelWindow->rect;
+					mgRect rBottom = g_dockPanelWindow->rect;
+					mgRect rCenter = g_dockPanelWindow->rect;
+
+					int wx = g_dockPanelWindow->rect.right - g_dockPanelWindow->rect.left;
+					int wy = g_dockPanelWindow->rect.bottom - g_dockPanelWindow->rect.top;
+
+					if (wx < 25 || wy < 25)
+					{
+						g_windowToDockRect = g_dockPanelWindow->rect;
+						g_windowToDockPanelMode = 1;
+						g_dockElIdOrWhere = 4;
+					}
+					else
+					{
+
+					}
 				}
+				else
+				{
+					for (int i = 1; i < w->context->dockPanel->elementsNum; ++i)
+					{
+						if (w->context->dockPanel->elements[i].panelWindows)
+							continue;
+
+						if (mgPointInRect(&w->context->dockPanel->elements[i].addWindowRect, &w->context->input->mousePosition))
+						{
+							g_dockElIdOrWhere = i - 1;
+							g_windowToDockPanelMode = 1;
+							g_windowToDockRect = w->context->dockPanel->elements[i].addWindowRect;
+							int rszX = g_windowToDockRect.right - g_windowToDockRect.left;
+							int rszY = g_windowToDockRect.bottom - g_windowToDockRect.top;
+
+							switch (w->context->dockPanel->elements[i].info.where)
+							{
+							case 0:
+								if (rszX < w->size.x)
+									g_windowToDockRect.right += w->size.x - rszX;
+								break;
+							case 1:
+								if (rszY < w->size.y)
+									g_windowToDockRect.bottom += w->size.y - rszY;
+								break;
+							case 2:
+								if (rszX < w->size.x)
+									g_windowToDockRect.left -= w->size.x - rszX;
+								break;
+							case 3:
+								if (rszY < w->size.y)
+									g_windowToDockRect.top -= w->size.y - rszY;
+								break;
+							}
+							break;
+						}
+					}
+				}
+
 			}
 		}
 	

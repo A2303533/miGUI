@@ -572,6 +572,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         guiWindow2->titlebarFont = g_win32font;
         guiWindow2->flags ^= mgWindowFlag_collapseButton;
         guiWindow2->flags |= mgWindowFlag_canDock;
+        guiWindow2->sizeMinimum.x = 200;
+        guiWindow2->sizeMinimum.y = 100;
         mgSetWindowTitle(guiWindow2, L"_canDock");
         {
             mgPointSet(&pos, 0, 0);

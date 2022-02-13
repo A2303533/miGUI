@@ -29,31 +29,29 @@
 #ifndef _MG_DOCKPANEL_H_
 #define _MG_DOCKPANEL_H_
 
-typedef struct mgDockPanelWindowNode_s {
-	struct mgWindow_s* window;
-	struct mgDockPanelWindowNode_s* left;
-	struct mgDockPanelWindowNode_s* right;
-} mgDockPanelWindowNode;
+//typedef struct mgDockPanelWindowNode_s {
+//	struct mgWindow_s* window;
+//	struct mgDockPanelWindowNode_s* left;
+//	struct mgDockPanelWindowNode_s* right;
+//} mgDockPanelWindowNode;
 
-typedef struct mgDockPanelWindow_s {
-	
-	mgDockPanelWindowNode* firstWindow;
-	int windowCount;
-
+typedef struct mgDockPanelWindow_s {	
 	mgRect rect; /*all area, with tabbar and other*/
 	mgRect windowRect;/*only window*/
 	mgRect tabRect;
 
 	/*
 	* 0 - left, 1 - top, 2 - right, 3 - bottom
-	* 4 - will be for first window...maybe
 	*/
 	int where;
 
-	struct mgDockPanelWindow_s* left;
-	struct mgDockPanelWindow_s* right;
+	int id;
+	int parentId;
 
+	struct mgWindow_s** windows;
+	int windowsSize;
 	struct mgWindow_s* activeWindow;
+
 } mgDockPanelWindow;
 
 typedef struct mgDockPanelElementCreationInfo_s {
@@ -84,7 +82,9 @@ typedef struct mgDockPanelElement_s {
 
 	mgColor colorBG;
 
-	struct mgDockPanelWindow_s* firstWindow;
+	mgDockPanelWindow** panelWindows;
+	int panelWindowsSize;
+
 } mgDockPanelElement;
 
 enum mgDockPanelFlag
