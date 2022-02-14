@@ -201,10 +201,53 @@ mgDockPanelRebuild(struct mgContext_s* c)
 			for (int o = 0; o < c->dockPanel->elements[i].panelWindowsSize; ++o)
 			{
 				mgDockPanelWindow* pw = c->dockPanel->elements[i].panelWindows[o];
-				pw->rect = c->dockPanel->elements[i].rect;
-				pw->windowRect = c->dockPanel->elements[i].rect;
+
+				if(o == 0)
+					pw->rect = c->dockPanel->elements[i].rect;
+
+				if (pw->parentId)
+				{
+					/*find parent and change it's rect*/
+					for (int o2 = 0; o2 < c->dockPanel->elements[i].panelWindowsSize; ++o2)
+					{
+						mgDockPanelWindow* pw2 = c->dockPanel->elements[i].panelWindows[o2];
+						if (pw2->id == pw->parentId)
+						{
+							pw->rect = pw2->rect;
+							switch (pw->where)
+							{
+							default:
+								break;
+							case 0:
+								pw2->rect.left += pw->sz;
+								pw->rect.right = pw2->rect.left;
+								break;
+							case 1:
+								pw2->rect.top += pw->sz;
+								pw->rect.bottom = pw2->rect.top;
+								break;
+							case 2:
+								pw2->rect.right -= pw->sz;
+								pw->rect.left = pw2->rect.right;
+								break;
+							case 3:
+								pw2->rect.bottom -= pw->sz;
+								pw->rect.top = pw2->rect.bottom;
+								break;
+							}
+							pw2->windowRect = pw2->rect;
+							pw2->windowRect.top += 25;
+							pw2->tabRect = pw2->rect;
+							pw2->tabRect.bottom = pw2->windowRect.top;
+
+							break;
+						}
+					}
+				}
+
+				pw->windowRect = pw->rect;
 				pw->windowRect.top += 25;
-				pw->tabRect = c->dockPanel->elements[i].rect;
+				pw->tabRect = pw->rect;
 				pw->tabRect.bottom = pw->windowRect.top;
 			}
 		}
@@ -270,11 +313,11 @@ mgDrawDockPanel(struct mgContext_s* c)
 				&c->activeStyle->windowBGColor,
 				&c->activeStyle->windowBGColor,
 				0, 0, 0);
-			/*mgPoint p;
+			mgPoint p;
 			mgPointSet(&p, c->dockPanel->arrayWindows[i]->tabRect.left, c->dockPanel->arrayWindows[i]->tabRect.top);
 			wchar_t t[30];
-			swprintf(t, 30, L"W:%i", c->dockPanel->arrayWindows[i]->windowCount);
-			c->gpu->drawText(0, &p, t, wcslen(t), &c->activeStyle->windowTitlebarTextColor, c->dockPanel->arrayWindows[i]->activeWindow->titlebarFont);*/
+			swprintf(t, 30, L"W:%i", c->dockPanel->arrayWindows[i]->windowsSize);
+			c->gpu->drawText(0, &p, t, wcslen(t), &c->activeStyle->windowTitlebarTextColor, c->dockPanel->arrayWindows[i]->activeWindow->titlebarFont);
 			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->windowRect);
 			mgDrawWindow(c->dockPanel->arrayWindows[i]->activeWindow);
 		}
@@ -523,6 +566,26 @@ mgDockUpdateArrayWindows(struct mgContext_s* c)
 
 }
 
+mgDockPanelWindow*
+add_new_dock_panel_window(mgDockPanelElement* dckEl, int pnlid, int prntid, struct mgWindow_s* w)
+{
+	mgDockPanelWindow* pnlWnd = calloc(1, sizeof(mgDockPanelWindow));
+	pnlWnd->dockElement = dckEl;
+	pnlWnd->id = pnlid;
+	pnlWnd->parentId = prntid;
+	pnlWnd->windows = calloc(1, sizeof(struct mgWindow_s*));
+	pnlWnd->windows[0] = w;
+	pnlWnd->activeWindow = w;
+	pnlWnd->where = 4;
+	dckEl->panelWindowsSize++;
+	mgDockPanelWindow** pnlWindows = calloc(1, sizeof(mgDockPanelElement*) * dckEl->panelWindowsSize);
+	memcpy(pnlWindows, dckEl->panelWindows, sizeof(mgDockPanelElement*) * (dckEl->panelWindowsSize-1));
+	pnlWindows[dckEl->panelWindowsSize - 1] = pnlWnd;
+	if (dckEl->panelWindows)
+		free(dckEl->panelWindows);
+	dckEl->panelWindows = pnlWindows;
+	return pnlWnd;
+}
 
 MG_API
 struct mgDockPanelWindow_s* MG_C_DECL
@@ -540,34 +603,57 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 
 	if (dw)
 	{
+		/*id == 4 - add new window in mgDockPanelWindow::windows*/
+		switch (id)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		{
+			mgDockPanelElement* dckEl = dw->dockElement;
+			pnlWnd = add_new_dock_panel_window(dckEl, pnlid, dw->id, w);
+			pnlWnd->where = id;
+			w->dockPanelWindow = pnlWnd;
+			++pnlid;
+			switch (id)
+			{
+			case 0:
+			case 2:
+				//pnlWnd->sz = g_windowToDockRect.right - g_windowToDockRect.left;
+				pnlWnd->sz = dw->rect.right - dw->rect.left;
+				break;
+			case 1:
+			case 3:
+				//pnlWnd->sz = g_windowToDockRect.bottom - g_windowToDockRect.top;
+				pnlWnd->sz = dw->rect.bottom - dw->rect.top;
+				break;
+			}
+			if (pnlWnd->sz > 3)
+				pnlWnd->sz /= 2;
+		}break;
+		case 4:
+		default:
+			pnlWnd = dw;
+			dw->windowsSize++;
+			struct mgWindow_s** new_windows = calloc(1, sizeof(struct mgWindow_s*) * dw->windowsSize);
+			memcpy(new_windows, dw->windows, sizeof(struct mgWindow_s*) * (dw->windowsSize - 1));
+			free(dw->windows);
+			dw->windows = new_windows;
+			w->dockPanelWindow = pnlWnd;
+			break;
+		}
 	}
 	else
 	{
 		id++;
 		if ((id > 0) && (id < dck->elementsNum))
 		{
-			mgDockPanelElement* dckEl = &dck->elements[id];
+			mgDockPanelElement* dckEl = &dck->elements[id];			
+			pnlWnd = add_new_dock_panel_window(dckEl, pnlid, 0, w);
+			w->dockPanelWindow = pnlWnd;
+			++pnlid;
 
-			pnlWnd = calloc(1, sizeof(mgDockPanelWindow));
-			
-			pnlWnd->id = pnlid;
-			pnlWnd->parentId = 0;
-			
-			pnlid++;
-
-			pnlWnd->windows = calloc(1, sizeof(struct mgWindow_s*));
-			pnlWnd->windows[0] = w;
-			pnlWnd->activeWindow = w;
-
-			dckEl->panelWindowsSize++;
-			mgDockPanelWindow** pnlWindows = calloc(1, sizeof(mgDockPanelElement*) * dckEl->panelWindowsSize);
-			pnlWindows[0] = pnlWnd;
-
-			if (dckEl->panelWindows)
-				free(dckEl->panelWindows);
-
-			dckEl->panelWindows = pnlWindows;
-			
 			switch (dckEl->info.where)
 			{
 			case 0:
@@ -582,7 +668,6 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 				break;
 			}
 
-			w->dockPanelWindow = pnlWnd;
 		}
 		else
 		{

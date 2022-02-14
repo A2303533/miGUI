@@ -559,30 +559,26 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 				/*first, check if cursor inside mgDockPanelWindow*/
 				/*only after check if cursor in elements[i].addWindowRect*/
-				/*for (int i = 1; i < w->context->dockPanel->elementsNum; ++i)
+				for (int i = 1; i < w->context->dockPanel->elementsNum; ++i)
 				{
 					if (mgPointInRect(&w->context->dockPanel->elements[i].rect, &w->context->input->mousePosition))
 					{
-						if (w->context->dockPanel->elements[i].firstWindow)
+						if (w->context->dockPanel->elements[i].panelWindows)
 						{
-							struct mgDockPanelWindow_s* cw = w->context->dockPanel->elements[i].firstWindow;
-							struct mgDockPanelWindow_s* lw = cw->left;
-							while (1)
+							for (int o = 0; o < w->context->dockPanel->elements[i].panelWindowsSize; ++o)
 							{
-								if (mgPointInRect(&cw->rect, &w->context->input->mousePosition))
+								mgDockPanelWindow* pnl = w->context->dockPanel->elements[i].panelWindows[o];
+								if (mgPointInRect(&pnl->rect, &w->context->input->mousePosition))
 								{
-									g_dockPanelWindow = cw;
+									g_dockPanelWindow = pnl;
 									i = w->context->dockPanel->elementsNum;
 									break;
 								}
-								if (cw == lw)
-									break;
-								cw = cw->right;
 							}
 						}
 						break;
 					}
-				}*/
+				}
 
 				if (g_dockPanelWindow)
 				{
@@ -593,7 +589,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 					mgRect rTop = g_dockPanelWindow->rect; 
 					mgRect rRight = g_dockPanelWindow->rect;
 					mgRect rBottom = g_dockPanelWindow->rect;
-					mgRect rCenter = g_dockPanelWindow->rect;
+					mgRect rCenter;
 
 					int wx = g_dockPanelWindow->rect.right - g_dockPanelWindow->rect.left;
 					int wy = g_dockPanelWindow->rect.bottom - g_dockPanelWindow->rect.top;
@@ -606,7 +602,48 @@ mgUpdateWindow(struct mgWindow_s* w)
 					}
 					else
 					{
+						int szY = wy / 4;
+						int szX = wx / 4;
 
+						rTop.bottom = rTop.top + szY;
+						rBottom.top = rBottom.bottom - szY;
+						rLeft.right = rLeft.left + szX;
+						rRight.left = rRight.right - szX;
+
+						rCenter.left = rLeft.right;
+						rCenter.top = rTop.bottom;
+						rCenter.right = rRight.left;
+						rCenter.bottom = rBottom.top;
+						if (mgPointInRect(&rCenter, &w->context->input->mousePosition))
+						{
+							g_windowToDockPanelMode = 1;
+							g_windowToDockRect = g_dockPanelWindow->rect;
+							g_dockElIdOrWhere = 4;
+						}
+						else if (mgPointInRect(&rTop, &w->context->input->mousePosition))
+						{
+							g_windowToDockPanelMode = 1;
+							g_windowToDockRect = rTop;
+							g_dockElIdOrWhere = 1;
+						}
+						else if (mgPointInRect(&rBottom, &w->context->input->mousePosition))
+						{
+							g_windowToDockPanelMode = 1;
+							g_windowToDockRect = rBottom;
+							g_dockElIdOrWhere = 3;
+						}
+						else if (mgPointInRect(&rLeft, &w->context->input->mousePosition))
+						{
+							g_windowToDockPanelMode = 1;
+							g_windowToDockRect = rLeft;
+							g_dockElIdOrWhere = 0;
+						}
+						else if (mgPointInRect(&rRight, &w->context->input->mousePosition))
+						{
+							g_windowToDockPanelMode = 1;
+							g_windowToDockRect = rRight;
+							g_dockElIdOrWhere = 2;
+						}
 					}
 				}
 				else

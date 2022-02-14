@@ -426,7 +426,7 @@ void btn_newWindow_onClickLMB(struct mgElement_s* e)
     {
         mgPointSet(&pos, 0, 0);
         mgPointSet(&sz, 160, 20);
-        mgElement* btn = mgCreateButton(wnd, &pos, &sz, L"Button", g_win32font);
+        mgElement* btn = mgCreateButton(wnd, &pos, &sz, wnd->titlebarText, g_win32font);
         btn->align = mgAlignment_top;
     }
 }

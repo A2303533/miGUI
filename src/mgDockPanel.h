@@ -39,6 +39,7 @@ typedef struct mgDockPanelWindow_s {
 	mgRect rect; /*all area, with tabbar and other*/
 	mgRect windowRect;/*only window*/
 	mgRect tabRect;
+	mgRect splitterRect;
 
 	/*
 	* 0 - left, 1 - top, 2 - right, 3 - bottom
@@ -52,6 +53,9 @@ typedef struct mgDockPanelWindow_s {
 	int windowsSize;
 	struct mgWindow_s* activeWindow;
 
+	struct mgDockPanelElement_s* dockElement;
+
+	int sz;
 } mgDockPanelWindow;
 
 typedef struct mgDockPanelElementCreationInfo_s {
