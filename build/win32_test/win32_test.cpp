@@ -185,7 +185,8 @@ void gui_drawRectangle(
     }
     else if (reason == mgDrawRectangleReason_buttonBG
         || reason == mgDrawRectangleReason_dockElementBG
-        || reason == mgDrawRectangleReason_dockSplitterBG
+        || reason == mgDrawRectangleReason_dockSplitterBGHor
+        || reason == mgDrawRectangleReason_dockSplitterBGVert
         || reason == mgDrawRectangleReason_dockBG
         || reason == mgDrawRectangleReason_dockTabBG)
     {

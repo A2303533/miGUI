@@ -221,24 +221,45 @@ mgDockPanelRebuild(struct mgContext_s* c)
 							case 0:
 								pw2->rect.left += pw->sz;
 								pw->rect.right = pw2->rect.left;
+								
+								pw->splitterRect.top = pw->rect.top;
+								pw->splitterRect.bottom = pw->rect.bottom;
+								pw->splitterRect.left = pw->rect.right - c->dockPanel->splitterWidth;
+								pw->splitterRect.right = pw->rect.right + c->dockPanel->splitterWidth;
 								break;
 							case 1:
 								pw2->rect.top += pw->sz;
 								pw->rect.bottom = pw2->rect.top;
+
+								pw->splitterRect.left = pw->rect.left;
+								pw->splitterRect.right = pw->rect.right;
+								pw->splitterRect.top = pw->rect.bottom - c->dockPanel->splitterWidth;
+								pw->splitterRect.bottom = pw->rect.bottom + c->dockPanel->splitterWidth;
 								break;
 							case 2:
 								pw2->rect.right -= pw->sz;
 								pw->rect.left = pw2->rect.right;
+
+								pw->splitterRect.top = pw->rect.top;
+								pw->splitterRect.bottom = pw->rect.bottom;
+								pw->splitterRect.left = pw->rect.left - c->dockPanel->splitterWidth;
+								pw->splitterRect.right = pw->rect.left + c->dockPanel->splitterWidth;
 								break;
 							case 3:
 								pw2->rect.bottom -= pw->sz;
 								pw->rect.top = pw2->rect.bottom;
+
+								pw->splitterRect.left = pw->rect.left;
+								pw->splitterRect.right = pw->rect.right;
+								pw->splitterRect.top = pw->rect.top - c->dockPanel->splitterWidth;
+								pw->splitterRect.bottom = pw->rect.top + c->dockPanel->splitterWidth;
 								break;
 							}
 							pw2->windowRect = pw2->rect;
 							pw2->windowRect.top += 25;
 							pw2->tabRect = pw2->rect;
 							pw2->tabRect.bottom = pw2->windowRect.top;
+
 
 							break;
 						}
@@ -321,14 +342,39 @@ mgDrawDockPanel(struct mgContext_s* c)
 			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->windowRect);
 			mgDrawWindow(c->dockPanel->arrayWindows[i]->activeWindow);
 		}
+
+		int reason = mgDrawRectangleReason_dockPanelSplitterBGHor;
+		for (int i = 0; i < c->dockPanel->arrayWindowsSize; ++i)
+		{
+			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->splitterRect);
+			switch (c->dockPanel->arrayWindows[i]->where)
+			{
+			case 0:
+			case 2:
+				reason = mgDrawRectangleReason_dockPanelSplitterBGVert;
+				break;
+			}
+			c->gpu->drawRectangle(reason, &c->dockPanel->arrayWindows[i]->splitterRect,
+				&c->activeStyle->dockpanelPanelSplitterBGColor,
+				&c->activeStyle->dockpanelPanelSplitterBGColor,
+				0, 0, 0);
+		}
 	}
 
 	if (c->dockPanel->flags & mgDockPanelFlag_drawSplitterBG)
 	{
+		int reason = mgDrawRectangleReason_dockSplitterBGHor;
 		for (int i = 0; i < c->dockPanel->elementsNum; ++i)
 		{
 			c->gpu->setClipRect(&c->dockPanel->elements[i].splitterRect);
-			c->gpu->drawRectangle(mgDrawRectangleReason_dockSplitterBG, &c->dockPanel->elements[i].splitterRect,
+			switch (c->dockPanel->elements[i].info.where)
+			{
+			case 0:
+			case 2:
+				reason = mgDrawRectangleReason_dockSplitterBGVert;
+				break;
+			}
+			c->gpu->drawRectangle(reason, &c->dockPanel->elements[i].splitterRect,
 				&c->activeStyle->dockpanelSplitterBGColor,
 				&c->activeStyle->dockpanelSplitterBGColor,
 				0, 0, 0);

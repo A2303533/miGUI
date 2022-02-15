@@ -547,11 +547,21 @@ mgUpdateWindow(struct mgWindow_s* w)
 		w->rootElement->transformLocal.clipArea.top += w->titlebarHeight;
 		w->rootElement->transformWorld = w->rootElement->transformLocal;
 
+		if (w->context->input->keyboardModifier == MG_KBMOD_CTRL)
+		{
+			g_windowToDockPanelMode = 0;
+			g_dockPanelWindow = 0;
+			g_dockElIdOrWhere = 0;
+		}
+
 		if (w->flags & mgWindowFlag_internal_isMove)
 		{
 			needUpdateTransform = 1;
 
-			if ((w->flags & mgWindowFlag_canDock) && !w->dockPanelWindow && w->context->dockPanel)
+			if ((w->flags & mgWindowFlag_canDock) 
+				&& !w->dockPanelWindow 
+				&& w->context->dockPanel
+				&& w->context->input->keyboardModifier != MG_KBMOD_CTRL)
 			{
 				g_windowToDockPanelMode = 0;
 				g_dockPanelWindow = 0;

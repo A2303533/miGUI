@@ -77,7 +77,10 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_buttonBG,
 	mgDrawRectangleReason_dockBG,
 	mgDrawRectangleReason_dockElementBG,
-	mgDrawRectangleReason_dockSplitterBG,
+	mgDrawRectangleReason_dockSplitterBGHor,
+	mgDrawRectangleReason_dockSplitterBGVert,
+	mgDrawRectangleReason_dockPanelSplitterBGHor,
+	mgDrawRectangleReason_dockPanelSplitterBGVert,
 	mgDrawRectangleReason_dockWindowToDock,
 	mgDrawRectangleReason_dockTabBG,
 };
