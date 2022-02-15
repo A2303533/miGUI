@@ -40,6 +40,8 @@ extern mgRect g_windowToDockRect;
 
 float lerp(float v0, float v1, float t);
 
+int g_blockSplitterMode = 0; /*block resizing when some panel is too small*/
+int g_mouseMoveDirBeforeBlock = 0; /*0, 1 = x+, 2= x-, 3 = y+, 4 = y-*/
 int g_dockpanel_inSplitterRect = 0;
 struct mgDockPanelElement_s* g_dockpanel_splitterModeElement = 0;
 struct mgDockPanelWindow_s* g_dockpanel_splitterModePanel = 0;
@@ -206,65 +208,79 @@ mgDockPanelRebuild(struct mgContext_s* c)
 				if(o == 0)
 					pw->rect = c->dockPanel->elements[i].rect;
 
-				if (pw->parentId)
+				if (pw->parent)
 				{
-					/*find parent and change it's rect*/
-					for (int o2 = 0; o2 < c->dockPanel->elements[i].panelWindowsSize; ++o2)
+					mgDockPanelWindow* pw2 = pw->parent;
+					pw->rect = pw2->rect;
+					switch (pw->where)
 					{
-						mgDockPanelWindow* pw2 = c->dockPanel->elements[i].panelWindows[o2];
-						if (pw2->id == pw->parentId)
-						{
-							pw->rect = pw2->rect;
-							switch (pw->where)
-							{
-							default:
-								break;
-							case 0:
-								pw2->rect.left += pw->sz;
-								pw->rect.right = pw2->rect.left;
+					default:
+						break;
+					case 0:
+						pw2->rect.left += pw->sz;
+						pw->rect.right = pw2->rect.left;
 								
-								pw->splitterRect.top = pw->rect.top;
-								pw->splitterRect.bottom = pw->rect.bottom;
-								pw->splitterRect.left = pw->rect.right - c->dockPanel->splitterWidth;
-								pw->splitterRect.right = pw->rect.right + c->dockPanel->splitterWidth;
-								break;
-							case 1:
-								pw2->rect.top += pw->sz;
-								pw->rect.bottom = pw2->rect.top;
+						pw->splitterRect.top = pw->rect.top;
+						pw->splitterRect.bottom = pw->rect.bottom;
+						pw->splitterRect.left = pw->rect.right - c->dockPanel->splitterWidth;
+						pw->splitterRect.right = pw->rect.right + c->dockPanel->splitterWidth;
 
-								pw->splitterRect.left = pw->rect.left;
-								pw->splitterRect.right = pw->rect.right;
-								pw->splitterRect.top = pw->rect.bottom - c->dockPanel->splitterWidth;
-								pw->splitterRect.bottom = pw->rect.bottom + c->dockPanel->splitterWidth;
-								break;
-							case 2:
-								pw2->rect.right -= pw->sz;
-								pw->rect.left = pw2->rect.right;
-
-								pw->splitterRect.top = pw->rect.top;
-								pw->splitterRect.bottom = pw->rect.bottom;
-								pw->splitterRect.left = pw->rect.left - c->dockPanel->splitterWidth;
-								pw->splitterRect.right = pw->rect.left + c->dockPanel->splitterWidth;
-								break;
-							case 3:
-								pw2->rect.bottom -= pw->sz;
-								pw->rect.top = pw2->rect.bottom;
-
-								pw->splitterRect.left = pw->rect.left;
-								pw->splitterRect.right = pw->rect.right;
-								pw->splitterRect.top = pw->rect.top - c->dockPanel->splitterWidth;
-								pw->splitterRect.bottom = pw->rect.top + c->dockPanel->splitterWidth;
-								break;
-							}
-							pw2->windowRect = pw2->rect;
-							pw2->windowRect.top += 25;
-							pw2->tabRect = pw2->rect;
-							pw2->tabRect.bottom = pw2->windowRect.top;
-
-
-							break;
+						if ((pw2->rect.right - pw2->rect.left) < c->dockPanel->tabHeight)
+						{
+							g_blockSplitterMode = 1;
+							g_mouseMoveDirBeforeBlock = c->input->mouseMoveDelta.x > 0 ? 1 : 2;
 						}
+						break;
+					case 1:
+						pw2->rect.top += pw->sz;
+						pw->rect.bottom = pw2->rect.top;
+
+						pw->splitterRect.left = pw->rect.left;
+						pw->splitterRect.right = pw->rect.right;
+						pw->splitterRect.top = pw->rect.bottom - c->dockPanel->splitterWidth;
+						pw->splitterRect.bottom = pw->rect.bottom + c->dockPanel->splitterWidth;
+
+						if ((pw2->rect.bottom - pw2->rect.top) < c->dockPanel->tabHeight)
+						{
+							g_blockSplitterMode = 1;
+							g_mouseMoveDirBeforeBlock = c->input->mouseMoveDelta.y > 0 ? 3 : 4;
+						}
+						break;
+					case 2:
+						pw2->rect.right -= pw->sz;
+						pw->rect.left = pw2->rect.right;
+
+						pw->splitterRect.top = pw->rect.top;
+						pw->splitterRect.bottom = pw->rect.bottom;
+						pw->splitterRect.left = pw->rect.left - c->dockPanel->splitterWidth;
+						pw->splitterRect.right = pw->rect.left + c->dockPanel->splitterWidth;
+
+						if ((pw2->rect.right - pw2->rect.left) < c->dockPanel->tabHeight)
+						{
+							g_blockSplitterMode = 1;
+							g_mouseMoveDirBeforeBlock = c->input->mouseMoveDelta.x > 0 ? 1 : 2;
+						}
+						break;
+					case 3:
+						pw2->rect.bottom -= pw->sz;
+						pw->rect.top = pw2->rect.bottom;
+
+						pw->splitterRect.left = pw->rect.left;
+						pw->splitterRect.right = pw->rect.right;
+						pw->splitterRect.top = pw->rect.top - c->dockPanel->splitterWidth;
+						pw->splitterRect.bottom = pw->rect.top + c->dockPanel->splitterWidth;
+
+						if ((pw2->rect.bottom - pw2->rect.top) < c->dockPanel->tabHeight)
+						{
+							g_blockSplitterMode = 1;
+							g_mouseMoveDirBeforeBlock = c->input->mouseMoveDelta.y > 0 ? 3 : 4;
+						}
+						break;
 					}
+					pw2->windowRect = pw2->rect;
+					pw2->windowRect.top += c->dockPanel->tabHeight;
+					pw2->tabRect = pw2->rect;
+					pw2->tabRect.bottom = pw2->windowRect.top;
 				}
 
 				pw->windowRect = pw->rect;
@@ -405,6 +421,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 	if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 	{
 		firstClick = c->input->mousePosition;
+		g_blockSplitterMode = 0;
 	}
 
 	for (int i = 0; i < c->dockPanel->elementsNum; ++i)
@@ -496,9 +513,9 @@ mgDockPanelUpdate(struct mgContext_s* c)
 			mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 		}
 	}
-	if (g_dockpanel_splitterModePanel)
+	static int panelSz = 0;
+	if (g_dockpanel_splitterModePanel && !g_blockSplitterMode)
 	{
-
 		int px = c->input->mousePosition.x - firstClick.x;
 		int py = c->input->mousePosition.y - firstClick.y;
 
@@ -517,12 +534,39 @@ mgDockPanelUpdate(struct mgContext_s* c)
 			splitterLerpTarget = (float)(sizeOnClick - py);
 			break;
 		}
-		int sizeOld = g_dockpanel_splitterModePanel->sz;
+		panelSz = g_dockpanel_splitterModePanel->sz;
 		g_dockpanel_splitterModePanel->sz = (int)lerp((float)g_dockpanel_splitterModePanel->sz, splitterLerpTarget, c->deltaTime * 30.f);
+		if (g_dockpanel_splitterModePanel->sz < c->dockPanel->tabHeight)
+			g_dockpanel_splitterModePanel->sz = c->dockPanel->tabHeight;
 
 		mgDockPanelRebuild(c);
 		mgDockPanelUpdateWindow(c);
 	}
+	/*not else*/if (g_dockpanel_splitterModePanel && g_blockSplitterMode)
+	{
+		g_dockpanel_splitterModePanel->sz = panelSz;
+
+		switch (g_mouseMoveDirBeforeBlock)
+		{
+		case 1:
+			if (c->input->mouseMoveDelta.x > 0)
+				g_blockSplitterMode = 0;
+			break;
+		case 2:
+			if (c->input->mouseMoveDelta.x < 0)
+				g_blockSplitterMode = 0;
+			break;
+		case 3:
+			if (c->input->mouseMoveDelta.y > 0)
+				g_blockSplitterMode = 0;
+			break;
+		case 4:
+			if (c->input->mouseMoveDelta.y < 0)
+				g_blockSplitterMode = 0;
+			break;
+		}
+	}
+
 
 	if (g_dockpanel_splitterModeElement)
 	{
@@ -619,6 +663,7 @@ mgInitDockPanel_f(
 	c->dockPanel->splitterWidth = 2;
 	c->dockPanel->mainElementSizeMinimum.x = 300;
 	c->dockPanel->mainElementSizeMinimum.y = 300;
+	c->dockPanel->tabHeight = 25;
 
 	c->dockPanel->elementsNum = elementsSize + 1;
 	c->dockPanel->elements = calloc(1, sizeof(mgDockPanelElement) * c->dockPanel->elementsNum);
@@ -690,12 +735,13 @@ mgDockUpdateArrayWindows(struct mgContext_s* c)
 }
 
 mgDockPanelWindow*
-add_new_dock_panel_window(mgDockPanelElement* dckEl, int pnlid, int prntid, struct mgWindow_s* w)
+add_new_dock_panel_window(mgDockPanelElement* dckEl, struct mgDockPanelWindow_s* parent, struct mgWindow_s* w)
 {
 	mgDockPanelWindow* pnlWnd = calloc(1, sizeof(mgDockPanelWindow));
 	pnlWnd->dockElement = dckEl;
-	pnlWnd->id = pnlid;
-	pnlWnd->parentId = prntid;
+	pnlWnd->parent = parent;
+	/*pnlWnd->id = pnlid;
+	pnlWnd->parentId = prntid;*/
 	pnlWnd->windows = calloc(1, sizeof(struct mgWindow_s*));
 	pnlWnd->windows[0] = w;
 	pnlWnd->activeWindow = w;
@@ -722,7 +768,7 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 
 	mgDockPanelWindow* pnlWnd = 0;	
 
-	static int pnlid = 1;
+	//static int pnlid = 1;
 
 	if (dw)
 	{
@@ -735,10 +781,10 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 		case 3:
 		{
 			mgDockPanelElement* dckEl = dw->dockElement;
-			pnlWnd = add_new_dock_panel_window(dckEl, pnlid, dw->id, w);
+			pnlWnd = add_new_dock_panel_window(dckEl, dw, w);
 			pnlWnd->where = id;
 			w->dockPanelWindow = pnlWnd;
-			++pnlid;
+		//	++pnlid;
 			switch (id)
 			{
 			case 0:
@@ -773,9 +819,9 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 		if ((id > 0) && (id < dck->elementsNum))
 		{
 			mgDockPanelElement* dckEl = &dck->elements[id];			
-			pnlWnd = add_new_dock_panel_window(dckEl, pnlid, 0, w);
+			pnlWnd = add_new_dock_panel_window(dckEl, 0, w);
 			w->dockPanelWindow = pnlWnd;
-			++pnlid;
+			//++pnlid;
 
 			switch (dckEl->info.where)
 			{

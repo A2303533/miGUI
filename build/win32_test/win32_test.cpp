@@ -187,6 +187,8 @@ void gui_drawRectangle(
         || reason == mgDrawRectangleReason_dockElementBG
         || reason == mgDrawRectangleReason_dockSplitterBGHor
         || reason == mgDrawRectangleReason_dockSplitterBGVert
+        || reason == mgDrawRectangleReason_dockPanelSplitterBGHor
+        || reason == mgDrawRectangleReason_dockPanelSplitterBGVert
         || reason == mgDrawRectangleReason_dockBG
         || reason == mgDrawRectangleReason_dockTabBG)
     {

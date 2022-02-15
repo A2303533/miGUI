@@ -46,8 +46,9 @@ typedef struct mgDockPanelWindow_s {
 	*/
 	int where;
 
-	int id;
-	int parentId;
+	/*int id;
+	int parentId;*/
+	struct mgDockPanelWindow_s* parent;
 
 	struct mgWindow_s** windows;
 	int windowsSize;
@@ -120,6 +121,8 @@ typedef struct mgDockPanel_s {
 	/*update and draw only windows in this array*/
 	mgDockPanelWindow** arrayWindows;
 	int arrayWindowsSize;
+
+	int tabHeight;
 
 } mgDockPanel;
 
