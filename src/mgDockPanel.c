@@ -31,15 +31,30 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <wchar.h>
 
+#include <Windows.h>
+void VSOutput(const char* szFormat, ...)
+{
+	char szBuff[1024];
+	memset(szBuff,0, 1024);
+	va_list arg;
+	va_start(arg, szFormat);
+	vsnprintf(szBuff, sizeof(szBuff), szFormat, arg);
+	va_end(arg);
+
+	OutputDebugStringA(szBuff);
+}
 
 extern int g_windowToDockPanelMode;
 extern mgRect g_windowToDockRect;
 
 float lerp(float v0, float v1, float t);
 
+int g_windowSize = 0;
+float g_lerpTime = 10.f;
 int g_blockSplitterMode = 0; /*block resizing when some panel is too small*/
 int g_mouseMoveDirBeforeBlock = 0; /*0, 1 = x+, 2= x-, 3 = y+, 4 = y-*/
 int g_dockpanel_inSplitterRect = 0;
@@ -158,17 +173,17 @@ mgDockPanelRebuild(struct mgContext_s* c)
 	_mgDockPanelRebuild(c);
 	if (c->dockPanel->elementsNum > 1)
 	{
+		int difx = c->dockPanel->mainElementSizeMinimum.x - c->dockPanel->mainElementSize.x;
+		int dify = c->dockPanel->mainElementSizeMinimum.y - c->dockPanel->mainElementSize.y;
 		if (c->dockPanel->mainElementSize.x < c->dockPanel->mainElementSizeMinimum.x)
 		{
-			int dif = c->dockPanel->mainElementSizeMinimum.x - c->dockPanel->mainElementSize.x;
-		
 			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
 			{
 				switch (c->dockPanel->elements[i].info.where)
 				{
 				case 0:
 				case 2:
-					c->dockPanel->elements[i].info.size -= dif;
+					c->dockPanel->elements[i].info.size -= difx;
 					if (c->dockPanel->elements[i].info.size < c->dockPanel->elements[i].info.sizeMinimum)
 						c->dockPanel->elements[i].info.size = c->dockPanel->elements[i].info.sizeMinimum;
 					break;
@@ -176,24 +191,70 @@ mgDockPanelRebuild(struct mgContext_s* c)
 			}
 			_mgDockPanelRebuild(c);
 		}
+		else if(g_dockpanel_splitterModeElement && (difx < -10))
+		{
+			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			{
+				if (&c->dockPanel->elements[i] == g_dockpanel_splitterModeElement)
+					continue;
+
+				c->dockPanel->elements[i].info.size =
+					(int)lerp((float)c->dockPanel->elements[i].info.size,
+						c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
+			}
+		}
+		else if (g_windowSize && (difx < -10))
+		{
+			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			{
+				if (&c->dockPanel->elements[i] == g_dockpanel_splitterModeElement)
+					continue;
+
+				c->dockPanel->elements[i].info.size =
+					(int)lerp((float)c->dockPanel->elements[i].info.size,
+						c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
+			}
+		}
 
 		if (c->dockPanel->mainElementSize.y < c->dockPanel->mainElementSizeMinimum.y)
 		{
-			int dif = c->dockPanel->mainElementSizeMinimum.y - c->dockPanel->mainElementSize.y;
-
 			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
 			{
 				switch (c->dockPanel->elements[i].info.where)
 				{
 				case 1:
 				case 3:
-					c->dockPanel->elements[i].info.size -= dif;
+					c->dockPanel->elements[i].info.size -= dify;
 					if (c->dockPanel->elements[i].info.size < c->dockPanel->elements[i].info.sizeMinimum)
 						c->dockPanel->elements[i].info.size = c->dockPanel->elements[i].info.sizeMinimum;
 					break;
 				}
 			}
 			_mgDockPanelRebuild(c);
+		}
+		else if (g_dockpanel_splitterModeElement && (dify < -10))
+		{
+			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			{
+				if (&c->dockPanel->elements[i] == g_dockpanel_splitterModeElement)
+					continue;
+
+				c->dockPanel->elements[i].info.size =
+					(int)lerp((float)c->dockPanel->elements[i].info.size,
+						c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
+			}
+		}
+		else if (g_windowSize && (dify < -10))
+		{
+			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			{
+				if (&c->dockPanel->elements[i] == g_dockpanel_splitterModeElement)
+					continue;
+
+				c->dockPanel->elements[i].info.size =
+					(int)lerp((float)c->dockPanel->elements[i].info.size,
+						c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
+			}
 		}
 
 		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
@@ -307,6 +368,31 @@ mgDockPanelUpdateWindow(struct mgContext_s* c)
 void
 mgDockPanelOnSize(struct mgContext_s* c)
 {
+	static int lmbdown = 0;
+	static int lmbdownOld = 0;
+
+	if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN && !lmbdown)
+	{
+		lmbdown = 1;
+		g_windowSize = 1;
+		g_lerpTime = 100.f;
+	}
+
+	if (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+	{
+		lmbdown = 0;
+		g_windowSize = 0;
+		g_lerpTime = 10.f;
+	}
+
+	if (lmbdown && !lmbdownOld)
+	{
+		for (int i2 = 0; i2 < c->dockPanel->elementsNum; ++i2)
+		{
+			c->dockPanel->elements[i2].sizeOnClick = c->dockPanel->elements[i2].info.size;
+		}
+	}
+
 	c->dockPanel->rect.left = c->dockPanel->indent.left;
 	c->dockPanel->rect.top = c->dockPanel->indent.top;
 	c->dockPanel->rect.right = c->windowSize.x - c->dockPanel->indent.right;
@@ -315,6 +401,12 @@ mgDockPanelOnSize(struct mgContext_s* c)
 	c->dockPanel->size.y = c->dockPanel->rect.bottom - c->dockPanel->rect.top;
 	mgDockPanelRebuild(c);
 	mgDockPanelUpdateWindow(c);
+	
+	if (c->dockPanel->elementsNum > 1)
+	{
+
+	}
+	lmbdownOld = lmbdown;
 }
 
 void
@@ -411,8 +503,10 @@ mgDrawDockPanel(struct mgContext_s* c)
 void
 mgDockPanelUpdate(struct mgContext_s* c)
 {
+	int needRebuild = 0;
+
 	static mgPoint firstClick;
-	static int sizeOnClick = 0;
+	//static int sizeOnClick = 0;
 	static float splitterLerpTarget = 0.f;
 
 	if(!g_dockpanel_splitterModeElement)
@@ -422,6 +516,11 @@ mgDockPanelUpdate(struct mgContext_s* c)
 	{
 		firstClick = c->input->mousePosition;
 		g_blockSplitterMode = 0;
+
+		for (int i2 = 0; i2 < c->dockPanel->elementsNum; ++i2)
+		{
+			c->dockPanel->elements[i2].sizeOnClick = c->dockPanel->elements[i2].info.size;
+		}
 	}
 
 	for (int i = 0; i < c->dockPanel->elementsNum; ++i)
@@ -452,8 +551,9 @@ mgDockPanelUpdate(struct mgContext_s* c)
 				{
 					g_dockpanel_splitterModeElement = &c->dockPanel->elements[i];
 					c->dockPanel->flags |= mgDockPanelFlag_onSplitter;
-					sizeOnClick = g_dockpanel_splitterModeElement->info.size;
-					splitterLerpTarget = (float)sizeOnClick;
+
+					//sizeOnClick = g_dockpanel_splitterModeElement->info.size;
+					splitterLerpTarget = (float)g_dockpanel_splitterModeElement->sizeOnClick;
 					break;
 				}
 			}
@@ -485,9 +585,8 @@ mgDockPanelUpdate(struct mgContext_s* c)
 					if (!g_dockpanel_splitterModePanel)
 					{
 						g_dockpanel_splitterModePanel = c->dockPanel->arrayWindows[i];
+						g_dockpanel_splitterModePanel->sizeOnClick = g_dockpanel_splitterModePanel->sz;
 						c->dockPanel->flags |= mgDockPanelFlag_onSplitter;
-						sizeOnClick = g_dockpanel_splitterModePanel->sz;
-						splitterLerpTarget = (float)sizeOnClick;
 						break;
 					}
 				}
@@ -522,16 +621,16 @@ mgDockPanelUpdate(struct mgContext_s* c)
 		switch (g_dockpanel_splitterModePanel->where)
 		{
 		case 0:
-			splitterLerpTarget = (float)(sizeOnClick + px);
+			splitterLerpTarget = (float)(g_dockpanel_splitterModePanel->sizeOnClick + px);
 			break;
 		case 1:
-			splitterLerpTarget = (float)(sizeOnClick + py);
+			splitterLerpTarget = (float)(g_dockpanel_splitterModePanel->sizeOnClick + py);
 			break;
 		case 2:
-			splitterLerpTarget = (float)(sizeOnClick - px);
+			splitterLerpTarget = (float)(g_dockpanel_splitterModePanel->sizeOnClick - px);
 			break;
 		case 3:
-			splitterLerpTarget = (float)(sizeOnClick - py);
+			splitterLerpTarget = (float)(g_dockpanel_splitterModePanel->sizeOnClick - py);
 			break;
 		}
 		panelSz = g_dockpanel_splitterModePanel->sz;
@@ -539,8 +638,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 		if (g_dockpanel_splitterModePanel->sz < c->dockPanel->tabHeight)
 			g_dockpanel_splitterModePanel->sz = c->dockPanel->tabHeight;
 
-		mgDockPanelRebuild(c);
-		mgDockPanelUpdateWindow(c);
+		needRebuild = 1;
 	}
 	/*not else*/if (g_dockpanel_splitterModePanel && g_blockSplitterMode)
 	{
@@ -567,6 +665,11 @@ mgDockPanelUpdate(struct mgContext_s* c)
 		}
 	}
 
+	if (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+	{
+		g_windowSize = 0;
+		g_lerpTime = 10.f;
+	}
 
 	if (g_dockpanel_splitterModeElement)
 	{
@@ -587,16 +690,16 @@ mgDockPanelUpdate(struct mgContext_s* c)
 		switch (g_dockpanel_splitterModeElement->info.where)
 		{
 		case 0:
-			splitterLerpTarget = (float)(sizeOnClick + px);
+			splitterLerpTarget = (float)(g_dockpanel_splitterModeElement->sizeOnClick + px);
 			break;
 		case 1:
-			splitterLerpTarget = (float)(sizeOnClick + py);
+			splitterLerpTarget = (float)(g_dockpanel_splitterModeElement->sizeOnClick + py);
 			break;
 		case 2:
-			splitterLerpTarget = (float)(sizeOnClick - px);
+			splitterLerpTarget = (float)(g_dockpanel_splitterModeElement->sizeOnClick - px);
 			break;
 		case 3:
-			splitterLerpTarget = (float)(sizeOnClick - py);
+			splitterLerpTarget = (float)(g_dockpanel_splitterModeElement->sizeOnClick - py);
 			break;
 		}
 		int sizeOld = g_dockpanel_splitterModeElement->info.size;
@@ -606,8 +709,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 			g_dockpanel_splitterModeElement->info.size = g_dockpanel_splitterModeElement->info.sizeMaximum;
 		if (g_dockpanel_splitterModeElement->info.size < g_dockpanel_splitterModeElement->info.sizeMinimum)
 			g_dockpanel_splitterModeElement->info.size = g_dockpanel_splitterModeElement->info.sizeMinimum;
-		mgDockPanelRebuild(c);
-		mgDockPanelUpdateWindow(c);
+		needRebuild = 1;
 	}
 	//mgDockPanelUpdateWindow(c);
 	
@@ -622,6 +724,12 @@ mgDockPanelUpdate(struct mgContext_s* c)
 				//mgUpdateWindow(c->dockPanel->arrayWindows[i]);
 			}
 		}
+	}
+
+	if(needRebuild)
+	{ 
+		mgDockPanelRebuild(c);
+		mgDockPanelUpdateWindow(c);
 	}
 }
 

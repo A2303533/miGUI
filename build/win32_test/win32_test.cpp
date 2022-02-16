@@ -523,6 +523,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             {1, 20, 20, 1000},
             {1, 20, 20, 1000},
         };
+        
         mgInitDockPanel(g_gui_context, 0, 30, 0, 0, dckElmts, sizeof(dckElmts) / sizeof(mgDockPanelElementCreationInfo));
 
        // mgColorSet(&g_gui_context->activeStyle->dockpanelBGColor, 0.9f, 0.9f, 0.9f, 1.f);

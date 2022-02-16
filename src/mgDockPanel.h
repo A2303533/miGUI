@@ -57,6 +57,7 @@ typedef struct mgDockPanelWindow_s {
 	struct mgDockPanelElement_s* dockElement;
 
 	int sz;
+	int sizeOnClick;
 } mgDockPanelWindow;
 
 typedef struct mgDockPanelElementCreationInfo_s {
@@ -84,6 +85,7 @@ typedef struct mgDockPanelElement_s {
 	mgRect addWindowRect;
 	
 	mgDockPanelElementCreationInfo info;
+	int sizeOnClick;
 
 	mgColor colorBG;
 
