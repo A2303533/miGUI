@@ -190,6 +190,7 @@ void gui_drawRectangle(
         || reason == mgDrawRectangleReason_dockPanelSplitterBGHor
         || reason == mgDrawRectangleReason_dockPanelSplitterBGVert
         || reason == mgDrawRectangleReason_dockBG
+        || reason == mgDrawRectangleReason_dockTabWindowTitle
         || reason == mgDrawRectangleReason_dockTabBG)
     {
         rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);

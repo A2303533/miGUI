@@ -83,6 +83,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_dockPanelSplitterBGVert,
 	mgDrawRectangleReason_dockWindowToDock,
 	mgDrawRectangleReason_dockTabBG,
+	mgDrawRectangleReason_dockTabWindowTitle,
 };
 
 enum mgDrawTextReason

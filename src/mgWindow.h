@@ -101,6 +101,7 @@ typedef struct mgWindow_s {
 	struct mgWindow_s* right;
 
 	struct mgDockPanelWindow_s* dockPanelWindow;
+	mgRect dockPanelTabRect;
 
 } mgWindow;
 

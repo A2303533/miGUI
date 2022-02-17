@@ -280,6 +280,18 @@ mgDockPanelRebuild(struct mgContext_s* c)
 					case 0:
 						pw2->rect.left += pw->sz;
 						pw->rect.right = pw2->rect.left;
+
+						/*I STILL NEED TO USE g_mouseMoveDirBeforeBlock and g_blockSplitterMode AFTER THIS?????*/
+						/*it not work....*/
+						/*possible solution for all problems is to do 2 rebuilds
+						* 1. rebuild all rects and DON'T do any actions like this
+						* 2. go through all rects and fix all bad rects
+						*/
+						if (pw2->rect.left >= pw2->rect.right - c->dockPanel->tabHeight)
+						{
+							pw2->rect.left = pw2->rect.right - c->dockPanel->tabHeight;
+							pw->rect.right = pw2->rect.left;
+						}
 								
 						pw->splitterRect.top = pw->rect.top;
 						pw->splitterRect.bottom = pw->rect.bottom;
@@ -295,6 +307,12 @@ mgDockPanelRebuild(struct mgContext_s* c)
 					case 1:
 						pw2->rect.top += pw->sz;
 						pw->rect.bottom = pw2->rect.top;
+						
+						if (pw2->rect.top >= pw2->rect.bottom - c->dockPanel->tabHeight)
+						{
+							pw2->rect.top = pw2->rect.bottom - c->dockPanel->tabHeight;
+							pw->rect.bottom = pw2->rect.top;
+						}
 
 						pw->splitterRect.left = pw->rect.left;
 						pw->splitterRect.right = pw->rect.right;
@@ -311,15 +329,22 @@ mgDockPanelRebuild(struct mgContext_s* c)
 						pw2->rect.right -= pw->sz;
 						pw->rect.left = pw2->rect.right;
 
+						if (pw2->rect.right <= pw2->rect.left + c->dockPanel->tabHeight)
+						{
+							pw2->rect.right = pw2->rect.left + c->dockPanel->tabHeight;
+							pw->rect.left = pw2->rect.right;
+						}
+
 						pw->splitterRect.top = pw->rect.top;
 						pw->splitterRect.bottom = pw->rect.bottom;
 						pw->splitterRect.left = pw->rect.left - c->dockPanel->splitterWidth;
 						pw->splitterRect.right = pw->rect.left + c->dockPanel->splitterWidth;
+						
 
 						if ((pw2->rect.right - pw2->rect.left) < c->dockPanel->tabHeight)
 						{
 							g_blockSplitterMode = 1;
-							g_mouseMoveDirBeforeBlock = c->input->mouseMoveDelta.x > 0 ? 1 : 2;
+							g_mouseMoveDirBeforeBlock = c->input->mouseMoveDelta.x > 0 ? 2 : 1;
 						}
 						break;
 					case 3:
@@ -348,6 +373,25 @@ mgDockPanelRebuild(struct mgContext_s* c)
 				pw->windowRect.top += 25;
 				pw->tabRect = pw->rect;
 				pw->tabRect.bottom = pw->windowRect.top;
+				
+				mgRect tr = pw->tabRect;
+				for (int i2 = 0; i2 < pw->windowsSize; ++i2)
+				{
+					int tl = 0;
+					mgWindow* wnd = pw->windows[i2];
+					if (wnd->titlebarText)
+					{
+					//	mgPoint pt;
+					//	c->getTextSize(pw->windows[i2]->titlebarText, pw->windows[i2]->titlebarFont, &pt);
+					//	tl = pt.x;
+					}
+
+					int w = tl + 6;
+					wnd->dockPanelTabRect.left = tr.left;
+					wnd->dockPanelTabRect.top = tr.top;
+					wnd->dockPanelTabRect.right = wnd->dockPanelTabRect.left + w;
+					tr.left += w + 2;
+				}
 			}
 		}
 	}
@@ -443,11 +487,17 @@ mgDrawDockPanel(struct mgContext_s* c)
 				&c->activeStyle->windowBGColor,
 				&c->activeStyle->windowBGColor,
 				0, 0, 0);
-			mgPoint p;
+			
+			/*mgPoint p;
 			mgPointSet(&p, c->dockPanel->arrayWindows[i]->tabRect.left, c->dockPanel->arrayWindows[i]->tabRect.top);
 			wchar_t t[30];
 			swprintf(t, 30, L"W:%i", c->dockPanel->arrayWindows[i]->windowsSize);
-			c->gpu->drawText(0, &p, t, wcslen(t), &c->activeStyle->windowTitlebarTextColor, c->dockPanel->arrayWindows[i]->activeWindow->titlebarFont);
+			c->gpu->drawText(0, &p, t, wcslen(t), &c->activeStyle->windowTitlebarTextColor, c->dockPanel->arrayWindows[i]->activeWindow->titlebarFont);*/
+			c->gpu->drawRectangle(mgDrawRectangleReason_dockTabWindowTitle, &c->dockPanel->arrayWindows[i]->activeWindow->dockPanelTabRect,
+				&c->activeStyle->dockpanelWindowToDockColor,
+				&c->activeStyle->dockpanelWindowToDockColor,
+				0, 0, 0);
+
 			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->windowRect);
 			mgDrawWindow(c->dockPanel->arrayWindows[i]->activeWindow);
 		}
@@ -655,11 +705,11 @@ mgDockPanelUpdate(struct mgContext_s* c)
 				g_blockSplitterMode = 0;
 			break;
 		case 3:
-			if (c->input->mouseMoveDelta.y > 0)
+			if (c->input->mouseMoveDelta.y < 0)
 				g_blockSplitterMode = 0;
 			break;
 		case 4:
-			if (c->input->mouseMoveDelta.y < 0)
+			if (c->input->mouseMoveDelta.y > 0)
 				g_blockSplitterMode = 0;
 			break;
 		}
@@ -915,6 +965,7 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 			dw->windowsSize++;
 			struct mgWindow_s** new_windows = calloc(1, sizeof(struct mgWindow_s*) * dw->windowsSize);
 			memcpy(new_windows, dw->windows, sizeof(struct mgWindow_s*) * (dw->windowsSize - 1));
+			new_windows[dw->windowsSize - 1] = w;
 			free(dw->windows);
 			dw->windows = new_windows;
 			w->dockPanelWindow = pnlWnd;
