@@ -429,9 +429,9 @@ void btn_newWindow_onClickLMB(struct mgElement_s* e)
     mgSetWindowTitle(wnd, text);
     {
         mgPointSet(&pos, 0, 0);
-        mgPointSet(&sz, 160, 20);
+        mgPointSet(&sz, 60, 20);
         mgElement* btn = mgCreateButton(wnd, &pos, &sz, wnd->titlebarText, g_win32font);
-        btn->align = mgAlignment_top;
+        //btn->align = mgAlignment_top;
     }
 }
 
@@ -584,7 +584,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             mgPointSet(&pos, 0, 0);
             mgPointSet(&sz, 160, 20);
             mgElement* btn = mgCreateButton(guiWindow2, &pos, &sz, L"Button", g_win32font);
-            btn->align = mgAlignment_top;
+        //    btn->align = mgAlignment_top;
         }
         //guiWindow2->flags ^= mgWindowFlag_withTitlebar;
         //guiWindow2->flags ^= mgWindowFlag_canMove;

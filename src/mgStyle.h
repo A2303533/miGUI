@@ -41,6 +41,9 @@ typedef struct mgStyle_s {
 	mgColor dockpanelPanelSplitterBGColor;
 	mgColor dockpanelWindowToDockColor;
 	mgColor dockpanelTabBGColor;
+	mgColor dockpanelTabWindowTitleBG;
+	mgColor dockpanelTabActiveWindowTitleBG;
+
 } mgStyle;
 
 #endif

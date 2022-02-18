@@ -78,7 +78,8 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabBGColor, 0x009BFF);
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelSplitterBGColor, 0xC4C4C4);
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelPanelSplitterBGColor, 0xC8C8C8);
-	
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabWindowTitleBG, 0xE5F3FF);
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabActiveWindowTitleBG, 0xB2D2FF);
 	
 	
 	c->functions.SetCursor_p = mgSetCursor_f;
