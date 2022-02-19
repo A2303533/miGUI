@@ -126,6 +126,7 @@ typedef struct mgDockPanel_s {
 
 	int tabHeight;
 
+	mgPopup* windowTabPopup;
 } mgDockPanel;
 
 #endif

@@ -184,6 +184,7 @@ void gui_drawRectangle(
         graphics.FillRectangle(&br, gdirct);*/
     }
     else if (reason == mgDrawRectangleReason_buttonBG
+        || reason == mgDrawRectangleReason_popupBG
         || reason == mgDrawRectangleReason_dockElementBG
         || reason == mgDrawRectangleReason_dockSplitterBGHor
         || reason == mgDrawRectangleReason_dockSplitterBGVert
@@ -193,8 +194,35 @@ void gui_drawRectangle(
         || reason == mgDrawRectangleReason_dockTabWindowTitle
         || reason == mgDrawRectangleReason_dockTabBG)
     {
-        rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
+        if (reason == mgDrawRectangleReason_popupBG)
+        {
+            // BORDER for popup
+            int sz = 1;
+            RECT r2 = r;
+            r2.left -= sz;
+            r2.top -= sz;
+            r2.bottom += sz;
+            r2.right += sz;
+            rgn = CreateRectRgn(
+                g_clipRect.left + borderSize.x- sz,
+                g_clipRect.top + borderSize.y- sz,
+                g_clipRect.right + borderSize.x+ sz,
+                g_clipRect.bottom + borderSize.y+ sz);
+            HBRUSH brsh2 = CreateSolidBrush(RGB(0, 0, 0));
+            SelectObject(hdcMem, brsh2);
+            FillRect(hdcMem, &r2, brsh2);
+            DeleteObject(brsh2);
+
+            SelectObject(hdcMem, brsh);
+        }
+        else
+        {
+            rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
+        }
         SelectClipRgn(hdcMem, rgn);
+
+        
+
         FillRect(hdcMem, &r, brsh);
     }
     else
@@ -515,6 +543,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
     g_win32font = gui_createFont("Segoe", 0, 10);
+    g_gui_context->defaultPopupFont = g_win32font;
     {
         mgDockPanelElementCreationInfo dckElmts[] = {
             {1, 20, 20, 1000},

@@ -26,28 +26,31 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_STYLE_H_
-#define _MG_STYLE_H_
+#ifndef _MG_POPUP_H_
+#define _MG_POPUP_H_
 
-typedef struct mgStyle_s {
-	mgColor windowBGColor;
-	mgColor windowTitlebarColor;
-	mgColor windowBGColorTopWindow;
-	mgColor windowTitlebarColorTopWindow;
-	mgColor windowTitlebarTextColor;
-	
-	mgColor dockpanelBGColor;
-	mgColor dockpanelSplitterBGColor;
-	mgColor dockpanelPanelSplitterBGColor;
-	mgColor dockpanelWindowToDockColor;
-	mgColor dockpanelTabBGColor;
-	mgColor dockpanelTabWindowTitleBG;
-	mgColor dockpanelTabActiveWindowTitleBG;
-	
-	mgColor popupBG;
-	mgColor popupText;
-	mgColor popupHoverElementBG;
+struct mgPopup_s;
 
-} mgStyle;
+struct mgPopupNode_s {
+	wchar_t* text;
+	int textLen;
+
+	struct mgPopup_s* subMenu; /*if subMenu then skip callback*/
+
+	void(*callback)();
+};
+
+typedef struct mgPopup_s {
+	mgRect rect;
+	mgPoint indent;
+	int itemHeight;
+	mgFont* font;
+
+	struct mgPopupNode_s* nodes;
+	int nodesSize;
+
+	struct mgPopupNode_s* nodeUnderCursor;
+	mgRect nodeUnderCursorRect;
+} mgPopup;
 
 #endif

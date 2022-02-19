@@ -55,6 +55,9 @@ PFNMGSETICONPROC mgSetIcon;
 PFNMGONWINDOWSIZEPROC mgOnWindowSize;
 PFNMGINITDOCKPANELPROC mgInitDockPanel;
 PFNMGDOCKADDWINDOWPROC mgDockAddWindow;
+PFNMGCREATEPOPUPPROC mgCreatePopup;
+PFNMGDESTROYPOPUPPROC mgDestroyPopup;
+PFNMGSHOWPOPUPPROC mgShowPopup;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -107,6 +110,9 @@ mgLoad()
 	mgOnWindowSize = mgGetProc(lib, "mgOnWindowSize_f");
 	mgInitDockPanel = mgGetProc(lib, "mgInitDockPanel_f");
 	mgDockAddWindow = mgGetProc(lib, "mgDockAddWindow_f");
+	mgCreatePopup = mgGetProc(lib, "mgCreatePopup_f");
+	mgDestroyPopup = mgGetProc(lib, "mgDestroyPopup_f");
+	mgShowPopup = mgGetProc(lib, "mgShowPopup_f");
 
 	return lib;
 }

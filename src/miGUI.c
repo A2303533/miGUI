@@ -38,6 +38,8 @@ void mgUpdateWindow(struct mgWindow_s* w);
 void mgDrawDockPanel(struct mgContext_s* c);
 void mgDockPanelOnSize(struct mgContext_s* c);
 void mgDockPanelUpdate(struct mgContext_s* c);
+void mgDrawPopup(struct mgContext_s* c, mgPopup* p);
+void mgUpdatePopup(struct mgContext_s* c, mgPopup* p);
 
 void 
 mgDestroyElement_f(mgElement* e)
@@ -80,6 +82,10 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelPanelSplitterBGColor, 0xC8C8C8);
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabWindowTitleBG, 0xE5F3FF);
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabActiveWindowTitleBG, 0xB2D2FF);
+	mgColorSetAsIntegerRGB(&c->styleLight.popupBG, 0xE8EDFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.popupText, 0x0);
+	mgColorSetAsIntegerRGB(&c->styleLight.popupHoverElementBG, 0xC1C1C1);
+	
 	
 	
 	c->functions.SetCursor_p = mgSetCursor_f;
@@ -113,6 +119,12 @@ mgDestroyContext_f(mgContext* c)
 
 	if (c->dockPanel)
 	{
+		if (c->dockPanel->windowTabPopup)
+		{
+			c->activePopup = 0;
+			mgDestroyPopup_f(c->dockPanel->windowTabPopup);
+		}
+
 		if (c->dockPanel->elements)
 			free(c->dockPanel->elements);
 		free(c->dockPanel);
@@ -196,6 +208,24 @@ mgUpdate_f(mgContext* c)
 	then = now;
 
 	c->windowUnderCursor = 0;
+
+	if (c->activePopup)
+	{
+		c->cursorInPopup = 0;
+		mgUpdatePopup(c, c->activePopup);
+
+		if (!c->cursorInPopup)
+		{
+			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+				mgShowPopup_f(c, 0, 0);
+			if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+				mgShowPopup_f(c, 0, 0);
+			if (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
+				mgShowPopup_f(c, 0, 0);
+		}
+
+		return;
+	}
 
 	mgWindow* cw = c->firstWindow;
 	if (cw && !(c->dockPanel->flags & mgDockPanelFlag_onSplitter))
@@ -404,6 +434,9 @@ mgDraw_f(mgContext* c)
 			cw = cw->right;
 		}
 	}
+
+	if (c->activePopup)
+		mgDrawPopup(c, c->activePopup);
 }
 
 MG_API

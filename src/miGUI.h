@@ -62,6 +62,7 @@ typedef void* mgTexture;
 
 #include "mgIcons.h"
 #include "mgStyle.h"
+#include "mgPopup.h"
 #include "mgDockPanel.h"
 #include "mgWindow.h"
 #include "mgElement.h"
@@ -84,6 +85,8 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_dockWindowToDock,
 	mgDrawRectangleReason_dockTabBG,
 	mgDrawRectangleReason_dockTabWindowTitle,
+	mgDrawRectangleReason_popupBG,
+	mgDrawRectangleReason_popupHoverElement,
 };
 
 enum mgDrawTextReason
@@ -92,6 +95,7 @@ enum mgDrawTextReason
 	mgDrawTextReason_windowTitlebar,
 	mgDrawTextReason_buttonText,
 	mgDrawTextReason_text,
+	mgDrawTextReason_popup,
 };
 
 /* Before creating GUI context you must create this objects.
@@ -228,6 +232,14 @@ extern PFNMGINITDOCKPANELPROC mgInitDockPanel;
 typedef struct mgDockPanelWindow_s* (*PFNMGDOCKADDWINDOWPROC)(struct mgWindow_s*, struct mgDockPanelWindow_s* dw, int id);
 extern PFNMGDOCKADDWINDOWPROC mgDockAddWindow;
 
+typedef struct mgPopup_s* (*PFNMGCREATEPOPUPPROC)(struct mgPopupNode_s* arr, int arrSize, mgFont*);
+extern PFNMGCREATEPOPUPPROC mgCreatePopup;
+
+typedef void (*PFNMGDESTROYPOPUPPROC)(struct mgPopup_s*);
+extern PFNMGDESTROYPOPUPPROC mgDestroyPopup;
+
+typedef void (*PFNMGSHOWPOPUPPROC)(struct mgContext_s*, struct mgPopup_s*, mgPoint* position);
+extern PFNMGSHOWPOPUPPROC mgShowPopup;
 
 #if defined(__cplusplus)
 }
@@ -272,6 +284,11 @@ typedef struct mgContext_s {
 	mgStyle styleLight;
 	mgStyle styleDark;
 	mgStyle* activeStyle;
+
+	mgPopup* activePopup;
+	mgFont* defaultPopupFont;
+	int cursorInPopup;
+
 } mgContext;
 
 #endif

@@ -60,10 +60,15 @@ int g_mouseMoveDirBeforeBlock = 0; /*0, 1 = x+, 2= x-, 3 = y+, 4 = y-*/
 int g_dockpanel_inSplitterRect = 0;
 struct mgDockPanelElement_s* g_dockpanel_splitterModeElement = 0;
 struct mgDockPanelWindow_s* g_dockpanel_splitterModePanel = 0;
+mgDockPanelWindow* g_pnlWnd_onPopup = 0;
 
 void mgDrawWindow(struct mgWindow_s* w);
 void mgUpdateWindow(struct mgWindow_s* w);
 void mgUpdateElement(mgElement* e);
+
+void dockPanel_popupCallback_makeFirst();
+void dockPanel_popupCallback_unpin();
+void dockPanel_popupCallback_close();
 
 void
 _mgDockPanelRebuild(struct mgContext_s* c)
@@ -741,6 +746,19 @@ mgDockPanelUpdate(struct mgContext_s* c)
 						mgWindow* wnd = c->dockPanel->elements[i].panelWindows[i2]->windows[i3];
 						if (mgPointInRect(&wnd->dockPanelTabRect, &c->input->mousePosition))
 						{
+							if (c->input->mouseButtonFlags1 & MG_MBFL_RMBUP)
+							{
+								c->dockPanel->elements[i].panelWindows[i2]->activeWindow = wnd;
+								needRebuild = 1;
+								if (c->dockPanel->windowTabPopup)
+								{
+									mgPoint pp = c->input->mousePosition;
+									g_pnlWnd_onPopup = c->dockPanel->elements[i].panelWindows[i2];
+									mgShowPopup_f(c, c->dockPanel->windowTabPopup, &pp);
+									return;
+								}
+							}
+
 							if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 							{
 								//VSOutput("Window");
@@ -966,6 +984,17 @@ mgInitDockPanel_f(
 	c->dockPanel->mainElementSizeMinimum.y = 300;
 	c->dockPanel->tabHeight = 25;
 
+	if (c->defaultPopupFont)
+	{
+		struct mgPopupNode_s popupNodes[] =
+		{
+			{L"Make first", 0, 0, dockPanel_popupCallback_makeFirst},
+			{L"Unpin\\remove", 0, 0, dockPanel_popupCallback_unpin},
+			{L"Close\\hide", 0, 0, dockPanel_popupCallback_close},
+		};
+		c->dockPanel->windowTabPopup = mgCreatePopup_f(popupNodes, 3, c->defaultPopupFont);
+	}
+
 	c->dockPanel->elementsNum = elementsSize + 1;
 	c->dockPanel->elements = calloc(1, sizeof(mgDockPanelElement) * c->dockPanel->elementsNum);
 	mgColorSetAsIntegerRGB(&c->dockPanel->elements[0].colorBG, 0xFFFFFF);
@@ -1182,4 +1211,35 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 		mgDockPanelUpdateWindow(w->context);
 
 	return pnlWnd;
+}
+
+void dockPanel_popupCallback_makeFirst()
+{
+	mgWindow* aw = 0;
+	for (int i = g_pnlWnd_onPopup->windowsSize; i > 1; i--)
+	{
+		if (g_pnlWnd_onPopup->activeWindow == g_pnlWnd_onPopup->windows[i - 1])
+			aw = g_pnlWnd_onPopup->activeWindow;
+
+		if (aw)
+		{
+			g_pnlWnd_onPopup->windows[i - 1] = g_pnlWnd_onPopup->windows[i - 2];
+		}
+	}
+
+	if (aw)
+	{
+		g_pnlWnd_onPopup->windows[0] = aw;
+		mgDockPanelRebuild(aw->context);
+	}
+}
+
+void dockPanel_popupCallback_unpin()
+{
+
+}
+
+void dockPanel_popupCallback_close()
+{
+
 }
