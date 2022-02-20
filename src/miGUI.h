@@ -156,6 +156,13 @@ extern PFNMGSETWINDOWTITLEPROC mgSetWindowTitle;
 typedef void (*PFNMGBRINGWINDOWTOTOPPROC)(struct mgWindow_s*);
 extern PFNMGBRINGWINDOWTOTOPPROC mgBringWindowToTop;
 
+/*
+* 1 show
+* 0 hide
+*/
+typedef void (*PFNMGSHOWWINDOWPROC)(struct mgWindow_s*, int);
+extern PFNMGSHOWWINDOWPROC mgShowWindow;
+
 typedef void (*PFNMGONWINDOWSIZEPROC)(struct mgContext_s*, int x, int y);
 extern PFNMGONWINDOWSIZEPROC mgOnWindowSize;
 

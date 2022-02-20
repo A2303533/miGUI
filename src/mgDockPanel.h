@@ -29,12 +29,6 @@
 #ifndef _MG_DOCKPANEL_H_
 #define _MG_DOCKPANEL_H_
 
-//typedef struct mgDockPanelWindowNode_s {
-//	struct mgWindow_s* window;
-//	struct mgDockPanelWindowNode_s* left;
-//	struct mgDockPanelWindowNode_s* right;
-//} mgDockPanelWindowNode;
-
 typedef struct mgDockPanelWindow_s {	
 	mgRect rect; /*all area, with tabbar and other*/
 	mgRect windowRect;/*only window*/
@@ -113,7 +107,7 @@ typedef struct mgDockPanel_s {
 	int flags;
 
 	mgDockPanelElement* elements;
-	int elementsNum;
+	int elementsSize;
 	
 	int splitterWidth; /*2*/
 

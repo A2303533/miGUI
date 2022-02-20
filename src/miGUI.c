@@ -126,7 +126,24 @@ mgDestroyContext_f(mgContext* c)
 		}
 
 		if (c->dockPanel->elements)
+		{
+			for (int i = 0; i < c->dockPanel->elementsSize; ++i)
+			{
+				mgDockPanelElement* el = &c->dockPanel->elements[i];
+				if (el->panelWindows)
+				{
+					for (int i2 = 0; i2 < el->panelWindowsSize; ++i2)
+					{
+						if(el->panelWindows[i2]->windows)
+							free(el->panelWindows[i2]->windows);
+						free(el->panelWindows[i2]);
+					}
+					free(el->panelWindows);
+				}
+			}
+
 			free(c->dockPanel->elements);
+		}
 		free(c->dockPanel);
 	}
 

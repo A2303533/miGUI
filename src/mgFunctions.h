@@ -54,5 +54,6 @@ MG_API struct mgDockPanelWindow_s* MG_C_DECL mgDockAddWindow_f(struct mgWindow_s
 MG_API struct mgPopup_s* MG_C_DECL mgCreatePopup_f(struct mgPopupNode_s* arr, int arrSize, mgFont* fnt);
 MG_API void MG_C_DECL mgDestroyPopup_f(struct mgPopup_s* p);
 MG_API void MG_C_DECL mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position);
+MG_API void MG_C_DECL mgShowWindow_f(struct mgWindow_s* w, int i);
 
 #endif

@@ -420,11 +420,15 @@ mgUpdateWindow(struct mgWindow_s* w)
 					if (w->onClose)
 					{
 						if (w->onClose(w))
-							w->flags ^= mgWindowFlag_internal_visible;
+						{
+							if(w->flags & mgWindowFlag_internal_visible)
+								w->flags ^= mgWindowFlag_internal_visible;
+						}
 					}
 					else
 					{
-						w->flags ^= mgWindowFlag_internal_visible;
+						if (w->flags & mgWindowFlag_internal_visible)
+							w->flags ^= mgWindowFlag_internal_visible;
 					}
 				}
 			}
@@ -754,3 +758,19 @@ mgSetWindowTitle_f(struct mgWindow_s* w, const wchar_t* t)
 	w->titlebarTextLen = newLen;
 }
 
+MG_API
+void
+MG_C_DECL
+mgShowWindow_f(struct mgWindow_s* w, int i)
+{
+	assert(w);
+	if (i)
+	{
+		w->flags |= mgWindowFlag_internal_visible;
+	}
+	else
+	{
+		if (w->flags & mgWindowFlag_internal_visible)
+			w->flags ^= mgWindowFlag_internal_visible;
+	}
+}

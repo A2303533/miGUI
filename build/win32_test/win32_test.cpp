@@ -334,81 +334,88 @@ void draw_gui()
     /*draw elements*/
     mgDraw(g_gui_context);
 
-    mgRect rect;
-    mgRectSet(&rect, 0, 0, 220, 180);
+    static int drawSomeInfo = 1;
+    if (mgIsKeyHit(g_gui_context->input, MG_KEY_F1))
+        drawSomeInfo = drawSomeInfo == 1 ? 0 : 1;
 
-    mgColor color1;
-    mgColor color2;
-    mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
-    mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
-    
+    if (drawSomeInfo)
     {
-        mgRect r;
-        r.left = 0;
-        r.top = 0;
-        r.right = 800;
-        r.bottom = 600;
-        gui_setClipRect(&r);
-    }
 
-    g_gui_context->gpu->drawRectangle(0, &rect, &color1, &color2, 0, 0, 0);
+        mgRect rect;
+        mgRectSet(&rect, 0, 0, 220, 180);
 
-    mgPoint textPosition;
-    mgPointSet(&textPosition, 10, 10);
-    mgColor textColor;
-    mgColorSetAsIntegerRGB(&textColor, 0xFF005000);
-    wchar_t textBuffer[200];
-    
+        mgColor color1;
+        mgColor color2;
+        mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
+        mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
 
-    swprintf_s(textBuffer, L"FPS: %i", g_fps);
-    mgPointSet(&textPosition, 0, 0);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-    
-    swprintf_s(textBuffer, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
-    mgPointSet(&textPosition, 10, 10);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-    
-    swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
-    mgPointSet(&textPosition, 10, 20);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-    
-    swprintf_s(textBuffer, L"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
-    mgPointSet(&textPosition, 10, 30);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-    
-    swprintf_s(textBuffer, L"mouseButtons: 0x%x 0x%x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
-    mgPointSet(&textPosition, 10, 40);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        {
+            mgRect r;
+            r.left = 0;
+            r.top = 0;
+            r.right = 800;
+            r.bottom = 600;
+            gui_setClipRect(&r);
+        }
 
-    swprintf_s(textBuffer, L"key char: %c 0x%x", g_input.character, g_input.character);
-    mgPointSet(&textPosition, 10, 50);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        g_gui_context->gpu->drawRectangle(0, &rect, &color1, &color2, 0, 0, 0);
 
-    if (mgIsKeyHit(&g_input, MG_KEY_ENTER))
-    {
-        swprintf_s(textBuffer, L"Hit ENTER");
-        mgPointSet(&textPosition, 10, 60);
+        mgPoint textPosition;
+        mgPointSet(&textPosition, 10, 10);
+        mgColor textColor;
+        mgColorSetAsIntegerRGB(&textColor, 0xFF005000);
+        wchar_t textBuffer[200];
+
+
+        swprintf_s(textBuffer, L"FPS: %i", g_fps);
+        mgPointSet(&textPosition, 0, 0);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+
+        swprintf_s(textBuffer, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
+        mgPointSet(&textPosition, 10, 10);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+
+        swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
+        mgPointSet(&textPosition, 10, 20);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+
+        swprintf_s(textBuffer, L"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
+        mgPointSet(&textPosition, 10, 30);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+
+        swprintf_s(textBuffer, L"mouseButtons: 0x%x 0x%x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
+        mgPointSet(&textPosition, 10, 40);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+
+        swprintf_s(textBuffer, L"key char: %c 0x%x", g_input.character, g_input.character);
+        mgPointSet(&textPosition, 10, 50);
+        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+
+        if (mgIsKeyHit(&g_input, MG_KEY_ENTER))
+        {
+            swprintf_s(textBuffer, L"Hit ENTER");
+            mgPointSet(&textPosition, 10, 60);
+            gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        }
+
+        if (mgIsKeyHold(&g_input, MG_KEY_ENTER))
+        {
+            swprintf_s(textBuffer, L"Hold ENTER");
+            mgPointSet(&textPosition, 10, 70);
+            gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        }
+
+        if (mgIsKeyRelease(&g_input, MG_KEY_ENTER))
+        {
+            swprintf_s(textBuffer, L"Release ENTER");
+            mgPointSet(&textPosition, 10, 80);
+            gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        }
+
+        swprintf_s(textBuffer, L"KB modifier 0x%x\n", g_input.keyboardModifier);
+        mgPointSet(&textPosition, 10, 90);
         gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
     }
-
-    if (mgIsKeyHold(&g_input, MG_KEY_ENTER))
-    {
-        swprintf_s(textBuffer, L"Hold ENTER");
-        mgPointSet(&textPosition, 10, 70);
-        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-    }
-
-    if (mgIsKeyRelease(&g_input, MG_KEY_ENTER))
-    {
-        swprintf_s(textBuffer, L"Release ENTER");
-        mgPointSet(&textPosition, 10, 80);
-        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-    }
-
-    swprintf_s(textBuffer, L"KB modifier 0x%x\n", g_input.keyboardModifier);
-    mgPointSet(&textPosition, 10, 90);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
-
     
 
     g_gui_context->gpu->endDraw();
@@ -558,7 +565,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
        // mgColorSet(&g_gui_context->activeStyle->dockpanelBGColor, 0.9f, 0.9f, 0.9f, 1.f);
         g_gui_context->dockPanel->flags |= mgDockPanelFlag_drawBG;
-        for (int i = 0; i < g_gui_context->dockPanel->elementsNum; ++i)
+        for (int i = 0; i < g_gui_context->dockPanel->elementsSize; ++i)
         {
             //g_gui_context->dockPanel->elements[i].flags |= mgDockPanelElementFlag_drawBG;
         }

@@ -76,9 +76,9 @@ _mgDockPanelRebuild(struct mgContext_s* c)
 	c->dockPanel->elements[0].rect = c->dockPanel->rect;
 	mgRect mainElRect = c->dockPanel->elements[0].rect;
 
-	if (c->dockPanel->elementsNum > 1)
+	if (c->dockPanel->elementsSize > 1)
 	{
-		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+		for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 		{
 			int sz = c->dockPanel->elements[i].info.size;
 
@@ -182,13 +182,13 @@ mgDockPanelUpdateTabRect(struct mgContext_s* c, mgDockPanelWindow* pw)
 void
 mgDockPanelCheckRects(struct mgContext_s* c)
 {
-	if (c->dockPanel->elementsNum > 1)
+	if (c->dockPanel->elementsSize > 1)
 	{
 		int difx = c->dockPanel->mainElementSizeMinimum.x - c->dockPanel->mainElementSize.x;
 		int dify = c->dockPanel->mainElementSizeMinimum.y - c->dockPanel->mainElementSize.y;
 		if (c->dockPanel->mainElementSize.x < c->dockPanel->mainElementSizeMinimum.x)
 		{
-			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 			{
 				switch (c->dockPanel->elements[i].info.where)
 				{
@@ -203,7 +203,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 		}
 		else if (g_dockpanel_splitterModeElement && (difx < -10))
 		{
-			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 			{
 				if (&c->dockPanel->elements[i] == g_dockpanel_splitterModeElement)
 					continue;
@@ -215,7 +215,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 		}
 		else if (g_windowSize && (difx < -10))
 		{
-			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 			{
 				if (&c->dockPanel->elements[i] == g_dockpanel_splitterModeElement)
 					continue;
@@ -228,7 +228,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 
 		if (c->dockPanel->mainElementSize.y < c->dockPanel->mainElementSizeMinimum.y)
 		{
-			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 			{
 				switch (c->dockPanel->elements[i].info.where)
 				{
@@ -243,7 +243,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 		}
 		else if (g_dockpanel_splitterModeElement && (dify < -10))
 		{
-			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 			{
 				if (&c->dockPanel->elements[i] == g_dockpanel_splitterModeElement)
 					continue;
@@ -255,7 +255,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 		}
 		else if (g_windowSize && (dify < -10))
 		{
-			for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+			for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 			{
 				if (&c->dockPanel->elements[i] == g_dockpanel_splitterModeElement)
 					continue;
@@ -267,7 +267,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 		}
 	}
 
-	for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+	for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 	{
 		if (!c->dockPanel->elements[i].panelWindows)
 			continue;
@@ -361,7 +361,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 		}
 	}
 
-	for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+	for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 	{
 		if (!c->dockPanel->elements[i].panelWindows)
 			continue;
@@ -404,9 +404,9 @@ void
 mgDockPanelRebuild(struct mgContext_s* c)
 {
 	_mgDockPanelRebuild(c);
-	if (c->dockPanel->elementsNum > 1)
+	if (c->dockPanel->elementsSize > 1)
 	{
-		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+		for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 		{
 			if (!c->dockPanel->elements[i].panelWindows)
 				continue;
@@ -470,7 +470,7 @@ mgDockPanelRebuild(struct mgContext_s* c)
 		
 		mgDockPanelCheckRects(c);
 
-		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+		for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 		{
 			if (!c->dockPanel->elements[i].panelWindows)
 				continue;
@@ -516,7 +516,7 @@ mgDockPanelOnSize(struct mgContext_s* c)
 
 	if (lmbdown && !lmbdownOld)
 	{
-		for (int i2 = 0; i2 < c->dockPanel->elementsNum; ++i2)
+		for (int i2 = 0; i2 < c->dockPanel->elementsSize; ++i2)
 		{
 			c->dockPanel->elements[i2].sizeOnClick = c->dockPanel->elements[i2].info.size;
 		}
@@ -531,7 +531,7 @@ mgDockPanelOnSize(struct mgContext_s* c)
 	mgDockPanelRebuild(c);
 	mgDockPanelUpdateWindow(c);
 	
-	if (c->dockPanel->elementsNum > 1)
+	if (c->dockPanel->elementsSize > 1)
 	{
 
 	}
@@ -550,7 +550,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 			0, 0, 0);
 	}
 
-	for (int i = 0; i < c->dockPanel->elementsNum; ++i)
+	for (int i = 0; i < c->dockPanel->elementsSize; ++i)
 	{
 		c->gpu->setClipRect(&c->dockPanel->elements[i].rect);
 
@@ -583,7 +583,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 			mgDrawWindow(c->dockPanel->arrayWindows[i]->activeWindow);			
 		}
 
-		for (int i = 0; i < c->dockPanel->elementsNum; ++i)
+		for (int i = 0; i < c->dockPanel->elementsSize; ++i)
 		{
 			for (int i2 = 0; i2 < c->dockPanel->elements[i].panelWindowsSize; ++i2)
 			{
@@ -650,7 +650,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 	if (c->dockPanel->flags & mgDockPanelFlag_drawSplitterBG)
 	{
 		int reason = mgDrawRectangleReason_dockSplitterBGHor;
-		for (int i = 0; i < c->dockPanel->elementsNum; ++i)
+		for (int i = 0; i < c->dockPanel->elementsSize; ++i)
 		{
 			c->gpu->setClipRect(&c->dockPanel->elements[i].splitterRect);
 			switch (c->dockPanel->elements[i].info.where)
@@ -694,13 +694,13 @@ mgDockPanelUpdate(struct mgContext_s* c)
 		firstClick = c->input->mousePosition;
 		g_blockSplitterMode = 0;
 
-		for (int i2 = 0; i2 < c->dockPanel->elementsNum; ++i2)
+		for (int i2 = 0; i2 < c->dockPanel->elementsSize; ++i2)
 		{
 			c->dockPanel->elements[i2].sizeOnClick = c->dockPanel->elements[i2].info.size;
 		}
 	}
 
-	for (int i = 0; i < c->dockPanel->elementsNum; ++i)
+	for (int i = 0; i < c->dockPanel->elementsSize; ++i)
 	{
 		if (!c->dockPanel->elements[i].panelWindows)
 			continue;
@@ -995,8 +995,8 @@ mgInitDockPanel_f(
 		c->dockPanel->windowTabPopup = mgCreatePopup_f(popupNodes, 3, c->defaultPopupFont);
 	}
 
-	c->dockPanel->elementsNum = elementsSize + 1;
-	c->dockPanel->elements = calloc(1, sizeof(mgDockPanelElement) * c->dockPanel->elementsNum);
+	c->dockPanel->elementsSize = elementsSize + 1;
+	c->dockPanel->elements = calloc(1, sizeof(mgDockPanelElement) * c->dockPanel->elementsSize);
 	mgColorSetAsIntegerRGB(&c->dockPanel->elements[0].colorBG, 0xFFFFFF);
 	static int colorCount = 0;
 	for (int i = 0; i < elementsSize; ++i)
@@ -1024,10 +1024,10 @@ mgDockUpdateArrayWindows(struct mgContext_s* c)
 	c->dockPanel->arrayWindows = 0;
 	c->dockPanel->arrayWindowsSize = 0;
 
-	if (c->dockPanel->elementsNum < 2)
+	if (c->dockPanel->elementsSize < 2)
 		return;
 
-	for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+	for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 	{
 		mgDockPanelElement * el = &c->dockPanel->elements[i];
 		if (!el->panelWindows)
@@ -1045,7 +1045,7 @@ mgDockUpdateArrayWindows(struct mgContext_s* c)
 		c->dockPanel->arrayWindows = malloc(c->dockPanel->arrayWindowsSize * sizeof(mgDockPanelWindow*));
 		mgDockPanelWindow** wptr = c->dockPanel->arrayWindows;
 
-		for (int i = 1; i < c->dockPanel->elementsNum; ++i)
+		for (int i = 1; i < c->dockPanel->elementsSize; ++i)
 		{
 			mgDockPanelElement* el = &c->dockPanel->elements[i];
 			if (!el->panelWindows)
@@ -1166,7 +1166,7 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 	else
 	{
 		id++;
-		if ((id > 0) && (id < dck->elementsNum))
+		if ((id > 0) && (id < dck->elementsSize))
 		{
 			mgDockPanelElement* dckEl = &dck->elements[id];			
 			pnlWnd = add_new_dock_panel_window(dckEl, 0, w);
@@ -1236,10 +1236,94 @@ void dockPanel_popupCallback_makeFirst()
 
 void dockPanel_popupCallback_unpin()
 {
+	mgWindow * w = g_pnlWnd_onPopup->activeWindow;
+	
+	w->position.x = g_pnlWnd_onPopup->rect.left;
+	w->position.y = g_pnlWnd_onPopup->rect.top;
 
+	if (g_pnlWnd_onPopup->windowsSize > 1)
+	{
+		struct mgWindow_s** newWindows = malloc(sizeof(struct mgWindow_s*) * (g_pnlWnd_onPopup->windowsSize - 1));
+		for (int i = 0, i2 = 0; i < g_pnlWnd_onPopup->windowsSize; ++i)
+		{
+			if (g_pnlWnd_onPopup->windows[i] == w)
+				continue;
+
+			newWindows[i2] = g_pnlWnd_onPopup->windows[i];
+			i2++;
+		}
+
+		g_pnlWnd_onPopup->activeWindow = newWindows[0];
+
+		free(g_pnlWnd_onPopup->windows);
+		g_pnlWnd_onPopup->windows = newWindows;
+
+		g_pnlWnd_onPopup->windowsSize--;
+	}
+	else
+	{
+		g_pnlWnd_onPopup->windowsSize = 0;
+
+		free(g_pnlWnd_onPopup->windows);
+
+		g_pnlWnd_onPopup->windows = 0;
+		g_pnlWnd_onPopup->activeWindow = 0;
+
+		struct mgDockPanelElement_s* de = g_pnlWnd_onPopup->dockElement;
+		if (de->panelWindowsSize > 1)
+		{
+			/*change parents*/
+			struct mgDockPanelWindow_s* grndPrnt = g_pnlWnd_onPopup->parent;
+			for (int i = 0; i < de->panelWindowsSize; ++i)
+			{
+				if (de->panelWindows[i] == g_pnlWnd_onPopup)
+					continue;
+
+				if (de->panelWindows[i]->parent == g_pnlWnd_onPopup)
+				{
+					de->panelWindows[i]->sz = g_pnlWnd_onPopup->sz;
+					de->panelWindows[i]->where = g_pnlWnd_onPopup->where;
+					if (de->panelWindows[i]->where == 4)
+						mgRectSet(&de->panelWindows[i]->splitterRect, 0, 0, 0, 0);
+					de->panelWindows[i]->parent = grndPrnt;
+				}
+			}
+
+			/*remove g_pnlWnd_onPopup from dockElement*/
+			mgDockPanelWindow** newPanels = malloc(sizeof(mgDockPanelWindow*) * (de->panelWindowsSize - 1));
+			for (int i = 0, i2 = 0; i < de->panelWindowsSize; ++i)
+			{
+				if (de->panelWindows[i] == g_pnlWnd_onPopup)
+					continue;
+
+				newPanels[i2] = de->panelWindows[i];
+				i2++;
+			}
+			
+			free(g_pnlWnd_onPopup);
+			g_pnlWnd_onPopup = 0;
+
+			free(de->panelWindows);
+			de->panelWindows = newPanels;
+			de->panelWindowsSize--;
+		}
+		else
+		{
+			de->panelWindowsSize = 0;
+			free(de->panelWindows);
+			de->panelWindows = 0;
+		}
+	}
+	
+	w->dockPanelWindow = 0;
+	mgDockPanelRebuild(w->context);
+	mgDockUpdateArrayWindows(w->context);
+	mgDockPanelUpdateWindow(w->context);
 }
 
 void dockPanel_popupCallback_close()
 {
-
+	mgWindow* w = g_pnlWnd_onPopup->activeWindow;
+	dockPanel_popupCallback_unpin();
+	mgShowWindow_f(w, 0);
 }

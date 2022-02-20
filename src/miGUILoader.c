@@ -58,6 +58,7 @@ PFNMGDOCKADDWINDOWPROC mgDockAddWindow;
 PFNMGCREATEPOPUPPROC mgCreatePopup;
 PFNMGDESTROYPOPUPPROC mgDestroyPopup;
 PFNMGSHOWPOPUPPROC mgShowPopup;
+PFNMGSHOWWINDOWPROC mgShowWindow;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -113,6 +114,7 @@ mgLoad()
 	mgCreatePopup = mgGetProc(lib, "mgCreatePopup_f");
 	mgDestroyPopup = mgGetProc(lib, "mgDestroyPopup_f");
 	mgShowPopup = mgGetProc(lib, "mgShowPopup_f");
+	mgShowWindow = mgGetProc(lib, "mgShowWindow_f");
 
 	return lib;
 }
