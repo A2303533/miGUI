@@ -74,6 +74,8 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_windowTitlebar,
 	mgDrawRectangleReason_windowCloseButton,
 	mgDrawRectangleReason_windowCollapseButton,
+	mgDrawRectangleReason_windowScrollbarBG,
+	mgDrawRectangleReason_windowScrollbarElement,
 	mgDrawRectangleReason_rectangle,
 	mgDrawRectangleReason_buttonBG,
 	mgDrawRectangleReason_dockBG,

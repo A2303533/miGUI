@@ -210,7 +210,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 
 				c->dockPanel->elements[i].info.size =
 					(int)lerp((float)c->dockPanel->elements[i].info.size,
-						c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
+						(float)c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
 			}
 		}
 		else if (g_windowSize && (difx < -10))
@@ -222,7 +222,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 
 				c->dockPanel->elements[i].info.size =
 					(int)lerp((float)c->dockPanel->elements[i].info.size,
-						c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
+						(float)c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
 			}
 		}
 
@@ -250,7 +250,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 
 				c->dockPanel->elements[i].info.size =
 					(int)lerp((float)c->dockPanel->elements[i].info.size,
-						c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
+						(float)c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
 			}
 		}
 		else if (g_windowSize && (dify < -10))
@@ -262,7 +262,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 
 				c->dockPanel->elements[i].info.size =
 					(int)lerp((float)c->dockPanel->elements[i].info.size,
-						c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
+						(float)c->dockPanel->elements[i].sizeOnClick, c->deltaTime * g_lerpTime);
 			}
 		}
 	}
@@ -491,6 +491,7 @@ mgDockPanelUpdateWindow(struct mgContext_s* c)
 	{
 		for (int i = 0; i < c->dockPanel->arrayWindowsSize; ++i)
 		{
+			c->dockPanel->arrayWindows[i]->activeWindow->flagsInternal |= mgWindowFlag_internal_updateContentHeight;
 			mgUpdateWindow(c->dockPanel->arrayWindows[i]->activeWindow);
 		}
 	}
@@ -741,6 +742,8 @@ mgDockPanelUpdate(struct mgContext_s* c)
 			{
 				if (mgPointInRect(&c->dockPanel->elements[i].panelWindows[i2]->rect, &c->input->mousePosition))
 				{
+					mgUpdateWindow(c->dockPanel->elements[i].panelWindows[i2]->activeWindow);
+
 					for (int i3 = 0; i3 < c->dockPanel->elements[i].panelWindows[i2]->windowsSize; ++i3)
 					{
 						mgWindow* wnd = c->dockPanel->elements[i].panelWindows[i2]->windows[i3];
@@ -880,6 +883,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 	if (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
 	{
 		g_windowSize = 0;
+		needRebuild = 1;
 	}
 
 	if (g_dockpanel_splitterModeElement)
@@ -1315,6 +1319,7 @@ void dockPanel_popupCallback_unpin()
 		}
 	}
 	
+	w->flagsInternal |= mgWindowFlag_internal_updateContentHeight;
 	w->dockPanelWindow = 0;
 	mgDockPanelRebuild(w->context);
 	mgDockUpdateArrayWindows(w->context);

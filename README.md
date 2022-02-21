@@ -17,4 +17,9 @@ See demos in build/ dir.
 * Button
 * Font generation
 
+# TODO
+
+* default icons
+* save\load dockpanel
+
 

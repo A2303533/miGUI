@@ -185,6 +185,7 @@ void gui_drawRectangle(
     }
     else if (reason == mgDrawRectangleReason_buttonBG
         || reason == mgDrawRectangleReason_popupBG
+        || reason == mgDrawRectangleReason_windowScrollbarBG
         || reason == mgDrawRectangleReason_dockElementBG
         || reason == mgDrawRectangleReason_dockSplitterBGHor
         || reason == mgDrawRectangleReason_dockSplitterBGVert
@@ -230,11 +231,11 @@ void gui_drawRectangle(
         /*RoundRect(hdcMem, r.left, r.top, r.right, r.bottom, 6, 6);*/
         /*or with clip region*/
 
-        int roundRectBtm = r.bottom;
+        int roundRectBtm = r.bottom+1;
         if (reason == mgDrawRectangleReason_windowTitlebar)
             roundRectBtm += 7;
 
-        rgn = CreateRoundRectRgn(r.left, r.top, r.right, roundRectBtm, 7, 7);
+        rgn = CreateRoundRectRgn(r.left, r.top, r.right+1, roundRectBtm, 7, 7);
 
         SelectClipRgn(hdcMem, rgn);
 
@@ -463,7 +464,7 @@ void btn_newWindow_onClickLMB(struct mgElement_s* e)
 
     mgSetWindowTitle(wnd, text);
     {
-        mgPointSet(&pos, 0, 0);
+        mgPointSet(&pos, 50, 50);
         mgPointSet(&sz, 60, 20);
         mgElement* btn = mgCreateButton(wnd, &pos, &sz, wnd->titlebarText, g_win32font);
         //btn->align = mgAlignment_top;
@@ -588,8 +589,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         mgPointSet(&sz, 50, 500);
         c1.setAsIntegerRGB(0xff0000);
         c2.setAsIntegerRGB(0x0000FF);
-        mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
-        er->align = mgAlignment_center;
+       // mgElement* er = mgCreateRectangle(guiWindow1, &pos, &sz, &c1, &c2);
+       // er->align = mgAlignment_center;
 
         mgPointSet(&sz, 100, 40);
         mgPointSet(&pos, 100, 60);

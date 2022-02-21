@@ -41,6 +41,9 @@ enum mgWindowFlag
 	mgWindowFlag_canResize = 0x20,  /*default*/
 	mgWindowFlag_canDock = 0x40,
 
+	mgWindowFlag_internal_scrollMode = 0x1000000,
+	mgWindowFlag_internal_canScroll = 0x2000000,
+	mgWindowFlag_internal_updateContentHeight = 0x4000000,
 	mgWindowFlag_internal_isResizeRB = 0x8000000,
 	mgWindowFlag_internal_isExpand   = 0x10000000,
 	mgWindowFlag_internal_isCloseButton = 0x20000000,
@@ -69,7 +72,7 @@ typedef struct mgWindow_s {
 	mgPoint sizeMinimum;
 
 	int flags;
-	/*int flagsOld;*/
+	int flagsInternal;
 	int titlebarHeight; /*10*/
 
 	int cursorInfo;
@@ -103,6 +106,11 @@ typedef struct mgWindow_s {
 	struct mgDockPanelWindow_s* dockPanelWindow;
 	mgRect dockPanelTabRect;
 
+	int contentHeight;
+	int scrollbarWidth;
+	int clientHeight;
+	mgRect scrollbarBGRect;
+	mgRect scrollbarElementRect;
 } mgWindow;
 
 

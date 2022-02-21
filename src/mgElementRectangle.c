@@ -166,6 +166,17 @@ miGUI_onUpdateTransform_rectangle(mgElement* e)
 		break;
 	}
 
+	e->scrollValueWorld = e->scrollValue;
+	if (e->parent)
+		e->scrollValueWorld += e->parent->scrollValueWorld;
+
+	e->transformWorld.buildArea.top -= (int)e->scrollValueWorld;
+	e->transformWorld.buildArea.bottom -= (int)e->scrollValueWorld;
+
+	e->transformWorld.clipArea.top -= (int)e->scrollValueWorld;
+	e->transformWorld.clipArea.bottom -= (int)e->scrollValueWorld;
+
+
 	if (e->transformWorld.clipArea.left < e->parent->transformWorld.clipArea.left)
 		e->transformWorld.clipArea.left = e->parent->transformWorld.clipArea.left;
 	if (e->transformWorld.clipArea.top < e->parent->transformWorld.clipArea.top)

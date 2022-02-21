@@ -85,7 +85,8 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.popupBG, 0xE8EDFF);
 	mgColorSetAsIntegerRGB(&c->styleLight.popupText, 0x0);
 	mgColorSetAsIntegerRGB(&c->styleLight.popupHoverElementBG, 0xC1C1C1);
-	
+	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarBG, 0xD4D2EF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarElement, 0xB3C4DB);
 	
 	
 	c->functions.SetCursor_p = mgSetCursor_f;
@@ -255,13 +256,13 @@ mgUpdate_f(mgContext* c)
 			if ((cw->flags & mgWindowFlag_canDock) && cw->dockPanelWindow)
 				goto skip;
 
-			if (cw->flags & mgWindowFlag_internal_visible)
+			if (cw->flagsInternal & mgWindowFlag_internal_visible)
 			{
 				if (!c->windowUnderCursor)
 				{
 					mgUpdateWindow(cw);
 
-					if (cw->flags & mgWindowFlag_internal_isExpand)
+					if (cw->flagsInternal & mgWindowFlag_internal_isExpand)
 					{
 						mgUpdateElement(cw->rootElement);
 
@@ -301,6 +302,7 @@ mgStartFrame_f(mgContext* c)
 	c->input->mouseWheelDeltaOld = c->input->mouseWheelDelta;
 	c->input->mousePositionOld = c->input->mousePosition;
 	c->input->mouseButtonFlags1 = 0;
+	c->input->mouseWheelDelta = 0;
 
 	if ((c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN) == MG_MBFL_LMBDOWN)
 		c->input->mouseButtonFlags1 ^= MG_MBFL_LMBDOWN;
@@ -396,6 +398,8 @@ mgSetParent_f(mgElement* object, mgElement* parent)
 
 		object->parent->children = newChildren;
 	}
+
+	object->window->flagsInternal |= mgWindowFlag_internal_updateContentHeight;
 }
 
 MG_API
@@ -442,7 +446,7 @@ mgDraw_f(mgContext* c)
 			if ((cw->flags & mgWindowFlag_canDock) && cw->dockPanelWindow)
 				goto skip;
 
-			if (cw->flags & mgWindowFlag_internal_visible)
+			if (cw->flagsInternal & mgWindowFlag_internal_visible)
 				mgDrawWindow(cw);
 
 		skip:;

@@ -35,6 +35,8 @@ typedef struct mgStyle_s {
 	mgColor windowBGColorTopWindow;
 	mgColor windowTitlebarColorTopWindow;
 	mgColor windowTitlebarTextColor;
+	mgColor windowScrollbarBG;
+	mgColor windowScrollbarElement;
 	
 	mgColor dockpanelBGColor;
 	mgColor dockpanelSplitterBGColor;

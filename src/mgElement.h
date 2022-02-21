@@ -112,6 +112,9 @@ typedef struct mgElement_s {
 	*/
 	int elementState;
 
+	float scrollValue;
+	float scrollValueTarget;
+	float scrollValueWorld;
 } mgElement;
 
 #include "mgElementRectangle.h"
