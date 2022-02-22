@@ -448,11 +448,11 @@ void btn_newWindow_onClickLMB(struct mgElement_s* e)
 {
     mgPoint pos, sz;
     mgWindow* wnd = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-    wnd->icons = g_icons;
+    /*wnd->icons = g_icons;
     wnd->iconCloseButton = 0;
     wnd->iconCloseButtonMouseHover = 1;
     wnd->iconCloseButtonPress = 2;
-    wnd->iconCollapseButton = 3;
+    wnd->iconCollapseButton = 3;*/
     wnd->titlebarFont = g_win32font;
     wnd->flags ^= mgWindowFlag_collapseButton;
     wnd->flags |= mgWindowFlag_canDock;
@@ -542,12 +542,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_iconsImage.load(L"../data/icons.png");
     
-    g_icons = mgCreateIcons(&g_iconsImage, 512, 512, 5);
-    mgSetIcon(g_icons, 0, 15, 2, 11, 11); //close wnd
-    mgSetIcon(g_icons, 1, 2, 2, 11, 11); // close wnd mouse hover
-    mgSetIcon(g_icons, 2, 29, 2, 11, 11); // close wnd push
-    mgSetIcon(g_icons, 3, 42, 2, 11, 11); // collapse wnd
-    mgSetIcon(g_icons, 4, 53, 2, 11, 11); // expand wnd
+    //g_icons = mgCreateIcons(&g_iconsImage, 512, 512, 5);
+    //mgSetIcon(g_icons, 0, 15, 2, 11, 11); //close wnd
+    //mgSetIcon(g_icons, 1, 2, 2, 11, 11); // close wnd mouse hover
+    //mgSetIcon(g_icons, 2, 29, 2, 11, 11); // close wnd push
+    //mgSetIcon(g_icons, 3, 42, 2, 11, 11); // collapse wnd
+    //mgSetIcon(g_icons, 4, 53, 2, 11, 11); // expand wnd
+    mgInitDefaultIcons(g_gui_context, &g_iconsImage);
 
 
     g_win32font = gui_createFont("Segoe", 0, 10);
@@ -572,12 +573,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
 
         mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
-        guiWindow1->icons = g_icons;
+        /*guiWindow1->icons = g_icons;
         guiWindow1->iconCloseButton = 0;
         guiWindow1->iconCloseButtonMouseHover = 1;
         guiWindow1->iconCloseButtonPress = 2;
         guiWindow1->iconCollapseButton = 3;
-        guiWindow1->iconExpandButton = 4;
+        guiWindow1->iconExpandButton = 4;*/
         guiWindow1->titlebarFont = g_win32font;
         guiWindow1->titlebarHeight = 30;
         guiWindow1->flags ^= mgWindowFlag_closeButton;
@@ -606,11 +607,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         et->align = mgAlignment_rightBottom;
 
         mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-        guiWindow2->icons = g_icons;
+        /*guiWindow2->icons = g_icons;
         guiWindow2->iconCloseButton = 0;
         guiWindow2->iconCloseButtonMouseHover = 1;
         guiWindow2->iconCloseButtonPress = 2;
-        guiWindow2->iconCollapseButton = 3;
+        guiWindow2->iconCollapseButton = 3;*/
         guiWindow2->titlebarFont = g_win32font;
         guiWindow2->flags ^= mgWindowFlag_collapseButton;
         guiWindow2->flags |= mgWindowFlag_canDock;

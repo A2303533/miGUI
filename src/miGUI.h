@@ -250,6 +250,10 @@ extern PFNMGDESTROYPOPUPPROC mgDestroyPopup;
 typedef void (*PFNMGSHOWPOPUPPROC)(struct mgContext_s*, struct mgPopup_s*, mgPoint* position);
 extern PFNMGSHOWPOPUPPROC mgShowPopup;
 
+/*return 0 if bad*/
+typedef int (*PFNMGINITDEFAULTICONSPROC)(struct mgContext_s*, mgTexture);
+extern PFNMGINITDEFAULTICONSPROC mgInitDefaultIcons;
+
 #if defined(__cplusplus)
 }
 #endif
@@ -297,6 +301,8 @@ typedef struct mgContext_s {
 	mgPopup* activePopup;
 	mgFont* defaultPopupFont;
 	int cursorInPopup;
+
+	mgIconGroup* defaultIconGroup;
 
 } mgContext;
 

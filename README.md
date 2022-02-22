@@ -19,7 +19,6 @@ See demos in build/ dir.
 
 # TODO
 
-* default icons
 * save\load dockpanel
 
 

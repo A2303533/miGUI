@@ -40,9 +40,20 @@ typedef struct mgIconsNode_s {
 typedef struct mgIcons_s {
 	mgTexture texture;
 	mgPoint textureSize;
-	mgIconsNode* icons;
-	int iconsSize;
+	mgIconsNode* iconNodes;
+	int iconNodesSize;
 } mgIcons;
+
+typedef struct mgIconGroup_s {
+	mgIcons* icons;
+
+	int windowCloseButton;
+	int windowCloseButtonMouseHover;
+	int windowCloseButtonPress;
+	int windowCollapseButton;
+	int windowExpandButton;
+
+} mgIconGroup;
 
 
 #endif

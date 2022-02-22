@@ -59,6 +59,7 @@ PFNMGCREATEPOPUPPROC mgCreatePopup;
 PFNMGDESTROYPOPUPPROC mgDestroyPopup;
 PFNMGSHOWPOPUPPROC mgShowPopup;
 PFNMGSHOWWINDOWPROC mgShowWindow;
+PFNMGINITDEFAULTICONSPROC mgInitDefaultIcons;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -115,6 +116,7 @@ mgLoad()
 	mgDestroyPopup = mgGetProc(lib, "mgDestroyPopup_f");
 	mgShowPopup = mgGetProc(lib, "mgShowPopup_f");
 	mgShowWindow = mgGetProc(lib, "mgShowWindow_f");
+	mgInitDefaultIcons = mgGetProc(lib, "mgInitDefaultIcons_f");
 
 	return lib;
 }

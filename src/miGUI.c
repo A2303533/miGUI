@@ -87,8 +87,7 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.popupHoverElementBG, 0xC1C1C1);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarBG, 0xD4D2EF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarElement, 0xB3C4DB);
-	
-	
+
 	c->functions.SetCursor_p = mgSetCursor_f;
 
 	mgInitDefaultCursors(c);
@@ -103,6 +102,13 @@ mgDestroyContext_f(mgContext* c)
 	assert(c);
 
 	mgDestroyDefaultCursors(c);
+
+	if (c->defaultIconGroup)
+	{
+		if (c->defaultIconGroup->icons)
+			mgDestroyIcons_f(c->defaultIconGroup->icons);
+		free(c->defaultIconGroup);
+	}
 
 	mgWindow* cw = c->firstWindow;
 	if (cw)
@@ -149,6 +155,34 @@ mgDestroyContext_f(mgContext* c)
 	}
 
 	free(c);
+}
+
+MG_API
+int MG_C_DECL
+mgInitDefaultIcons_f(struct mgContext_s* c, mgTexture t)
+{
+	if (c->defaultIconGroup)
+		return 0;
+
+	c->defaultIconGroup = calloc(1, sizeof(mgIconGroup));
+	c->defaultIconGroup->icons = mgCreateIcons_f(t, 512, 512, 5);
+	
+	c->defaultIconGroup->windowCloseButton = 0;
+	mgSetIcon_f(c->defaultIconGroup->icons, 0, 15, 2, 11, 11); //close wnd
+
+	c->defaultIconGroup->windowCloseButtonMouseHover = 1;
+	mgSetIcon_f(c->defaultIconGroup->icons, 1, 2, 2, 11, 11); // close wnd mouse hover
+
+	c->defaultIconGroup->windowCloseButtonPress = 2;
+	mgSetIcon_f(c->defaultIconGroup->icons, 2, 29, 2, 11, 11); // close wnd push
+
+	c->defaultIconGroup->windowCollapseButton = 3;
+	mgSetIcon_f(c->defaultIconGroup->icons, 3, 42, 2, 11, 11); // collapse wnd
+
+	c->defaultIconGroup->windowExpandButton = 4;
+	mgSetIcon_f(c->defaultIconGroup->icons, 4, 53, 2, 11, 11); // expand wnd
+
+	return 1;
 }
 
 void
@@ -472,8 +506,8 @@ mgCreateIcons_f(mgTexture t, int textureSizeX, int textureSizeY, int iconNum)
 	newIc->texture = t;
 	newIc->textureSize.x = textureSizeX;
 	newIc->textureSize.y = textureSizeY;
-	newIc->iconsSize = iconNum;
-	newIc->icons = malloc(iconNum * sizeof(mgIconsNode));
+	newIc->iconNodesSize = iconNum;
+	newIc->iconNodes = malloc(iconNum * sizeof(mgIconsNode));
 	return newIc;
 }
 
@@ -482,8 +516,8 @@ void MG_C_DECL
 mgDestroyIcons_f(mgIcons* ic)
 {
 	assert(ic);
-	if (ic->icons)
-		free(ic->icons);
+	if (ic->iconNodes)
+		free(ic->iconNodes);
 	free(ic);
 }
 
@@ -492,24 +526,24 @@ void MG_C_DECL
 mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy)
 {
 	assert(ic);
-	assert(ic->iconsSize);
+	assert(ic->iconNodesSize);
 	assert(id >= 0);
-	assert(id < ic->iconsSize);
-	ic->icons[id].lt.x = px;
-	ic->icons[id].lt.y = py;
-	ic->icons[id].rb.x = px + sx;
-	ic->icons[id].rb.y = py + sy;
+	assert(id < ic->iconNodesSize);
+	ic->iconNodes[id].lt.x = px;
+	ic->iconNodes[id].lt.y = py;
+	ic->iconNodes[id].rb.x = px + sx;
+	ic->iconNodes[id].rb.y = py + sy;
 
-	ic->icons[id].sz.x = sx;
-	ic->icons[id].sz.y = sy;
+	ic->iconNodes[id].sz.x = sx;
+	ic->iconNodes[id].sz.y = sy;
 	
 	float mx = 1.f / ic->textureSize.x;
 	float my = 1.f / ic->textureSize.y;
 	
-	ic->icons[id].uv.x = px * mx;
-	ic->icons[id].uv.y = py * my;
-	ic->icons[id].uv.z = (px + sx) * mx;
-	ic->icons[id].uv.w = (py + sy) * my;
+	ic->iconNodes[id].uv.x = px * mx;
+	ic->iconNodes[id].uv.y = py * my;
+	ic->iconNodes[id].uv.z = (px + sx) * mx;
+	ic->iconNodes[id].uv.w = (py + sy) * my;
 }
 
 MG_API

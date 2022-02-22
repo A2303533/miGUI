@@ -209,7 +209,7 @@ void
 mgDrawWindow(struct mgWindow_s* w)
 {
 	assert(w);
-
+	mgIconGroup* iconGroup = w->context->defaultIconGroup;
 	mgStyle* style = w->userStyle ? w->userStyle : w->context->activeStyle;
 
 	mgColor clrbg = w->context->firstWindow->left == w ? style->windowBGColorTopWindow : style->windowBGColor;
@@ -242,17 +242,17 @@ mgDrawWindow(struct mgWindow_s* w)
 			int text_move = 0;
 			if (w->flags & mgWindowFlag_collapseButton)
 			{
-				if (w->icons)
+				if (iconGroup)
 				{
 					mgPoint pos;
 					pos.x = w->position.x + 3;
 					pos.y = w->position.y;
-					int iconID = w->iconExpandButton;
+					int iconID = iconGroup->windowExpandButton;
 
 					if (w->flagsInternal & mgWindowFlag_internal_isExpand)
-						iconID = w->iconCollapseButton;
+						iconID = iconGroup->windowCollapseButton;
 
-					mgPoint sz = w->icons->icons[iconID].sz;
+					mgPoint sz = iconGroup->icons->iconNodes[iconID].sz;
 
 
 					text_move = sz.x + 3;
@@ -270,12 +270,12 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->collapseButtonRect.right = w->collapseButtonRect.left + sz.x;
 					w->collapseButtonRect.bottom = w->collapseButtonRect.top + sz.y;
 
-					w->context->currentIcon.left = w->icons->icons[iconID].lt.x;
-					w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
-					w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
-					w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
+					w->context->currentIcon.left = iconGroup->icons->iconNodes[iconID].lt.x;
+					w->context->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
+					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
+					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, 
-						&w->collapseButtonRect, &wh, &wh, 0, w->icons->texture, 0);
+						&w->collapseButtonRect, &wh, &wh, 0, iconGroup->icons->texture, 0);
 				}
 			}
 
@@ -296,11 +296,11 @@ mgDrawWindow(struct mgWindow_s* w)
 
 			if (w->flags & mgWindowFlag_closeButton)
 			{
-				if (w->icons)
+				if (iconGroup)
 				{
 					mgColor wh;
 					mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
-					mgPoint sz = w->icons->icons[w->iconCloseButton].sz;
+					mgPoint sz = iconGroup->icons->iconNodes[iconGroup->windowCloseButton].sz;
 					mgPoint pos;
 					pos.x = w->position.x + w->size.x - sz.x - 3;
 					pos.y = w->position.y;
@@ -310,7 +310,7 @@ mgDrawWindow(struct mgWindow_s* w)
 						pos.y += (int)(tbhalfsz - ichalfsz);
 					}
 
-					int iconID = w->iconCloseButton;
+					int iconID = iconGroup->windowCloseButton;
 
 					w->closeButtonRect.left = pos.x;
 					w->closeButtonRect.top = pos.y;
@@ -319,18 +319,18 @@ mgDrawWindow(struct mgWindow_s* w)
 
 					if (w->cursorInfo == mgWindowCursorInfo_closeButton)
 					{
-						iconID = w->iconCloseButtonMouseHover;
+						iconID = iconGroup->windowCloseButtonMouseHover;
 
 					}
 					if (w->flagsInternal & mgWindowFlag_internal_isCloseButton)
-						iconID = w->iconCloseButtonPress;
+						iconID = iconGroup->windowCloseButtonPress;
 
-					w->context->currentIcon.left = w->icons->icons[iconID].lt.x;
-					w->context->currentIcon.top = w->icons->icons[iconID].lt.y;
-					w->context->currentIcon.right = w->icons->icons[iconID].sz.x;
-					w->context->currentIcon.bottom = w->icons->icons[iconID].sz.y;
+					w->context->currentIcon.left = iconGroup->icons->iconNodes[iconID].lt.x;
+					w->context->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
+					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
+					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, 
-						&w->closeButtonRect, &wh, &wh, 0, w->icons->texture, 0);
+						&w->closeButtonRect, &wh, &wh, 0, iconGroup->icons->texture, 0);
 				}
 			}
 		}
@@ -370,10 +370,10 @@ mgDrawWindow(struct mgWindow_s* w)
 			float m1 = 1.f / (float)w->contentHeight;
 			float m2 = (float)w->clientHeight * m1;
 
-			float screlsz = (int)((float)(r.bottom - r.top) * m2);
+			float screlsz = ((float)(r.bottom - r.top) * m2);
 			if (screlsz < 20.f)
 				screlsz = 20.f;
-			r.bottom = r.top + screlsz;
+			r.bottom = r.top + (int)screlsz;
 
 			//if (w->scrollValue)
 			{
@@ -385,8 +385,8 @@ mgDrawWindow(struct mgWindow_s* w)
 
 				float v2 = w->rootElement->scrollValue * m1;
 				v2 = v2 / (1.f / (float)w->clientHeight);
-				r.top += v2;
-				r.bottom += v2;
+				r.top += (int)v2;
+				r.bottom += (int)v2;
 			}
 
 			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowScrollbarElement,
@@ -428,15 +428,8 @@ mgUpdateWindow(struct mgWindow_s* w)
 			windowBtm = w->position.y + w->titlebarHeight;
 	}
 
-	/*w->rect.left = w->position.x;
-	w->rect.top = w->position.y;
-	w->rect.right = w->rect.left + w->size.x;
-	w->rect.bottom = windowBtm;*/
-
-	mgRect rct = w->rect;
 	if (w->dockPanelWindow && (w->flags & mgWindowFlag_canDock))
 	{
-		//	rct = w->dockPanelWindow->windowRect;
 		if (mgPointInRect(&w->dockPanelWindow->windowRect, &w->context->input->mousePosition))
 		{
 			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
@@ -877,13 +870,19 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 	if (w->contentHeight > w->clientHeight)
 	{
+		static int locklmb = 0;
 		if (mgPointInRect(&w->scrollbarElementRect, &w->context->input->mousePosition))
 		{
 			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			{
 				scrollOnClick = w->rootElement->scrollValue;
+				locklmb = 1;
+			}
+
 			if ((w->flagsInternal & mgWindowFlag_internal_isResizeRB) == 0)
 			{
-				if (w->context->input->mouseButtonFlags2 & MG_MBFL_LMBHOLD)
+				if ((w->context->input->mouseButtonFlags2 & MG_MBFL_LMBHOLD)
+					&& locklmb)
 					w->flagsInternal |= mgWindowFlag_internal_scrollMode;
 			}
 		}
@@ -891,7 +890,10 @@ mgUpdateWindow(struct mgWindow_s* w)
 		if (w->flagsInternal & mgWindowFlag_internal_scrollMode)
 		{
 			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+			{
 				w->flagsInternal ^= mgWindowFlag_internal_scrollMode;
+				locklmb = 0;
+			}
 
 			int y = w->context->input->mousePosition.y - firstClick.y;
 			if (w->context->input->mousePosition.y <= w->scrollbarBGRect.top)

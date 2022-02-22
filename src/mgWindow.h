@@ -87,12 +87,13 @@ typedef struct mgWindow_s {
 	wchar_t* titlebarText; /*use mgSetWindowTitle function*/
 	int titlebarTextLen;
 
-	mgIcons* icons;
+	/*mgIcons* icons;
 	int iconCloseButton;
 	int iconCloseButtonMouseHover;
 	int iconCloseButtonPress;
 	int iconCollapseButton;
-	int iconExpandButton;
+	int iconExpandButton;*/
+
 	mgRect closeButtonRect;
 	mgRect collapseButtonRect;
 	mgRect resizeRBRect;
