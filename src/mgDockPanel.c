@@ -1105,10 +1105,15 @@ add_new_dock_panel_window(mgDockPanelElement* dckEl, struct mgDockPanelWindow_s*
 
 	dckEl->panelWindowsSize++;
 	mgDockPanelWindow** pnlWindows = calloc(1, sizeof(mgDockPanelElement*) * dckEl->panelWindowsSize);
-	memcpy(pnlWindows, dckEl->panelWindows, sizeof(mgDockPanelElement*) * (dckEl->panelWindowsSize-1));
+	
+	if (dckEl->panelWindows)
+		memcpy(pnlWindows, dckEl->panelWindows, sizeof(mgDockPanelElement*) * (dckEl->panelWindowsSize-1));
+
 	pnlWindows[dckEl->panelWindowsSize - 1] = pnlWnd;
+
 	if (dckEl->panelWindows)
 		free(dckEl->panelWindows);
+
 	dckEl->panelWindows = pnlWindows;
 	return pnlWnd;
 }
@@ -1331,4 +1336,299 @@ void dockPanel_popupCallback_close()
 	mgWindow* w = g_pnlWnd_onPopup->activeWindow;
 	dockPanel_popupCallback_unpin();
 	mgShowWindow_f(w, 0);
+}
+
+struct mgDockSaveData_element {
+	int size;
+};
+struct mgDockSaveData_panel {
+	int elementIndex;
+	int panelIndex;
+	int parentIndex;
+	int where;
+	int size;
+};
+struct mgDockSaveData_window {
+	int windowID;
+	int panelIndex;
+};
+
+MG_API
+int* MG_C_DECL
+mgDockGetSaveData_f(struct mgContext_s* c, int* dataSize_out)
+{
+	assert(c);
+	assert(c->dockPanel);
+	assert(dataSize_out);
+	*dataSize_out = 0;
+
+	if (c->dockPanel->elementsSize < 2)
+		return 0;
+	
+	for (int i = 1; i < c->dockPanel->elementsSize; ++i)
+	{
+		mgDockPanelElement* el = &c->dockPanel->elements[i];
+		*dataSize_out += 1; /*0x1*/
+		*dataSize_out += 1;   /*size*/
+		for (int i2 = 0; i2 < el->panelWindowsSize; ++i2)
+		{
+			mgDockPanelWindow* pnl = el->panelWindows[i2];
+			*dataSize_out += 1; /*0x2*/
+			*dataSize_out += 1; /*	parentIndex*/
+			*dataSize_out += 1; /*	where*/
+			*dataSize_out += 1; /*	size*/
+			for (int i3 = 0; i3 < pnl->windowsSize; ++i3)
+			{
+				/*mgWindow * w = pnl->windows[i3];*/
+				*dataSize_out += 1; /*0x3*/
+				*dataSize_out += 1; /*w->id*/
+			}
+		}
+	}
+
+
+	if (!*dataSize_out)
+		return 0;
+
+	int* data = calloc(1, *dataSize_out * sizeof(int));
+	
+	int* ptr = data;
+	for (int i = 1; i < c->dockPanel->elementsSize; ++i)
+	{
+		mgDockPanelElement* el = &c->dockPanel->elements[i];
+		*ptr = 0x1; ptr++; /*0x1*/
+		*ptr = el->info.size; ptr++;   /*size*/
+		for (int i2 = 0; i2 < el->panelWindowsSize; ++i2)
+		{
+			mgDockPanelWindow* pnl = el->panelWindows[i2];
+			*ptr = 0x2; ptr++; /*0x2*/
+
+			int parentIndex = -1;
+			for (int i3 = 0; i3 < el->panelWindowsSize; ++i3){
+				mgDockPanelWindow* pnl2 = el->panelWindows[i3];
+				if (pnl2 == pnl)
+					continue;
+				if (pnl->parent == pnl2){
+					parentIndex = i3;
+					break;
+				}
+			}
+			*ptr = parentIndex; ptr++; /*	parentIndex*/
+
+			*ptr = pnl->where; ptr++; /*	where*/
+			*ptr = pnl->sz; ptr++; /*	size*/
+
+			for (int i3 = 0; i3 < pnl->windowsSize; ++i3)
+			{
+				*ptr = 0x3; ptr++; /*0x3*/
+
+				mgWindow * w = pnl->windows[i3];
+				*ptr = w->id; ptr++; /*	windowID*/
+			}
+		}
+	}
+	
+	return data;
+}
+
+void
+mgDockPanelClear(struct mgContext_s* c)
+{
+	if (!c->dockPanel)
+		return;
+
+	if (c->dockPanel->elements)
+	{
+		for (int i = 0; i < c->dockPanel->elementsSize; ++i)
+		{
+			mgDockPanelElement* el = &c->dockPanel->elements[i];
+			if (el->panelWindows)
+			{
+				for (int i2 = 0; i2 < el->panelWindowsSize; ++i2)
+				{
+					if (el->panelWindows[i2]->windows)
+					{
+						for (int i3 = 0; i3 < el->panelWindows[i2]->windowsSize; ++i3)
+						{
+							mgWindow* w = el->panelWindows[i2]->windows[i3];
+							w->dockPanelWindow = 0;
+						}
+						free(el->panelWindows[i2]->windows);
+					}
+					free(el->panelWindows[i2]);
+				}
+
+				free(el->panelWindows);
+				el->panelWindows = 0;
+				el->panelWindowsSize = 0;
+			}
+		}
+	}
+}
+
+MG_API
+void MG_C_DECL
+mgDockLoadData_f(struct mgContext_s* c, int* data, int dataSizeInInt, mgWindow* (*callback)(int windowID))
+{
+	assert(c);
+	assert(c->dockPanel);
+	assert(data);
+	assert(callback);
+	assert(dataSizeInInt > 0);
+	mgDockPanelClear(c);
+
+	/*
+	* 1. find all panels (in current element)
+	* 2. allocate memory for this panels
+	* 3. init them
+	* 4. put them in to element
+	*/
+
+	mgDockPanelWindow** panelWindows = 0;
+	int panelWindowsSize = 0;
+
+	int elementIndex = 0;
+	int panelIndex = 0;
+
+	mgDockPanelElement* dckEl = 0;
+	int* ptr = data;
+	int sz = 0;
+	while(sz < dataSizeInInt)
+	{
+
+		if (*ptr == 0x1) /*current element*/
+		{
+
+			sz++; ptr++;
+			if (sz == dataSizeInInt)
+				break;
+			
+			elementIndex++;
+			if (elementIndex < c->dockPanel->elementsSize)
+			{
+				dckEl = &c->dockPanel->elements[elementIndex];
+				dckEl->info.size = *ptr;
+			}
+			else
+			{
+				/*error?*/
+			}
+			panelIndex = 0;
+		
+			sz++; ptr++;
+			if (sz == dataSizeInInt)
+				break;
+			
+		panel0x2:;
+			/*next is panel window or other element*/
+			if (*ptr == 0x2)
+			{
+				if (elementIndex)
+				{
+					sz++; ptr++;
+					if (sz == dataSizeInInt)
+						break;
+
+					int parentIndex = 0;
+					int where = 0;
+					int size = 0;
+
+					parentIndex = *ptr;
+					
+					sz++; ptr++;
+					if (sz == dataSizeInInt)
+						break;
+
+					where = *ptr;
+
+					sz++; ptr++;
+					if (sz == dataSizeInInt)
+						break;
+
+					size = *ptr;
+
+					mgDockPanelWindow* dckPnl = 0;
+
+				window0x3:;
+					sz++; ptr++;
+					if (sz == dataSizeInInt)
+						break;
+					if (*ptr == 0x3)
+					{
+						int windowID = -1;
+						
+						sz++; ptr++;
+						if (sz == dataSizeInInt)
+							break;
+						windowID = *ptr;
+
+						mgWindow* window = callback(windowID);
+						if (window)
+						{
+							if (!dckPnl)
+							{
+								dckPnl = add_new_dock_panel_window(dckEl, 0, window);
+								dckPnl->where = where;
+								dckPnl->sz = size;
+								dckPnl->parentIndex = parentIndex;
+							}
+							else
+							{
+								put_new_window_to_panel(dckPnl, window, 0);
+							}
+							window->dockPanelWindow = dckPnl;
+						}
+
+						goto window0x3;
+					}
+					else
+					{
+						continue;
+					}
+				}
+			}
+			else
+			{
+				continue;
+			}
+		}
+		else
+		{
+			if (*ptr == 0x2)
+				goto panel0x2;
+		}
+	
+		if (sz == dataSizeInInt)
+			break;
+		sz++; ptr++;
+	}
+
+	for (int i = 1; i < c->dockPanel->elementsSize; ++i)
+	{
+		mgDockPanelElement* dckEl = &c->dockPanel->elements[i];
+		for (int i2 = 0; i2 < dckEl->panelWindowsSize; ++i2)
+		{
+			mgDockPanelWindow* dckPnl = dckEl->panelWindows[i2];
+			if (dckPnl->parentIndex != -1)
+			{
+				/*find parent*/
+				for (int i3 = 0; i3 < dckEl->panelWindowsSize; ++i3)
+				{
+					mgDockPanelWindow* dckPnl2 = dckEl->panelWindows[i3];
+					if (dckPnl == dckPnl2)
+						continue;
+
+					if (dckPnl->parentIndex == i3)
+					{
+						dckPnl->parent = dckPnl2;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	mgDockPanelRebuild(c);
+	mgDockUpdateArrayWindows(c);
+	mgDockPanelUpdateWindow(c);
 }

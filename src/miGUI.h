@@ -254,6 +254,32 @@ extern PFNMGSHOWPOPUPPROC mgShowPopup;
 typedef int (*PFNMGINITDEFAULTICONSPROC)(struct mgContext_s*, mgTexture);
 extern PFNMGINITDEFAULTICONSPROC mgInitDefaultIcons;
 
+/*return int* , use free().
+* Everything is in int
+*	element - 0x1
+*       size
+*       panelWindow - 0x2
+*			parentIndex
+*			where
+*			size
+*			window - 0x3
+*				windowID
+* *			window - 0x3
+*				windowID
+* 
+* Every mgWindow in dockpanel must have unique ID.
+* dataSize_out in int, use `* sizeof(int)`
+*/
+typedef int* (*PFNMGDOCKGETSAVEDATAPROC)(struct mgContext_s*, int* dataSize_out);
+extern PFNMGDOCKGETSAVEDATAPROC mgDockGetSaveData;
+
+/*
+* callback must return window with same id
+*/
+typedef void (*PFNMGDOCKLOADDATAPROC)(struct mgContext_s*, int* data, int dataSizeInInt, mgWindow*(*callback)(int windowID));
+extern PFNMGDOCKLOADDATAPROC mgDockLoadData;
+
+
 #if defined(__cplusplus)
 }
 #endif

@@ -22,6 +22,17 @@ HRAWINPUT g_rawInputData[0xff];
 mgFont* g_win32font = 0;
 mgIcons* g_icons = 0;
 
+mgWindow* test_guiWindow1 = 0;
+mgWindow* test_guiWindow2 = 0;
+mgWindow* test_guiWindow3 = 0;
+mgWindow* test_guiWindow4 = 0;
+mgWindow* test_guiWindow5 = 0;
+#define WindowID_1 1
+#define WindowID_2 2
+#define WindowID_3 3
+#define WindowID_4 4
+#define WindowID_5 5
+
 HDC g_dc = 0;
 HWND g_hwnd = 0;
 RECT g_windowRect;
@@ -444,32 +455,61 @@ void rect_onReleaseLMB(struct mgElement_s* e) {
     text->color.setAsIntegerBGR(0xFFFFFF);
 }
 
-void btn_newWindow_onClickLMB(struct mgElement_s* e)
+void saveDock(struct mgElement_s* e)
 {
-    mgPoint pos, sz;
-    mgWindow* wnd = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-    /*wnd->icons = g_icons;
-    wnd->iconCloseButton = 0;
-    wnd->iconCloseButtonMouseHover = 1;
-    wnd->iconCloseButtonPress = 2;
-    wnd->iconCollapseButton = 3;*/
-    wnd->titlebarFont = g_win32font;
-    wnd->flags ^= mgWindowFlag_collapseButton;
-    wnd->flags |= mgWindowFlag_canDock;
-    
-    static int index = 0;
-    index++;
-    wchar_t text[512];
-    wsprintfW(text, L"Window%i", index);
-
-    mgSetWindowTitle(wnd, text);
+    int saveDataSize = 0;
+    int* saveData = mgDockGetSaveData(g_gui_context, &saveDataSize);
+    if (saveData)
     {
-        mgPointSet(&pos, 50, 50);
-        mgPointSet(&sz, 60, 20);
-        mgElement* btn = mgCreateButton(wnd, &pos, &sz, wnd->titlebarText, g_win32font);
-        //btn->align = mgAlignment_top;
+        HANDLE f = CreateFile(L"dock.data", GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
+        if (f)
+        {
+            WriteFile(f, (void*)saveData, saveDataSize * sizeof(int), 0, 0);
+            CloseHandle(f);
+        }
+        free(saveData);
     }
 }
+
+mgWindow* loadDockCallback(int windowID)
+{
+    switch (windowID)
+    {
+    case WindowID_1:
+        return test_guiWindow1;
+    case WindowID_2:
+        return test_guiWindow2;
+    case WindowID_3:
+        return test_guiWindow3;
+    case WindowID_4:
+        return test_guiWindow4;
+    case WindowID_5:
+        return test_guiWindow5;
+    }
+    return 0;
+}
+void loadDock(struct mgElement_s* e)
+{
+
+    HANDLE f = CreateFile(L"dock.data", GENERIC_READ, FILE_SHARE_READ, 0, OPEN_ALWAYS, 0, 0);
+    if (f)
+    {
+        int fileSize = GetFileSize(f, 0);
+        int* data = (int*)malloc(fileSize);
+        if (data)
+        {
+            ReadFile(f, (void*)data, fileSize, 0, 0);
+        }
+
+        CloseHandle(f);
+
+        mgDockLoadData(g_gui_context, data, fileSize / 4, loadDockCallback);
+
+        if (data)
+            free(data);
+    }
+}
+
 
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 
@@ -572,17 +612,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             //g_gui_context->dockPanel->elements[i].flags |= mgDockPanelElementFlag_drawBG;
         }
 
-        mgWindow* guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
-        /*guiWindow1->icons = g_icons;
-        guiWindow1->iconCloseButton = 0;
-        guiWindow1->iconCloseButtonMouseHover = 1;
-        guiWindow1->iconCloseButtonPress = 2;
-        guiWindow1->iconCollapseButton = 3;
-        guiWindow1->iconExpandButton = 4;*/
-        guiWindow1->titlebarFont = g_win32font;
-        guiWindow1->titlebarHeight = 30;
-        guiWindow1->flags ^= mgWindowFlag_closeButton;
-        mgSetWindowTitle(guiWindow1, L"Window1");
+        test_guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
+        test_guiWindow1->titlebarFont = g_win32font;
+        test_guiWindow1->titlebarHeight = 30;
+        test_guiWindow1->flags ^= mgWindowFlag_closeButton;
+        test_guiWindow1->flags |= mgWindowFlag_canDock;
+        test_guiWindow1->id = WindowID_1;
+        mgSetWindowTitle(test_guiWindow1, L"Window1");
         
         mgPoint pos, sz;
         mgColor c1, c2;
@@ -595,35 +631,78 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         mgPointSet(&sz, 100, 40);
         mgPointSet(&pos, 100, 60);
-        mgElement* eb = mgCreateButton(guiWindow1, &pos, &sz, L"Button", g_win32font);
+        mgElement* eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Button", g_win32font);
         eb->align = mgAlignment_rightBottom;
 
         mgPointSet(&pos, 100, 120);
-        eb = mgCreateButton(guiWindow1, &pos, &sz, L"New window", g_win32font);
-        eb->onClickLMB = btn_newWindow_onClickLMB;
+        eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Save dock", g_win32font);
+        eb->onClickLMB = saveDock;
+
+        mgPointSet(&pos, 100, 160);
+        eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Load dock", g_win32font);
+        eb->onClickLMB = loadDock;
 
         mgPointSet(&pos, 100, 100);
-        mgElement* et = mgCreateText(guiWindow1, &pos, L"Text", g_win32font);
+        mgElement* et = mgCreateText(test_guiWindow1, &pos, L"Text", g_win32font);
         et->align = mgAlignment_rightBottom;
 
-        mgWindow* guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-        /*guiWindow2->icons = g_icons;
-        guiWindow2->iconCloseButton = 0;
-        guiWindow2->iconCloseButtonMouseHover = 1;
-        guiWindow2->iconCloseButtonPress = 2;
-        guiWindow2->iconCollapseButton = 3;*/
-        guiWindow2->titlebarFont = g_win32font;
-        guiWindow2->flags ^= mgWindowFlag_collapseButton;
-        guiWindow2->flags |= mgWindowFlag_canDock;
-        guiWindow2->sizeMinimum.x = 200;
-        guiWindow2->sizeMinimum.y = 100;
-        mgSetWindowTitle(guiWindow2, L"_canDock");
+        test_guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
+        test_guiWindow2->titlebarFont = g_win32font;
+        test_guiWindow2->flags ^= mgWindowFlag_collapseButton;
+        test_guiWindow2->flags |= mgWindowFlag_canDock;
+        test_guiWindow2->sizeMinimum.x = 200;
+        test_guiWindow2->sizeMinimum.y = 100;
+        test_guiWindow2->id = WindowID_2;
+        mgSetWindowTitle(test_guiWindow2, L"_canDock");
         {
-            mgPointSet(&pos, 0, 0);
             mgPointSet(&sz, 160, 20);
-            mgElement* btn = mgCreateButton(guiWindow2, &pos, &sz, L"Button", g_win32font);
-        //    btn->align = mgAlignment_top;
+            mgPointSet(&pos, 0, 0);
+            mgElement* btn = mgCreateButton(test_guiWindow2, &pos, &sz, L"Button", g_win32font);
         }
+
+        test_guiWindow3 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
+        test_guiWindow3->titlebarFont = g_win32font;
+        test_guiWindow3->flags ^= mgWindowFlag_collapseButton;
+        test_guiWindow3->flags |= mgWindowFlag_canDock;
+        test_guiWindow3->sizeMinimum.x = 200;
+        test_guiWindow3->sizeMinimum.y = 100;
+        test_guiWindow3->id = WindowID_3;
+        mgSetWindowTitle(test_guiWindow3, L"_canDock3");
+        {
+            mgPointSet(&sz, 160, 20);
+            mgPointSet(&pos, 0, 0);
+            mgElement* btn = mgCreateButton(test_guiWindow3, &pos, &sz, L"Button", g_win32font);
+        }
+
+        test_guiWindow4 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
+        test_guiWindow4->titlebarFont = g_win32font;
+        test_guiWindow4->flags ^= mgWindowFlag_collapseButton;
+        test_guiWindow4->flags |= mgWindowFlag_canDock;
+        test_guiWindow4->sizeMinimum.x = 200;
+        test_guiWindow4->sizeMinimum.y = 100;
+        test_guiWindow4->id = WindowID_4;
+        mgSetWindowTitle(test_guiWindow4, L"_canDock4");
+        {
+            mgPointSet(&sz, 160, 20);
+            mgPointSet(&pos, 0, 0);
+            mgElement* btn = mgCreateButton(test_guiWindow4, &pos, &sz, L"Button", g_win32font);
+        }
+
+        test_guiWindow5 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
+        test_guiWindow5->titlebarFont = g_win32font;
+        test_guiWindow5->flags ^= mgWindowFlag_collapseButton;
+        test_guiWindow5->flags |= mgWindowFlag_canDock;
+        test_guiWindow5->sizeMinimum.x = 200;
+        test_guiWindow5->sizeMinimum.y = 100;
+        test_guiWindow5->id = WindowID_5;
+        mgSetWindowTitle(test_guiWindow5, L"_canDock5");
+        {
+            mgPointSet(&sz, 160, 20);
+            mgPointSet(&pos, 0, 0);
+            mgElement* btn = mgCreateButton(test_guiWindow5, &pos, &sz, L"Button", g_win32font);
+        }
+        
+
         //guiWindow2->flags ^= mgWindowFlag_withTitlebar;
         //guiWindow2->flags ^= mgWindowFlag_canMove;
 

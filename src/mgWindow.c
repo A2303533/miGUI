@@ -108,13 +108,14 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 		| mgWindowFlag_closeButton
 		| mgWindowFlag_canResize
 		| mgWindowFlag_collapseButton;
+	
+	newWindow->id = -1;
 
 	newWindow->scrollbarWidth = 12;
 	newWindow->titlebarHeight = 17;
 	newWindow->flagsInternal
 		= mgWindowFlag_internal_visible
 		| mgWindowFlag_internal_isExpand;
-	/*newWindow->uniqueID = uniqueID++;*/
 	
 	newWindow->left = newWindow;
 	newWindow->right = newWindow;

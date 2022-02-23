@@ -507,8 +507,8 @@ public:
         m_d3d11DevCon->RSSetScissorRects(1, &sr);
 
         D3D11_VIEWPORT viewport;
-        viewport.Width = m_windowSize.x;
-        viewport.Height = m_windowSize.y;
+        viewport.Width = (float)m_windowSize.x;
+        viewport.Height = (float)m_windowSize.y;
         viewport.MinDepth = 0.0f;
         viewport.MaxDepth = 1.0f;
         viewport.TopLeftX = 0.0f;
@@ -825,10 +825,10 @@ void gui_drawRectangle(
     mgVec4* UVRegion)
 {
     mgVec4 corners;
-    corners.x = rct->left;
-    corners.y = rct->top;
-    corners.z = rct->right;
-    corners.w = rct->bottom;
+    corners.x = (float)rct->left;
+    corners.y = (float)rct->top;
+    corners.z = (float)rct->right;
+    corners.w = (float)rct->bottom;
     g_d3d11->DrawRectangle(corners, *color1, *color2, &g_proj, 0, 0);
 }
 
@@ -851,8 +851,8 @@ void gui_drawText(
             _position.x += glyph->underhang;
 
             mgVec4 corners;
-            corners.x = _position.x;
-            corners.y = _position.y;
+            corners.x = (float)_position.x;
+            corners.y = (float)_position.y;
 
             corners.z = corners.x + glyph->width;
             corners.w = corners.y + glyph->height;

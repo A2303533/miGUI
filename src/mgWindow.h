@@ -64,6 +64,8 @@ enum mgWindowCursorInfo
 typedef struct mgWindow_s {
 	mgStyle* userStyle; /*optional*/
 
+	int id;
+
 	mgPoint position;
 	mgPoint size;
 	mgRect  rect; /*auto calculation in mgUpdateWindow*/
@@ -80,19 +82,10 @@ typedef struct mgWindow_s {
 
 	struct mgContext_s* context;
 	struct mgElement_s* rootElement;
-	/*struct mgElementNode_s* children;
-	int childrenCount;*/
 
 	struct mgFont_s* titlebarFont; /*titlebar text active only with font*/
 	wchar_t* titlebarText; /*use mgSetWindowTitle function*/
 	int titlebarTextLen;
-
-	/*mgIcons* icons;
-	int iconCloseButton;
-	int iconCloseButtonMouseHover;
-	int iconCloseButtonPress;
-	int iconCollapseButton;
-	int iconExpandButton;*/
 
 	mgRect closeButtonRect;
 	mgRect collapseButtonRect;

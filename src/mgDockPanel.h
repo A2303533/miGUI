@@ -40,9 +40,8 @@ typedef struct mgDockPanelWindow_s {
 	*/
 	int where;
 
-	/*int id;
-	int parentId;*/
 	struct mgDockPanelWindow_s* parent;
+	int parentIndex;/*only for loading*/
 
 	struct mgWindow_s** windows;
 	int windowsSize;

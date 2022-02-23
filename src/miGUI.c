@@ -40,6 +40,7 @@ void mgDockPanelOnSize(struct mgContext_s* c);
 void mgDockPanelUpdate(struct mgContext_s* c);
 void mgDrawPopup(struct mgContext_s* c, mgPopup* p);
 void mgUpdatePopup(struct mgContext_s* c, mgPopup* p);
+void mgDockPanelClear(struct mgContext_s* c);
 
 void 
 mgDestroyElement_f(mgElement* e)
@@ -132,25 +133,10 @@ mgDestroyContext_f(mgContext* c)
 			mgDestroyPopup_f(c->dockPanel->windowTabPopup);
 		}
 
-		if (c->dockPanel->elements)
-		{
-			for (int i = 0; i < c->dockPanel->elementsSize; ++i)
-			{
-				mgDockPanelElement* el = &c->dockPanel->elements[i];
-				if (el->panelWindows)
-				{
-					for (int i2 = 0; i2 < el->panelWindowsSize; ++i2)
-					{
-						if(el->panelWindows[i2]->windows)
-							free(el->panelWindows[i2]->windows);
-						free(el->panelWindows[i2]);
-					}
-					free(el->panelWindows);
-				}
-			}
+		mgDockPanelClear(c);
 
+		if (c->dockPanel->elements)
 			free(c->dockPanel->elements);
-		}
 		free(c->dockPanel);
 	}
 
