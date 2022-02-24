@@ -149,7 +149,8 @@ void gui_drawRectangle(
     if (texture)
     {
         if (reason == mgDrawRectangleReason_windowCloseButton
-            || reason == mgDrawRectangleReason_windowCollapseButton)
+            || reason == mgDrawRectangleReason_windowCollapseButton
+            || reason == mgDrawRectangleReason_popupNextIcon)
         {
             MyImage* myimg = (MyImage*)texture;
             Gdiplus::Graphics graphics(hdcMem);

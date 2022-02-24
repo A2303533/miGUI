@@ -44,7 +44,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 
 	mgPoint pt;
 	mgPoint pt2;
-	pt.x = p->rect.left + p->indent.x;
+	pt.x = p->rect.left + p->indent.x + p->iconLeftWidth;
 	pt.y = p->rect.top + p->indent.y;
 	for (int i = 0; i < p->itemsSize; ++i)
 	{
@@ -89,6 +89,38 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 					p->items[i].shortcutTextLen,
 					&c->activeStyle->popupTextShortcut,
 					p->font);
+			}
+
+			if (p->items[i].info.subMenu)
+			{
+				mgIconGroup* iconGroup = c->defaultIconGroup;
+				int iconID = iconGroup->popupNext;
+				c->currentIcon.left =  iconGroup->icons->iconNodes[iconID].lt.x;
+				c->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
+				c->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
+				c->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
+
+				mgColor wh;
+				mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
+
+
+				mgRect r;
+				r.left = p->rect.right - iconGroup->icons->iconNodes[iconID].sz.x;
+				r.right = p->rect.right;
+				r.top = pt.y;
+				r.bottom = pt.y + 11;
+				
+				if (p->itemHeight && iconGroup->icons->iconNodes[iconID].sz.x)
+				{
+					int ihHalf = p->itemHeight / 2;
+					int szHalf = iconGroup->icons->iconNodes[iconID].sz.x / 2;
+
+					r.top += ihHalf - szHalf;
+					r.bottom += ihHalf - szHalf;
+				}
+
+				c->gpu->drawRectangle(mgDrawRectangleReason_popupNextIcon,
+					&r, &wh, &wh, 0, iconGroup->icons->texture, 0);
 			}
 
 			pt.y += p->itemHeight;
@@ -144,13 +176,17 @@ mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 				}
 				pt.y += p->itemHeight;
 			}
+			/*p->items[i].rect = r;*/
 		}
 
 		if (p->nodeUnderCursor && (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP))
 		{
-			if (p->nodeUnderCursor->info.callback)
-				p->nodeUnderCursor->info.callback();
-			mgShowPopup_f(c, 0, 0);
+			if (!p->nodeUnderCursor->info.subMenu)
+			{
+				if (p->nodeUnderCursor->info.callback)
+					p->nodeUnderCursor->info.callback();
+				mgShowPopup_f(c, 0, 0);
+			}
 		}
 	}
 }
@@ -170,6 +206,8 @@ mgCreatePopup_f(struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt)
 	newPopup->indent.x = 5;
 	newPopup->indent.y = 5;
 	newPopup->textShortcutTextIndent = 20;
+	newPopup->iconRightWidth = 16;
+	newPopup->iconLeftWidth = 18;
 
 	for (int i = 0; i < arrSize; ++i)
 	{
@@ -263,7 +301,24 @@ mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 				}
 			}
 
-			p->rect.right = p->rect.left + p->maxTextWidth + p->maxShortcutTextWidth + p->textShortcutTextIndent + p->indent.x + p->indent.x;
+			p->rect.right = p->rect.left 
+				+ p->maxTextWidth 
+				+ p->maxShortcutTextWidth 
+				+ p->textShortcutTextIndent 
+				+ p->iconLeftWidth
+				+ p->indent.x 
+				+ p->indent.x
+				+ p->iconRightWidth;
+
+			/*for (int i = 0; i < p->itemsSize; ++i)
+			{
+				if (p->items[i].info.type != mgPopupItemType_separator)
+				{
+					p->items[i].rect.left = p->rect.left;
+					p->items[i].rect.right = p->rect.right;
+				}
+			}*/
+
 			p->rect.bottom = p->rect.top + (p->itemHeight * notSeparatorItems) + p->indent.y + p->indent.y;
 			p->rect.bottom += 5 * separatorItems;
 		}

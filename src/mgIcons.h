@@ -52,6 +52,8 @@ typedef struct mgIconGroup_s {
 	int windowCloseButtonPress;
 	int windowCollapseButton;
 	int windowExpandButton;
+	
+	int popupNext;
 
 } mgIconGroup;
 

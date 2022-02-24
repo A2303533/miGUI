@@ -54,6 +54,7 @@ struct mgPopupItem_s {
 	int shortcutTextLen;
 	int indentForShortcutText;
 	int shortcutTextWidth;
+	/*mgRect rect;*/
 };
 
 typedef struct mgPopup_s {
@@ -72,6 +73,9 @@ typedef struct mgPopup_s {
 	int maxTextWidth;/*internal, in pixels*/
 	int maxShortcutTextWidth;/*internal, in pixels*/
 	int textShortcutTextIndent;/*space between text and shortcutText*/
+
+	int iconLeftWidth;
+	int iconRightWidth;
 } mgPopup;
 
 #endif

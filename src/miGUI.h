@@ -91,6 +91,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_popupBG,
 	mgDrawRectangleReason_popupHoverElement,
 	mgDrawRectangleReason_popupSeparator,
+	mgDrawRectangleReason_popupNextIcon,
 };
 
 enum mgDrawTextReason
