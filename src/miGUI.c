@@ -85,9 +85,12 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabActiveWindowTitleBG, 0xB2D2FF);
 	mgColorSetAsIntegerRGB(&c->styleLight.popupBG, 0xE8EDFF);
 	mgColorSetAsIntegerRGB(&c->styleLight.popupText, 0x0);
+	mgColorSetAsIntegerRGB(&c->styleLight.popupTextShortcut, 0x555555);	
 	mgColorSetAsIntegerRGB(&c->styleLight.popupHoverElementBG, 0xC1C1C1);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarBG, 0xD4D2EF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarElement, 0xB3C4DB);
+	mgColorSetAsIntegerRGB(&c->styleLight.popupSeparator, 0xC1C1C1);
+	
 
 	c->functions.SetCursor_p = mgSetCursor_f;
 

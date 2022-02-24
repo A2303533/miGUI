@@ -168,8 +168,8 @@ mgDestroyWindow_f(struct mgWindow_s* w)
 	if (w->rootElement)
 		mgDestroyElement_f(w->rootElement);
 
-	if (w->titlebarText)
-		free(w->titlebarText);
+	/*if (w->titlebarText)
+		free(w->titlebarText);*/
 
 	free(w);
 }
@@ -956,8 +956,8 @@ mgSetWindowTitle_f(struct mgWindow_s* w, const wchar_t* t)
 	if (t)
 	{
 		newLen = wcslen(t);
-
-		if (w->titlebarText)
+		w->titlebarText = t;
+		/*if (w->titlebarText)
 		{
 			int oldLen = wcslen(w->titlebarText);
 			if (newLen > oldLen)
@@ -976,7 +976,7 @@ mgSetWindowTitle_f(struct mgWindow_s* w, const wchar_t* t)
 	else if(w->titlebarText)
 	{
 		free(w->titlebarText);
-		w->titlebarText = 0;
+		w->titlebarText = 0;*/
 	}
 	w->titlebarTextLen = newLen;
 }

@@ -990,13 +990,14 @@ mgInitDockPanel_f(
 
 	if (c->defaultPopupFont)
 	{
-		struct mgPopupNode_s popupNodes[] =
+		struct mgPopupItemInfo_s popupItems[] =
 		{
-			{L"Make first", 0, 0, dockPanel_popupCallback_makeFirst},
-			{L"Unpin\\remove", 0, 0, dockPanel_popupCallback_unpin},
-			{L"Close\\hide", 0, 0, dockPanel_popupCallback_close},
+			{L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A"},
+			{0, 0, 0, mgPopupItemType_separator, 0, 0},
+			{L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove"},
+			{L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide"},
 		};
-		c->dockPanel->windowTabPopup = mgCreatePopup_f(popupNodes, 3, c->defaultPopupFont);
+		c->dockPanel->windowTabPopup = mgCreatePopup_f(popupItems, 4, c->defaultPopupFont);
 	}
 
 	c->dockPanel->elementsSize = elementsSize + 1;
@@ -1577,6 +1578,7 @@ mgDockLoadData_f(struct mgContext_s* c, int* data, int dataSizeInInt, mgWindow* 
 								put_new_window_to_panel(dckPnl, window, 0);
 							}
 							window->dockPanelWindow = dckPnl;
+							window->flagsInternal |= mgWindowFlag_internal_visible;
 						}
 
 						goto window0x3;

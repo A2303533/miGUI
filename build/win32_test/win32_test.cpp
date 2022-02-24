@@ -203,6 +203,7 @@ void gui_drawRectangle(
         || reason == mgDrawRectangleReason_dockPanelSplitterBGHor
         || reason == mgDrawRectangleReason_dockPanelSplitterBGVert
         || reason == mgDrawRectangleReason_dockBG
+        || reason == mgDrawRectangleReason_popupSeparator
         || reason == mgDrawRectangleReason_dockTabWindowTitle
         || reason == mgDrawRectangleReason_dockTabBG)
     {
@@ -226,6 +227,13 @@ void gui_drawRectangle(
             DeleteObject(brsh2);
 
             SelectObject(hdcMem, brsh);
+        }
+        else if (reason == mgDrawRectangleReason_popupSeparator)
+        {
+            r.top += 2;
+            r.bottom -= 2;
+            r.left += 2;
+            r.right -= 2;
         }
         else
         {

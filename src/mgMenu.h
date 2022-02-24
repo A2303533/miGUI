@@ -26,32 +26,25 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_STYLE_H_
-#define _MG_STYLE_H_
+#ifndef _MG_MENU_H_
+#define _MG_MENU_H_
 
-typedef struct mgStyle_s {
-	mgColor windowBGColor;
-	mgColor windowTitlebarColor;
-	mgColor windowBGColorTopWindow;
-	mgColor windowTitlebarColorTopWindow;
-	mgColor windowTitlebarTextColor;
-	mgColor windowScrollbarBG;
-	mgColor windowScrollbarElement;
-	
-	mgColor dockpanelBGColor;
-	mgColor dockpanelSplitterBGColor;
-	mgColor dockpanelPanelSplitterBGColor;
-	mgColor dockpanelWindowToDockColor;
-	mgColor dockpanelTabBGColor;
-	mgColor dockpanelTabWindowTitleBG;
-	mgColor dockpanelTabActiveWindowTitleBG;
-	
-	mgColor popupBG;
-	mgColor popupText;
-	mgColor popupTextShortcut;
-	mgColor popupHoverElementBG;
-	mgColor popupSeparator;
+typedef struct mgMenuItem_s {
+	const wchar_t* text;
+	int textLen;
 
-} mgStyle;
+	mgPopup* popup;
+} mgMenuItem;
+
+typedef struct mgMenu_s {
+	mgMenuItem* items;
+	int itemsSize;
+
+	/*current*/
+	int height;
+
+	/*indent from left side*/
+	int indent;
+} mgMenu;
 
 #endif

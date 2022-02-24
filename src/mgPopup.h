@@ -31,26 +31,47 @@
 
 struct mgPopup_s;
 
-struct mgPopupNode_s {
-	wchar_t* text;
-	int textLen;
+enum mgPopupItemType
+{
+	mgPopupItemType_default = 0,
+	mgPopupItemType_separator,
+	mgPopupItemType_check,
+	mgPopupItemType_radio, /*use separator for groups*/
+};
 
+struct mgPopupItemInfo_s {
+	const wchar_t* text;
 	struct mgPopup_s* subMenu; /*if subMenu then skip callback*/
-
 	void(*callback)();
+	int type;
+	int isChecked;
+	const wchar_t* shortcutText;
+};
+
+struct mgPopupItem_s {
+	struct mgPopupItemInfo_s info;
+	int textLen;
+	int shortcutTextLen;
+	int indentForShortcutText;
+	int shortcutTextWidth;
 };
 
 typedef struct mgPopup_s {
 	mgRect rect;
+
 	mgPoint indent;
 	int itemHeight;
 	mgFont* font;
 
-	struct mgPopupNode_s* nodes;
-	int nodesSize;
+	struct mgPopupItem_s* items;
+	int itemsSize;
 
-	struct mgPopupNode_s* nodeUnderCursor;
+	struct mgPopupItem_s* nodeUnderCursor;
 	mgRect nodeUnderCursorRect;
+
+	int maxTextWidth;/*internal, in pixels*/
+	int maxShortcutTextWidth;/*internal, in pixels*/
+	int textShortcutTextIndent;/*space between text and shortcutText*/
 } mgPopup;
 
 #endif

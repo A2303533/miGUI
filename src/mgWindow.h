@@ -84,7 +84,7 @@ typedef struct mgWindow_s {
 	struct mgElement_s* rootElement;
 
 	struct mgFont_s* titlebarFont; /*titlebar text active only with font*/
-	wchar_t* titlebarText; /*use mgSetWindowTitle function*/
+	const wchar_t* titlebarText; /*use mgSetWindowTitle function*/
 	int titlebarTextLen;
 
 	mgRect closeButtonRect;

@@ -43,25 +43,56 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 
 
 	mgPoint pt;
+	mgPoint pt2;
 	pt.x = p->rect.left + p->indent.x;
 	pt.y = p->rect.top + p->indent.y;
-	for (int i = 0; i < p->nodesSize; ++i)
+	for (int i = 0; i < p->itemsSize; ++i)
 	{
-		if (&p->nodes[i] == p->nodeUnderCursor)
+		if (p->items[i].info.type == mgPopupItemType_separator)
 		{
-			c->gpu->drawRectangle(mgDrawRectangleReason_popupHoverElement,
-				&p->nodeUnderCursorRect,
-				&c->activeStyle->popupHoverElementBG,
-				&c->activeStyle->popupHoverElementBG,
+			mgRect r;
+			r.left = p->rect.left;
+			r.top = pt.y;
+			r.right = p->rect.right;
+			r.bottom = r.top + 5;
+			c->gpu->drawRectangle(mgDrawRectangleReason_popupSeparator,
+				&r,
+				&c->activeStyle->popupSeparator,
+				&c->activeStyle->popupSeparator,
 				0, 0, 0);
+			pt.y += 5;
 		}
+		else
+		{
 
-		c->gpu->drawText(mgDrawTextReason_popup, &pt,
-			p->nodes[i].text,
-			p->nodes[i].textLen,
-			&c->activeStyle->popupText,
-			p->font);
-		pt.y += p->itemHeight;
+			if (&p->items[i] == p->nodeUnderCursor)
+			{
+				c->gpu->drawRectangle(mgDrawRectangleReason_popupHoverElement,
+					&p->nodeUnderCursorRect,
+					&c->activeStyle->popupHoverElementBG,
+					&c->activeStyle->popupHoverElementBG,
+					0, 0, 0);
+			}
+
+			c->gpu->drawText(mgDrawTextReason_popup, &pt,
+				p->items[i].info.text,
+				p->items[i].textLen,
+				&c->activeStyle->popupText,
+				p->font);
+
+			if (p->items[i].info.shortcutText)
+			{
+				pt2 = pt;
+				pt2.x += p->items[i].indentForShortcutText;
+				c->gpu->drawText(mgDrawTextReason_popupShortcut, &pt2,
+					p->items[i].info.shortcutText,
+					p->items[i].shortcutTextLen,
+					&c->activeStyle->popupTextShortcut,
+					p->font);
+			}
+
+			pt.y += p->itemHeight;
+		}
 	}
 }
 
@@ -93,23 +124,32 @@ mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 		mgRect r;
 		r.left = pt.x - p->indent.x;
 		r.right = p->rect.right;
-		for (int i = 0; i < p->nodesSize; ++i)
+		for (int i = 0; i < p->itemsSize; ++i)
 		{
 			r.top = pt.y;
-			r.bottom = r.top + p->itemHeight;
-			if (mgPointInRect(&r, &c->input->mousePosition))
+			
+			if (p->items[i].info.type == mgPopupItemType_separator)
 			{
-				p->nodeUnderCursor = &p->nodes[i];
-				p->nodeUnderCursorRect = r;
-				break;
+				r.bottom = r.top + 5;
+				pt.y += 5;
 			}
-			pt.y += p->itemHeight;
+			else
+			{
+				r.bottom = r.top + p->itemHeight;
+				if (mgPointInRect(&r, &c->input->mousePosition))
+				{
+					p->nodeUnderCursor = &p->items[i];
+					p->nodeUnderCursorRect = r;
+					break;
+				}
+				pt.y += p->itemHeight;
+			}
 		}
 
 		if (p->nodeUnderCursor && (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP))
 		{
-			if (p->nodeUnderCursor->callback)
-				p->nodeUnderCursor->callback();
+			if (p->nodeUnderCursor->info.callback)
+				p->nodeUnderCursor->info.callback();
 			mgShowPopup_f(c, 0, 0);
 		}
 	}
@@ -117,7 +157,7 @@ mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 
 MG_API
 struct mgPopup_s* MG_C_DECL
-mgCreatePopup_f(struct mgPopupNode_s* arr, int arrSize, mgFont* fnt)
+mgCreatePopup_f(struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt)
 {
 	assert(arr);
 	assert(arrSize>0);
@@ -125,15 +165,20 @@ mgCreatePopup_f(struct mgPopupNode_s* arr, int arrSize, mgFont* fnt)
 	struct mgPopup_s* newPopup = calloc(1, sizeof(struct mgPopup_s));
 
 	newPopup->font = fnt;
-	newPopup->nodesSize = arrSize;
-	newPopup->nodes = calloc(1, sizeof(struct mgPopupNode_s) * arrSize);
+	newPopup->itemsSize = arrSize;
+	newPopup->items = calloc(1, sizeof(struct mgPopupItem_s) * arrSize);
 	newPopup->indent.x = 5;
 	newPopup->indent.y = 5;
+	newPopup->textShortcutTextIndent = 20;
 
 	for (int i = 0; i < arrSize; ++i)
 	{
-		newPopup->nodes[i] = arr[i];
-		newPopup->nodes[i].textLen = wcslen(newPopup->nodes[i].text);
+		newPopup->items[i].info = arr[i];
+		if(newPopup->items[i].info.text)
+			newPopup->items[i].textLen = wcslen(newPopup->items[i].info.text);
+
+		if (newPopup->items[i].info.shortcutText)
+			newPopup->items[i].shortcutTextLen = wcslen(newPopup->items[i].info.shortcutText);
 	}
 
 	return newPopup;
@@ -146,8 +191,8 @@ mgDestroyPopup_f(struct mgPopup_s* p)
 	assert(p);
 	if (p)
 	{
-		if (p->nodes)
-			free(p->nodes);
+		if (p->items)
+			free(p->items);
 		free(p);
 	}
 }
@@ -168,27 +213,59 @@ mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 		p->rect.top = position->y + p->indent.y;
 		
 		p->itemHeight = 0;
-		int maxWidth = 20;
+		p->maxTextWidth = 20;
+		p->maxShortcutTextWidth = 0;
 
-		if (p->nodesSize)
+		int notSeparatorItems = 0;
+		int separatorItems = 0;
+
+		if (p->itemsSize)
 		{
 			mgPoint tsz;
-			for (int i = 0; i < p->nodesSize; ++i)
-			{
-				if (p->nodes[i].text)
+			for (int i = 0; i < p->itemsSize; ++i)
+			{			
+				if(p->items[i].info.type == mgPopupItemType_separator)
 				{
-					c->getTextSize(p->nodes[i].text, p->font, &tsz);
-					
-					if (tsz.y > p->itemHeight)
-						p->itemHeight = tsz.y;
-					
-					if (tsz.x > maxWidth)
-						maxWidth = tsz.x;
+					separatorItems++;
+				}
+				else 
+				{
+					notSeparatorItems++;
+					if (p->items[i].info.text)
+					{
+						c->getTextSize(p->items[i].info.text, p->font, &tsz);
+
+						if (tsz.y > p->itemHeight)
+							p->itemHeight = tsz.y;
+
+						if (tsz.x > p->maxTextWidth)
+							p->maxTextWidth = tsz.x;
+					}
+
+					if (p->items[i].info.shortcutText)
+					{
+						c->getTextSize(p->items[i].info.shortcutText, p->font, &tsz);
+						if (tsz.x > p->maxShortcutTextWidth)
+							p->maxShortcutTextWidth = tsz.x;
+						p->items[i].shortcutTextWidth = tsz.x;
+					}
+				}
+			}
+			for (int i = 0; i < p->itemsSize; ++i)
+			{
+				if (p->items[i].info.type != mgPopupItemType_separator)
+				{
+					p->items[i].indentForShortcutText = p->maxTextWidth + p->textShortcutTextIndent;
+					if (p->items[i].shortcutTextWidth < p->maxShortcutTextWidth)
+					{
+						p->items[i].indentForShortcutText += p->maxShortcutTextWidth - p->items[i].shortcutTextWidth;
+					}
 				}
 			}
 
-			p->rect.right = p->rect.left + maxWidth + p->indent.x + p->indent.x;
-			p->rect.bottom = p->rect.top + (p->itemHeight * p->nodesSize) + p->indent.y + p->indent.y;
+			p->rect.right = p->rect.left + p->maxTextWidth + p->maxShortcutTextWidth + p->textShortcutTextIndent + p->indent.x + p->indent.x;
+			p->rect.bottom = p->rect.top + (p->itemHeight * notSeparatorItems) + p->indent.y + p->indent.y;
+			p->rect.bottom += 5 * separatorItems;
 		}
 		else
 		{

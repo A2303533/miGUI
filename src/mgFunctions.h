@@ -51,7 +51,7 @@ MG_API void MG_C_DECL mgSetVisible_f(mgElement* e, int v);
 MG_API void MG_C_DECL mgStartFrame_f(mgContext* c);
 MG_API void MG_C_DECL mgUpdate_f(mgContext* c);
 MG_API struct mgDockPanelWindow_s* MG_C_DECL mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id);
-MG_API struct mgPopup_s* MG_C_DECL mgCreatePopup_f(struct mgPopupNode_s* arr, int arrSize, mgFont* fnt);
+MG_API struct mgPopup_s* MG_C_DECL mgCreatePopup_f(struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt);
 MG_API void MG_C_DECL mgDestroyPopup_f(struct mgPopup_s* p);
 MG_API void MG_C_DECL mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position);
 MG_API void MG_C_DECL mgShowWindow_f(struct mgWindow_s* w, int i);
