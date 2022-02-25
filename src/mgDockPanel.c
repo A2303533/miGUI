@@ -990,21 +990,12 @@ mgInitDockPanel_f(
 
 	if (c->defaultPopupFont)
 	{
-		struct mgPopupItemInfo_s popupItems2[] =
-		{
-			{L"Other", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"comment"},
-			{0, 0, 0, mgPopupItemType_separator, 0, 0},
-			{L"And", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, 0},
-			{L"this", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, 0},
-		};
-		mgPopup* p2 = mgCreatePopup_f(popupItems2, 4, c->defaultPopupFont);
-
 		struct mgPopupItemInfo_s popupItems[] =
 		{
 			{L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A"},
 			{0, 0, 0, mgPopupItemType_separator, 0, 0},
 			{L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove"},
-			{L"Close", p2, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide"},
+			{L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide"},
 		};
 		c->dockPanel->windowTabPopup = mgCreatePopup_f(popupItems, 4, c->defaultPopupFont);
 	}

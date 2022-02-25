@@ -329,6 +329,8 @@ typedef struct mgContext_s {
 	mgStyle* activeStyle;
 
 	mgPopup* activePopup;
+	mgPopup* popupUnderCursor;
+
 	mgFont* defaultPopupFont;
 	int cursorInPopup;
 

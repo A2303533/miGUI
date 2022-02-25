@@ -76,6 +76,10 @@ typedef struct mgPopup_s {
 
 	int iconLeftWidth;
 	int iconRightWidth;
+
+	int subVisible;
+
+	struct mgPopup_s* parent;/*internal*/
 } mgPopup;
 
 #endif

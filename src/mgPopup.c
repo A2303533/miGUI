@@ -32,6 +32,129 @@
 #include <wchar.h>
 
 void
+mgPopupFixPosition(struct mgContext_s* c, mgPopup* p)
+{
+	if (p->rect.right > c->windowSize.x)
+	{
+		int v = p->rect.right - c->windowSize.x;
+		p->rect.left -= v;
+		p->rect.right -= v;
+	}
+
+	if (p->rect.bottom > c->windowSize.y)
+	{
+		int v = p->rect.bottom - c->windowSize.y;
+		p->rect.top -= v;
+		p->rect.bottom -= v;
+	}
+
+	if (p->parent)
+	{
+		if ((p->rect.left < p->parent->rect.right)
+			&& (p->rect.left > p->parent->rect.left))
+		{
+			int v = p->rect.left - p->parent->rect.left;
+			v += p->rect.right - p->rect.left;
+			p->rect.left -= v;
+			p->rect.right -= v;
+		}
+	}
+}
+
+void
+mgPopupHideSub(struct mgPopup_s* p)
+{
+	p->subVisible = 0;
+
+	for (int i = 0; i < p->itemsSize; ++i)
+	{
+		if (p->items[i].info.subMenu)
+			mgPopupHideSub(p->items[i].info.subMenu);
+	}
+}
+
+void
+mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
+{
+	if (p)
+	{
+		p->nodeUnderCursor = 0;
+
+		p->rect.left = position->x + p->indent.x;
+		p->rect.top = position->y + p->indent.y;
+
+		p->itemHeight = 0;
+		p->maxTextWidth = 20;
+		p->maxShortcutTextWidth = 0;
+
+		int notSeparatorItems = 0;
+		int separatorItems = 0;
+
+		if (p->itemsSize)
+		{
+			mgPoint tsz;
+			for (int i = 0; i < p->itemsSize; ++i)
+			{
+				if (p->items[i].info.type == mgPopupItemType_separator)
+				{
+					separatorItems++;
+				}
+				else
+				{
+					notSeparatorItems++;
+					if (p->items[i].info.text)
+					{
+						c->getTextSize(p->items[i].info.text, p->font, &tsz);
+
+						if (tsz.y > p->itemHeight)
+							p->itemHeight = tsz.y;
+
+						if (tsz.x > p->maxTextWidth)
+							p->maxTextWidth = tsz.x;
+					}
+
+					if (p->items[i].info.shortcutText)
+					{
+						c->getTextSize(p->items[i].info.shortcutText, p->font, &tsz);
+						if (tsz.x > p->maxShortcutTextWidth)
+							p->maxShortcutTextWidth = tsz.x;
+						p->items[i].shortcutTextWidth = tsz.x;
+					}
+				}
+			}
+			for (int i = 0; i < p->itemsSize; ++i)
+			{
+				if (p->items[i].info.type != mgPopupItemType_separator)
+				{
+					p->items[i].indentForShortcutText = p->maxTextWidth + p->textShortcutTextIndent;
+					if (p->items[i].shortcutTextWidth < p->maxShortcutTextWidth)
+					{
+						p->items[i].indentForShortcutText += p->maxShortcutTextWidth - p->items[i].shortcutTextWidth;
+					}
+				}
+			}
+
+			p->rect.right = p->rect.left
+				+ p->maxTextWidth
+				+ p->maxShortcutTextWidth
+				+ p->textShortcutTextIndent
+				+ p->iconLeftWidth
+				+ p->indent.x
+				+ p->indent.x
+				+ p->iconRightWidth;
+
+			p->rect.bottom = p->rect.top + (p->itemHeight * notSeparatorItems) + p->indent.y + p->indent.y;
+			p->rect.bottom += 5 * separatorItems;
+		}
+		else
+		{
+			p->rect.right = p->rect.left + 20;
+			p->rect.bottom = p->rect.top + 20;
+		}
+	}
+}
+
+void
 mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 {
 	c->gpu->setClipRect(&p->rect);
@@ -126,25 +249,21 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 			pt.y += p->itemHeight;
 		}
 	}
+
+	for (int i = 0; i < p->itemsSize; ++i)
+	{
+		if (/*(p->items[i].info.type != mgPopupItemType_separator)
+			&& */(p->items[i].info.subMenu))
+		{
+			if (p->items[i].info.subMenu->subVisible)
+				mgDrawPopup(c, p->items[i].info.subMenu);
+		}
+	}
 }
 
 void
-mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
+_mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 {
-	if (p->rect.right > c->windowSize.x)
-	{
-		int v = p->rect.right - c->windowSize.x;
-		p->rect.left -= v;
-		p->rect.right -= v;
-	}
-
-	if (p->rect.bottom > c->windowSize.y)
-	{
-		int v = p->rect.bottom - c->windowSize.y;
-		p->rect.top -= v;
-		p->rect.bottom -= v;
-	}
-
 	if (mgPointInRect(&p->rect, &c->input->mousePosition))
 	{
 		c->cursorInPopup = 1;
@@ -156,10 +275,13 @@ mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 		mgRect r;
 		r.left = pt.x - p->indent.x;
 		r.right = p->rect.right;
+
+		//mgPopup* subPopup = 0;
+
 		for (int i = 0; i < p->itemsSize; ++i)
 		{
 			r.top = pt.y;
-			
+
 			if (p->items[i].info.type == mgPopupItemType_separator)
 			{
 				r.bottom = r.top + 5;
@@ -167,17 +289,46 @@ mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 			}
 			else
 			{
+				
+				/*if (p->items[i].info.subMenu)
+					p->items[i].info.subMenu->subVisible = 0;*/
+
 				r.bottom = r.top + p->itemHeight;
 				if (mgPointInRect(&r, &c->input->mousePosition))
 				{
+					//if (p->items[i].info.subMenu)
+					//	subPopup = p->items[i].info.subMenu;
+
 					p->nodeUnderCursor = &p->items[i];
 					p->nodeUnderCursorRect = r;
+
+					if (p->items[i].info.subMenu)
+					{
+						mgPoint pt2;
+						pt2.x = r.right - p->indent.x;
+						pt2.y = r.top - p->indent.y;
+						mgPopupSetPosition(c, p->items[i].info.subMenu, &pt2);
+
+						//if(!p->items[i].info.subMenu->subVisible)
+						//	_mgUpdatePopup(c, p->items[i].info.subMenu);
+
+						mgPopupFixPosition(c, p->items[i].info.subMenu);
+						p->items[i].info.subMenu->subVisible = 1;
+					}
+					else
+					{
+
+					}
 					break;
 				}
 				pt.y += p->itemHeight;
 			}
-			/*p->items[i].rect = r;*/
 		}
+
+		/*if (!subPopup)
+		{
+			mgPopupHideSub(p);
+		}*/
 
 		if (p->nodeUnderCursor && (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP))
 		{
@@ -186,6 +337,49 @@ mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 				if (p->nodeUnderCursor->info.callback)
 					p->nodeUnderCursor->info.callback();
 				mgShowPopup_f(c, 0, 0);
+			}
+		}
+	}
+}
+
+void
+mgUpdatePopup_internal(struct mgContext_s* c, mgPopup* p)
+{
+	for (int i = 0; i < p->itemsSize; ++i)
+	{
+		if (p->items[i].info.subMenu)
+		{
+			p->items[i].info.subMenu->parent = p;
+
+			if (p->items[i].info.subMenu->subVisible)
+				mgUpdatePopup_internal(c, p->items[i].info.subMenu);
+		}
+	}
+	mgPopupFixPosition(c, p);
+
+
+	if (mgPointInRect(&p->rect, &c->input->mousePosition))
+	{
+		if (!c->popupUnderCursor)
+		{
+			c->popupUnderCursor = p;
+			_mgUpdatePopup(c, p);
+		}
+	}
+}
+
+void
+mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
+{
+	mgUpdatePopup_internal(c, p);
+	if (c->popupUnderCursor)
+	{
+		for (int i = 0; i < c->popupUnderCursor->itemsSize; ++i)
+		{
+			if (c->popupUnderCursor->nodeUnderCursor != &c->popupUnderCursor->items[i])
+			{
+				if (c->popupUnderCursor->items[i].info.subMenu)
+					mgPopupHideSub(c->popupUnderCursor->items[i].info.subMenu);
 			}
 		}
 	}
@@ -240,92 +434,16 @@ void MG_C_DECL
 mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 {
 	assert(c);
-	
 	c->activePopup = p;
 
-	if (p)
+	if (!p)
+		return;
+
+	for (int i = 0; i < p->itemsSize; ++i)
 	{
-		p->nodeUnderCursor = 0;
-		
-		p->rect.left = position->x + p->indent.x;
-		p->rect.top = position->y + p->indent.y;
-		
-		p->itemHeight = 0;
-		p->maxTextWidth = 20;
-		p->maxShortcutTextWidth = 0;
-
-		int notSeparatorItems = 0;
-		int separatorItems = 0;
-
-		if (p->itemsSize)
-		{
-			mgPoint tsz;
-			for (int i = 0; i < p->itemsSize; ++i)
-			{			
-				if(p->items[i].info.type == mgPopupItemType_separator)
-				{
-					separatorItems++;
-				}
-				else 
-				{
-					notSeparatorItems++;
-					if (p->items[i].info.text)
-					{
-						c->getTextSize(p->items[i].info.text, p->font, &tsz);
-
-						if (tsz.y > p->itemHeight)
-							p->itemHeight = tsz.y;
-
-						if (tsz.x > p->maxTextWidth)
-							p->maxTextWidth = tsz.x;
-					}
-
-					if (p->items[i].info.shortcutText)
-					{
-						c->getTextSize(p->items[i].info.shortcutText, p->font, &tsz);
-						if (tsz.x > p->maxShortcutTextWidth)
-							p->maxShortcutTextWidth = tsz.x;
-						p->items[i].shortcutTextWidth = tsz.x;
-					}
-				}
-			}
-			for (int i = 0; i < p->itemsSize; ++i)
-			{
-				if (p->items[i].info.type != mgPopupItemType_separator)
-				{
-					p->items[i].indentForShortcutText = p->maxTextWidth + p->textShortcutTextIndent;
-					if (p->items[i].shortcutTextWidth < p->maxShortcutTextWidth)
-					{
-						p->items[i].indentForShortcutText += p->maxShortcutTextWidth - p->items[i].shortcutTextWidth;
-					}
-				}
-			}
-
-			p->rect.right = p->rect.left 
-				+ p->maxTextWidth 
-				+ p->maxShortcutTextWidth 
-				+ p->textShortcutTextIndent 
-				+ p->iconLeftWidth
-				+ p->indent.x 
-				+ p->indent.x
-				+ p->iconRightWidth;
-
-			/*for (int i = 0; i < p->itemsSize; ++i)
-			{
-				if (p->items[i].info.type != mgPopupItemType_separator)
-				{
-					p->items[i].rect.left = p->rect.left;
-					p->items[i].rect.right = p->rect.right;
-				}
-			}*/
-
-			p->rect.bottom = p->rect.top + (p->itemHeight * notSeparatorItems) + p->indent.y + p->indent.y;
-			p->rect.bottom += 5 * separatorItems;
-		}
-		else
-		{
-			p->rect.right = p->rect.left + 20;
-			p->rect.bottom = p->rect.top + 20;
-		}
+		if (p->items[i].info.subMenu)
+			mgPopupHideSub(p->items[i].info.subMenu);
 	}
+
+	mgPopupSetPosition(c, p, position);
 }

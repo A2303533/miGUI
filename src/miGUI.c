@@ -256,6 +256,7 @@ mgUpdate_f(mgContext* c)
 	if (c->activePopup)
 	{
 		c->cursorInPopup = 0;
+		c->popupUnderCursor = 0;
 		mgUpdatePopup(c, c->activePopup);
 
 		if (!c->cursorInPopup)
