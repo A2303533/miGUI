@@ -594,13 +594,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     g_iconsImage.load(L"../data/icons.png");
-    
-    //g_icons = mgCreateIcons(&g_iconsImage, 512, 512, 5);
-    //mgSetIcon(g_icons, 0, 15, 2, 11, 11); //close wnd
-    //mgSetIcon(g_icons, 1, 2, 2, 11, 11); // close wnd mouse hover
-    //mgSetIcon(g_icons, 2, 29, 2, 11, 11); // close wnd push
-    //mgSetIcon(g_icons, 3, 42, 2, 11, 11); // collapse wnd
-    //mgSetIcon(g_icons, 4, 53, 2, 11, 11); // expand wnd
     mgInitDefaultIcons(g_gui_context, &g_iconsImage);
 
 

@@ -49,7 +49,7 @@ void mgDrawElement(mgElement* e);
 void mgUpdateTransformElement(mgElement* e);
 void mgDockPanelUpdateWindow(struct mgContext_s* c);
 
-float 
+inline float 
 lerp(float v0, float v1, float t) 
 {
 	return (1.f - t) * v0 + t * v1;
@@ -475,7 +475,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 	int topIndent = 0;
 
-	if (w->flags & mgWindowFlag_withTitlebar)
+	if ((w->flags & mgWindowFlag_withTitlebar) && !w->dockPanelWindow)
 	{
 		topIndent += w->titlebarHeight;
 	}
