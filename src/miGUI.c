@@ -90,6 +90,11 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarBG, 0xD4D2EF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarElement, 0xB3C4DB);
 	mgColorSetAsIntegerRGB(&c->styleLight.popupSeparator, 0xC1C1C1);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuBG, 0xD6E1FF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuHoverItemBG, 0x9EC0FF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuActiveItemBG, 0x00E1FF);
+	
+	
 	
 
 	c->functions.SetCursor_p = mgSetCursor_f;
@@ -253,10 +258,10 @@ mgUpdate_f(mgContext* c)
 
 	c->windowUnderCursor = 0;
 
+	c->popupUnderCursor = 0;
 	if (c->activePopup)
 	{
 		c->cursorInPopup = 0;
-		c->popupUnderCursor = 0;
 		mgUpdatePopup(c, c->activePopup);
 
 		if (!c->cursorInPopup)
@@ -269,7 +274,6 @@ mgUpdate_f(mgContext* c)
 				mgShowPopup_f(c, 0, 0);
 		}
 
-		return;
 	}
 
 	mgWindow* cw = c->firstWindow;
@@ -289,19 +293,22 @@ mgUpdate_f(mgContext* c)
 				{
 					mgUpdateWindow(cw);
 
-					if (cw->flagsInternal & mgWindowFlag_internal_isExpand)
+					if (!c->activePopup)
 					{
-						mgUpdateElement(cw->rootElement);
-
-						if (c->needUpdateTransform)
+						if (cw->flagsInternal & mgWindowFlag_internal_isExpand)
 						{
-							mgUpdateTransformElement(cw->rootElement);
-						}
+							mgUpdateElement(cw->rootElement);
 
-						if (c->needRebuild)
-						{
-							mgRebuildElement(cw->rootElement);
-							c->needRebuild = 0;
+							if (c->needUpdateTransform)
+							{
+								mgUpdateTransformElement(cw->rootElement);
+							}
+
+							if (c->needRebuild)
+							{
+								mgRebuildElement(cw->rootElement);
+								c->needRebuild = 0;
+							}
 						}
 					}
 				}
@@ -315,8 +322,21 @@ mgUpdate_f(mgContext* c)
 		c->needUpdateTransform = 0;
 	}
 
-	if (c->dockPanel && !c->windowUnderCursor)
-		mgDockPanelUpdate(c);
+	if (c->dockPanel)
+	{
+		if (!c->windowUnderCursor)
+			mgDockPanelUpdate(c);
+
+		if (c->activeMenu && !c->activePopup)
+		{
+			if ((c->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+				|| (c->input->mouseButtonFlags1 & MG_MBFL_RMBUP))
+			{
+				c->activeMenu->activeItem = 0;
+				c->activeMenu = 0;
+			}
+		}
+	}
 }
 
 MG_API

@@ -35,6 +35,9 @@
 
 #include <Windows.h>
 
+extern struct mgDockPanelElement_s* g_dockpanel_splitterModeElement;
+extern struct mgDockPanelWindow_s* g_dockpanel_splitterModePanel;
+
 mgDockPanelWindow* g_dockPanelWindow = 0;
 int g_dockElIdOrWhere = 0;
 int g_windowToDockPanelMode = 0;
@@ -342,68 +345,146 @@ mgDrawWindow(struct mgWindow_s* w)
 		mgDrawElement(w->rootElement);
 		if (w->flagsInternal & mgWindowFlag_internal_canScroll)
 		{
-			mgRect r;
-
-			if (w->dockPanelWindow)
-			{
-				r.right = w->dockPanelWindow->rect.right;
-				r.left = r.right - w->scrollbarWidth;
-				r.top = w->dockPanelWindow->tabRect.bottom;
-				r.bottom = w->dockPanelWindow->rect.bottom;
-			}
-			else
-			{
-				r.right = w->rect.right;
-				r.left = r.right - w->scrollbarWidth;
-				r.top = w->rect.top + w->titlebarHeight;
-				r.bottom = w->rect.bottom;
-			}
-
-			w->context->gpu->setClipRect(&r);
+			w->context->gpu->setClipRect(&w->scrollbarBGRect);
 			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowScrollbarBG,
-				&r, 
+				&w->scrollbarBGRect,
 				&style->windowScrollbarBG,
 				&style->windowScrollbarBG,
 				0, 0, 0);
 			
-			w->scrollbarBGRect = r;
-
-			float m1 = 1.f / (float)w->contentHeight;
-			float m2 = (float)w->clientHeight * m1;
-
-			float screlsz = ((float)(r.bottom - r.top) * m2);
-			if (screlsz < 20.f)
-				screlsz = 20.f;
-			r.bottom = r.top + (int)screlsz;
-
-			//if (w->scrollValue)
-			{
-				int v = w->contentHeight - w->clientHeight;
-				if (w->rootElement->scrollValue > (float)v)
-					w->rootElement->scrollValue = (float)v;
-				if (w->rootElement->scrollValueTarget > (float)v)
-					w->rootElement->scrollValueTarget = (float)v;
-
-				float v2 = w->rootElement->scrollValue * m1;
-				v2 = v2 / (1.f / (float)w->clientHeight);
-				r.top += (int)v2;
-				r.bottom += (int)v2;
-			}
-
 			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowScrollbarElement,
-				&r,
+				&w->scrollbarElementRect,
 				&style->windowScrollbarElement,
 				&style->windowScrollbarElement,
 				0, 0, 0);
-			w->scrollbarElementRect = r;
+		}
+
+		if (w->menu)
+		{
+			w->context->gpu->setClipRect(&w->menuRect);
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuBG,
+				&w->menuRect,
+				&style->windowMenuBG,
+				&style->windowMenuBG,
+				0, 0, 0);
+			mgPoint pt;
+			for (int i = 0; i < w->menu->itemsSize; ++i)
+			{
+				if (w->menu->activeItem == &w->menu->items[i])
+				{
+					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuActiveItemBG,
+						&w->menu->activeItem->rect,
+						&style->windowMenuActiveItemBG,
+						&style->windowMenuActiveItemBG,
+						0, 0, 0);
+				}
+				else if (w->menu->hoverItem == &w->menu->items[i])
+				{
+					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuHoverItemBG,
+						&w->menu->hoverItem->rect,
+						&style->windowMenuHoverItemBG,
+						&style->windowMenuHoverItemBG,
+						0, 0, 0);
+				}
+
+				if (!w->menu->items[i].info.text)
+					continue;
+
+				pt.x = w->menu->items[i].rect.left + w->menu->textIndent;
+				pt.y = w->menu->items[i].rect.top;
+
+				w->context->gpu->drawText(mgDrawTextReason_windowMenu,
+					&pt,
+					w->menu->items[i].info.text,
+					w->menu->items[i].textLen,
+					&style->windowTitlebarTextColor,
+					w->menu->font);
+			}
 		}
 	}
+}
+
+void
+mgWindowRebuildMenu(struct mgWindow_s* w)
+{
+	mgRect r = w->rect;
+	if (w->dockPanelWindow)
+		r = w->dockPanelWindow->windowRect;
+
+	w->menu->currentHeight = w->menu->height;
+
+	w->menuRect.left = r.left;
+	w->menuRect.top = r.top;
+
+	if (w->flags & mgWindowFlag_withTitlebar)
+	{
+		if(!w->dockPanelWindow)
+			w->menuRect.top += w->titlebarHeight;
+	}
+
+	w->menuRect.right = r.right;
+
+	int X = w->menuRect.left + w->menu->indent;
+	int Y = w->menuRect.top;
+	for (int i = 0; i < w->menu->itemsSize; ++i)
+	{
+		mgRect itemRect;
+		itemRect.left = 0;
+		itemRect.top = 0;
+		itemRect.right = w->menu->items[i].width;
+		itemRect.bottom = w->menu->height;
+
+		itemRect.top += Y;
+		itemRect.bottom += Y;
+		itemRect.left += X;
+		itemRect.right += X;
+
+		X += w->menu->items[i].width + w->menu->textIndent;
+		
+		if (X > w->menuRect.right)
+		{
+			Y += w->menu->height+1;
+			X = w->menuRect.left;
+			w->menu->currentHeight += w->menu->height;
+
+			itemRect.left = 0;
+			itemRect.top = 0;
+			itemRect.right = w->menu->items[i].width;
+			itemRect.bottom = w->menu->height;
+
+			itemRect.top += Y;
+			itemRect.bottom += Y;
+			itemRect.left += X;
+			itemRect.right += X;
+			X += w->menu->items[i].width + w->menu->textIndent;
+		}
+
+		itemRect.right += w->menu->textIndent + w->menu->textIndent;
+		X += w->menu->textIndent + 1;
+
+		w->menu->items[i].rect = itemRect;
+	}
+
+	w->menuRect.bottom = w->menuRect.top + w->menu->currentHeight;
 }
 
 void
 mgUpdateWindow(struct mgWindow_s* w)
 {
 	assert(w);
+
+	int topIndent = 0;
+
+	if (w->flags & mgWindowFlag_withTitlebar)
+	{
+		topIndent += w->titlebarHeight;
+	}
+
+	if (w->menu)
+	{
+		mgWindowRebuildMenu(w);
+		topIndent += w->menu->currentHeight;
+	}
 
 	static float posX = 0;
 	static float posXlerp = 0;
@@ -426,7 +507,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 	if (w->flags & mgWindowFlag_collapseButton)
 	{
 		if ((w->flagsInternal & mgWindowFlag_internal_isExpand) == 0)
-			windowBtm = w->position.y + w->titlebarHeight;
+			windowBtm = w->position.y + topIndent;
 	}
 
 	if (w->dockPanelWindow && (w->flags & mgWindowFlag_canDock))
@@ -439,6 +520,10 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 		w->rootElement->transformLocal.buildArea = w->dockPanelWindow->windowRect;
 		w->rootElement->transformLocal.clipArea = w->dockPanelWindow->windowRect;
+
+		w->rootElement->transformLocal.buildArea.top += topIndent;
+		w->rootElement->transformLocal.clipArea.top += topIndent;
+
 		if (w->contentHeight > w->clientHeight)
 		{
 			w->rootElement->transformLocal.buildArea.right -= w->scrollbarWidth;
@@ -615,8 +700,8 @@ mgUpdateWindow(struct mgWindow_s* w)
 
 					if (w->size.x < w->sizeMinimum.x)
 						w->size.x = w->sizeMinimum.x;
-					if (w->size.y < w->sizeMinimum.y)
-						w->size.y = w->sizeMinimum.y;
+					if (w->size.y < w->sizeMinimum.y + topIndent)
+						w->size.y = w->sizeMinimum.y + topIndent;
 
 					if (w->size.x < 0)
 						w->size.x = 0;
@@ -644,8 +729,8 @@ mgUpdateWindow(struct mgWindow_s* w)
 		if (w->position.y < 0)
 			w->position.y = 0;
 
-		if (w->position.y > w->context->windowSize.y - w->titlebarHeight)
-			w->position.y = w->context->windowSize.y - w->titlebarHeight;
+		if (w->position.y > w->context->windowSize.y - topIndent)
+			w->position.y = w->context->windowSize.y - topIndent;
 
 		w->rect.left = w->position.x;
 		w->rect.top = w->position.y;
@@ -653,7 +738,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 		w->rect.bottom = windowBtm;
 		w->rootElement->transformLocal.buildArea = w->rect;
 		w->rootElement->transformLocal.clipArea = w->rect;
-		w->rootElement->transformLocal.clipArea.top += w->titlebarHeight;
+		w->rootElement->transformLocal.clipArea.top += topIndent;
 		
 		if (w->contentHeight > w->clientHeight)
 		{
@@ -816,8 +901,8 @@ mgUpdateWindow(struct mgWindow_s* w)
 	
 		if ((w->flags & mgWindowFlag_withTitlebar))
 		{
-			w->rootElement->transformWorld.buildArea.top += w->titlebarHeight;
-			w->rootElement->transformWorld.buildArea.bottom += w->titlebarHeight;
+			w->rootElement->transformWorld.buildArea.top += topIndent;
+			w->rootElement->transformWorld.buildArea.bottom += topIndent;
 		}
 	}
 
@@ -846,7 +931,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 			w->clientHeight = w->rect.bottom - w->rect.top;
 
 			if (w->flags & mgWindowFlag_withTitlebar)
-				w->clientHeight -= w->titlebarHeight;
+				w->clientHeight -= topIndent;
 		}
 
 		w->contentHeight = 0;
@@ -855,11 +940,6 @@ mgUpdateWindow(struct mgWindow_s* w)
 		if (w->contentHeight > w->clientHeight)
 		{
 			w->flagsInternal |= mgWindowFlag_internal_canScroll;
-			//int v = w->contentHeight - windowH;
-
-			/*double m1 = 1.0 / (double)w->contentHeight;
-			double m2 = (double)windowH * m1;*/
-			
 		}
 		else
 		{
@@ -872,6 +952,9 @@ mgUpdateWindow(struct mgWindow_s* w)
 	if (w->contentHeight > w->clientHeight)
 	{
 		static int locklmb = 0;
+		float m1 = 1.f / (float)w->contentHeight;
+		float m2 = (float)w->clientHeight * m1;
+
 		if (mgPointInRect(&w->scrollbarElementRect, &w->context->input->mousePosition))
 		{
 			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
@@ -908,9 +991,6 @@ mgUpdateWindow(struct mgWindow_s* w)
 			}
 			else
 			{
-				float m1 = 1.f / (float)w->contentHeight;
-				float m2 = (float)w->clientHeight * m1;
-
 				w->rootElement->scrollValueTarget = scrollOnClick + ((float)y / m2);
 				if (w->rootElement->scrollValueTarget < 0.f)
 					w->rootElement->scrollValueTarget = 0.f;
@@ -927,12 +1007,10 @@ mgUpdateWindow(struct mgWindow_s* w)
 		{
 			if (w->context->input->mouseWheelDelta < 0.f)
 			{
-				//w->rootElement->scrollValue += 1.f;
 				w->rootElement->scrollValueTarget += 10.f;
 			}
 			else if (w->context->input->mouseWheelDelta > 0.f)
 			{
-				//w->rootElement->scrollValue -= 1.f;
 				w->rootElement->scrollValueTarget -= 10.f;
 
 				if (w->rootElement->scrollValueTarget < 0.f)
@@ -940,8 +1018,113 @@ mgUpdateWindow(struct mgWindow_s* w)
 			}
 		}
 
+		if (w->dockPanelWindow)
+		{
+			w->scrollbarBGRect.right = w->dockPanelWindow->rect.right;
+			w->scrollbarBGRect.left = w->scrollbarBGRect.right - w->scrollbarWidth;
+			w->scrollbarBGRect.top = w->dockPanelWindow->tabRect.bottom + topIndent;
+			w->scrollbarBGRect.bottom = w->dockPanelWindow->rect.bottom;
+		}
+		else
+		{
+			w->scrollbarBGRect.right = w->rect.right;
+			w->scrollbarBGRect.left = w->scrollbarBGRect.right - w->scrollbarWidth;
+			
+			w->scrollbarBGRect.top = w->rect.top + topIndent;
+
+			w->scrollbarBGRect.bottom = w->rect.bottom;
+		}
+
+		w->scrollbarElementRect = w->scrollbarBGRect;
+		float screlsz = ((float)(w->scrollbarElementRect.bottom - w->scrollbarElementRect.top) * m2);
+		if (screlsz < 20.f)
+			screlsz = 20.f;
+		w->scrollbarElementRect.bottom = w->scrollbarElementRect.top + (int)screlsz;
+		{
+			int v = w->contentHeight - w->clientHeight;
+			if (w->rootElement->scrollValue > (float)v)
+				w->rootElement->scrollValue = (float)v;
+			if (w->rootElement->scrollValueTarget > (float)v)
+				w->rootElement->scrollValueTarget = (float)v;
+
+			float v2 = w->rootElement->scrollValue * m1;
+			v2 = v2 / (1.f / (float)w->clientHeight);
+			w->scrollbarElementRect.top += (int)v2;
+			w->scrollbarElementRect.bottom += (int)v2;
+		}
+
 		w->rootElement->scrollValue = lerp(w->rootElement->scrollValue, w->rootElement->scrollValueTarget, 0.1f);
 	}
+
+
+	if (w->menu && !w->context->popupUnderCursor 
+		&& !g_dockpanel_splitterModeElement
+		&& !g_dockpanel_splitterModePanel)
+	{
+		mgWindowRebuildMenu(w);
+		w->menu->hoverItem = 0;
+
+		if (w->menu->activeItem)
+		{
+			if (w->menu->activeItem && mgPointInRect(&w->menuRect, &w->context->input->mousePosition))
+			{
+				for (int i = 0; i < w->menu->itemsSize; ++i)
+				{
+					if (mgPointInRect(&w->menu->items[i].rect, &w->context->input->mousePosition))
+					{
+						if (&w->menu->items[i] != w->menu->activeItem)
+						{
+							mgShowPopup_f(w->context, 0, 0);
+							w->context->activeMenu = w->menu;
+							w->menu->activeItem = &w->menu->items[i];
+							if (w->menu->activeItem->info.popup)
+							{
+								mgPoint pt;
+								pt.x = w->menu->activeItem->rect.left;
+								pt.y = w->menu->activeItem->rect.bottom - 5;
+								mgShowPopup_f(w->context, w->menu->activeItem->info.popup, &pt);
+							}
+							break;
+						}
+					}
+				}
+			}
+			if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			{
+				w->menu->activeItem = 0;
+				w->context->activeMenu = 0;
+				mgShowPopup_f(w->context, 0, 0);
+			}
+		}
+		else
+		{
+			if (mgPointInRect(&w->menuRect, &w->context->input->mousePosition))
+			{
+				for (int i = 0; i < w->menu->itemsSize; ++i)
+				{
+					if (mgPointInRect(&w->menu->items[i].rect, &w->context->input->mousePosition))
+					{
+						w->menu->hoverItem = &w->menu->items[i];
+						if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+						{
+							w->menu->activeItem = &w->menu->items[i];
+							w->context->activeMenu = w->menu;
+							if (w->menu->activeItem->info.popup)
+							{
+
+								mgPoint pt;
+								pt.x = w->menu->activeItem->rect.left;
+								pt.y = w->menu->activeItem->rect.bottom - 5;
+								mgShowPopup_f(w->context, w->menu->activeItem->info.popup, &pt);
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+	
 
 	w->cursorInfoOld = w->cursorInfo;
 }
@@ -957,26 +1140,6 @@ mgSetWindowTitle_f(struct mgWindow_s* w, const wchar_t* t)
 	{
 		newLen = wcslen(t);
 		w->titlebarText = t;
-		/*if (w->titlebarText)
-		{
-			int oldLen = wcslen(w->titlebarText);
-			if (newLen > oldLen)
-			{
-				free(w->titlebarText);
-				w->titlebarText = malloc((newLen * sizeof(wchar_t)) + sizeof(wchar_t));
-			}
-		}
-		else
-		{
-			w->titlebarText = malloc((newLen*sizeof(wchar_t)) + sizeof(wchar_t));
-		}
-		memcpy(w->titlebarText, t, (newLen * sizeof(wchar_t)));
-		w->titlebarText[newLen] = 0;
-	}
-	else if(w->titlebarText)
-	{
-		free(w->titlebarText);
-		w->titlebarText = 0;*/
 	}
 	w->titlebarTextLen = newLen;
 }

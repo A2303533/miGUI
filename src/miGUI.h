@@ -77,6 +77,9 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_windowCollapseButton,
 	mgDrawRectangleReason_windowScrollbarBG,
 	mgDrawRectangleReason_windowScrollbarElement,
+	mgDrawRectangleReason_windowMenuBG,
+	mgDrawRectangleReason_windowMenuHoverItemBG,
+	mgDrawRectangleReason_windowMenuActiveItemBG,
 	mgDrawRectangleReason_rectangle,
 	mgDrawRectangleReason_buttonBG,
 	mgDrawRectangleReason_dockBG,
@@ -98,6 +101,7 @@ enum mgDrawTextReason
 {
 	mgDrawTextReason_user,
 	mgDrawTextReason_windowTitlebar,
+	mgDrawTextReason_windowMenu,
 	mgDrawTextReason_buttonText,
 	mgDrawTextReason_text,
 	mgDrawTextReason_popup,
@@ -283,6 +287,16 @@ extern PFNMGDOCKGETSAVEDATAPROC mgDockGetSaveData;
 typedef void (*PFNMGDOCKLOADDATAPROC)(struct mgContext_s*, int* data, int dataSizeInInt, mgWindow*(*callback)(int windowID));
 extern PFNMGDOCKLOADDATAPROC mgDockLoadData;
 
+/*
+* mgMenu works with mgWindow
+* You must create popups by yourself, and destroy them too.
+*/
+typedef mgMenu*(*PFNMGCREATEMENUPROC)(struct mgContext_s*, mgMenuItemInfo* items, int itemsSize, mgFont* f);
+extern PFNMGCREATEMENUPROC mgCreateMenu;
+
+typedef void (*PFNMGDESTROYMENUPROC)(mgMenu*);
+extern PFNMGDESTROYMENUPROC mgDestroyMenu;
+
 
 #if defined(__cplusplus)
 }
@@ -330,6 +344,7 @@ typedef struct mgContext_s {
 
 	mgPopup* activePopup;
 	mgPopup* popupUnderCursor;
+	mgMenu* activeMenu;
 
 	mgFont* defaultPopupFont;
 	int cursorInPopup;

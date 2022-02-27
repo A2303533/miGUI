@@ -204,6 +204,7 @@ void gui_drawRectangle(
         || reason == mgDrawRectangleReason_dockPanelSplitterBGHor
         || reason == mgDrawRectangleReason_dockPanelSplitterBGVert
         || reason == mgDrawRectangleReason_dockBG
+        || reason == mgDrawRectangleReason_windowMenuBG
         || reason == mgDrawRectangleReason_popupSeparator
         || reason == mgDrawRectangleReason_dockTabWindowTitle
         || reason == mgDrawRectangleReason_dockTabBG)
@@ -711,6 +712,39 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             mgElement* btn = mgCreateButton(test_guiWindow5, &pos, &sz, L"Button", g_win32font);
         }
         
+        {
+            mgPopupItemInfo items_file_popup[] =
+            {
+                {0, L"Open", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O"},
+                {0, L"New", 0, 0, mgPopupItemType_default, 0, 0},
+                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0},
+                {0, L"Save", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S"},
+                {0, L"Save ass...", 0, 0, mgPopupItemType_default, 0, L"Ctrl+Shift+S"},
+                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0},
+                {0, L"Exit", 0, 0, mgPopupItemType_default, 0, L"Alt+F4"},
+            };
+            mgPopup* file_popup = mgCreatePopup(items_file_popup, 7, g_win32font);
+
+            mgPopupItemInfo items_edit_popup[] =
+            {
+                {0, L"Copy", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O"},
+                {0, L"Paste", 0, 0, mgPopupItemType_default, 0, 0},
+                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0},
+                {0, L"Cut", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S"},
+            };
+            mgPopup* edit_popup = mgCreatePopup(items_edit_popup, 4, g_win32font);
+
+            mgMenuItemInfo menu_items[] =
+            {
+                {L"File", file_popup},
+                {L"Edit", edit_popup},
+                {L"Window", 0},
+                {L"View", 0},
+                {L"Extension", 0},
+            };
+            mgMenu* menu = mgCreateMenu(g_gui_context, menu_items, 5, g_win32font);
+            test_guiWindow1->menu = menu;
+        }
 
         //guiWindow2->flags ^= mgWindowFlag_withTitlebar;
         //guiWindow2->flags ^= mgWindowFlag_canMove;

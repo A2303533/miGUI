@@ -26,40 +26,50 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_MENU_H_
-#define _MG_MENU_H_
+#include "miGUI.h"
+#include "mgFunctions.h"
 
-typedef struct mgMenuItemInfo_s {
-	const wchar_t* text;
-	mgPopup* popup;
-} mgMenuItemInfo;
+#include <wchar.h>
 
-typedef struct mgMenuItem_s {
-	mgMenuItemInfo info;
-	int textLen;
-	int width;
-	mgRect rect;
-} mgMenuItem;
+MG_API
+mgMenu* MG_C_DECL
+mgCreateMenu_f(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, mgFont* f)
+{
+	assert(f);
+	assert(items);
+	assert(itemsSize > 0);
 
-/*
-* mgMenu works with mgWindow
-*/
-typedef struct mgMenu_s {
-	mgMenuItem* items;
-	int itemsSize;
+	mgMenu* newMenu = calloc(1, sizeof(mgMenu));
+	newMenu->items = calloc(1, sizeof(mgMenuItem) * itemsSize);
+	newMenu->itemsSize = itemsSize;
+	newMenu->height = 20;
+	newMenu->indent = 0;
+	newMenu->font = f;
+	newMenu->textIndent = 5;
+	for (int i = 0; i < itemsSize; ++i)
+	{
+		newMenu->items[i].info = items[i];
 
-	mgFont* font;
+		if (newMenu->items[i].info.text)
+		{
+			newMenu->items[i].textLen = wcslen(newMenu->items[i].info.text);
 
-	int height;
-	int currentHeight;
+			mgPoint tsz;
+			c->getTextSize(newMenu->items[i].info.text, f, &tsz);
 
-	/*indent from left side*/
-	int indent;
+			newMenu->items[i].width = tsz.x;
+		}
+	}
 
-	int textIndent;
+	return newMenu;
+}
 
-	mgMenuItem* activeItem;
-	mgMenuItem* hoverItem;
-} mgMenu;
-
-#endif
+MG_API
+void MG_C_DECL
+mgDestroyMenu_f(mgMenu* m)
+{
+	assert(m);
+	if (m->items)
+		free(m->items);
+	free(m);
+}

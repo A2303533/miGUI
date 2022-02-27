@@ -39,14 +39,15 @@ enum mgPopupItemType
 	mgPopupItemType_radio, /*use separator for groups*/
 };
 
-struct mgPopupItemInfo_s {
+typedef struct mgPopupItemInfo_s {
+	int id;
 	const wchar_t* text;
 	struct mgPopup_s* subMenu; /*if subMenu then skip callback*/
-	void(*callback)();
+	void(*callback)(int id);
 	int type;
 	int isChecked;
 	const wchar_t* shortcutText;
-};
+} mgPopupItemInfo;
 
 struct mgPopupItem_s {
 	struct mgPopupItemInfo_s info;
@@ -54,7 +55,6 @@ struct mgPopupItem_s {
 	int shortcutTextLen;
 	int indentForShortcutText;
 	int shortcutTextWidth;
-	/*mgRect rect;*/
 };
 
 typedef struct mgPopup_s {

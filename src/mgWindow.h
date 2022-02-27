@@ -105,6 +105,9 @@ typedef struct mgWindow_s {
 	int clientHeight;
 	mgRect scrollbarBGRect;
 	mgRect scrollbarElementRect;
+
+	mgMenu* menu;
+	mgRect  menuRect;
 } mgWindow;
 
 

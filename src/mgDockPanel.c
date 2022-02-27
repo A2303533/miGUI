@@ -66,9 +66,9 @@ void mgDrawWindow(struct mgWindow_s* w);
 void mgUpdateWindow(struct mgWindow_s* w);
 void mgUpdateElement(mgElement* e);
 
-void dockPanel_popupCallback_makeFirst();
-void dockPanel_popupCallback_unpin();
-void dockPanel_popupCallback_close();
+void dockPanel_popupCallback_makeFirst(int id);
+void dockPanel_popupCallback_unpin(int id);
+void dockPanel_popupCallback_close(int id);
 
 void
 _mgDockPanelRebuild(struct mgContext_s* c)
@@ -992,10 +992,10 @@ mgInitDockPanel_f(
 	{
 		struct mgPopupItemInfo_s popupItems[] =
 		{
-			{L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A"},
-			{0, 0, 0, mgPopupItemType_separator, 0, 0},
-			{L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove"},
-			{L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide"},
+			{0, L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A"},
+			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0},
+			{0, L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove"},
+			{0, L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide"},
 		};
 		c->dockPanel->windowTabPopup = mgCreatePopup_f(popupItems, 4, c->defaultPopupFont);
 	}
@@ -1205,13 +1205,6 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 
 	if (pnlWnd)
 	{
-		/*pnlWnd->windowsSize++;
-		struct mgWindow_s** new_windows = calloc(1, sizeof(struct mgWindow_s*) * pnlWnd->windowsSize);
-		memcpy(new_windows, pnlWnd->windows, sizeof(struct mgWindow_s*) * (pnlWnd->windowsSize - 1));
-		new_windows[pnlWnd->windowsSize - 1] = w;
-		free(pnlWnd->windows);
-		pnlWnd->windows = new_windows;*/
-
 		mgDockPanelRebuild(w->context);
 	}
 	
@@ -1223,7 +1216,7 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 	return pnlWnd;
 }
 
-void dockPanel_popupCallback_makeFirst()
+void dockPanel_popupCallback_makeFirst(int id)
 {
 	mgWindow* aw = 0;
 	for (int i = g_pnlWnd_onPopup->windowsSize; i > 1; i--)
@@ -1244,7 +1237,7 @@ void dockPanel_popupCallback_makeFirst()
 	}
 }
 
-void dockPanel_popupCallback_unpin()
+void dockPanel_popupCallback_unpin(int id)
 {
 	mgWindow * w = g_pnlWnd_onPopup->activeWindow;
 	
@@ -1332,10 +1325,10 @@ void dockPanel_popupCallback_unpin()
 	mgDockPanelUpdateWindow(w->context);
 }
 
-void dockPanel_popupCallback_close()
+void dockPanel_popupCallback_close(int id)
 {
 	mgWindow* w = g_pnlWnd_onPopup->activeWindow;
-	dockPanel_popupCallback_unpin();
+	dockPanel_popupCallback_unpin(id);
 	mgShowWindow_f(w, 0);
 }
 
