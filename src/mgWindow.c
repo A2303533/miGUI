@@ -216,8 +216,8 @@ mgDrawWindow(struct mgWindow_s* w)
 	mgIconGroup* iconGroup = w->context->defaultIconGroup;
 	mgStyle* style = w->userStyle ? w->userStyle : w->context->activeStyle;
 
-	mgColor clrbg = w->context->firstWindow->left == w ? style->windowBGColorTopWindow : style->windowBGColor;
-	mgColor clrttl = w->context->firstWindow->left == w ? style->windowTitlebarColorTopWindow : style->windowTitlebarColor;
+	mgColor clrbg = w->context->firstWindow->left == w ? style->windowBGTopWindow : style->windowBG;
+	mgColor clrttl = w->context->firstWindow->left == w ? style->windowTitlebarTopWindow : style->windowTitlebar;
 
 	w->context->gpu->setClipRect(&w->rect);
 	
@@ -294,7 +294,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					&pos,
 					w->titlebarText,
 					w->titlebarTextLen,
-					&style->windowTitlebarTextColor,
+					&style->windowTitlebarText,
 					w->titlebarFont);
 			}
 
@@ -397,7 +397,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					&pt,
 					w->menu->items[i].info.text,
 					w->menu->items[i].textLen,
-					&style->windowTitlebarTextColor,
+					&style->windowTitlebarText,
 					w->menu->font);
 			}
 		}
@@ -561,7 +561,10 @@ mgUpdateWindow(struct mgWindow_s* w)
 					w->cursorInfo = mgWindowCursorInfo_titlebar;
 
 					if (mgPointInRect(&w->closeButtonRect, &w->context->input->mousePosition))
+					{
 						w->cursorInfo = mgWindowCursorInfo_closeButton;
+						/*w->context->tooltipText = L"Close";*/
+					}
 					else if (mgPointInRect(&w->collapseButtonRect, &w->context->input->mousePosition))
 						w->cursorInfo = mgWindowCursorInfo_collapseButton;
 				}

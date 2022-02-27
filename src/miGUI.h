@@ -80,6 +80,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_windowMenuBG,
 	mgDrawRectangleReason_windowMenuHoverItemBG,
 	mgDrawRectangleReason_windowMenuActiveItemBG,
+	mgDrawRectangleReason_tooltip,
 	mgDrawRectangleReason_rectangle,
 	mgDrawRectangleReason_buttonBG,
 	mgDrawRectangleReason_dockBG,
@@ -106,6 +107,7 @@ enum mgDrawTextReason
 	mgDrawTextReason_text,
 	mgDrawTextReason_popup,
 	mgDrawTextReason_popupShortcut,
+	mgDrawTextReason_tooltip,
 };
 
 /* Before creating GUI context you must create this objects.
@@ -350,6 +352,10 @@ typedef struct mgContext_s {
 	int cursorInPopup;
 
 	mgIconGroup* defaultIconGroup;
+	
+	mgFont* tooltipFont;
+	const wchar_t* tooltipText;
+
 
 } mgContext;
 

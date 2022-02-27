@@ -546,8 +546,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 	{
 		c->gpu->setClipRect(&c->dockPanel->rect);
 		c->gpu->drawRectangle(mgDrawRectangleReason_dockBG, &c->dockPanel->rect, 
-			&c->activeStyle->dockpanelBGColor, 
-			&c->activeStyle->dockpanelBGColor, 
+			&c->activeStyle->dockpanelBG, 
+			&c->activeStyle->dockpanelBG, 
 			0, 0, 0);
 	}
 
@@ -570,8 +570,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 		{
 			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->tabRect);
 			c->gpu->drawRectangle(mgDrawRectangleReason_dockTabBG, &c->dockPanel->arrayWindows[i]->tabRect,
-				&c->activeStyle->windowBGColor,
-				&c->activeStyle->windowBGColor,
+				&c->activeStyle->windowBG,
+				&c->activeStyle->windowBG,
 				0, 0, 0);
 			
 			/*mgPoint p;
@@ -621,7 +621,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 						c->gpu->drawText(0, &p, 
 							wnd->titlebarText, 
 							wnd->titlebarTextLen, 
-							&c->activeStyle->windowTitlebarTextColor, 
+							&c->activeStyle->windowTitlebarText, 
 							wnd->titlebarFont);
 					}
 				}
@@ -642,8 +642,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 				break;
 			}
 			c->gpu->drawRectangle(reason, &c->dockPanel->arrayWindows[i]->splitterRect,
-				&c->activeStyle->dockpanelPanelSplitterBGColor,
-				&c->activeStyle->dockpanelPanelSplitterBGColor,
+				&c->activeStyle->dockpanelPanelSplitterBG,
+				&c->activeStyle->dockpanelPanelSplitterBG,
 				0, 0, 0);
 		}
 	}
@@ -662,8 +662,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 				break;
 			}
 			c->gpu->drawRectangle(reason, &c->dockPanel->elements[i].splitterRect,
-				&c->activeStyle->dockpanelSplitterBGColor,
-				&c->activeStyle->dockpanelSplitterBGColor,
+				&c->activeStyle->dockpanelSplitterBG,
+				&c->activeStyle->dockpanelSplitterBG,
 				0, 0, 0);
 		}
 	}
@@ -672,8 +672,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 	{
 		c->gpu->setClipRect(&g_windowToDockRect);
 		c->gpu->drawRectangle(mgDrawRectangleReason_dockWindowToDock, &g_windowToDockRect,
-			&c->activeStyle->dockpanelWindowToDockColor,
-			&c->activeStyle->dockpanelWindowToDockColor,
+			&c->activeStyle->dockpanelWindowToDock,
+			&c->activeStyle->dockpanelWindowToDock,
 			0, 0, 0);
 	}
 }

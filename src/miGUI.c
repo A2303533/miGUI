@@ -30,6 +30,7 @@
 #include "mgFunctions.h"
 
 #include <time.h>
+#include <wchar.h>
 
 void mgInitDefaultCursors(mgContext* c);
 void mgDestroyDefaultCursors(mgContext* c);
@@ -71,16 +72,16 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->activeStyle = &c->styleLight;
 	c->deltaTime = 0.f;
 
-	mgColorSetAsIntegerRGB(&c->styleLight.windowBGColor, 0xE1E6F7);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColor, 0xC9D6F2);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowBGColorTopWindow, 0xE8EDFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarColorTopWindow, 0xB5CCFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarTextColor, 0x0);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelBGColor, 0xFFFFFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelWindowToDockColor, 0x009BFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabBGColor, 0x009BFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelSplitterBGColor, 0xC4C4C4);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelPanelSplitterBGColor, 0xC8C8C8);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowBG, 0xE1E6F7);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebar, 0xC9D6F2);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowBGTopWindow, 0xE8EDFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarTopWindow, 0xB5CCFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarText, 0x0);
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelBG, 0xFFFFFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelWindowToDock, 0x009BFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabBG, 0x009BFF);
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelSplitterBG, 0xC4C4C4);
+	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelPanelSplitterBG, 0xC8C8C8);
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabWindowTitleBG, 0xE5F3FF);
 	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabActiveWindowTitleBG, 0xB2D2FF);
 	mgColorSetAsIntegerRGB(&c->styleLight.popupBG, 0xE8EDFF);
@@ -93,9 +94,8 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuBG, 0xD6E1FF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuHoverItemBG, 0x9EC0FF);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuActiveItemBG, 0x00E1FF);
-	
-	
-	
+	mgColorSetAsIntegerRGB(&c->styleLight.tooltipBG, 0xD6E5FF);
+	mgColorSetAsIntegerRGB(&c->styleLight.tooltipText, 0x0);
 
 	c->functions.SetCursor_p = mgSetCursor_f;
 
@@ -223,6 +223,8 @@ void MG_C_DECL
 mgUpdate_f(mgContext* c)
 {
 	assert(c);
+
+	c->tooltipText = 0;
 
 	unsigned int ctrl_shift_alt = 0;
 	if (mgIsKeyHold(c->input, MG_KEY_LALT) || mgIsKeyHold(c->input, MG_KEY_RALT))
@@ -481,6 +483,8 @@ mgDraw_f(mgContext* c)
 {
 	assert(c);
 
+	static int drawTooltip = 0;
+
 	if (c->dockPanel)
 		mgDrawDockPanel(c);
 
@@ -505,6 +509,106 @@ mgDraw_f(mgContext* c)
 
 	if (c->activePopup)
 		mgDrawPopup(c, c->activePopup);
+
+	if(!c->tooltipText)
+		drawTooltip = 0;
+
+	if (c->tooltipText && c->tooltipFont)
+	{
+		static float tttime = 0.f;
+		static mgRect cursorRect;
+		static mgPoint saveCursorPos;
+
+		tttime += c->deltaTime;
+		if (tttime > 0.5f)
+		{
+			tttime = 0.f;
+			if (!drawTooltip)
+			{
+				drawTooltip = 1;
+				cursorRect.left = c->input->mousePosition.x - 10;
+				cursorRect.top = c->input->mousePosition.y - 10;
+				cursorRect.right = c->input->mousePosition.x + 20;
+				cursorRect.bottom = c->input->mousePosition.y + 20;
+				saveCursorPos = c->input->mousePosition;
+			}
+		}
+		
+		/*c->gpu->drawRectangle(mgDrawRectangleReason_tooltip,
+			&cursorRect,
+			&c->activeStyle->popupSeparator,
+			&c->activeStyle->popupSeparator,
+			0, 0, 0);*/
+
+		if (drawTooltip)
+		{
+			size_t textLen = wcslen(c->tooltipText);
+			if (textLen)
+			{
+				int tooltipIndent = 3;
+
+				mgRect r;
+				r.left = saveCursorPos.x;
+				r.top = saveCursorPos.y;
+				r.bottom = r.top;
+				r.right = r.left;
+
+				mgPoint pt;
+				c->getTextSize(c->tooltipText, c->tooltipFont, &pt);
+
+				r.left -= tooltipIndent;
+				r.top -= tooltipIndent;
+				r.right += tooltipIndent + pt.x;
+				r.bottom += tooltipIndent + pt.y;
+
+
+				r.top += 10;
+				r.bottom += 10;
+
+				if (r.top < cursorRect.bottom)
+				{
+					int v = cursorRect.bottom - r.top;
+					r.top += v;
+					r.bottom += v;
+				}
+
+				if (r.bottom > c->windowSize.y)
+				{
+					int v = (r.bottom - c->windowSize.y) + 20;
+					r.top -= v;
+					r.bottom -= v;
+				}
+
+				c->gpu->setClipRect(&r);
+				c->gpu->drawRectangle(mgDrawRectangleReason_tooltip,
+					&r,
+					&c->activeStyle->tooltipBG,
+					&c->activeStyle->tooltipBG,
+					0, 0, 0);
+
+				pt.x = r.left + tooltipIndent;
+				pt.y = r.top + tooltipIndent;
+
+				c->gpu->drawText(mgDrawTextReason_tooltip,
+					&pt,
+					c->tooltipText,
+					textLen,
+					&c->activeStyle->tooltipText,
+					c->tooltipFont);
+			}
+		}
+
+		if (c->input->mouseMoveDelta.x || c->input->mouseMoveDelta.y)
+		{
+			if (!mgPointInRect(&cursorRect, &c->input->mousePosition))
+			{
+				drawTooltip = 0;
+				tttime = 0.f;
+				mgRectSet(&cursorRect, 0, 0, 0, 0);
+				mgPointSet(&saveCursorPos, 0, 0);
+			}
+		}
+	}
 }
 
 MG_API

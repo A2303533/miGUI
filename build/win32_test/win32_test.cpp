@@ -11,6 +11,7 @@
 
 #include <objidl.h>
 #include <gdiplus.h>
+
 #pragma comment (lib,"Gdiplus.lib")
 Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 ULONG_PTR           gdiplusToken;
@@ -204,14 +205,16 @@ void gui_drawRectangle(
         || reason == mgDrawRectangleReason_dockPanelSplitterBGHor
         || reason == mgDrawRectangleReason_dockPanelSplitterBGVert
         || reason == mgDrawRectangleReason_dockBG
+        || reason == mgDrawRectangleReason_tooltip
         || reason == mgDrawRectangleReason_windowMenuBG
         || reason == mgDrawRectangleReason_popupSeparator
         || reason == mgDrawRectangleReason_dockTabWindowTitle
         || reason == mgDrawRectangleReason_dockTabBG)
     {
-        if (reason == mgDrawRectangleReason_popupBG)
+        if (reason == mgDrawRectangleReason_popupBG
+            || reason == mgDrawRectangleReason_tooltip)
         {
-            // BORDER for popup
+            // BORDER for popup and tooltip
             int sz = 1;
             RECT r2 = r;
             r2.left -= sz;
@@ -246,6 +249,7 @@ void gui_drawRectangle(
         
 
         FillRect(hdcMem, &r, brsh);
+
     }
     else
     {
@@ -520,7 +524,6 @@ void loadDock(struct mgElement_s* e)
     }
 }
 
-
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -603,6 +606,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_win32font = gui_createFont("Segoe", 0, 10);
     g_gui_context->defaultPopupFont = g_win32font;
+    g_gui_context->tooltipFont = g_win32font;
     {
         mgDockPanelElementCreationInfo dckElmts[] = {
             {1, 20, 20, 1000},

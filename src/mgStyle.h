@@ -30,22 +30,25 @@
 #define _MG_STYLE_H_
 
 typedef struct mgStyle_s {
-	mgColor windowBGColor;
-	mgColor windowTitlebarColor;
-	mgColor windowBGColorTopWindow;
-	mgColor windowTitlebarColorTopWindow;
-	mgColor windowTitlebarTextColor;
+	mgColor windowBG;
+	mgColor windowTitlebar;
+	mgColor windowBGTopWindow;
+	mgColor windowTitlebarTopWindow;
+	mgColor windowTitlebarText;
 	mgColor windowScrollbarBG;
 	mgColor windowScrollbarElement;
 	mgColor windowMenuBG;
 	mgColor windowMenuHoverItemBG;
 	mgColor windowMenuActiveItemBG;
-	
-	mgColor dockpanelBGColor;
-	mgColor dockpanelSplitterBGColor;
-	mgColor dockpanelPanelSplitterBGColor;
-	mgColor dockpanelWindowToDockColor;
-	mgColor dockpanelTabBGColor;
+
+	mgColor tooltipBG;
+	mgColor tooltipText;
+
+	mgColor dockpanelBG;
+	mgColor dockpanelSplitterBG;
+	mgColor dockpanelPanelSplitterBG;
+	mgColor dockpanelWindowToDock;
+	mgColor dockpanelTabBG;
 	mgColor dockpanelTabWindowTitleBG;
 	mgColor dockpanelTabActiveWindowTitleBG;
 	
