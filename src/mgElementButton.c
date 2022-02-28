@@ -81,7 +81,9 @@ miGUI_onDraw_button(mgElement* e)
 	}
 
 	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG, &e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, e, 0, 0);
+	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG, 
+		impl,
+		&e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, e, 0, 0);
 
 	if (impl->text && impl->textLen)
 	{
@@ -106,7 +108,8 @@ miGUI_onDraw_button(mgElement* e)
 		pos.x += impl->textIndentInternal.x;
 		pos.y += impl->textIndentInternal.y;
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-		e->window->context->gpu->drawText(mgDrawTextReason_buttonText, &pos, impl->text, impl->textLen, &impl->textColorFinal, impl->font);
+		e->window->context->gpu->drawText(mgDrawTextReason_buttonText, impl, 
+			&pos, impl->text, impl->textLen, &impl->textColorFinal, impl->font);
 	}
 }
 

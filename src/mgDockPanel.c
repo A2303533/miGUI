@@ -545,7 +545,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 	if (c->dockPanel->flags & mgDockPanelFlag_drawBG)
 	{
 		c->gpu->setClipRect(&c->dockPanel->rect);
-		c->gpu->drawRectangle(mgDrawRectangleReason_dockBG, &c->dockPanel->rect, 
+		c->gpu->drawRectangle(mgDrawRectangleReason_dockBG, c->dockPanel,
+			&c->dockPanel->rect, 
 			&c->activeStyle->dockpanelBG, 
 			&c->activeStyle->dockpanelBG, 
 			0, 0, 0);
@@ -557,7 +558,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 
 		if (c->dockPanel->elements[i].flags & mgDockPanelElementFlag_drawBG)
 		{
-			c->gpu->drawRectangle(mgDrawRectangleReason_dockElementBG, &c->dockPanel->elements[i].rect,
+			c->gpu->drawRectangle(mgDrawRectangleReason_dockElementBG, c->dockPanel, 
+				&c->dockPanel->elements[i].rect,
 				&c->dockPanel->elements[i].colorBG, 
 				&c->dockPanel->elements[i].colorBG, 
 				0, 0, 0);
@@ -569,7 +571,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 		for (int i = 0; i < c->dockPanel->arrayWindowsSize; ++i)
 		{
 			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->tabRect);
-			c->gpu->drawRectangle(mgDrawRectangleReason_dockTabBG, &c->dockPanel->arrayWindows[i]->tabRect,
+			c->gpu->drawRectangle(mgDrawRectangleReason_dockTabBG, c->dockPanel, 
+				&c->dockPanel->arrayWindows[i]->tabRect,
 				&c->activeStyle->windowBG,
 				&c->activeStyle->windowBG,
 				0, 0, 0);
@@ -599,7 +602,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 
 					if (c->dockPanel->elements[i].panelWindows[i2]->activeWindow == wnd)
 					{
-						c->gpu->drawRectangle(mgDrawRectangleReason_dockTabWindowTitle,
+						c->gpu->drawRectangle(mgDrawRectangleReason_dockTabWindowTitle, c->dockPanel,
 							&wnd->dockPanelTabRect,
 							&c->activeStyle->dockpanelTabActiveWindowTitleBG,
 							&c->activeStyle->dockpanelTabActiveWindowTitleBG,
@@ -607,7 +610,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 					}
 					else
 					{
-						c->gpu->drawRectangle(mgDrawRectangleReason_dockTabWindowTitle,
+						c->gpu->drawRectangle(mgDrawRectangleReason_dockTabWindowTitle, c->dockPanel,
 							&wnd->dockPanelTabRect,
 							&c->activeStyle->dockpanelTabWindowTitleBG,
 							&c->activeStyle->dockpanelTabWindowTitleBG,
@@ -618,7 +621,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 						mgPoint p;
 						p.x = wnd->dockPanelTabRect.left+3;
 						p.y = wnd->dockPanelTabRect.top;
-						c->gpu->drawText(0, &p, 
+						c->gpu->drawText(0, c->dockPanel,
+							&p, 
 							wnd->titlebarText, 
 							wnd->titlebarTextLen, 
 							&c->activeStyle->windowTitlebarText, 
@@ -641,7 +645,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 				reason = mgDrawRectangleReason_dockPanelSplitterBGVert;
 				break;
 			}
-			c->gpu->drawRectangle(reason, &c->dockPanel->arrayWindows[i]->splitterRect,
+			c->gpu->drawRectangle(reason, c->dockPanel, 
+				&c->dockPanel->arrayWindows[i]->splitterRect,
 				&c->activeStyle->dockpanelPanelSplitterBG,
 				&c->activeStyle->dockpanelPanelSplitterBG,
 				0, 0, 0);
@@ -661,7 +666,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 				reason = mgDrawRectangleReason_dockSplitterBGVert;
 				break;
 			}
-			c->gpu->drawRectangle(reason, &c->dockPanel->elements[i].splitterRect,
+			c->gpu->drawRectangle(reason, c->dockPanel, 
+				&c->dockPanel->elements[i].splitterRect,
 				&c->activeStyle->dockpanelSplitterBG,
 				&c->activeStyle->dockpanelSplitterBG,
 				0, 0, 0);
@@ -671,7 +677,8 @@ mgDrawDockPanel(struct mgContext_s* c)
 	if (g_windowToDockPanelMode)
 	{
 		c->gpu->setClipRect(&g_windowToDockRect);
-		c->gpu->drawRectangle(mgDrawRectangleReason_dockWindowToDock, &g_windowToDockRect,
+		c->gpu->drawRectangle(mgDrawRectangleReason_dockWindowToDock, c->dockPanel, 
+			&g_windowToDockRect,
 			&c->activeStyle->dockpanelWindowToDock,
 			&c->activeStyle->dockpanelWindowToDock,
 			0, 0, 0);

@@ -817,6 +817,7 @@ mgRect gui_setClipRect(mgRect* r)
 
 void gui_drawRectangle(
     int reason,
+    void* object,
     mgRect* rct,
     mgColor* color1,
     mgColor* color2,
@@ -834,6 +835,7 @@ void gui_drawRectangle(
 
 void gui_drawText(
     int reason,
+    void* object,
     mgPoint* position,
     const wchar_t* text,
     int textLen,
@@ -914,7 +916,7 @@ void draw_gui()
     mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
     mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
 
-    g_gui_context->gpu->drawRectangle(0, &rect, &color1, &color2, 0, 0, 0);
+    g_gui_context->gpu->drawRectangle(0, 0, &rect, &color1, &color2, 0, 0, 0);
 
     mgPoint textPosition;
     mgPointSet(&textPosition, 10, 10);
@@ -924,48 +926,48 @@ void draw_gui()
     
     swprintf(textBuffer, 200, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
     mgPointSet(&textPosition, 10, 10);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     
     swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
     mgPointSet(&textPosition, 10, 20);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     
     swprintf_s(textBuffer, L"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
     mgPointSet(&textPosition, 10, 30);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     
     swprintf_s(textBuffer, L"mouseButtons: 0x%x 0x%x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
     mgPointSet(&textPosition, 10, 40);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
 
     swprintf_s(textBuffer, L"key char: %c 0x%x", g_input.character, g_input.character);
     mgPointSet(&textPosition, 10, 50);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
 
     if (mgIsKeyHit(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Hit ENTER");
         mgPointSet(&textPosition, 10, 60);
-        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     }
 
     if (mgIsKeyHold(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Hold ENTER");
         mgPointSet(&textPosition, 10, 70);
-        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     }
 
     if (mgIsKeyRelease(&g_input, MG_KEY_ENTER))
     {
         swprintf_s(textBuffer, L"Release ENTER");
         mgPointSet(&textPosition, 10, 80);
-        gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
     }
 
     swprintf_s(textBuffer, L"KB modifier 0x%x\n", g_input.keyboardModifier);
     mgPointSet(&textPosition, 10, 90);
-    gui_drawText(0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
+    gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_font);
 
     /*draw elements*/
     mgDraw(g_gui_context);

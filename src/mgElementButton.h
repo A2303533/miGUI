@@ -49,11 +49,19 @@ typedef struct mgElementButton_s {
 	mgColor textColorFinal;
 
 	int enabled;
+	int pushButton;
 
 	mgFont* font;
 	const wchar_t* text;
 	int textLen;
 	mgPoint textIndentInternal;
+
+	mgIcons* icons;
+	int iconID_default;
+	int iconID_hover;
+	int iconID_push;
+	int iconID_disable;
+	int drawBG; /*only if icons*/
 
 } mgElementButton;
 

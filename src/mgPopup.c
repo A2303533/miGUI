@@ -159,6 +159,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 {
 	c->gpu->setClipRect(&p->rect);
 	c->gpu->drawRectangle(mgDrawRectangleReason_popupBG, 
+		p,
 		&p->rect,
 		&c->activeStyle->popupBG,
 		&c->activeStyle->popupBG,
@@ -178,6 +179,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 			r.right = p->rect.right;
 			r.bottom = r.top + 5;
 			c->gpu->drawRectangle(mgDrawRectangleReason_popupSeparator,
+				p,
 				&r,
 				&c->activeStyle->popupSeparator,
 				&c->activeStyle->popupSeparator,
@@ -189,13 +191,16 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 			if (&p->items[i] == p->nodeUnderCursor)
 			{
 				c->gpu->drawRectangle(mgDrawRectangleReason_popupHoverElement,
+					p,
 					&p->nodeUnderCursorRect,
 					&c->activeStyle->popupHoverElementBG,
 					&c->activeStyle->popupHoverElementBG,
 					0, 0, 0);
 			}
 
-			c->gpu->drawText(mgDrawTextReason_popup, &pt,
+			c->gpu->drawText(mgDrawTextReason_popup, 
+				p,
+				&pt,
 				p->items[i].info.text,
 				p->items[i].textLen,
 				&c->activeStyle->popupText,
@@ -205,7 +210,9 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 			{
 				pt2 = pt;
 				pt2.x += p->items[i].indentForShortcutText;
-				c->gpu->drawText(mgDrawTextReason_popupShortcut, &pt2,
+				c->gpu->drawText(mgDrawTextReason_popupShortcut, 
+					p,
+					&pt2,
 					p->items[i].info.shortcutText,
 					p->items[i].shortcutTextLen,
 					&c->activeStyle->popupTextShortcut,
@@ -240,6 +247,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 				}
 
 				c->gpu->drawRectangle(mgDrawRectangleReason_popupNextIcon,
+					p,
 					&r, &wh, &wh, 0, iconGroup->icons->texture, 0);
 			}
 

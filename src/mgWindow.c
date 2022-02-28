@@ -94,9 +94,6 @@ MG_C_DECL
 mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 {
 	assert(ctx);
-
-	/*static int uniqueID = 1;*/
-
 	mgWindow* newWindow = calloc(1, sizeof(mgWindow));
 	newWindow->position.x = px;
 	newWindow->position.y = py;
@@ -171,9 +168,6 @@ mgDestroyWindow_f(struct mgWindow_s* w)
 	if (w->rootElement)
 		mgDestroyElement_f(w->rootElement);
 
-	/*if (w->titlebarText)
-		free(w->titlebarText);*/
-
 	free(w);
 }
 
@@ -229,7 +223,7 @@ mgDrawWindow(struct mgWindow_s* w)
 	{
 		if ((w->flags & mgWindowFlag_drawBG)
 			&& (w->flagsInternal & mgWindowFlag_internal_isExpand))
-			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, &w->rect, &clrbg, &clrbg, 0, 0, 0);
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, w, &w->rect, &clrbg, &clrbg, 0, 0, 0);
 
 		if ((w->flags & mgWindowFlag_withTitlebar) && !w->dockPanelWindow)
 		{
@@ -240,7 +234,7 @@ mgDrawWindow(struct mgWindow_s* w)
 			w->rectTitlebar.right = w->position.x + w->size.x;
 			w->rectTitlebar.bottom = w->position.y + w->titlebarHeight;
 
-			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, 
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, w,
 				&w->rectTitlebar, &clrttl, &clrttl, 0, 0, 0);
 
 			int text_move = 0;
@@ -278,7 +272,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->context->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
 					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
 					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
-					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, 
+					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, w,
 						&w->collapseButtonRect, &wh, &wh, 0, iconGroup->icons->texture, 0);
 				}
 			}
@@ -290,7 +284,7 @@ mgDrawWindow(struct mgWindow_s* w)
 				pos.y = w->position.y;
 
 				w->context->gpu->setClipRect(&w->rect);
-				w->context->gpu->drawText(mgDrawTextReason_windowTitlebar,
+				w->context->gpu->drawText(mgDrawTextReason_windowTitlebar, w,
 					&pos,
 					w->titlebarText,
 					w->titlebarTextLen,
@@ -333,7 +327,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->context->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
 					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
 					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
-					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, 
+					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, w,
 						&w->closeButtonRect, &wh, &wh, 0, iconGroup->icons->texture, 0);
 				}
 			}
@@ -346,13 +340,13 @@ mgDrawWindow(struct mgWindow_s* w)
 		if (w->flagsInternal & mgWindowFlag_internal_canScroll)
 		{
 			w->context->gpu->setClipRect(&w->scrollbarBGRect);
-			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowScrollbarBG,
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowScrollbarBG, w,
 				&w->scrollbarBGRect,
 				&style->windowScrollbarBG,
 				&style->windowScrollbarBG,
 				0, 0, 0);
 			
-			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowScrollbarElement,
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowScrollbarElement, w,
 				&w->scrollbarElementRect,
 				&style->windowScrollbarElement,
 				&style->windowScrollbarElement,
@@ -362,7 +356,7 @@ mgDrawWindow(struct mgWindow_s* w)
 		if (w->menu)
 		{
 			w->context->gpu->setClipRect(&w->menuRect);
-			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuBG,
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuBG, w,
 				&w->menuRect,
 				&style->windowMenuBG,
 				&style->windowMenuBG,
@@ -372,7 +366,7 @@ mgDrawWindow(struct mgWindow_s* w)
 			{
 				if (w->menu->activeItem == &w->menu->items[i])
 				{
-					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuActiveItemBG,
+					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuActiveItemBG, w,
 						&w->menu->activeItem->rect,
 						&style->windowMenuActiveItemBG,
 						&style->windowMenuActiveItemBG,
@@ -380,7 +374,7 @@ mgDrawWindow(struct mgWindow_s* w)
 				}
 				else if (w->menu->hoverItem == &w->menu->items[i])
 				{
-					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuHoverItemBG,
+					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuHoverItemBG, w,
 						&w->menu->hoverItem->rect,
 						&style->windowMenuHoverItemBG,
 						&style->windowMenuHoverItemBG,
@@ -393,7 +387,7 @@ mgDrawWindow(struct mgWindow_s* w)
 				pt.x = w->menu->items[i].rect.left + w->menu->textIndent;
 				pt.y = w->menu->items[i].rect.top;
 
-				w->context->gpu->drawText(mgDrawTextReason_windowMenu,
+				w->context->gpu->drawText(mgDrawTextReason_windowMenu, w,
 					&pt,
 					w->menu->items[i].info.text,
 					w->menu->items[i].textLen,

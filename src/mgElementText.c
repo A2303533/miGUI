@@ -64,7 +64,7 @@ miGUI_onDraw_text(mgElement* e)
 	if (impl->text && impl->textLen)
 	{
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-		e->window->context->gpu->drawText(mgDrawTextReason_text, &pos, impl->text, impl->textLen, &impl->color, impl->font);
+		e->window->context->gpu->drawText(mgDrawTextReason_text, impl, &pos, impl->text, impl->textLen, &impl->color, impl->font);
 	}
 }
 

@@ -126,6 +126,7 @@ typedef struct mgVideoDriverAPI_s {
 
 	void(*drawRectangle)(
 		int reason,
+		void* object,  /*depends on reason*/
 		mgRect* rect,
 		mgColor* color1, 
 		mgColor* color2, 
@@ -133,7 +134,10 @@ typedef struct mgVideoDriverAPI_s {
 		mgTexture texture, /*optional*/
 		mgVec4* UVRegion); /*optional*/
 
-	void(*drawText)( int reason, mgPoint* position, const wchar_t* text, int textLen, mgColor*, mgFont*);
+	void(*drawText)( 
+		int reason, 
+		void* object,  /*depends on reason*/
+		mgPoint* position, const wchar_t* text, int textLen, mgColor*, mgFont*);
 
 	/*set new and return old clip rect*/
 	mgRect(*setClipRect)(mgRect*);

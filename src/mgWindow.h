@@ -64,6 +64,7 @@ enum mgWindowCursorInfo
 typedef struct mgWindow_s {
 	mgStyle* userStyle; /*optional*/
 
+	void* userData;
 	int id;
 
 	mgPoint position;

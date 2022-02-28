@@ -581,6 +581,7 @@ mgDraw_f(mgContext* c)
 
 				c->gpu->setClipRect(&r);
 				c->gpu->drawRectangle(mgDrawRectangleReason_tooltip,
+					0,
 					&r,
 					&c->activeStyle->tooltipBG,
 					&c->activeStyle->tooltipBG,
@@ -590,6 +591,7 @@ mgDraw_f(mgContext* c)
 				pt.y = r.top + tooltipIndent;
 
 				c->gpu->drawText(mgDrawTextReason_tooltip,
+					0,
 					&pt,
 					c->tooltipText,
 					textLen,
