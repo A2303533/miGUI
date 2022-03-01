@@ -223,7 +223,7 @@ mgDrawWindow(struct mgWindow_s* w)
 	{
 		if ((w->flags & mgWindowFlag_drawBG)
 			&& (w->flagsInternal & mgWindowFlag_internal_isExpand))
-			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, w, &w->rect, &clrbg, &clrbg, 0, 0, 0);
+			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, w, &w->rect, &clrbg, &clrbg, 0, 0);
 
 		if ((w->flags & mgWindowFlag_withTitlebar) && !w->dockPanelWindow)
 		{
@@ -235,7 +235,7 @@ mgDrawWindow(struct mgWindow_s* w)
 			w->rectTitlebar.bottom = w->position.y + w->titlebarHeight;
 
 			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowTitlebar, w,
-				&w->rectTitlebar, &clrttl, &clrttl, 0, 0, 0);
+				&w->rectTitlebar, &clrttl, &clrttl, 0, 0);
 
 			int text_move = 0;
 			if (w->flags & mgWindowFlag_collapseButton)
@@ -273,7 +273,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
 					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, w,
-						&w->collapseButtonRect, &wh, &wh, 0, iconGroup->icons->texture, 0);
+						&w->collapseButtonRect, &wh, &wh, iconGroup->icons->texture, 0);
 				}
 			}
 
@@ -328,7 +328,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
 					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, w,
-						&w->closeButtonRect, &wh, &wh, 0, iconGroup->icons->texture, 0);
+						&w->closeButtonRect, &wh, &wh, iconGroup->icons->texture, 0);
 				}
 			}
 		}
@@ -344,13 +344,13 @@ mgDrawWindow(struct mgWindow_s* w)
 				&w->scrollbarBGRect,
 				&style->windowScrollbarBG,
 				&style->windowScrollbarBG,
-				0, 0, 0);
+				0, 0);
 			
 			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowScrollbarElement, w,
 				&w->scrollbarElementRect,
 				&style->windowScrollbarElement,
 				&style->windowScrollbarElement,
-				0, 0, 0);
+				0, 0);
 		}
 
 		if (w->menu)
@@ -360,7 +360,7 @@ mgDrawWindow(struct mgWindow_s* w)
 				&w->menuRect,
 				&style->windowMenuBG,
 				&style->windowMenuBG,
-				0, 0, 0);
+				0, 0);
 			mgPoint pt;
 			for (int i = 0; i < w->menu->itemsSize; ++i)
 			{
@@ -370,7 +370,7 @@ mgDrawWindow(struct mgWindow_s* w)
 						&w->menu->activeItem->rect,
 						&style->windowMenuActiveItemBG,
 						&style->windowMenuActiveItemBG,
-						0, 0, 0);
+						0, 0);
 				}
 				else if (w->menu->hoverItem == &w->menu->items[i])
 				{
@@ -378,7 +378,7 @@ mgDrawWindow(struct mgWindow_s* w)
 						&w->menu->hoverItem->rect,
 						&style->windowMenuHoverItemBG,
 						&style->windowMenuHoverItemBG,
-						0, 0, 0);
+						0, 0);
 				}
 
 				if (!w->menu->items[i].info.text)

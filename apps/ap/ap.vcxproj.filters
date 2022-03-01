@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\src\framework\mgfImpl.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\miGUILoader.c">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\BackendGDI.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\ContextImpl.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="migui">
+      <UniqueIdentifier>{186dde6e-fb4b-475a-901c-222f882dba05}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\framework\mgfImpl.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\SystemWindowImpl.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\BackendGDI.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\ContextImpl.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

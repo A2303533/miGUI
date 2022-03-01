@@ -42,3 +42,5 @@ build/d3d11_demo/Debug
 build/d3d11_demo/Release
 data/fonts
 bin32/dock.data
+apps/ap/Debug
+apps/ap/Release

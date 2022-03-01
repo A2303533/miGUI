@@ -83,7 +83,7 @@ miGUI_onDraw_button(mgElement* e)
 	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG, 
 		impl,
-		&e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, e, 0, 0);
+		&e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, 0, 0);
 
 	if (impl->text && impl->textLen)
 	{

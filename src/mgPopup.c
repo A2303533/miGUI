@@ -163,7 +163,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 		&p->rect,
 		&c->activeStyle->popupBG,
 		&c->activeStyle->popupBG,
-		0, 0, 0);
+		0, 0);
 
 	mgPoint pt;
 	mgPoint pt2;
@@ -183,7 +183,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 				&r,
 				&c->activeStyle->popupSeparator,
 				&c->activeStyle->popupSeparator,
-				0, 0, 0);
+				0, 0);
 			pt.y += 5;
 		}
 		else
@@ -195,7 +195,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 					&p->nodeUnderCursorRect,
 					&c->activeStyle->popupHoverElementBG,
 					&c->activeStyle->popupHoverElementBG,
-					0, 0, 0);
+					0, 0);
 			}
 
 			c->gpu->drawText(mgDrawTextReason_popup, 
@@ -248,7 +248,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 
 				c->gpu->drawRectangle(mgDrawRectangleReason_popupNextIcon,
 					p,
-					&r, &wh, &wh, 0, iconGroup->icons->texture, 0);
+					&r, &wh, &wh, iconGroup->icons->texture, 0);
 			}
 
 			pt.y += p->itemHeight;

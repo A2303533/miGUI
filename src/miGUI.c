@@ -585,7 +585,7 @@ mgDraw_f(mgContext* c)
 					&r,
 					&c->activeStyle->tooltipBG,
 					&c->activeStyle->tooltipBG,
-					0, 0, 0);
+					0, 0);
 
 				pt.x = r.left + tooltipIndent;
 				pt.y = r.top + tooltipIndent;

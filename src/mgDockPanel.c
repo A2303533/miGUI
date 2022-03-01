@@ -549,7 +549,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 			&c->dockPanel->rect, 
 			&c->activeStyle->dockpanelBG, 
 			&c->activeStyle->dockpanelBG, 
-			0, 0, 0);
+			0, 0);
 	}
 
 	for (int i = 0; i < c->dockPanel->elementsSize; ++i)
@@ -562,7 +562,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 				&c->dockPanel->elements[i].rect,
 				&c->dockPanel->elements[i].colorBG, 
 				&c->dockPanel->elements[i].colorBG, 
-				0, 0, 0);
+				0, 0);
 		}
 	}
 
@@ -575,7 +575,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 				&c->dockPanel->arrayWindows[i]->tabRect,
 				&c->activeStyle->windowBG,
 				&c->activeStyle->windowBG,
-				0, 0, 0);
+				0, 0);
 			
 			/*mgPoint p;
 			mgPointSet(&p, c->dockPanel->arrayWindows[i]->tabRect.left, c->dockPanel->arrayWindows[i]->tabRect.top);
@@ -606,7 +606,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 							&wnd->dockPanelTabRect,
 							&c->activeStyle->dockpanelTabActiveWindowTitleBG,
 							&c->activeStyle->dockpanelTabActiveWindowTitleBG,
-							0, 0, 0);
+							0, 0);
 					}
 					else
 					{
@@ -614,7 +614,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 							&wnd->dockPanelTabRect,
 							&c->activeStyle->dockpanelTabWindowTitleBG,
 							&c->activeStyle->dockpanelTabWindowTitleBG,
-							0, 0, 0);
+							0, 0);
 					}
 					if (wnd->titlebarText)
 					{
@@ -649,7 +649,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 				&c->dockPanel->arrayWindows[i]->splitterRect,
 				&c->activeStyle->dockpanelPanelSplitterBG,
 				&c->activeStyle->dockpanelPanelSplitterBG,
-				0, 0, 0);
+				0, 0);
 		}
 	}
 
@@ -670,7 +670,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 				&c->dockPanel->elements[i].splitterRect,
 				&c->activeStyle->dockpanelSplitterBG,
 				&c->activeStyle->dockpanelSplitterBG,
-				0, 0, 0);
+				0, 0);
 		}
 	}
 
@@ -681,7 +681,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 			&g_windowToDockRect,
 			&c->activeStyle->dockpanelWindowToDock,
 			&c->activeStyle->dockpanelWindowToDock,
-			0, 0, 0);
+			0, 0);
 	}
 }
 

@@ -821,7 +821,6 @@ void gui_drawRectangle(
     mgRect* rct,
     mgColor* color1,
     mgColor* color2,
-    mgElement* element, /*current element, can be null*/
     mgTexture texture, /*optional*/
     mgVec4* UVRegion)
 {
@@ -916,7 +915,7 @@ void draw_gui()
     mgColorSetAsIntegerRGB(&color1, 0xFFFF9999);
     mgColorSetAsIntegerRGB(&color2, 0xFF9999FF);
 
-    g_gui_context->gpu->drawRectangle(0, 0, &rect, &color1, &color2, 0, 0, 0);
+    g_gui_context->gpu->drawRectangle(0, 0, &rect, &color1, &color2, 0, 0);
 
     mgPoint textPosition;
     mgPointSet(&textPosition, 10, 10);

@@ -33,32 +33,17 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#if defined(WIN32)
-#define MG_PLATFORM_WINDOWS
-#define MG_C_DECL _cdecl
-#ifdef MG_DLL
-#define MG_API _declspec(dllexport) 
-#else
-#define MG_API _declspec(dllimport) 
-#endif
-#else
-#error Please write code for other OS
-#endif
-
-#define MG_MAKEFOURCC( ch0, ch1, ch2, ch3 )\
-	((unsigned int)(unsigned char)(ch0)|((unsigned int)(unsigned char)(ch1)<<8)|\
-	((unsigned int)(unsigned char)(ch2)<<16)|((unsigned int)(unsigned char)(ch3)<<24))
-
 struct mgContext_s;
 
+#include "mgDefs.h"
 #include "mgPoint.h"
 #include "mgRect.h"
 #include "mgVec4.h"
 #include "mgColor.h"
 #include "mgFont.h"
 #include "mgImage.h"
+#include "mgTexture.h"
 
-typedef void* mgTexture;
 
 #include "mgIcons.h"
 #include "mgStyle.h"
@@ -130,7 +115,6 @@ typedef struct mgVideoDriverAPI_s {
 		mgRect* rect,
 		mgColor* color1, 
 		mgColor* color2, 
-		mgElement* element, /*current element, can be null*/
 		mgTexture texture, /*optional*/
 		mgVec4* UVRegion); /*optional*/
 
