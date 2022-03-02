@@ -37,7 +37,7 @@
 using namespace mgf;
 
 Backend* g_backend = 0;
-Framework* g_mgf = 0;
+FrameworkImpl* g_mgf = 0;
 
 MG_LIB_HANDLE g_migui_dll = 0;
 
@@ -66,7 +66,38 @@ FrameworkImpl::~FrameworkImpl()
 
 bool FrameworkImpl::Run()
 {
+	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
+	{
+		auto c = m_contexts[i];
+		mgStartFrame(c->m_gui_context);
+	}
+
+	MSG msg;
+	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+	{
+		GetMessage(&msg, NULL, 0, 0);
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
+	{
+		auto c = m_contexts[i];
+		mgUpdate(c->m_gui_context);
+	}
+
 	return m_run;
+}
+
+void FrameworkImpl::DrawAll()
+{
+	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
+	{
+		auto c = m_contexts[i];
+		c->m_gui_context->gpu->beginDraw();
+		mgDraw(c->m_gui_context);
+		c->m_gui_context->gpu->endDraw();
+	}
 }
 
 Context* FrameworkImpl::CreateContext(
@@ -76,5 +107,7 @@ Context* FrameworkImpl::CreateContext(
 	Backend* backend
 )
 {
-	return new ContextImpl(t, windowPosition, windowSize, backend);
+	ContextImpl* c = new ContextImpl(t, windowPosition, windowSize, backend);
+	m_contexts.push_back(c);
+	return c;
 }

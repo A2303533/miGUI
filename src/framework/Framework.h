@@ -47,6 +47,7 @@ namespace mgf
 		* Return true if system work
 		*/
 		virtual bool Run() = 0;
+		virtual void DrawAll() = 0;
 	};
 
 	Framework* InitFramework();

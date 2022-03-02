@@ -279,7 +279,15 @@ mgUpdate_f(mgContext* c)
 	}
 
 	mgWindow* cw = c->firstWindow;
-	if (cw && !(c->dockPanel->flags & mgDockPanelFlag_onSplitter))
+
+	int ok = 1;
+	if (c->dockPanel)
+	{
+		if (c->dockPanel->flags & mgDockPanelFlag_onSplitter)
+			ok = 0;
+	}
+
+	if (cw && ok)
 	{
 		cw = cw->left;
 		

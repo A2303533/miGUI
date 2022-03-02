@@ -29,8 +29,11 @@
 #ifndef _MG_FRAMEWORK_IMPL_H_
 #define _MG_FRAMEWORK_IMPL_H_
 
+#include <vector>
+
 namespace mgf
 {
+	class ContextImpl;
 	class FrameworkImpl : public Framework
 	{
 	public:
@@ -44,7 +47,10 @@ namespace mgf
 			Backend* backend
 		) override;
 
+		std::vector<ContextImpl*> m_contexts;
+
 		virtual bool Run() override;
+		virtual void DrawAll() override;
 		
 		bool m_run = true;
 	};

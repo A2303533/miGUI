@@ -31,6 +31,13 @@
 
 namespace mgf
 {
+	using SystemWindowOnClose = int(*)(SystemWindow*);
+
+	struct SystemWindowOSData
+	{
+		void* handle = 0;
+	};
+
 	class SystemWindow : public BaseClass
 	{
 	public:
@@ -40,12 +47,16 @@ namespace mgf
 			type_default = 0
 		};
 
+		virtual const SystemWindowOSData& GetOSData() = 0;
+
 		virtual void SetTitle(const wchar_t*) = 0;
 		virtual void Show() = 0;
 		virtual void Hide() = 0;
 		virtual const mgPoint& GetSize() = 0;
 
 		virtual void UpdateBackbuffer() = 0;
+
+		virtual void SetOnClose(SystemWindowOnClose) = 0;
 	};
 }
 

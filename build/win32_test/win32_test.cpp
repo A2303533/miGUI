@@ -344,8 +344,6 @@ mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
         CLEARTYPE_QUALITY,
         VARIABLE_PITCH,
         fn);
-   /* f->implementation = CreateFont(48, 0, 0, 0, FW_DONTCARE, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS,
-        CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, TEXT("Impact"));*/
     ReleaseDC(g_hwnd, g_dc);
     return f;
 }

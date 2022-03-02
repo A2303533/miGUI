@@ -38,6 +38,11 @@ using namespace mgf;
 
 extern mgf::Backend* g_backend;
 
+void BackendGDI_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
+{
+	g_backend->GetTextSize(text, font, sz);
+}
+
 mgTexture BackendGDI_createTexture(mgImage* img)
 {
 	return g_backend;
@@ -88,6 +93,7 @@ mgRect BackendGDI_setClipRect(mgRect* r)
 
 BackendGDI::BackendGDI()
 {
+	m_getTextSize = BackendGDI_getTextSize;
 	g_backend = this;
 	m_gpu = new mgVideoDriverAPI;
 	((mgVideoDriverAPI*)m_gpu)->createTexture = BackendGDI_createTexture;
@@ -111,27 +117,26 @@ void* BackendGDI::GetVideoDriverAPI()
 
 void BackendGDI::BeginDraw()
 {
-	mgf::SystemWindowImpl* impl = (mgf::SystemWindowImpl*)m_window;
-	impl->m_hbmOld = (HBITMAP)SelectObject(impl->m_hdcMem, impl->m_hbmMem);
+	m_window->m_hbmOld = (HBITMAP)SelectObject(m_window->m_hdcMem, m_window->m_hbmMem);
 	RECT r;
 	r.left = 0;
 	r.top = 0;
-	r.right = impl->m_size.x;
-	r.bottom = impl->m_size.y;
-	FillRect(impl->m_hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
+	r.right = m_window->m_size.x + m_window->m_borderSize.x;
+	r.bottom = m_window->m_size.y + m_window->m_borderSize.y;
+	FillRect(m_window->m_hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
 }
 
 void BackendGDI::EndDraw()
 {
-	mgf::SystemWindowImpl* impl = (mgf::SystemWindowImpl*)m_window;
-	HDC dc = GetWindowDC(impl->m_hWnd);
+	HDC dc = GetWindowDC(m_window->m_hWnd);
 	BitBlt(dc,
 		0, 0,
-		impl->m_size.x, impl->m_size.y,
-		impl->m_hdcMem,
+		m_window->m_size.x + m_window->m_borderSize.x,
+		m_window->m_size.y + m_window->m_borderSize.y,
+		m_window->m_hdcMem,
 		0, 0,
 		SRCCOPY);
-	ReleaseDC(impl->m_hWnd, dc);
+	ReleaseDC(m_window->m_hWnd, dc);
 }
 
 mgTexture BackendGDI::CreateTexture(mgImage* img)
@@ -147,18 +152,57 @@ void BackendGDI::DestroyTexture(mgTexture)
 void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* color1, mgColor* color2,
 	mgTexture texture, mgVec4* UVRegion)
 {
+	unsigned int c1 = mgColorGetAsIntegerARGB(color1);
+	unsigned int c2 = mgColorGetAsIntegerARGB(color2);
+	HBRUSH brsh = CreateSolidBrush(RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
+	SelectObject(m_window->m_hdcMem, brsh);
 
+	RECT r;
+	r.left = rct->left + m_window->m_borderSize.x;
+	r.top = rct->top + m_window->m_borderSize.y;
+	r.right = rct->right + m_window->m_borderSize.x;
+	r.bottom = rct->bottom + m_window->m_borderSize.y;
+
+	HRGN rgn = 0;
+	rgn = CreateRectRgn(
+		m_clipRect.left + m_window->m_borderSize.x, 
+		m_clipRect.top + m_window->m_borderSize.y,
+		m_clipRect.right + m_window->m_borderSize.x,
+		m_clipRect.bottom + m_window->m_borderSize.y);
+	SelectClipRgn(m_window->m_hdcMem, rgn);
+	FillRect(m_window->m_hdcMem, &r, brsh);
+	DeleteObject(rgn);
+	DeleteObject(brsh);
+	SelectClipRgn(m_window->m_hdcMem, 0);
 }
 
 void BackendGDI::DrawText(int reason, void* object, mgPoint* position, const wchar_t* text, int textLen,
 	mgColor* color, mgFont* font)
 {
+	SelectObject(m_window->m_hdcMem, font->implementation);
+	SetTextColor(m_window->m_hdcMem, mgColorGetAsIntegerBGR(color));
+	SetBkMode(m_window->m_hdcMem, TRANSPARENT);
 
+	HRGN rgn = CreateRectRgn(
+		m_clipRect.left + m_window->m_borderSize.x,
+		m_clipRect.top + m_window->m_borderSize.y,
+		m_clipRect.right + m_window->m_borderSize.x,
+		m_clipRect.bottom + m_window->m_borderSize.y);
+
+	SelectClipRgn(m_window->m_hdcMem, rgn);
+	TextOutW(m_window->m_hdcMem, 
+		position->x + m_window->m_borderSize.x, 
+		position->y + m_window->m_borderSize.y, 
+		text, textLen);
+	DeleteObject(rgn);
+	SelectClipRgn(m_window->m_hdcMem, 0);
 }
 
 mgRect BackendGDI::SetClipRect(mgRect* r)
 {
-	return mgRect();
+	mgRect old = m_clipRect;
+	m_clipRect = *r;
+	return old;
 }
 
 
@@ -176,27 +220,36 @@ void BackendGDI_createBackBuffer(mgf::SystemWindowImpl* impl)
 
 void BackendGDI::InitWindow(mgf::SystemWindow* w)
 {
-	mgf::SystemWindowImpl* impl = (mgf::SystemWindowImpl*)w;
-	if (impl->m_hdcMem)
+	if (m_window->m_hdcMem)
 		return;
-	BackendGDI_createBackBuffer(impl);
+	BackendGDI_createBackBuffer(m_window);
 }
 
 void BackendGDI::SetActiveWindow(mgf::SystemWindow* w)
 {
-	m_window = w;
+	m_window = (mgf::SystemWindowImpl*)w;
 }
 
 void BackendGDI::UpdateBackbuffer()
 {
-	mgf::SystemWindowImpl* impl = (mgf::SystemWindowImpl*)m_window;
-
-	if (impl->m_hdcMem)
-		DeleteDC(impl->m_hdcMem);
-	if (impl->m_hbmMem)
-		DeleteObject(impl->m_hbmMem);
+	if (m_window->m_hdcMem)
+		DeleteDC(m_window->m_hdcMem);
+	if (m_window->m_hbmMem)
+		DeleteObject(m_window->m_hbmMem);
 	
-	BackendGDI_createBackBuffer(impl);
+	BackendGDI_createBackBuffer(m_window);
+}
+
+void BackendGDI::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
+{
+	SelectObject(m_window->m_hdcMem, font->implementation);
+	int c = wcslen(text);
+	if (!c)
+		return;
+	SIZE s;
+	GetTextExtentPoint32W(m_window->m_hdcMem, text, c, &s);
+	sz->x = s.cx;
+	sz->y = s.cy;
 }
 
 #endif

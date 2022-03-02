@@ -1,6 +1,16 @@
 #include "framework/mgf.h"
 #include "framework/BackendGDI.h"
 
+int window_OnClose(mgf::SystemWindow* w)
+{
+	return MessageBoxA(
+		(HWND)w->GetOSData().handle, 
+		"Close app", 
+		"Are you sure?", 
+		MB_ICONQUESTION | MB_YESNO) 
+		== IDYES ? 1 : 0;
+}
+
 int main()
 {
 	mgf::Ptr<mgf::Framework> framework = 0;
@@ -11,16 +21,17 @@ int main()
 		context = framework.m_data->CreateContext(mgf::SystemWindow::Type::type_default,
 			mgPoint(0,0), mgPoint(800, 600), new mgf::BackendGDI);
 
+		context.m_data->GetWindow()->SetOnClose(window_OnClose);
 		context.m_data->GetWindow()->Show();
 
-		//while (framework.m_data->Run())
+		bool sleep = true;
+
+		while (framework.m_data->Run())
 		{
-			MSG msg;
-			while (GetMessage(&msg, nullptr, 0, 0))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+			if (sleep)
+				Sleep(1);
+
+			framework.m_data->DrawAll();
 		}
 	}
 	catch (const char* str)

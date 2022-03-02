@@ -72,6 +72,10 @@ namespace mgf
 
 		/*return prev rect*/
 		virtual mgRect SetClipRect(mgRect* r) = 0;
+
+		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) = 0;
+
+		void (*m_getTextSize)(const wchar_t* text, mgFont*, mgPoint*) = 0;
 	};
 }
 

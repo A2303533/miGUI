@@ -39,10 +39,14 @@
 
 namespace mgf
 {
+	class SystemWindowImpl;
+
 	class BackendGDI : public Backend
 	{
-		mgf::SystemWindow* m_window = 0;
+		mgf::SystemWindowImpl* m_window = 0;
 		void* m_gpu = 0;
+
+		mgRect m_clipRect;
 
 	public:
 		BackendGDI();
@@ -64,6 +68,7 @@ namespace mgf
 		virtual void DrawText(int reason,void* object,mgPoint* position,const wchar_t* text,int textLen,
 			mgColor* color, mgFont* font) override;
 		virtual mgRect SetClipRect(mgRect* r) override;
+		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) override;
 	};
 
 }

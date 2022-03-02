@@ -50,12 +50,52 @@ ContextImpl::ContextImpl(
 
 	mgVideoDriverAPI* gpu = (mgVideoDriverAPI*)backend->GetVideoDriverAPI();
 	m_gui_context = mgCreateContext(gpu, &m_input);
+	m_gui_context->getTextSize = m_backend->m_getTextSize;
+
+	mgFont* g_win32font = 0;
+	{
+		mgFont* f = (mgFont*)malloc(sizeof(mgFont));
+		HDC g_dc = GetWindowDC(this->m_window->m_hWnd);
+		f->implementation = CreateFontA(
+			-MulDiv(11, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
+			0, 0, 0,
+			FW_NORMAL,
+			0,
+			0,
+			0,
+			DEFAULT_CHARSET,
+			OUT_OUTLINE_PRECIS,
+			CLIP_DEFAULT_PRECIS,
+			CLEARTYPE_QUALITY,
+			VARIABLE_PITCH,
+			"Segoe");
+		ReleaseDC(this->m_window->m_hWnd, g_dc);
+		g_win32font = f;
+	}
+
+	auto test_guiWindow1 = mgCreateWindow(m_gui_context, 110, 110, 300, 180);
+	test_guiWindow1->titlebarFont = g_win32font;
+	test_guiWindow1->titlebarHeight = 30;
+	test_guiWindow1->id = 0;
+	mgSetWindowTitle(test_guiWindow1, L"Window1");
+
+	{
+		RECT rc;
+		GetClientRect(this->m_window->m_hWnd, &rc);
+		m_gui_context->needRebuild = 1;
+		m_gui_context->windowSize.x = rc.right - rc.left;
+		m_gui_context->windowSize.y = rc.bottom - rc.top;
+	}
+	mgOnWindowSize(m_gui_context, m_gui_context->windowSize.x, m_gui_context->windowSize.y);
 }
 
 ContextImpl::~ContextImpl()
 {
 	if (m_gui_context)
+	{
 		mgDestroyContext(m_gui_context);
+		m_gui_context = 0;
+	}
 
 	if (m_backend)
 		m_backend->Release();
@@ -71,5 +111,8 @@ mgf::SystemWindow* ContextImpl::GetWindow()
 
 void ContextImpl::OnWindowSize()
 {
-
+	m_gui_context->needRebuild = 1;
+	m_gui_context->windowSize.x = m_window->m_size.x;
+	m_gui_context->windowSize.y = m_window->m_size.y;
+	mgOnWindowSize(m_gui_context, m_gui_context->windowSize.x, m_gui_context->windowSize.y);
 }

@@ -45,6 +45,8 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 #endif
 
+extern FrameworkImpl* g_mgf;
+
 
 SystemWindowImpl::SystemWindowImpl(SystemWindow::Type t)
 {
@@ -70,13 +72,23 @@ SystemWindowImpl::SystemWindowImpl(SystemWindow::Type t)
 
     m_hWnd = CreateWindowExW(0, m_className, L"mgf", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, 0, 0, wcex.hInstance, this);
+    
+    m_OSData.handle = m_hWnd;
 
     KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
     KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
 
-    int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
-    m_borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
+    UINT dpi = GetDpiForWindow(m_hWnd);
+    int padding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+    m_borderSize.x = GetSystemMetricsForDpi(SM_CXFRAME, dpi) + padding;
     m_borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
+
+    RAWINPUTDEVICE device;
+    device.usUsagePage = 0x01;
+    device.usUsage = 0x02;
+    device.dwFlags = 0;
+    device.hwndTarget = 0;
+    RegisterRawInputDevices(&device, 1, sizeof device);
 #endif
 }
 
@@ -98,6 +110,11 @@ SystemWindowImpl::~SystemWindowImpl()
         UnregisterClass(m_className, GetModuleHandle(0));
     }
 #endif
+}
+
+const SystemWindowOSData& SystemWindowImpl::GetOSData()
+{
+    return m_OSData;
 }
 
 void SystemWindowImpl::Show()
@@ -128,7 +145,12 @@ const mgPoint& SystemWindowImpl::GetSize()
 
 void SystemWindowImpl::UpdateBackbuffer()
 {
+    m_context->m_backend->UpdateBackbuffer();
+}
 
+void SystemWindowImpl::SetOnClose(SystemWindowOnClose c)
+{
+    m_onClose = c;
 }
 
 #ifdef MG_PLATFORM_WINDOWS
@@ -187,10 +209,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
     {
         /*draw_gui();*/
-        //PAINTSTRUCT ps;
-        //HDC hdc = BeginPaint(hWnd, &ps);
-        ////// TODO: Add any drawing code that uses hdc here...
-        //EndPaint(hWnd, &ps);
+        //if (pW)
+        //{
+        //    PAINTSTRUCT ps;
+        //    HDC hdc = BeginPaint(hWnd, &ps);
+        //    ////// TODO: Add any drawing code that uses hdc here...
+        //    //pW->m_context->
+
+        //    if (pW->m_context->m_gui_context)
+        //    {
+        //        pW->m_context->m_gui_context->gpu->beginDraw();
+        //        mgDraw(pW->m_context->m_gui_context);
+        //        pW->m_context->m_gui_context->gpu->endDraw();
+        //    }
+
+        //    EndPaint(hWnd, &ps);
+        //}
     }break;
     case WM_INPUT:
     {
@@ -292,12 +326,43 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
 
             }
+
+            /*if (pW->m_context->m_gui_context)
+            {
+                pW->m_context->m_gui_context->gpu->beginDraw();
+                mgDraw(pW->m_context->m_gui_context);
+                pW->m_context->m_gui_context->gpu->endDraw();
+            }*/
         }
+        //if (pW->m_context->m_gui_context)
+        //{
+        //    mgUpdate(pW->m_context->m_gui_context);
+        //    //printf("u");
+        //}
     }break;
-   /* case WM_DESTROY:
-        g_run = 0;
-        PostQuitMessage(0);
-        break;*/
+   case WM_CLOSE:
+       if (pW)
+       {
+           if (pW->m_onClose)
+           {
+               if (pW->m_onClose(pW))
+               {
+                   g_mgf->m_run = false;
+                   PostQuitMessage(0);
+               }
+           }
+           else
+           {
+               g_mgf->m_run = false;
+               PostQuitMessage(0);
+           }
+       }
+       else
+       {
+           g_mgf->m_run = false;
+           PostQuitMessage(0);
+       }
+       return 0;
     case WM_SETCURSOR: {
         auto id = LOWORD(lParam);
         switch (id)

@@ -42,12 +42,15 @@ namespace mgf
 	public:
 		SystemWindowImpl(SystemWindow::Type t);
 		virtual ~SystemWindowImpl();
+		
+		virtual const SystemWindowOSData& GetOSData() override;
 
 		virtual void SetTitle(const wchar_t*) override;
 		virtual void Show() override;
 		virtual void Hide() override;
 		virtual const mgPoint& GetSize() override;
 		virtual void UpdateBackbuffer() override;
+		virtual void SetOnClose(SystemWindowOnClose) override;
 
 #ifdef _WIN32
 		HWND m_hWnd = 0;
@@ -59,10 +62,13 @@ namespace mgf
 		HBITMAP m_hbmMem = 0;
 		HBITMAP m_hbmOld = 0;
 #endif
+		SystemWindowOSData m_OSData;
+
 		/*FrameworkImpl* m_mgf = 0;*/
 		ContextImpl* m_context = 0;
 		mgPoint m_size;
 		mgPoint m_borderSize;
+		SystemWindowOnClose m_onClose = 0;
 	};
 
 }
