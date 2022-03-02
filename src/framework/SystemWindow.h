@@ -57,6 +57,8 @@ namespace mgf
 		virtual void UpdateBackbuffer() = 0;
 
 		virtual void SetOnClose(SystemWindowOnClose) = 0;
+
+		virtual bool IsVisible() = 0;
 	};
 }
 

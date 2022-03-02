@@ -153,6 +153,11 @@ void SystemWindowImpl::SetOnClose(SystemWindowOnClose c)
     m_onClose = c;
 }
 
+bool SystemWindowImpl::IsVisible()
+{
+    return m_isVisible;
+}
+
 #ifdef MG_PLATFORM_WINDOWS
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -182,13 +187,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_SIZE:
     {
-        RECT rc;
-        GetClientRect(hWnd, &rc);
-        pW->m_size.x = rc.right - rc.left;
-        pW->m_size.y = rc.bottom - rc.top;
+        if (pW)
+        {
 
-        pW->UpdateBackbuffer();
-        pW->m_context->OnWindowSize();
+            RECT rc;
+            GetClientRect(hWnd, &rc);
+            pW->m_size.x = rc.right - rc.left;
+            pW->m_size.y = rc.bottom - rc.top;
+
+            pW->UpdateBackbuffer();
+            pW->m_context->OnWindowSize();
+
+            int wmId = LOWORD(wParam);
+            switch (wmId)
+            {
+            case SIZE_MINIMIZED:
+                pW->m_isVisible = false;
+                break;
+            case SIZE_RESTORED:
+            case SIZE_MAXIMIZED:
+                pW->m_isVisible = true;
+                break;
+            }
+        }
     }return DefWindowProc(hWnd, message, wParam, lParam);
     case WM_COMMAND:
     {

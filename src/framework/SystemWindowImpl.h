@@ -51,6 +51,9 @@ namespace mgf
 		virtual const mgPoint& GetSize() override;
 		virtual void UpdateBackbuffer() override;
 		virtual void SetOnClose(SystemWindowOnClose) override;
+		virtual bool IsVisible() override;
+
+		bool m_isVisible = false;
 
 #ifdef _WIN32
 		HWND m_hWnd = 0;

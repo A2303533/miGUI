@@ -32,6 +32,7 @@
 #include "framework/mgf.h"
 #include "framework/mgfImpl.h"
 #include "framework/ContextImpl.h"
+#include "framework/SystemWindowImpl.h"
 
 
 using namespace mgf;
@@ -39,16 +40,19 @@ using namespace mgf;
 Backend* g_backend = 0;
 FrameworkImpl* g_mgf = 0;
 
+#ifndef MG_NO_DLL
 MG_LIB_HANDLE g_migui_dll = 0;
+#endif
 
 Framework* mgf::InitFramework()
 {
+#ifndef MG_NO_DLL
 	g_migui_dll = mgLoad();
 	if (!g_migui_dll)
 	{
 		throw "Can't load migui.dll";
 	}
-
+#endif
 	g_mgf = new FrameworkImpl();
 	return g_mgf;
 }
@@ -59,8 +63,10 @@ FrameworkImpl::FrameworkImpl()
 
 FrameworkImpl::~FrameworkImpl()
 {
+#ifndef MG_NO_DLL
 	if(g_migui_dll)
 		mgUnload(g_migui_dll);
+#endif
 }
 
 
@@ -83,7 +89,8 @@ bool FrameworkImpl::Run()
 	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
 	{
 		auto c = m_contexts[i];
-		mgUpdate(c->m_gui_context);
+		if(c->m_window->m_isVisible)
+			mgUpdate(c->m_gui_context);
 	}
 
 	return m_run;
@@ -94,6 +101,8 @@ void FrameworkImpl::DrawAll()
 	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
 	{
 		auto c = m_contexts[i];
+		if (!c->m_window->m_isVisible)
+			continue;
 		c->m_gui_context->gpu->beginDraw();
 		mgDraw(c->m_gui_context);
 		c->m_gui_context->gpu->endDraw();

@@ -35,11 +35,16 @@
 #ifdef MG_DLL
 #define MG_API _declspec(dllexport) 
 #else
+#ifdef MG_NO_DLL
+#define MG_API 
+#else
 #define MG_API _declspec(dllimport) 
+#endif
 #endif
 #else
 #error Please write code for other OS
 #endif
+
 
 #define MG_MAKEFOURCC( ch0, ch1, ch2, ch3 )\
 	((unsigned int)(unsigned char)(ch0)|((unsigned int)(unsigned char)(ch1)<<8)|\

@@ -8,13 +8,13 @@
     <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp">
       <Filter>migui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\miGUILoader.c">
-      <Filter>migui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp">
       <Filter>migui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\framework\ContextImpl.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\miGUILoader.c">
       <Filter>migui</Filter>
     </ClCompile>
   </ItemGroup>
