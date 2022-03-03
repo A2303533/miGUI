@@ -29,6 +29,10 @@
 #ifndef _MGF_CONTEXT_IMPL_H_
 #define _MGF_CONTEXT_IMPL_H_
 
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
+
 namespace mgf
 {
 	class SystemWindowImpl;
@@ -36,15 +40,18 @@ namespace mgf
 	class ContextImpl : public Context
 	{
 	public:
-		ContextImpl(SystemWindow::Type t,
+		ContextImpl(int windowFlags,
 			const mgPoint& windowPosition,
 			const mgPoint& windowSize,
 			Backend* backend);
 		virtual ~ContextImpl();
 
-		virtual mgf::SystemWindow* GetWindow() override;
+		virtual mgf::SystemWindow* GetSystemWindow() override;
 		virtual void OnWindowSize() override;
-		
+		virtual mgf::Window* CreateWindow() override;
+
+		void DrawAll();
+
 		SystemWindowImpl* m_window = 0;
 		mgInputContext m_input;
 		mgContext* m_gui_context = 0;

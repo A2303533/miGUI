@@ -41,6 +41,8 @@ namespace mgf
 		*/
 		virtual void InitWindow(mgf::SystemWindow*) = 0;
 		virtual void SetActiveWindow(mgf::SystemWindow*) = 0;
+		virtual void SetActiveContext(mgf::Context*) = 0;
+
 		/*
 		* free memory for screen buffer and allocate new.
 		* for active window.
@@ -76,6 +78,12 @@ namespace mgf
 		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) = 0;
 
 		void (*m_getTextSize)(const wchar_t* text, mgFont*, mgPoint*) = 0;
+
+		virtual void* GetDefaultIcons() = 0;
+
+		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) = 0;
+		virtual void DestroyFont(Font*) = 0;
+		virtual Font* GetDefaultFont() = 0;
 	};
 }
 

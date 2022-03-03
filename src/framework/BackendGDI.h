@@ -32,22 +32,42 @@
 #ifdef MGF_BACKEND_GDI
 
 #include <Windows.h>
+#include <objidl.h>
+#include <gdiplus.h>
+//#pragma comment (lib,"Gdiplus.lib")
 
 #ifdef DrawText
 #undef DrawText
 #endif
 
+#ifdef CreateFont
+#undef CreateFont
+#endif
+
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
+
 namespace mgf
 {
 	class SystemWindowImpl;
+	class ContextImpl;
 
 	class BackendGDI : public Backend
 	{
 		mgf::SystemWindowImpl* m_window = 0;
+		mgf::ContextImpl* m_context = 0;
+
 		void* m_gpu = 0;
+		Gdiplus::GdiplusStartupInput m_gdiplusStartupInput = 0;
+		ULONG_PTR m_gdiplusToken = 0;
+
+		Gdiplus::Image* m_gdiimage_defaultIcons = 0;
+		Font* m_defaultFont = 0;
 
 		mgRect m_clipRect;
 
+		friend class ContextImpl;
 	public:
 		BackendGDI();
 		virtual ~BackendGDI();
@@ -56,6 +76,8 @@ namespace mgf
 
 		virtual void InitWindow(mgf::SystemWindow*) override;
 		virtual void SetActiveWindow(mgf::SystemWindow*) override;
+		virtual void SetActiveContext(mgf::Context*) override;
+
 		virtual void UpdateBackbuffer() override;
 
 		virtual void BeginDraw() override;
@@ -69,6 +91,10 @@ namespace mgf
 			mgColor* color, mgFont* font) override;
 		virtual mgRect SetClipRect(mgRect* r) override;
 		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) override;
+		virtual void* GetDefaultIcons() override;
+		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) override;
+		virtual void DestroyFont(Font*) override;
+		virtual Font* GetDefaultFont() override;
 	};
 
 }

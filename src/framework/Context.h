@@ -29,14 +29,20 @@
 #ifndef _MGF_CONTEXT_H_
 #define _MGF_CONTEXT_H_
 
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
+
 namespace mgf
 {
 	class Context : public BaseClass
 	{
 	public:
-		virtual mgf::SystemWindow* GetWindow() = 0;
+		virtual mgf::SystemWindow* GetSystemWindow() = 0;
 		
 		virtual void OnWindowSize() = 0;
+		
+		virtual mgf::Window* CreateWindow() = 0;
 	};
 }
 

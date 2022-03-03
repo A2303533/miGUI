@@ -36,7 +36,7 @@ namespace mgf
 	public:
 
 		virtual Context* CreateContext(
-			SystemWindow::Type, 
+			int windowFlags, /*WinAPI flags*/
 			const mgPoint& windowPosition,
 			const mgPoint& windowSize,
 			Backend* backend

@@ -48,7 +48,7 @@ static unsigned int LocaleIdToCodepage(unsigned int lcid);
 extern FrameworkImpl* g_mgf;
 
 
-SystemWindowImpl::SystemWindowImpl(SystemWindow::Type t)
+SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize)
 {
 #ifdef MG_PLATFORM_WINDOWS
     WNDCLASSEXW wcex;
@@ -70,8 +70,20 @@ SystemWindowImpl::SystemWindowImpl(SystemWindow::Type t)
     wcex.hIconSm = 0;// LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
     RegisterClassExW(&wcex);
 
-    m_hWnd = CreateWindowExW(0, m_className, L"mgf", WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, 0, 0, wcex.hInstance, this);
+    m_hWnd = CreateWindowExW(
+        0, 
+        m_className, 
+        L"mgf", 
+        windowFlags,
+        windowPosition.x,
+        windowPosition.y,
+        windowSize.x,
+        windowSize.y,
+        0, 
+        0, 
+        wcex.hInstance, 
+        this
+    );
     
     m_OSData.handle = m_hWnd;
 
@@ -79,8 +91,8 @@ SystemWindowImpl::SystemWindowImpl(SystemWindow::Type t)
     KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
 
     UINT dpi = GetDpiForWindow(m_hWnd);
-    int padding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
-    m_borderSize.x = GetSystemMetricsForDpi(SM_CXFRAME, dpi) + padding;
+    int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
+    m_borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
     m_borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
 
     RAWINPUTDEVICE device;
@@ -153,6 +165,11 @@ void SystemWindowImpl::SetOnClose(SystemWindowOnClose c)
     m_onClose = c;
 }
 
+void SystemWindowImpl::SetOnSize(SystemWindowOnSize c)
+{
+    m_onSize = c;
+}
+
 bool SystemWindowImpl::IsVisible()
 {
     return m_isVisible;
@@ -194,6 +211,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             GetClientRect(hWnd, &rc);
             pW->m_size.x = rc.right - rc.left;
             pW->m_size.y = rc.bottom - rc.top;
+            if (pW->m_onSize)
+                pW->m_onSize(pW);
 
             pW->UpdateBackbuffer();
             pW->m_context->OnWindowSize();
@@ -229,6 +248,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_ACTIVATE:
     case WM_PAINT:
     {
+        if (pW)
+            pW->m_context->DrawAll();
         /*draw_gui();*/
         //if (pW)
         //{

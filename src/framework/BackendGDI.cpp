@@ -29,8 +29,11 @@
 #include "miGUI.h"
 
 #include "framework/mgf.h"
+#include "framework/ContextImpl.h"
 #include "framework/SystemWindowImpl.h"
 #include "framework/BackendGDI.h"
+#include "framework/Font.h"
+#include "framework/FontImpl.h"
 
 #ifdef MG_PLATFORM_WINDOWS
 
@@ -93,6 +96,8 @@ mgRect BackendGDI_setClipRect(mgRect* r)
 
 BackendGDI::BackendGDI()
 {
+	GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
+
 	m_getTextSize = BackendGDI_getTextSize;
 	g_backend = this;
 	m_gpu = new mgVideoDriverAPI;
@@ -107,7 +112,25 @@ BackendGDI::BackendGDI()
 
 BackendGDI::~BackendGDI()
 {
+	if (m_defaultFont)
+		m_defaultFont->Release();
+
+	if (m_gdiimage_defaultIcons)
+		delete m_gdiimage_defaultIcons;
+	
+	if(m_gdiplusToken)
+		Gdiplus::GdiplusShutdown(m_gdiplusToken);
+
 	delete m_gpu;
+}
+
+void* BackendGDI::GetDefaultIcons()
+{
+	if (m_gdiimage_defaultIcons)
+		return m_gdiimage_defaultIcons;
+
+	m_gdiimage_defaultIcons = new Gdiplus::Image(L"../data/icons.png");
+	return m_gdiimage_defaultIcons;
 }
 
 void* BackendGDI::GetVideoDriverAPI()
@@ -164,13 +187,73 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	r.bottom = rct->bottom + m_window->m_borderSize.y;
 
 	HRGN rgn = 0;
-	rgn = CreateRectRgn(
-		m_clipRect.left + m_window->m_borderSize.x, 
-		m_clipRect.top + m_window->m_borderSize.y,
-		m_clipRect.right + m_window->m_borderSize.x,
-		m_clipRect.bottom + m_window->m_borderSize.y);
-	SelectClipRgn(m_window->m_hdcMem, rgn);
-	FillRect(m_window->m_hdcMem, &r, brsh);
+
+	switch (reason)
+	{
+	default:
+	{
+		rgn = CreateRectRgn(
+			m_clipRect.left + m_window->m_borderSize.x, 
+			m_clipRect.top + m_window->m_borderSize.y,
+			m_clipRect.right + m_window->m_borderSize.x,
+			m_clipRect.bottom + m_window->m_borderSize.y);
+		SelectClipRgn(m_window->m_hdcMem, rgn);
+		FillRect(m_window->m_hdcMem, &r, brsh);
+	}break;
+	case mgDrawRectangleReason_windowCloseButton:
+	case mgDrawRectangleReason_windowCollapseButton:
+	case mgDrawRectangleReason_popupNextIcon:
+	{
+		if (texture)
+		{
+			Gdiplus::Graphics graphics(m_window->m_hdcMem);
+			Gdiplus::Rect gdirct;
+			gdirct.X = rct->left + m_window->m_borderSize.x;
+			gdirct.Y = rct->top + m_window->m_borderSize.y;
+			gdirct.Width = rct->right - rct->left;
+			gdirct.Height = rct->bottom - rct->top;
+			graphics.DrawImage((Gdiplus::Image*)texture, gdirct,
+				m_context->m_gui_context->currentIcon.left,
+				m_context->m_gui_context->currentIcon.top,
+				m_context->m_gui_context->currentIcon.right,
+				m_context->m_gui_context->currentIcon.bottom,
+				Gdiplus::UnitPixel);
+		}
+	}break;
+	case mgDrawRectangleReason_windowTitlebar:
+	case mgDrawRectangleReason_windowBG:
+	{
+		int roundRectBtm = r.bottom + 1;
+		if (reason == mgDrawRectangleReason_windowTitlebar)
+			roundRectBtm += 7;
+
+		rgn = CreateRoundRectRgn(r.left, r.top, r.right + 1, roundRectBtm, 7, 7);
+
+		SelectClipRgn(m_window->m_hdcMem, rgn);
+		{
+			TRIVERTEX vertex[2];
+			vertex[0].x = r.left;
+			vertex[0].y = r.top;
+			vertex[0].Red = (c1 & 0x000000ff) << 8;
+			vertex[0].Green = (c1 & 0x0000ff00);
+			vertex[0].Blue = (c1 & 0x00ff0000) >> 8;
+			vertex[0].Alpha = (c1 & 0xff000000) >> 16;
+
+			vertex[1].x = r.right;
+			vertex[1].y = r.bottom;
+			vertex[1].Red = (c2 & 0x000000ff) << 8;
+			vertex[1].Green = (c2 & 0x0000ff00);
+			vertex[1].Blue = (c2 & 0x00ff0000) >> 8;
+			vertex[1].Alpha = (c2 & 0xff000000) >> 16;
+
+			GRADIENT_RECT gRect;
+			gRect.UpperLeft = 0;
+			gRect.LowerRight = 1;
+			GradientFill(m_window->m_hdcMem, vertex, 2, &gRect, 1, GRADIENT_FILL_RECT_V);
+		}
+	}break;
+	}
+
 	DeleteObject(rgn);
 	DeleteObject(brsh);
 	SelectClipRgn(m_window->m_hdcMem, 0);
@@ -230,6 +313,11 @@ void BackendGDI::SetActiveWindow(mgf::SystemWindow* w)
 	m_window = (mgf::SystemWindowImpl*)w;
 }
 
+void BackendGDI::SetActiveContext(mgf::Context* c)
+{
+	m_context = (mgf::ContextImpl*)c;
+}
+
 void BackendGDI::UpdateBackbuffer()
 {
 	if (m_window->m_hdcMem)
@@ -250,6 +338,54 @@ void BackendGDI::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 	GetTextExtentPoint32W(m_window->m_hdcMem, text, c, &s);
 	sz->x = s.cx;
 	sz->y = s.cy;
+}
+
+Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool italic)
+{
+	FontImpl* newFont = new FontImpl;
+	newFont->m_context = this->m_context;
+	{
+		mgFont* f = (mgFont*)malloc(sizeof(mgFont));
+		HDC g_dc = GetWindowDC(this->m_window->m_hWnd);
+		f->implementation = CreateFontA(
+			-MulDiv(size, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
+			0, 0, 0,
+			bold ? FW_BOLD : FW_NORMAL,
+			italic ? 1 : 0,
+			0,
+			0,
+			DEFAULT_CHARSET,
+			OUT_OUTLINE_PRECIS,
+			CLIP_DEFAULT_PRECIS,
+			CLEARTYPE_QUALITY,
+			VARIABLE_PITCH,
+			0);
+		ReleaseDC(this->m_window->m_hWnd, g_dc);
+		newFont->m_font = f;
+	}
+	newFont->m_backend = this;
+	return newFont;
+}
+
+void BackendGDI::DestroyFont(Font* f)
+{
+	if (!f)
+		return;
+	FontImpl* fi = (FontImpl*)f;
+	if (fi->m_font)
+	{
+		if (fi->m_font->implementation)
+			DeleteObject(fi->m_font->implementation);
+		free(fi->m_font);
+	}
+}
+
+Font* BackendGDI::GetDefaultFont()
+{
+	if(!m_defaultFont)
+		m_defaultFont = this->CreateFont(L"Arial", 10, 1, 0);
+
+	return m_defaultFont;
 }
 
 #endif

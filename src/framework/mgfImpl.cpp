@@ -103,20 +103,19 @@ void FrameworkImpl::DrawAll()
 		auto c = m_contexts[i];
 		if (!c->m_window->m_isVisible)
 			continue;
-		c->m_gui_context->gpu->beginDraw();
-		mgDraw(c->m_gui_context);
-		c->m_gui_context->gpu->endDraw();
+
+		c->DrawAll();
 	}
 }
 
 Context* FrameworkImpl::CreateContext(
-	SystemWindow::Type t,
+	int windowFlags,
 	const mgPoint& windowPosition,
 	const mgPoint& windowSize,
 	Backend* backend
 )
 {
-	ContextImpl* c = new ContextImpl(t, windowPosition, windowSize, backend);
+	ContextImpl* c = new ContextImpl(windowFlags, windowPosition, windowSize, backend);
 	m_contexts.push_back(c);
 	return c;
 }

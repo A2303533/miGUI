@@ -37,6 +37,8 @@ namespace mgf
 	class Text;
 	class DockPanel;
 	class SystemWindow;
+	class Font;
+	class Context;
 }
 
 #endif

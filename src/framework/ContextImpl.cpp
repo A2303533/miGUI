@@ -31,53 +31,43 @@
 #include "framework/mgf.h"
 #include "framework/ContextImpl.h"
 #include "framework/SystemWindowImpl.h"
+#include "framework/Backend.h"
+#include "framework/Window.h"
+#include "framework/WindowImpl.h"
+#include "framework/Font.h"
+#include "framework/FontImpl.h"
+
+#ifdef CreateFont
+#undef CreateFont
+#endif
+
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
 
 using namespace mgf;
 
 ContextImpl::ContextImpl(
-	SystemWindow::Type t,
+	int windowFlags,
 	const mgPoint& windowPosition,
 	const mgPoint& windowSize,
 	Backend* backend)
 {
-	m_window = new mgf::SystemWindowImpl(t);
+	m_window = new mgf::SystemWindowImpl(windowFlags, windowPosition, windowSize);
 	m_window->m_context = this;
 	
 	m_backend = backend;
 	m_backend->SetActiveWindow(m_window);
+	m_backend->SetActiveContext(this);
 	m_backend->InitWindow(m_window);
 	m_backend->UpdateBackbuffer();
+	m_backend->GetDefaultFont();
 
 	mgVideoDriverAPI* gpu = (mgVideoDriverAPI*)backend->GetVideoDriverAPI();
 	m_gui_context = mgCreateContext(gpu, &m_input);
 	m_gui_context->getTextSize = m_backend->m_getTextSize;
-
-	mgFont* g_win32font = 0;
-	{
-		mgFont* f = (mgFont*)malloc(sizeof(mgFont));
-		HDC g_dc = GetWindowDC(this->m_window->m_hWnd);
-		f->implementation = CreateFontA(
-			-MulDiv(11, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
-			0, 0, 0,
-			FW_NORMAL,
-			0,
-			0,
-			0,
-			DEFAULT_CHARSET,
-			OUT_OUTLINE_PRECIS,
-			CLIP_DEFAULT_PRECIS,
-			CLEARTYPE_QUALITY,
-			VARIABLE_PITCH,
-			"Segoe");
-		ReleaseDC(this->m_window->m_hWnd, g_dc);
-		g_win32font = f;
-	}
-
-	auto test_guiWindow1 = mgCreateWindow(m_gui_context, 110, 110, 300, 180);
-	test_guiWindow1->titlebarFont = g_win32font;
-	test_guiWindow1->titlebarHeight = 30;
-	test_guiWindow1->id = 0;
-	mgSetWindowTitle(test_guiWindow1, L"Window1");
+	
+	mgInitDefaultIcons(m_gui_context, m_backend->GetDefaultIcons());
 
 	{
 		RECT rc;
@@ -104,7 +94,7 @@ ContextImpl::~ContextImpl()
 		m_window->Release();
 }
 
-mgf::SystemWindow* ContextImpl::GetWindow()
+mgf::SystemWindow* ContextImpl::GetSystemWindow()
 {
 	return m_window;
 }
@@ -115,4 +105,22 @@ void ContextImpl::OnWindowSize()
 	m_gui_context->windowSize.x = m_window->m_size.x;
 	m_gui_context->windowSize.y = m_window->m_size.y;
 	mgOnWindowSize(m_gui_context, m_gui_context->windowSize.x, m_gui_context->windowSize.y);
+}
+
+Window* ContextImpl::CreateWindow()
+{
+	WindowImpl* newWindow = new WindowImpl;
+	newWindow->m_window = mgCreateWindow(m_gui_context, 0, 0, 300, 200);
+	newWindow->m_window->titlebarFont = ((mgf::FontImpl*)this->m_backend->GetDefaultFont())->m_font;
+	return newWindow;
+}
+
+void ContextImpl::DrawAll()
+{
+	if (!m_gui_context)
+		return;
+
+	m_gui_context->gpu->beginDraw();
+	mgDraw(m_gui_context);
+	m_gui_context->gpu->endDraw();
 }

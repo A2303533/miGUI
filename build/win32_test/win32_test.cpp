@@ -155,7 +155,6 @@ void gui_drawRectangle(
         {
             MyImage* myimg = (MyImage*)texture;
             Gdiplus::Graphics graphics(hdcMem);
-            //Gdiplus::Pen      pen(Gdiplus::Color(0, 0, 0, 255));
             Gdiplus::Rect gdirct;
             gdirct.X = rct->left + borderSize.x;
             gdirct.Y = rct->top + borderSize.y;
@@ -245,11 +244,7 @@ void gui_drawRectangle(
             rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
         }
         SelectClipRgn(hdcMem, rgn);
-
-        
-
         FillRect(hdcMem, &r, brsh);
-
     }
     else
     {

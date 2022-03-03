@@ -29,9 +29,49 @@
 #ifndef _MG_SYSWIND_H_
 #define _MG_SYSWIND_H_
 
+/*Just like WINAPI*/
+#define MGWS_OVERLAPPED       0x00000000L
+#define MGWS_POPUP            0x80000000L
+#define MGWS_CHILD            0x40000000L
+#define MGWS_MINIMIZE         0x20000000L
+#define MGWS_VISIBLE          0x10000000L
+#define MGWS_DISABLED         0x08000000L
+#define MGWS_CLIPSIBLINGS     0x04000000L
+#define MGWS_CLIPCHILDREN     0x02000000L
+#define MGWS_MAXIMIZE         0x01000000L
+#define MGWS_CAPTION          0x00C00000L
+#define MGWS_BORDER           0x00800000L
+#define MGWS_DLGFRAME         0x00400000L
+#define MGWS_VSCROLL          0x00200000L
+#define MGWS_HSCROLL          0x00100000L
+#define MGWS_SYSMENU          0x00080000L
+#define MGWS_THICKFRAME       0x00040000L
+#define MGWS_GROUP            0x00020000L
+#define MGWS_TABSTOP          0x00010000L
+#define MGWS_MINIMIZEBOX      0x00020000L
+#define MGWS_MAXIMIZEBOX      0x00010000L
+#define MGWS_TILED            MGWS_OVERLAPPED
+#define MGWS_ICONIC           MGWS_MINIMIZE
+#define MGWS_SIZEBOX          MGWS_THICKFRAME
+#define MGWS_TILEDWINDOW      MGWS_OVERLAPPEDWINDOW
+#define MGWS_OVERLAPPEDWINDOW (MGWS_OVERLAPPED     | \
+                             MGWS_CAPTION        | \
+                             MGWS_SYSMENU        | \
+                             MGWS_THICKFRAME     | \
+                             MGWS_MINIMIZEBOX    | \
+                             MGWS_MAXIMIZEBOX)
+#define MGWS_POPUPWINDOW      (MGWS_POPUP          | \
+                             MGWS_BORDER         | \
+                             MGWS_SYSMENU)
+#define MGWS_CHILDWINDOW      (MGWS_CHILD)
+#define MGCW_USEDEFAULT       ((int)0x80000000)
+
 namespace mgf
 {
 	using SystemWindowOnClose = int(*)(SystemWindow*);
+	using SystemWindowOnSize = void(*)(SystemWindow*);
+
+	//struct SystemWindowCreationInfo
 
 	struct SystemWindowOSData
 	{
@@ -41,11 +81,6 @@ namespace mgf
 	class SystemWindow : public BaseClass
 	{
 	public:
-
-		enum Type
-		{
-			type_default = 0
-		};
 
 		virtual const SystemWindowOSData& GetOSData() = 0;
 
@@ -57,6 +92,7 @@ namespace mgf
 		virtual void UpdateBackbuffer() = 0;
 
 		virtual void SetOnClose(SystemWindowOnClose) = 0;
+		virtual void SetOnSize(SystemWindowOnSize) = 0;
 
 		virtual bool IsVisible() = 0;
 	};

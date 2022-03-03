@@ -41,7 +41,7 @@ namespace mgf
 		virtual ~FrameworkImpl();
 
 		virtual Context* CreateContext(
-			SystemWindow::Type,
+			int windowFlags,
 			const mgPoint& windowPosition,
 			const mgPoint& windowSize,
 			Backend* backend

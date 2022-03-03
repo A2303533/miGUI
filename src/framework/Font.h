@@ -26,56 +26,16 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_SYSWIND_IMPL_H_
-#define _MG_SYSWIND_IMPL_H_
-
-#ifdef MG_PLATFORM_WINDOWS
-#include <Windows.h>
-#endif
+#ifndef _MGF_FONT_H_
+#define _MGF_FONT_H_
 
 namespace mgf
 {
-	/*class FrameworkImpl;*/
-	class ContextImpl;
-	class SystemWindowImpl : public SystemWindow
+	class Font : public BaseClass
 	{
 	public:
-		SystemWindowImpl(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize);
-		virtual ~SystemWindowImpl();
-		
-		virtual const SystemWindowOSData& GetOSData() override;
 
-		virtual void SetTitle(const wchar_t*) override;
-		virtual void Show() override;
-		virtual void Hide() override;
-		virtual const mgPoint& GetSize() override;
-		virtual void UpdateBackbuffer() override;
-		virtual void SetOnClose(SystemWindowOnClose) override;
-		virtual void SetOnSize(SystemWindowOnSize) override;
-		virtual bool IsVisible() override;
-
-		bool m_isVisible = false;
-
-#ifdef _WIN32
-		HWND m_hWnd = 0;
-		//HDC m_dc = 0;
-		wchar_t m_className[20];
-
-		/*double bufferring for GDI*/
-		HDC m_hdcMem = 0;
-		HBITMAP m_hbmMem = 0;
-		HBITMAP m_hbmOld = 0;
-#endif
-		SystemWindowOSData m_OSData;
-
-		/*FrameworkImpl* m_mgf = 0;*/
-		ContextImpl* m_context = 0;
-		mgPoint m_size;
-		mgPoint m_borderSize;
-		SystemWindowOnClose m_onClose = 0;
-		SystemWindowOnSize m_onSize = 0;
 	};
-
 }
 
 #endif
