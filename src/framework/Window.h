@@ -50,6 +50,9 @@ namespace mgf
 		virtual int GetID() = 0;
 		virtual void SetUserData(void*) = 0;
 		virtual void* GetUserData() = 0;
+		
+		virtual void DeleteElement(Element*) = 0;
+		virtual Rectangle* AddRectangle() = 0;
 	};
 }
 

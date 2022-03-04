@@ -26,29 +26,28 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MGF_CONTEXT_H_
-#define _MGF_CONTEXT_H_
+#include "miGUI.h"
 
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
+#include "framework/mgf.h"
+#include "framework/Element.h"
+#include "framework/ElementImpl.h"
 
-namespace mgf
+using namespace mgf;
+
+ElementImpl::ElementImpl() 
 {
-	using ContextOnDraw = void(*)(Context*,Backend*);
-
-	class Context : public BaseClass
-	{
-	public:
-		virtual mgf::SystemWindow* GetSystemWindow() = 0;
-		
-		virtual void OnWindowSize() = 0;
-		
-		virtual mgf::Window* CreateWindow() = 0;
-
-		// Will draw after drawing all windows
-		virtual void SetOnDraw(ContextOnDraw) = 0;
-	};
 }
 
-#endif
+ElementImpl::~ElementImpl() 
+{
+}
+
+void ElementImpl::SetVisible(bool v)
+{
+	m_element->visible = v ? 1 : 0;
+}
+
+bool ElementImpl::IsVisible()
+{
+	return (bool)m_element->visible;
+}

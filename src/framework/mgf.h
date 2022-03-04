@@ -32,6 +32,7 @@
 #include "config.h"
 
 #include "mgDefs.h"
+#include "mgForward.h"
 #include "mgPoint.h"
 #include "mgRect.h"
 #include "mgVec4.h"

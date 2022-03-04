@@ -39,6 +39,8 @@ namespace mgf
 	class SystemWindow;
 	class Font;
 	class Context;
+	class Element;
+	class Rectangle;
 }
 
 #endif

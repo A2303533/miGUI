@@ -44,17 +44,52 @@ void mgUpdatePopup(struct mgContext_s* c, mgPopup* p);
 void mgDockPanelClear(struct mgContext_s* c);
 
 void 
-mgDestroyElement_f(mgElement* e)
+mgDestroyElement_internal(mgElement* e)
 {
 	assert(e);
 	for (int i = 0; i < e->childrenCount; ++i)
 	{
-		mgDestroyElement_f(e->children[i].pointer);
+		mgDestroyElement_internal(e->children[i].pointer);
 	}
 
 	if (e->implementation)
 		free(e->implementation);
 	free(e);
+}
+
+MG_API
+void MG_C_DECL
+mgDestroyElement_f(mgElement* e)
+{
+	assert(e);
+
+	mgElement* parent = e->parent;
+	mgDestroyElement_internal(e);
+	if (!parent)
+		return;
+	
+	if (parent->childrenCount == 1)
+	{
+		free(parent->children);
+		parent->children = 0;
+		parent->childrenCount = 0;
+	}
+	else
+	{
+		struct mgElementNode_s* newChildren = malloc(sizeof(struct mgElementNode_s) * (parent->childrenCount - 1));
+		for (int i = 0, i2 = 0; i < parent->childrenCount; ++i)
+		{
+			if (parent->children[i].pointer == e)
+				continue;
+
+			newChildren[i2] = parent->children[i];
+			++i2;
+		}
+		--parent->childrenCount;
+
+		free(parent->children);
+		parent->children = newChildren;
+	}
 }
 
 MG_API 

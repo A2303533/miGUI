@@ -71,6 +71,13 @@ namespace mgf
 			int textLen,
 			mgColor* color,
 			mgFont* font) = 0;
+		virtual void DrawLine(
+			int reason, 
+			void* object, 
+			mgPoint* position, 
+			mgPoint* where,
+			mgColor* color, 
+			int size) = 0;
 
 		/*return prev rect*/
 		virtual mgRect SetClipRect(mgRect* r) = 0;

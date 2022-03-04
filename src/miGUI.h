@@ -36,6 +36,7 @@
 struct mgContext_s;
 
 #include "mgDefs.h"
+#include "mgForward.h"
 #include "mgPoint.h"
 #include "mgRect.h"
 #include "mgVec4.h"
@@ -43,7 +44,6 @@ struct mgContext_s;
 #include "mgFont.h"
 #include "mgImage.h"
 #include "mgTexture.h"
-
 
 #include "mgIcons.h"
 #include "mgStyle.h"
@@ -122,6 +122,14 @@ typedef struct mgVideoDriverAPI_s {
 		int reason, 
 		void* object,  /*depends on reason*/
 		mgPoint* position, const wchar_t* text, int textLen, mgColor*, mgFont*);
+
+	void(*drawLine)(
+		int reason,
+		void* object,  /*depends on reason*/
+		mgPoint* position, 
+		mgPoint* where,
+		mgColor*,
+		int size);
 
 	/*set new and return old clip rect*/
 	mgRect(*setClipRect)(mgRect*);
@@ -275,6 +283,17 @@ MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* c, mgPoint* posi
 #else
 typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
 extern PFNMGCREATEBUTTONPROC mgCreateButton;
+#endif
+
+/*
+* Will destroy element and children.
+*/
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgDestroyElement_f(mgElement*);
+#define mgDestroyElement mgDestroyElement_f
+#else
+typedef void (*PFNMGDESTROYELEMENTPROC)(mgElement*);
+extern PFNMGDESTROYELEMENTPROC mgDestroyElement;
 #endif
 
 /*set visible include all children*/

@@ -122,5 +122,12 @@ void ContextImpl::DrawAll()
 
 	m_gui_context->gpu->beginDraw();
 	mgDraw(m_gui_context);
+	if (m_onDraw)
+		m_onDraw(this, this->m_backend);
 	m_gui_context->gpu->endDraw();
+}
+
+void ContextImpl::SetOnDraw(ContextOnDraw c)
+{
+	m_onDraw = c;
 }

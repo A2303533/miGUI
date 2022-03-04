@@ -26,29 +26,55 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MGF_CONTEXT_H_
-#define _MGF_CONTEXT_H_
+#include "miGUI.h"
 
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
+#include "framework/mgf.h"
+#include "framework/Window.h"
+#include "framework/WindowImpl.h"
+#include "framework/Rectangle.h"
+#include "framework/RectangleImpl.h"
 
-namespace mgf
+using namespace mgf;
+
+RectangleImpl::RectangleImpl(WindowImpl* w)
 {
-	using ContextOnDraw = void(*)(Context*,Backend*);
-
-	class Context : public BaseClass
-	{
-	public:
-		virtual mgf::SystemWindow* GetSystemWindow() = 0;
-		
-		virtual void OnWindowSize() = 0;
-		
-		virtual mgf::Window* CreateWindow() = 0;
-
-		// Will draw after drawing all windows
-		virtual void SetOnDraw(ContextOnDraw) = 0;
-	};
+	mgPoint p;
+	mgPointSet(&p, 0, 0);
+	mgColor c;
+	mgColorSet(&c, 1.f, 1.f, 1.f, 1.f);
+	m_element = mgCreateRectangle(w->m_window, &p, &p, &c, &c);
+	m_elementRectangle = (mgElementRectangle*)m_element->implementation;
 }
 
-#endif
+RectangleImpl::~RectangleImpl()
+{
+	if (m_element)
+		mgDestroyElement(m_element);
+}
+
+void RectangleImpl::SetRect(mgRect* r)
+{
+	assert(m_element);
+	m_element->transformLocal.buildArea = *r;
+	m_element->transformLocal.clipArea = *r;
+	m_element->creationRect = *r;
+}
+
+void RectangleImpl::SetRect(int left, int top, int right, int bottom)
+{
+	assert(m_element);
+	m_element->transformLocal.buildArea.left = left;
+	m_element->transformLocal.buildArea.top = top;
+	m_element->transformLocal.buildArea.right = right;
+	m_element->transformLocal.buildArea.bottom = bottom;
+	m_element->transformLocal.clipArea.left = left;
+	m_element->transformLocal.clipArea.top = top;
+	m_element->transformLocal.clipArea.right = right;
+	m_element->transformLocal.clipArea.bottom = bottom;
+	m_element->creationRect.left = left;
+	m_element->creationRect.top = top;
+	m_element->creationRect.right = right;
+	m_element->creationRect.bottom = bottom;
+}
+
+

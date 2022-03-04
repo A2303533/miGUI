@@ -66,6 +66,9 @@ namespace mgf
 		Font* m_defaultFont = 0;
 
 		mgRect m_clipRect;
+		Gdiplus::Graphics * m_gdigraphics = 0;
+
+		void _createBackbuffer(mgf::SystemWindowImpl* impl);
 
 		friend class ContextImpl;
 	public:
@@ -89,6 +92,8 @@ namespace mgf
 			mgTexture texture,  mgVec4* UVRegion ) override;
 		virtual void DrawText(int reason,void* object,mgPoint* position,const wchar_t* text,int textLen,
 			mgColor* color, mgFont* font) override;
+		virtual void DrawLine( int reason, void* object, mgPoint* position, mgPoint* where,
+			mgColor* color, int size) override;
 		virtual mgRect SetClipRect(mgRect* r) override;
 		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) override;
 		virtual void* GetDefaultIcons() override;

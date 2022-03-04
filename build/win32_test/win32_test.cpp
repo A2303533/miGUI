@@ -343,6 +343,17 @@ mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
     return f;
 }
 
+void gui_drawLine(
+    int reason,
+    void* object,  /*depends on reason*/
+    mgPoint* position,
+    mgPoint* where,
+    mgColor*,
+    int size)
+{
+
+}
+
 void draw_gui()
 {
     if (!g_gui_context)
@@ -573,6 +584,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     gui_gpu.endDraw = gui_endDraw;
     gui_gpu.drawRectangle = gui_drawRectangle;
     gui_gpu.drawText = gui_drawText;
+    gui_gpu.drawLine = gui_drawLine;
     gui_gpu.setClipRect = gui_setClipRect;
 
     memset(&g_input, 0, sizeof(g_input));

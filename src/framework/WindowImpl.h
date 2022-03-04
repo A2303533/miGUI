@@ -30,9 +30,11 @@
 #define _MGF_WINDOWIMPL_H_
 
 #include <string>
+#include <vector>
 
 namespace mgf
 {
+
 	class WindowImpl : public Window
 	{
 		void _updateRect();
@@ -56,10 +58,15 @@ namespace mgf
 		virtual int GetID() override;
 		virtual void SetUserData(void*) override;
 		virtual void* GetUserData() override;
+		
+		virtual void DeleteElement(Element*) override;
+		virtual Rectangle* AddRectangle() override;
+
 
 		mgWindow* m_window = 0;
 
 		std::wstring m_title;
+		std::vector<Rectangle*> m_elements;
 	};
 }
 

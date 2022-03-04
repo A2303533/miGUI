@@ -42,6 +42,7 @@ PFNMGDRAWPROC mgDraw;
 PFNMGCREATERECTANGLEPROC mgCreateRectangle;
 PFNMGCREATETEXTPROC mgCreateText;
 PFNMGCREATEBUTTONPROC mgCreateButton;
+PFNMGDESTROYELEMENTPROC mgDestroyElement;
 PFNMGCREATEWINDOWPROC mgCreateWindow;
 PFNMGDESTROYWINDOWPROC mgDestroyWindow;
 PFNMGSETWINDOWTITLEPROC mgSetWindowTitle;
@@ -125,7 +126,7 @@ mgLoad()
 	mgDockLoadData = mgGetProc(lib, "mgDockLoadData_f");
 	mgCreateMenu = mgGetProc(lib, "mgCreateMenu_f");
 	mgDestroyMenu = mgGetProc(lib, "mgDestroyMenu_f");
-
+	mgDestroyElement = mgGetProc(lib, "mgDestroyElement_f");
 
 	return lib;
 }

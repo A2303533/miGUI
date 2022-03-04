@@ -26,28 +26,19 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MGF_CONTEXT_H_
-#define _MGF_CONTEXT_H_
-
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
+#ifndef _MGF_ELEMENT_H_
+#define _MGF_ELEMENT_H_
 
 namespace mgf
 {
-	using ContextOnDraw = void(*)(Context*,Backend*);
-
-	class Context : public BaseClass
+	class Element
 	{
 	public:
-		virtual mgf::SystemWindow* GetSystemWindow() = 0;
-		
-		virtual void OnWindowSize() = 0;
-		
-		virtual mgf::Window* CreateWindow() = 0;
+		Element() {}
+		virtual ~Element() {}
 
-		// Will draw after drawing all windows
-		virtual void SetOnDraw(ContextOnDraw) = 0;
+		virtual void SetVisible(bool) = 0;
+		virtual bool IsVisible() = 0;
 	};
 }
 

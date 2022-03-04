@@ -32,11 +32,15 @@
 #include "framework/Window.h"
 #include "framework/WindowImpl.h"
 
+#include "framework/Rectangle.h"
+#include "framework/RectangleImpl.h"
+
 using namespace mgf;
+
+
 
 WindowImpl::WindowImpl()
 {
-
 }
 
 WindowImpl::~WindowImpl()
@@ -191,5 +195,26 @@ void WindowImpl::SetUserData(void* d)
 void* WindowImpl::GetUserData()
 {
 	return m_window->userData;
+}
+
+void WindowImpl::DeleteElement(Element* e)
+{
+	assert(e);
+	for (size_t i = 0, sz = m_elements.size(); i < sz; ++i)
+	{
+		if (m_elements[i] != e)
+			continue;
+
+		m_elements.erase(m_elements.begin() + i);
+		break;
+	}
+	delete e;
+}
+
+Rectangle* WindowImpl::AddRectangle()
+{
+	RectangleImpl* e = new RectangleImpl(this);
+	m_elements.emplace_back(e);
+	return e;
 }
 

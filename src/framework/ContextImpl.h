@@ -49,6 +49,7 @@ namespace mgf
 		virtual mgf::SystemWindow* GetSystemWindow() override;
 		virtual void OnWindowSize() override;
 		virtual mgf::Window* CreateWindow() override;
+		virtual void SetOnDraw(ContextOnDraw) override;
 
 		void DrawAll();
 
@@ -56,6 +57,7 @@ namespace mgf
 		mgInputContext m_input;
 		mgContext* m_gui_context = 0;
 		Backend* m_backend = 0;
+		ContextOnDraw m_onDraw = 0;
 	};
 }
 

@@ -23,6 +23,12 @@
     <ClCompile Include="..\..\src\framework\WindowImpl.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\RectangleImpl.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\ElementImpl.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">
@@ -46,6 +52,12 @@
       <Filter>migui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\framework\WindowImpl.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\RectangleImpl.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\ElementImpl.h">
       <Filter>migui</Filter>
     </ClInclude>
   </ItemGroup>

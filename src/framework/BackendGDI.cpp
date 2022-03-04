@@ -89,6 +89,17 @@ void BackendGDI_drawText(
 	g_backend->DrawText(reason, object, position, text, textLen, color, font);
 }
 
+void BackendGDI_drawLine(
+	int reason,
+	void* object,
+	mgPoint* position,
+	mgPoint* where,
+	mgColor* color,
+	int size)
+{
+	g_backend->DrawLine(reason, object, position, where, color, size);
+}
+
 mgRect BackendGDI_setClipRect(mgRect* r)
 {
 	return g_backend->SetClipRect(r);
@@ -118,6 +129,9 @@ BackendGDI::~BackendGDI()
 	if (m_gdiimage_defaultIcons)
 		delete m_gdiimage_defaultIcons;
 	
+	if (m_gdigraphics)
+		delete m_gdigraphics;
+
 	if(m_gdiplusToken)
 		Gdiplus::GdiplusShutdown(m_gdiplusToken);
 
@@ -206,13 +220,12 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	{
 		if (texture)
 		{
-			Gdiplus::Graphics graphics(m_window->m_hdcMem);
 			Gdiplus::Rect gdirct;
 			gdirct.X = rct->left + m_window->m_borderSize.x;
 			gdirct.Y = rct->top + m_window->m_borderSize.y;
 			gdirct.Width = rct->right - rct->left;
 			gdirct.Height = rct->bottom - rct->top;
-			graphics.DrawImage((Gdiplus::Image*)texture, gdirct,
+			m_gdigraphics->DrawImage((Gdiplus::Image*)texture, gdirct,
 				m_context->m_gui_context->currentIcon.left,
 				m_context->m_gui_context->currentIcon.top,
 				m_context->m_gui_context->currentIcon.right,
@@ -281,6 +294,19 @@ void BackendGDI::DrawText(int reason, void* object, mgPoint* position, const wch
 	SelectClipRgn(m_window->m_hdcMem, 0);
 }
 
+void BackendGDI::DrawLine(
+	int reason,
+	void* object,
+	mgPoint* position,
+	mgPoint* where,
+	mgColor* color,
+	int size)
+{
+	/*Gdiplus::Graphics graphics(hdc);*/
+	Gdiplus::Pen      pen(Gdiplus::Color(255, 0, 0, 255));
+	m_gdigraphics->DrawLine(&pen, 0, 0, 200, 100);
+}
+
 mgRect BackendGDI::SetClipRect(mgRect* r)
 {
 	mgRect old = m_clipRect;
@@ -289,7 +315,7 @@ mgRect BackendGDI::SetClipRect(mgRect* r)
 }
 
 
-void BackendGDI_createBackBuffer(mgf::SystemWindowImpl* impl)
+void BackendGDI::_createBackbuffer(mgf::SystemWindowImpl* impl)
 {
 	HDC dc = GetWindowDC(impl->m_hWnd);
 	impl->m_hdcMem = CreateCompatibleDC(dc);
@@ -298,14 +324,18 @@ void BackendGDI_createBackBuffer(mgf::SystemWindowImpl* impl)
 	impl->m_hbmMem = CreateCompatibleBitmap(dc,
 		r.right - r.left,
 		r.bottom - r.top);
-	ReleaseDC(impl->m_hWnd, dc);	
+	ReleaseDC(impl->m_hWnd, dc);
+
+	if (m_gdigraphics)
+		delete m_gdigraphics;
+	m_gdigraphics = new Gdiplus::Graphics(impl->m_hdcMem);
 }
 
 void BackendGDI::InitWindow(mgf::SystemWindow* w)
 {
 	if (m_window->m_hdcMem)
 		return;
-	BackendGDI_createBackBuffer(m_window);
+	_createBackbuffer(m_window);
 }
 
 void BackendGDI::SetActiveWindow(mgf::SystemWindow* w)
@@ -325,7 +355,7 @@ void BackendGDI::UpdateBackbuffer()
 	if (m_window->m_hbmMem)
 		DeleteObject(m_window->m_hbmMem);
 	
-	BackendGDI_createBackBuffer(m_window);
+	_createBackbuffer(m_window);
 }
 
 void BackendGDI::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)

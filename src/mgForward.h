@@ -26,29 +26,42 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MGF_CONTEXT_H_
-#define _MGF_CONTEXT_H_
+#ifndef _MG_FORWARD_H_
+#define _MG_FORWARD_H_
 
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
-
-namespace mgf
-{
-	using ContextOnDraw = void(*)(Context*,Backend*);
-
-	class Context : public BaseClass
-	{
-	public:
-		virtual mgf::SystemWindow* GetSystemWindow() = 0;
-		
-		virtual void OnWindowSize() = 0;
-		
-		virtual mgf::Window* CreateWindow() = 0;
-
-		// Will draw after drawing all windows
-		virtual void SetOnDraw(ContextOnDraw) = 0;
-	};
-}
+struct mgPoint_s;
+struct mgRect_s;
+struct mgVec4_s;
+struct mgColor_s;
+struct mgFontBitmap_s;
+struct mgFontGlyph_s;
+struct mgFont_s;
+struct mgImage_s;
+struct mgIconsNode_s;
+struct mgIcons_s;
+struct mgIconGroup_s;
+struct mgStyle_s;
+struct mgPopupItemInfo_s;
+struct mgPopupItem_s;
+struct mgPopup_s;
+struct mgMenuItemInfo_s;
+struct mgMenuItem_s;
+struct mgMenu_s;
+struct mgDockPanelWindow_s;
+struct mgDockPanelElementCreationInfo_s;
+struct mgDockPanelElement_s;
+struct mgDockPanel_s;
+struct mgWindow_s;
+struct mgElementNode_s;
+struct mgElementTransform_s;
+struct mgElement_s;
+struct mgElementRectangle_s;
+struct mgElementText_s;
+struct mgElementButton_s;
+struct mgVideoDriverAPI_s;
+struct mgInputContext_s;
+struct mgCursor_s;
+struct mgFunctions_s;
+struct mgContext_s;
 
 #endif
