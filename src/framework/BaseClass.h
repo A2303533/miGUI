@@ -26,6 +26,7 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MGf_BASECLASS_H_
 #define _MGf_BASECLASS_H_
 

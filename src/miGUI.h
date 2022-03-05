@@ -26,6 +26,8 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
+
 #ifndef _MI_GUI_H_
 #define _MI_GUI_H_
 

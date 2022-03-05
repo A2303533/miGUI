@@ -26,6 +26,7 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MGF_CONTEXT_H_
 #define _MGF_CONTEXT_H_
 
@@ -37,18 +38,35 @@ namespace mgf
 {
 	using ContextOnDraw = void(*)(Context*,Backend*);
 
+	class SystemWindowImpl;
+
 	class Context : public BaseClass
 	{
-	public:
-		virtual mgf::SystemWindow* GetSystemWindow() = 0;
-		virtual mgf::Backend* GetBackend() = 0;
+		friend class Framework;
+		friend class SystemWindowImpl;
 
-		virtual void OnWindowSize() = 0;
+		SystemWindowImpl* m_window = 0;
+		Backend* m_backend = 0;
+		ContextOnDraw m_onDraw = 0;
+	public:
+		Context(int windowFlags,const mgPoint& windowPosition,const mgPoint& windowSize,Backend* backend);
+		virtual ~Context();
+
+		mgContext_s* m_gui_context = 0;
+		mgInputContext_s* m_input = 0;
+
+		mgContext_s* GetGUIContext();
+		mgf::SystemWindow* GetSystemWindow();
+		mgf::Backend* GetBackend();
+
+		void OnWindowSize();
 		
-		virtual mgf::Window* CreateWindow() = 0;
+		mgf::Window* CreateWindow();
 
 		// Will draw after drawing all windows
-		virtual void SetOnDraw(ContextOnDraw) = 0;
+		void SetOnDraw(ContextOnDraw);
+		
+		void DrawAll();
 	};
 }
 

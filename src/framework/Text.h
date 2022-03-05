@@ -26,23 +26,28 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MGF_TEXT_H_
 #define _MGF_TEXT_H_
 
 #include "Element.h"
-#include "ElementImpl.h"
 
 namespace mgf
 {
-	class Text : public ElementImpl
+	class Text : public Element
 	{
+		std::basic_string<wchar_t>* m_text = 0;
+		mgElementText_s* m_elementText = 0;
 	public:
-		virtual void SetText(const wchar_t*) = 0;
-		virtual void SetFont(Font*) = 0;
-		virtual void SetPosition(mgPoint*) = 0;
-		virtual void SetPosition(int x, int y) = 0;
-		virtual void SetColor(mgColor*) = 0;
-		virtual void SetColor(int) = 0; // ARGB 0xFFrrggbb
+		Text(Window* w, const wchar_t* t, Font* f);
+		virtual ~Text();
+
+		void SetText(const wchar_t*);
+		void SetFont(Font*);
+		void SetPosition(mgPoint*);
+		void SetPosition(int x, int y);
+		void SetColor(mgColor*);
+		void SetColor(int); // ARGB 0xFFrrggbb
 	};
 }
 

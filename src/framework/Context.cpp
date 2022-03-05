@@ -29,11 +29,10 @@
 #include "miGUI.h"
 
 #include "framework/mgf.h"
-#include "framework/ContextImpl.h"
+#include "framework/Context.h"
 #include "framework/SystemWindowImpl.h"
 #include "framework/Backend.h"
 #include "framework/Window.h"
-#include "framework/WindowImpl.h"
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 
@@ -47,7 +46,7 @@
 
 using namespace mgf;
 
-ContextImpl::ContextImpl(
+Context::Context(
 	int windowFlags,
 	const mgPoint& windowPosition,
 	const mgPoint& windowSize,
@@ -56,6 +55,8 @@ ContextImpl::ContextImpl(
 	m_window = new mgf::SystemWindowImpl(windowFlags, windowPosition, windowSize);
 	m_window->m_context = this;
 	
+	m_input = new mgInputContext_s;
+
 	m_backend = backend;
 	m_backend->SetActiveWindow(m_window);
 	m_backend->SetActiveContext(this);
@@ -64,7 +65,7 @@ ContextImpl::ContextImpl(
 	m_backend->GetDefaultFont();
 
 	mgVideoDriverAPI* gpu = (mgVideoDriverAPI*)backend->GetVideoDriverAPI();
-	m_gui_context = mgCreateContext(gpu, &m_input);
+	m_gui_context = mgCreateContext(gpu, m_input);
 	m_gui_context->getTextSize = m_backend->m_getTextSize;
 	
 	mgInitDefaultIcons(m_gui_context, m_backend->GetDefaultIcons());
@@ -79,13 +80,16 @@ ContextImpl::ContextImpl(
 	mgOnWindowSize(m_gui_context, m_gui_context->windowSize.x, m_gui_context->windowSize.y);
 }
 
-ContextImpl::~ContextImpl()
+Context::~Context()
 {
 	if (m_gui_context)
 	{
 		mgDestroyContext(m_gui_context);
 		m_gui_context = 0;
 	}
+
+	if (m_input)
+		delete m_input;
 
 	if (m_backend)
 		m_backend->Release();
@@ -94,17 +98,7 @@ ContextImpl::~ContextImpl()
 		m_window->Release();
 }
 
-mgf::SystemWindow* ContextImpl::GetSystemWindow()
-{
-	return m_window;
-}
-
-mgf::Backend* ContextImpl::GetBackend()
-{
-	return m_backend;
-}
-
-void ContextImpl::OnWindowSize()
+void Context::OnWindowSize()
 {
 	m_gui_context->needRebuild = 1;
 	m_gui_context->windowSize.x = m_window->m_size.x;
@@ -112,15 +106,15 @@ void ContextImpl::OnWindowSize()
 	mgOnWindowSize(m_gui_context, m_gui_context->windowSize.x, m_gui_context->windowSize.y);
 }
 
-Window* ContextImpl::CreateWindow()
+Window* Context::CreateWindow()
 {
-	WindowImpl* newWindow = new WindowImpl;
+	Window* newWindow = new Window;
 	newWindow->m_window = mgCreateWindow(m_gui_context, 0, 0, 300, 200);
 	newWindow->m_window->titlebarFont = ((mgf::FontImpl*)this->m_backend->GetDefaultFont())->m_font;
 	return newWindow;
 }
 
-void ContextImpl::DrawAll()
+void Context::DrawAll()
 {
 	if (!m_gui_context)
 		return;
@@ -132,7 +126,23 @@ void ContextImpl::DrawAll()
 	m_gui_context->gpu->endDraw();
 }
 
-void ContextImpl::SetOnDraw(ContextOnDraw c)
+void Context::SetOnDraw(ContextOnDraw c)
 {
 	m_onDraw = c;
 }
+
+mgContext* Context::GetGUIContext()
+{
+	return m_gui_context;
+}
+
+mgf::SystemWindow* Context::GetSystemWindow()
+{
+	return m_window;
+}
+
+mgf::Backend* Context::GetBackend()
+{
+	return m_backend;
+}
+

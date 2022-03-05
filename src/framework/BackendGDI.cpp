@@ -29,7 +29,7 @@
 #include "miGUI.h"
 
 #include "framework/mgf.h"
-#include "framework/ContextImpl.h"
+#include "framework/Context.h"
 #include "framework/SystemWindowImpl.h"
 #include "framework/BackendGDI.h"
 #include "framework/Font.h"
@@ -345,7 +345,7 @@ void BackendGDI::SetActiveWindow(mgf::SystemWindow* w)
 
 void BackendGDI::SetActiveContext(mgf::Context* c)
 {
-	m_context = (mgf::ContextImpl*)c;
+	m_context = c;
 }
 
 void BackendGDI::UpdateBackbuffer()

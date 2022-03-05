@@ -26,6 +26,7 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MG_COLOR_H_
 #define _MG_COLOR_H_
 

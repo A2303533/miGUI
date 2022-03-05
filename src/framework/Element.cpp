@@ -26,50 +26,27 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MGF_WINDOWIMPL_H_
-#define _MGF_WINDOWIMPL_H_
+#include "miGUI.h"
 
-#include <string>
-#include <vector>
+#include "framework/mgf.h"
+#include "framework/Element.h"
 
-namespace mgf
+using namespace mgf;
+
+Element::Element()
 {
-
-	class WindowImpl : public Window
-	{
-		void _updateRect();
-	public:
-		WindowImpl();
-		virtual ~WindowImpl();
-
-		virtual void SetTitle(const wchar_t* t) override;
-		virtual void Show() override;
-		virtual void Hide() override;
-		virtual void WithCloseButton(bool) override;
-		virtual void WithCollapseButton(bool) override;
-		virtual void WithTitlebar(bool) override;
-		virtual void CanMove(bool) override;
-		virtual void SetSize(int x, int y) override;
-		virtual void SetPosition(int x, int y) override;
-		virtual void DrawBG(bool) override;
-		virtual void CanDock(bool) override;
-		virtual void CanResize(bool) override;
-		virtual void SetID(int) override;
-		virtual int GetID() override;
-		virtual void SetUserData(void*) override;
-		virtual void* GetUserData() override;
-		
-		virtual void DeleteElement(Element*) override;
-		virtual Rectangle* AddRectangle() override;
-		virtual Text* AddText(int x, int y, const wchar_t* text, Font*) override;
-
-
-
-		mgWindow* m_window = 0;
-
-		std::wstring m_title;
-		std::vector<Element*> m_elements;
-	};
 }
 
-#endif
+Element::~Element()
+{
+}
+
+void Element::SetVisible(bool v)
+{
+	m_element->visible = v ? 1 : 0;
+}
+
+bool Element::IsVisible()
+{
+	return (bool)m_element->visible;
+}

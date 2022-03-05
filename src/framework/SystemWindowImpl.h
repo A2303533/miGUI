@@ -26,6 +26,7 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MG_SYSWIND_IMPL_H_
 #define _MG_SYSWIND_IMPL_H_
 
@@ -36,7 +37,6 @@
 namespace mgf
 {
 	/*class FrameworkImpl;*/
-	class ContextImpl;
 	class SystemWindowImpl : public SystemWindow
 	{
 	public:
@@ -68,8 +68,7 @@ namespace mgf
 #endif
 		SystemWindowOSData m_OSData;
 
-		/*FrameworkImpl* m_mgf = 0;*/
-		ContextImpl* m_context = 0;
+		Context* m_context = 0;
 		mgPoint m_size;
 		mgPoint m_borderSize;
 		SystemWindowOnClose m_onClose = 0;

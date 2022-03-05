@@ -74,7 +74,6 @@ int main()
 		context.m_data->GetSystemWindow()->SetOnSize(window_OnSize);
 		context.m_data->GetSystemWindow()->Show();
 		context.m_data->SetOnDraw(context_onDraw);
-		
 
 		window = context.m_data->CreateWindow();
 		window.m_data->SetTitle(L"Window");

@@ -26,32 +26,24 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MGF_TEXTIMPL_H_
-#define _MGF_TEXTIMPL_H_
+#include "miGUI.h"
 
-#include "Element.h"
-#include "ElementImpl.h"
+#include "framework/mgf.h"
+#include "framework/Window.h"
+#include "framework/Font.h"
+#include "framework/FontImpl.h"
+#include "framework/Button.h"
 
-#include <string>
+using namespace mgf;
 
-namespace mgf
+Button::Button()
 {
-	class WindowImpl;
-	class TextImpl : public Text
-	{
-		std::wstring m_text;
-		mgElementText_s* m_elementText = 0;
-	public:
-		TextImpl(WindowImpl* w, const wchar_t* t, Font* f);
-		virtual ~TextImpl();
 
-		virtual void SetText(const wchar_t*) override;
-		virtual void SetFont(Font*) override;
-		virtual void SetPosition(mgPoint*) override;
-		virtual void SetPosition(int x, int y) override;
-		virtual void SetColor(mgColor*) override;
-		virtual void SetColor(int) override;
-	};
 }
 
-#endif
+Button::~Button()
+{
+
+}
+
+

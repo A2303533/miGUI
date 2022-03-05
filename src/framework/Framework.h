@@ -26,28 +26,37 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MGF_FMWK_H_
 #define _MGF_FMWK_H_
+
+#include <vector>
 
 namespace mgf
 {
 	class Framework : public BaseClass
 	{
-	public:
+		std::vector<Context*> m_contexts;
 
-		virtual Context* CreateContext(
+	public:
+		Framework();
+		virtual ~Framework();
+		
+		bool m_run = true;
+
+		Context* CreateContext(
 			int windowFlags, /*WinAPI flags*/
 			const mgPoint& windowPosition,
 			const mgPoint& windowSize,
 			Backend* backend
-		) = 0;
+		);
 
 		/*
 		* Call every frame.
 		* Return true if system work
 		*/
-		virtual bool Run() = 0;
-		virtual void DrawAll() = 0;
+		bool Run();
+		void DrawAll();
 	};
 
 	Framework* InitFramework();

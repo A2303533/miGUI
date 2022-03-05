@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="..\..\src\framework\mgfImpl.cpp">
+    <ClCompile Include="..\..\src\framework\Framework.cpp">
       <Filter>migui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp">
@@ -11,7 +11,7 @@
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp">
       <Filter>migui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\ContextImpl.cpp">
+    <ClCompile Include="..\..\src\framework\Context.cpp">
       <Filter>migui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\miGUILoader.c">
@@ -20,16 +20,19 @@
     <ClCompile Include="..\..\src\framework\FontImpl.cpp">
       <Filter>migui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\WindowImpl.cpp">
+    <ClCompile Include="..\..\src\framework\Window.cpp">
       <Filter>migui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\RectangleImpl.cpp">
+    <ClCompile Include="..\..\src\framework\Rectangle.cpp">
       <Filter>migui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\ElementImpl.cpp">
+    <ClCompile Include="..\..\src\framework\Element.cpp">
       <Filter>migui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\TextImpl.cpp">
+    <ClCompile Include="..\..\src\framework\Text.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Button.cpp">
       <Filter>migui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -39,31 +42,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\framework\mgfImpl.h">
-      <Filter>migui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\framework\SystemWindowImpl.h">
       <Filter>migui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\framework\BackendGDI.h">
       <Filter>migui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\framework\ContextImpl.h">
-      <Filter>migui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\framework\FontImpl.h">
-      <Filter>migui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\framework\WindowImpl.h">
-      <Filter>migui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\framework\RectangleImpl.h">
-      <Filter>migui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\framework\ElementImpl.h">
-      <Filter>migui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\framework\TextImpl.h">
       <Filter>migui</Filter>
     </ClInclude>
   </ItemGroup>

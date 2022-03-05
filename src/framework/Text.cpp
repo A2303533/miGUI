@@ -30,49 +30,54 @@
 
 #include "framework/mgf.h"
 #include "framework/Window.h"
-#include "framework/WindowImpl.h"
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 #include "framework/Text.h"
-#include "framework/TextImpl.h"
 
 using namespace mgf;
 
-TextImpl::TextImpl(WindowImpl* w, const wchar_t* t, Font* f)
+#include <string>
+
+Text::Text(Window* w, const wchar_t* t, Font* f)
 {
 	assert(t);
 	assert(f);
+
+	m_text = new std::basic_string<wchar_t>;
 
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 	mgColor c;
 	mgColorSet(&c, 1.f, 1.f, 1.f, 1.f);
 
-	m_text = t;
+	m_text->assign(t);
 
-	m_element = mgCreateText(w->m_window, &p, m_text.data(), ((FontImpl*)f)->m_font);
+	m_element = mgCreateText(w->m_window, &p, m_text->data(), ((FontImpl*)f)->m_font);
 	m_elementText = (mgElementText*)m_element->implementation;
 }
 
-TextImpl::~TextImpl()
+Text::~Text()
 {
+	if (m_text)
+		delete m_text;
+
 	if (m_element)
 		mgDestroyElement(m_element);
 }
 
-void TextImpl::SetText(const wchar_t* t)
+void Text::SetText(const wchar_t* t)
 {
-	m_text = t;
-	m_elementText->text = m_text.data();
-	m_elementText->textLen = m_text.size();
+	m_text->assign(t);
+	m_elementText->text = m_text->data();
+	m_elementText->textLen = m_text->size();
 }
 
-void TextImpl::SetFont(Font* f)
+void Text::SetFont(Font* f)
 {
 	m_elementText->font = ((FontImpl*)f)->m_font;
 }
 
-void TextImpl::SetPosition(mgPoint* p)
+void Text::SetPosition(mgPoint* p)
 {
 	m_element->transformLocal.buildArea.left = p->x;
 	m_element->transformLocal.buildArea.top = p->y;
@@ -89,7 +94,7 @@ void TextImpl::SetPosition(mgPoint* p)
 	m_element->transformWorld = m_element->transformLocal;
 }
 
-void TextImpl::SetPosition(int x, int y)
+void Text::SetPosition(int x, int y)
 {
 	mgPoint p;
 	p.x = x;
@@ -98,12 +103,12 @@ void TextImpl::SetPosition(int x, int y)
 }
 
 
-void TextImpl::SetColor(mgColor* c)
+void Text::SetColor(mgColor* c)
 {
 	m_elementText->color = *c;
 }
 
-void TextImpl::SetColor(int i)
+void Text::SetColor(int i)
 {
 	mgColorSetAsIntegerARGB(&m_elementText->color, i);
 }

@@ -51,12 +51,14 @@
 namespace mgf
 {
 	class SystemWindowImpl;
-	class ContextImpl;
+	class Context;
 
 	class BackendGDI : public Backend
 	{
+		friend class Context;
+
 		mgf::SystemWindowImpl* m_window = 0;
-		mgf::ContextImpl* m_context = 0;
+		mgf::Context* m_context = 0;
 
 		void* m_gpu = 0;
 		Gdiplus::GdiplusStartupInput m_gdiplusStartupInput = 0;
@@ -70,7 +72,6 @@ namespace mgf
 
 		void _createBackbuffer(mgf::SystemWindowImpl* impl);
 
-		friend class ContextImpl;
 	public:
 		BackendGDI();
 		virtual ~BackendGDI();

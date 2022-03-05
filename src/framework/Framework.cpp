@@ -30,15 +30,15 @@
 #include "miGUILoader.h"
 
 #include "framework/mgf.h"
-#include "framework/mgfImpl.h"
-#include "framework/ContextImpl.h"
+#include "framework/Framework.h"
+#include "framework/Context.h"
 #include "framework/SystemWindowImpl.h"
 
 
 using namespace mgf;
 
 Backend* g_backend = 0;
-FrameworkImpl* g_mgf = 0;
+Framework* g_mgf = 0;
 
 #ifndef MG_NO_DLL
 MG_LIB_HANDLE g_migui_dll = 0;
@@ -53,15 +53,15 @@ Framework* mgf::InitFramework()
 		throw "Can't load migui.dll";
 	}
 #endif
-	g_mgf = new FrameworkImpl();
+	g_mgf = new Framework();
 	return g_mgf;
 }
 
-FrameworkImpl::FrameworkImpl()
+Framework::Framework()
 {
 }
 
-FrameworkImpl::~FrameworkImpl()
+Framework::~Framework()
 {
 #ifndef MG_NO_DLL
 	if(g_migui_dll)
@@ -70,12 +70,12 @@ FrameworkImpl::~FrameworkImpl()
 }
 
 
-bool FrameworkImpl::Run()
+bool Framework::Run()
 {
 	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
 	{
 		auto c = m_contexts[i];
-		mgStartFrame(c->m_gui_context);
+		mgStartFrame(c->GetGUIContext());
 	}
 
 	MSG msg;
@@ -96,7 +96,7 @@ bool FrameworkImpl::Run()
 	return m_run;
 }
 
-void FrameworkImpl::DrawAll()
+void Framework::DrawAll()
 {
 	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
 	{
@@ -108,14 +108,14 @@ void FrameworkImpl::DrawAll()
 	}
 }
 
-Context* FrameworkImpl::CreateContext(
+Context* Framework::CreateContext(
 	int windowFlags,
 	const mgPoint& windowPosition,
 	const mgPoint& windowSize,
 	Backend* backend
 )
 {
-	ContextImpl* c = new ContextImpl(windowFlags, windowPosition, windowSize, backend);
+	Context* c = new Context(windowFlags, windowPosition, windowSize, backend);
 	m_contexts.push_back(c);
 	return c;
 }

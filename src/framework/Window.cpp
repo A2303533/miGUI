@@ -30,47 +30,41 @@
 
 #include "framework/mgf.h"
 #include "framework/Window.h"
-#include "framework/WindowImpl.h"
-
 #include "framework/Rectangle.h"
-#include "framework/RectangleImpl.h"
-
 #include "framework/Text.h"
-#include "framework/TextImpl.h"
 
 using namespace mgf;
 
-
-
-WindowImpl::WindowImpl()
+Window::Window()
 {
 }
 
-WindowImpl::~WindowImpl()
+Window::~Window()
 {
+	auto elements = m_elements.data();
 	for (size_t i = 0, sz = m_elements.size(); i < sz; ++i)
 	{
-		delete(m_elements[i]);
+		delete(elements[i]);
 	}
 }
 
-void WindowImpl::SetTitle(const wchar_t* t)
+void Window::SetTitle(const wchar_t* t)
 {
-	m_title = t;
+	m_title.assign(t);
 	mgSetWindowTitle(m_window, m_title.data());
 }
 
-void WindowImpl::Show()
+void Window::Show()
 {
 	mgShowWindow(m_window, 1);
 }
 
-void WindowImpl::Hide()
+void Window::Hide()
 {
 	mgShowWindow(m_window, 0);
 }
 
-void WindowImpl::WithCloseButton(bool v)
+void Window::WithCloseButton(bool v)
 {
 	if (v)
 	{
@@ -83,7 +77,7 @@ void WindowImpl::WithCloseButton(bool v)
 	}
 }
 
-void WindowImpl::WithCollapseButton(bool v)
+void Window::WithCollapseButton(bool v)
 {
 	if (v)
 	{
@@ -96,7 +90,7 @@ void WindowImpl::WithCollapseButton(bool v)
 	}
 }
 
-void WindowImpl::WithTitlebar(bool v)
+void Window::WithTitlebar(bool v)
 {
 	if (v)
 	{
@@ -109,7 +103,7 @@ void WindowImpl::WithTitlebar(bool v)
 	}
 }
 
-void WindowImpl::CanMove(bool v)
+void Window::CanMove(bool v)
 {
 	if (v)
 	{
@@ -122,7 +116,7 @@ void WindowImpl::CanMove(bool v)
 	}
 }
 
-void WindowImpl::_updateRect()
+void Window::UpdateRect()
 {
 	m_window->rect.left = m_window->position.x;
 	m_window->rect.top = m_window->position.y;
@@ -130,21 +124,21 @@ void WindowImpl::_updateRect()
 	m_window->rect.bottom = m_window->rect.top + m_window->size.y;
 }
 
-void WindowImpl::SetSize(int x, int y)
+void Window::SetSize(int x, int y)
 {
 	m_window->size.x = x;
 	m_window->size.y = y;
-	_updateRect();
+	UpdateRect();
 }
 
-void WindowImpl::SetPosition(int x, int y)
+void Window::SetPosition(int x, int y)
 {
 	m_window->position.x = x;
 	m_window->position.y = y;
-	_updateRect();
+	UpdateRect();
 }
 
-void WindowImpl::DrawBG(bool v)
+void Window::DrawBG(bool v)
 {
 	if (v)
 	{
@@ -157,7 +151,7 @@ void WindowImpl::DrawBG(bool v)
 	}
 }
 
-void WindowImpl::CanDock(bool v)
+void Window::CanDock(bool v)
 {
 	if (v)
 	{
@@ -170,7 +164,7 @@ void WindowImpl::CanDock(bool v)
 	}
 }
 
-void WindowImpl::CanResize(bool v)
+void Window::CanResize(bool v)
 {
 	if (v)
 	{
@@ -183,32 +177,33 @@ void WindowImpl::CanResize(bool v)
 	}
 }
 
-void WindowImpl::SetID(int i)
+void Window::SetID(int i)
 {
 	m_window->id = i;
 }
 
-int WindowImpl::GetID()
+int Window::GetID()
 {
 	return m_window->id;
 }
 
-void WindowImpl::SetUserData(void* d)
+void Window::SetUserData(void* d)
 {
 	m_window->userData = d;
 }
 
-void* WindowImpl::GetUserData()
+void* Window::GetUserData()
 {
 	return m_window->userData;
 }
 
-void WindowImpl::DeleteElement(Element* e)
+void Window::DeleteElement(Element* e)
 {
 	assert(e);
+	auto elements = m_elements.data();
 	for (size_t i = 0, sz = m_elements.size(); i < sz; ++i)
 	{
-		if (m_elements[i] != e)
+		if (elements[i] != e)
 			continue;
 
 		m_elements.erase(m_elements.begin() + i);
@@ -217,16 +212,16 @@ void WindowImpl::DeleteElement(Element* e)
 	delete e;
 }
 
-Rectangle* WindowImpl::AddRectangle()
+Rectangle* Window::AddRectangle()
 {
-	RectangleImpl* e = new RectangleImpl(this);
+	Rectangle* e = new Rectangle(this);
 	m_elements.emplace_back(e);
 	return e;
 }
 
-Text* WindowImpl::AddText(int x, int y, const wchar_t* text, Font* f)
+Text* Window::AddText(int x, int y, const wchar_t* text, Font* f)
 {
-	TextImpl* e = new TextImpl(this, text, f);
+	Text* e = new Text(this, text, f);
 	m_elements.emplace_back(e);
 	e->SetPosition(x, y);
 	return e;

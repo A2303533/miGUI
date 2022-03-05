@@ -26,6 +26,7 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MGF_ELEMENT_H_
 #define _MGF_ELEMENT_H_
 
@@ -33,12 +34,14 @@ namespace mgf
 {
 	class Element
 	{
+	protected:
+		mgElement_s* m_element = 0;
 	public:
-		Element() {}
-		virtual ~Element() {}
+		Element();
+		virtual ~Element();
 
-		virtual void SetVisible(bool) = 0;
-		virtual bool IsVisible() = 0;
+		virtual void SetVisible(bool);
+		virtual bool IsVisible();
 	};
 }
 

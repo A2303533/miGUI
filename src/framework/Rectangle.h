@@ -26,22 +26,30 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MGF_RECTANGLE_H_
 #define _MGF_RECTANGLE_H_
 
+#include "mgForward.h"
+
 #include "Element.h"
-#include "ElementImpl.h"
 
 namespace mgf
 {
-	class Rectangle : public ElementImpl
+	class Rectangle : public Element
 	{
+	protected:
+		mgElementRectangle_s* m_elementRectangle = 0;
 	public:
-		virtual void SetRect(mgRect*) = 0;
-		virtual void SetRect(int left, int top, int right, int bottom) = 0;
-		virtual void SetColor(mgColor* c1, mgColor* c2) = 0;
-		virtual void SetColor(int, int) = 0; // ARGB 0xFFrrggbb
-		virtual void SetColor(int) = 0; // ARGB 0xFFrrggbb
+		Rectangle();
+		Rectangle(Window* w);
+		virtual  ~Rectangle();
+
+		virtual void SetRect(mgRect*);
+		virtual void SetRect(int left, int top, int right, int bottom);
+		virtual void SetColor(mgColor* c1, mgColor* c2);
+		virtual void SetColor(int, int); // ARGB 0xFFrrggbb
+		virtual void SetColor(int); // ARGB 0xFFrrggbb
 	};
 }
 

@@ -20,27 +20,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp" />
-    <ClCompile Include="..\..\src\framework\ContextImpl.cpp" />
-    <ClCompile Include="..\..\src\framework\ElementImpl.cpp" />
+    <ClCompile Include="..\..\src\framework\Button.cpp" />
+    <ClCompile Include="..\..\src\framework\Context.cpp" />
+    <ClCompile Include="..\..\src\framework\Element.cpp" />
     <ClCompile Include="..\..\src\framework\FontImpl.cpp" />
-    <ClCompile Include="..\..\src\framework\mgfImpl.cpp" />
-    <ClCompile Include="..\..\src\framework\RectangleImpl.cpp" />
+    <ClCompile Include="..\..\src\framework\Framework.cpp" />
+    <ClCompile Include="..\..\src\framework\Rectangle.cpp" />
     <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp" />
-    <ClCompile Include="..\..\src\framework\TextImpl.cpp" />
-    <ClCompile Include="..\..\src\framework\WindowImpl.cpp" />
+    <ClCompile Include="..\..\src\framework\Text.cpp" />
+    <ClCompile Include="..\..\src\framework\Window.cpp" />
     <ClCompile Include="..\..\src\miGUILoader.c" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\framework\BackendGDI.h" />
-    <ClInclude Include="..\..\src\framework\ContextImpl.h" />
-    <ClInclude Include="..\..\src\framework\ElementImpl.h" />
     <ClInclude Include="..\..\src\framework\FontImpl.h" />
-    <ClInclude Include="..\..\src\framework\mgfImpl.h" />
-    <ClInclude Include="..\..\src\framework\RectangleImpl.h" />
     <ClInclude Include="..\..\src\framework\SystemWindowImpl.h" />
-    <ClInclude Include="..\..\src\framework\TextImpl.h" />
-    <ClInclude Include="..\..\src\framework\WindowImpl.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

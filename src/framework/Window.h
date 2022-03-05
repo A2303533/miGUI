@@ -26,34 +26,54 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MGF_WINDOW_H_
 #define _MGF_WINDOW_H_
+
+#include "forward.h"
+
+#include <string>
+#include <vector>
 
 namespace mgf
 {
 	class Window : public BaseClass
 	{
+		friend class Text;
+		friend class Context;
+		friend class Rectangle;
+
+		mgWindow_s* m_window = 0;
+		std::basic_string<wchar_t> m_title;
+		std::vector<Element*> m_elements;
 	public:
-		virtual void SetTitle(const wchar_t* t) = 0;
-		virtual void Show() = 0;
-		virtual void Hide() = 0;
-		virtual void WithCloseButton(bool) = 0;
-		virtual void WithCollapseButton(bool) = 0;
-		virtual void WithTitlebar(bool) = 0;
-		virtual void CanMove(bool) = 0;
-		virtual void SetSize(int x, int y) = 0;
-		virtual void SetPosition(int x, int y) = 0;
-		virtual void DrawBG(bool) = 0;
-		virtual void CanDock(bool) = 0;
-		virtual void CanResize(bool) = 0;
-		virtual void SetID(int) = 0;
-		virtual int GetID() = 0;
-		virtual void SetUserData(void*) = 0;
-		virtual void* GetUserData() = 0;
+		Window();
+		virtual ~Window();
+
+		void SetTitle(const wchar_t* t);
+		void Show();
+		void Hide();
+		void WithCloseButton(bool);
+		void WithCollapseButton(bool);
+		void WithTitlebar(bool);
+		void CanMove(bool);
+		void SetSize(int x, int y);
+		void SetPosition(int x, int y);
+		void DrawBG(bool);
+		void CanDock(bool);
+		void CanResize(bool);
+		void SetID(int);
+		int GetID();
+		void SetUserData(void*);
+		void* GetUserData();
 		
-		virtual void DeleteElement(Element*) = 0;
-		virtual Rectangle* AddRectangle() = 0;
-		virtual Text* AddText(int x, int y, const wchar_t* text, Font*) = 0;
+		void DeleteElement(Element*);
+		Rectangle* AddRectangle();
+		Text* AddText(int x, int y, const wchar_t* text, Font*);
+		Button* AddButton();
+
+		void UpdateRect();
+
 	};
 }
 

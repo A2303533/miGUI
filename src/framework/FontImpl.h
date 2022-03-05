@@ -26,13 +26,12 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#pragma once
 #ifndef _MGF_FONTIMPL_H_
 #define _MGF_FONTIMPL_H_
 
 namespace mgf
 {
-	class ContextImpl;
-
 	class FontImpl : public Font
 	{
 	public:
@@ -40,7 +39,7 @@ namespace mgf
 		virtual ~FontImpl();
 		
 		Backend* m_backend = 0;
-		ContextImpl* m_context = 0;
+		Context* m_context = 0;
 		mgFont* m_font = 0;
 	};
 }

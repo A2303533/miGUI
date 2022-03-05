@@ -30,13 +30,16 @@
 
 #include "framework/mgf.h"
 #include "framework/Window.h"
-#include "framework/WindowImpl.h"
 #include "framework/Rectangle.h"
-#include "framework/RectangleImpl.h"
 
 using namespace mgf;
- 
-RectangleImpl::RectangleImpl(WindowImpl* w)
+
+Rectangle::Rectangle()
+{
+
+}
+
+Rectangle::Rectangle(Window* w)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
@@ -46,13 +49,13 @@ RectangleImpl::RectangleImpl(WindowImpl* w)
 	m_elementRectangle = (mgElementRectangle*)m_element->implementation;
 }
 
-RectangleImpl::~RectangleImpl()
+Rectangle::~Rectangle()
 {
 	if (m_element)
 		mgDestroyElement(m_element);
 }
 
-void RectangleImpl::SetRect(mgRect* r)
+void Rectangle::SetRect(mgRect* r)
 {
 	assert(m_element);
 	m_element->transformLocal.buildArea = *r;
@@ -61,7 +64,7 @@ void RectangleImpl::SetRect(mgRect* r)
 	m_element->transformWorld = m_element->transformLocal;
 }
 
-void RectangleImpl::SetRect(int left, int top, int right, int bottom)
+void Rectangle::SetRect(int left, int top, int right, int bottom)
 {
 	assert(m_element);
 	m_element->transformLocal.buildArea.left = left;
@@ -80,19 +83,19 @@ void RectangleImpl::SetRect(int left, int top, int right, int bottom)
 	m_element->transformWorld = m_element->transformLocal;
 }
 
-void RectangleImpl::SetColor(mgColor* c1, mgColor* c2)
+void Rectangle::SetColor(mgColor* c1, mgColor* c2)
 {
 	m_elementRectangle->color1 = *c1;
 	m_elementRectangle->color2 = *c2;
 }
 
-void RectangleImpl::SetColor(int c1, int c2)
+void Rectangle::SetColor(int c1, int c2)
 {
 	mgColorSetAsIntegerARGB(&m_elementRectangle->color1, c1);
 	mgColorSetAsIntegerARGB(&m_elementRectangle->color2, c2);
 }
 
-void RectangleImpl::SetColor(int c)
+void Rectangle::SetColor(int c)
 {
 	mgColorSetAsIntegerARGB(&m_elementRectangle->color1, c);
 	mgColorSetAsIntegerARGB(&m_elementRectangle->color2, c);

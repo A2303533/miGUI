@@ -29,9 +29,9 @@
 #include "miGUI.h"
 
 #include "framework/mgf.h"
-#include "framework/mgfImpl.h"
+#include "framework/Framework.h"
 #include "framework/SystemWindowImpl.h"
-#include "framework/ContextImpl.h"
+#include "framework/Context.h"
 
 #include <wchar.h>
 
@@ -45,7 +45,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 #endif
 
-extern FrameworkImpl* g_mgf;
+extern Framework* g_mgf;
 
 
 SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize)
@@ -296,75 +296,75 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 deviceHandle, flags, wheelDelta, x, y);*/
 
             if (wheelDelta)
-                pW->m_context->m_input.mouseWheelDelta = (float)wheelDelta / (float)WHEEL_DELTA;
+                pW->m_context->m_input->mouseWheelDelta = (float)wheelDelta / (float)WHEEL_DELTA;
 
             POINT cursorPoint;
             GetCursorPos(&cursorPoint);
             ScreenToClient(hWnd, &cursorPoint);
-            pW->m_context->m_input.mousePosition.x = cursorPoint.x;
-            pW->m_context->m_input.mousePosition.y = cursorPoint.y;
+            pW->m_context->m_input->mousePosition.x = cursorPoint.x;
+            pW->m_context->m_input->mousePosition.y = cursorPoint.y;
 
             if (flags)
             {
                 if ((flags & 0x1) == 0x1)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_LMBDOWN;
-                    pW->m_context->m_input.mouseButtonFlags2 |= MG_MBFL_LMBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_LMBDOWN;
+                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_LMBHOLD;
                 }
 
                 if ((flags & 0x2) == 0x2)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_LMBUP;
-                    if ((pW->m_context->m_input.mouseButtonFlags2 & MG_MBFL_LMBHOLD) == MG_MBFL_LMBHOLD)
-                        pW->m_context->m_input.mouseButtonFlags2 ^= MG_MBFL_LMBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_LMBUP;
+                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_LMBHOLD) == MG_MBFL_LMBHOLD)
+                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_LMBHOLD;
                 }
 
                 if ((flags & 0x4) == 0x4)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_RMBDOWN;
-                    pW->m_context->m_input.mouseButtonFlags2 |= MG_MBFL_RMBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_RMBDOWN;
+                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_RMBHOLD;
                 }
                 if ((flags & 0x8) == 0x8)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_RMBUP;
-                    if ((pW->m_context->m_input.mouseButtonFlags2 & MG_MBFL_RMBHOLD) == MG_MBFL_RMBHOLD)
-                        pW->m_context->m_input.mouseButtonFlags2 ^= MG_MBFL_RMBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_RMBUP;
+                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_RMBHOLD) == MG_MBFL_RMBHOLD)
+                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_RMBHOLD;
                 }
 
                 if ((flags & 0x10) == 0x10)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_MMBDOWN;
-                    pW->m_context->m_input.mouseButtonFlags2 |= MG_MBFL_MMBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_MMBDOWN;
+                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_MMBHOLD;
                 }
                 if ((flags & 0x20) == 0x20)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_MMBUP;
-                    if ((pW->m_context->m_input.mouseButtonFlags2 & MG_MBFL_MMBHOLD) == MG_MBFL_MMBHOLD)
-                        pW->m_context->m_input.mouseButtonFlags2 ^= MG_MBFL_MMBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_MMBUP;
+                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_MMBHOLD) == MG_MBFL_MMBHOLD)
+                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_MMBHOLD;
                 }
 
                 if ((flags & 0x100) == 0x100)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_X1MBDOWN;
-                    pW->m_context->m_input.mouseButtonFlags2 |= MG_MBFL_X1MBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X1MBDOWN;
+                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_X1MBHOLD;
                 }
                 if ((flags & 0x200) == 0x200)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_X1MBUP;
-                    if ((pW->m_context->m_input.mouseButtonFlags2 & MG_MBFL_X1MBHOLD) == MG_MBFL_X1MBHOLD)
-                        pW->m_context->m_input.mouseButtonFlags2 ^= MG_MBFL_X1MBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X1MBUP;
+                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_X1MBHOLD) == MG_MBFL_X1MBHOLD)
+                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_X1MBHOLD;
                 }
 
                 if ((flags & 0x40) == 0x40)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_X2MBDOWN;
-                    pW->m_context->m_input.mouseButtonFlags2 |= MG_MBFL_X2MBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X2MBDOWN;
+                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_X2MBHOLD;
                 }
                 if ((flags & 0x80) == 0x80)
                 {
-                    pW->m_context->m_input.mouseButtonFlags1 |= MG_MBFL_X2MBUP;
-                    if ((pW->m_context->m_input.mouseButtonFlags2 & MG_MBFL_X2MBHOLD) == MG_MBFL_X2MBHOLD)
-                        pW->m_context->m_input.mouseButtonFlags2 ^= MG_MBFL_X2MBHOLD;
+                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X2MBUP;
+                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_X2MBHOLD) == MG_MBFL_X2MBHOLD)
+                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_X2MBHOLD;
                 }
 
             }
@@ -481,25 +481,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (ToAsciiEx((UINT)wParam, HIWORD(lParam), keys, chars, 0, KEYBOARD_INPUT_HKL) == 1)
         {
             MultiByteToWideChar(KEYBOARD_INPUT_CODEPAGE, MB_PRECOMPOSED, (LPCSTR)chars,
-                sizeof(chars), (WCHAR*)&pW->m_context->m_input.character, 1);
+                sizeof(chars), (WCHAR*)&pW->m_context->m_input->character, 1);
         }
 
         if (isPress)
         {
             if (key < 256)
             {
-                pW->m_context->m_input.keyFlags[key] |= MG_KEYFL_HOLD;
-                pW->m_context->m_input.keyFlags[key] |= MG_KEYFL_HIT;
+                pW->m_context->m_input->keyFlags[key] |= MG_KEYFL_HOLD;
+                pW->m_context->m_input->keyFlags[key] |= MG_KEYFL_HIT;
             }
         }
         else
         {
             if (key < 256)
             {
-                if ((pW->m_context->m_input.keyFlags[key] & MG_KEYFL_HOLD) == MG_KEYFL_HOLD)
-                    pW->m_context->m_input.keyFlags[key] ^= MG_KEYFL_HOLD;
+                if ((pW->m_context->m_input->keyFlags[key] & MG_KEYFL_HOLD) == MG_KEYFL_HOLD)
+                    pW->m_context->m_input->keyFlags[key] ^= MG_KEYFL_HOLD;
 
-                pW->m_context->m_input.keyFlags[key] |= MG_KEYFL_RELEASE;
+                pW->m_context->m_input->keyFlags[key] |= MG_KEYFL_RELEASE;
             }
         }
 
