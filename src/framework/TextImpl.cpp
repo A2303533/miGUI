@@ -31,72 +31,80 @@
 #include "framework/mgf.h"
 #include "framework/Window.h"
 #include "framework/WindowImpl.h"
-#include "framework/Rectangle.h"
-#include "framework/RectangleImpl.h"
+#include "framework/Font.h"
+#include "framework/FontImpl.h"
+#include "framework/Text.h"
+#include "framework/TextImpl.h"
 
 using namespace mgf;
- 
-RectangleImpl::RectangleImpl(WindowImpl* w)
+
+TextImpl::TextImpl(WindowImpl* w, const wchar_t* t, Font* f)
 {
+	assert(t);
+	assert(f);
+
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 	mgColor c;
 	mgColorSet(&c, 1.f, 1.f, 1.f, 1.f);
-	m_element = mgCreateRectangle(w->m_window, &p, &p, &c, &c);
-	m_elementRectangle = (mgElementRectangle*)m_element->implementation;
+
+	m_text = t;
+
+	m_element = mgCreateText(w->m_window, &p, m_text.data(), ((FontImpl*)f)->m_font);
+	m_elementText = (mgElementText*)m_element->implementation;
 }
 
-RectangleImpl::~RectangleImpl()
+TextImpl::~TextImpl()
 {
 	if (m_element)
 		mgDestroyElement(m_element);
 }
 
-void RectangleImpl::SetRect(mgRect* r)
+void TextImpl::SetText(const wchar_t* t)
 {
-	assert(m_element);
-	m_element->transformLocal.buildArea = *r;
-	m_element->transformLocal.clipArea = *r;
-	m_element->creationRect = *r;
+	m_text = t;
+	m_elementText->text = m_text.data();
+	m_elementText->textLen = m_text.size();
+}
+
+void TextImpl::SetFont(Font* f)
+{
+	m_elementText->font = ((FontImpl*)f)->m_font;
+}
+
+void TextImpl::SetPosition(mgPoint* p)
+{
+	m_element->transformLocal.buildArea.left = p->x;
+	m_element->transformLocal.buildArea.top = p->y;
+	m_element->transformLocal.buildArea.right = p->x;
+	m_element->transformLocal.buildArea.bottom = p->y;
+	m_element->transformLocal.clipArea.left = p->x;
+	m_element->transformLocal.clipArea.top = p->y;
+	m_element->transformLocal.clipArea.right = p->x;
+	m_element->transformLocal.clipArea.bottom = p->y;
+	m_element->creationRect.left = p->x;
+	m_element->creationRect.top = p->y;
+	m_element->creationRect.right = p->x;
+	m_element->creationRect.bottom = p->y;
 	m_element->transformWorld = m_element->transformLocal;
 }
 
-void RectangleImpl::SetRect(int left, int top, int right, int bottom)
+void TextImpl::SetPosition(int x, int y)
 {
-	assert(m_element);
-	m_element->transformLocal.buildArea.left = left;
-	m_element->transformLocal.buildArea.top = top;
-	m_element->transformLocal.buildArea.right = right;
-	m_element->transformLocal.buildArea.bottom = bottom;
-	m_element->transformLocal.clipArea.left = left;
-	m_element->transformLocal.clipArea.top = top;
-	m_element->transformLocal.clipArea.right = right;
-	m_element->transformLocal.clipArea.bottom = bottom;
-	m_element->creationRect.left = left;
-	m_element->creationRect.top = top;
-	m_element->creationRect.right = right;
-	m_element->creationRect.bottom = bottom;
-	
-	m_element->transformWorld = m_element->transformLocal;
-}
-
-void RectangleImpl::SetColor(mgColor* c1, mgColor* c2)
-{
-	m_elementRectangle->color1 = *c1;
-	m_elementRectangle->color2 = *c2;
-}
-
-void RectangleImpl::SetColor(int c1, int c2)
-{
-	mgColorSetAsIntegerARGB(&m_elementRectangle->color1, c1);
-	mgColorSetAsIntegerARGB(&m_elementRectangle->color2, c2);
-}
-
-void RectangleImpl::SetColor(int c)
-{
-	mgColorSetAsIntegerARGB(&m_elementRectangle->color1, c);
-	mgColorSetAsIntegerARGB(&m_elementRectangle->color2, c);
+	mgPoint p;
+	p.x = x;
+	p.y = y;
+	SetPosition(&p);
 }
 
 
+void TextImpl::SetColor(mgColor* c)
+{
+	m_elementText->color = *c;
+}
+
+void TextImpl::SetColor(int i)
+{
+	mgColorSetAsIntegerARGB(&m_elementText->color, i);
+}
 

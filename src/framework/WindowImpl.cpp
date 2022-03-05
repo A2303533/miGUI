@@ -35,6 +35,9 @@
 #include "framework/Rectangle.h"
 #include "framework/RectangleImpl.h"
 
+#include "framework/Text.h"
+#include "framework/TextImpl.h"
+
 using namespace mgf;
 
 
@@ -45,7 +48,10 @@ WindowImpl::WindowImpl()
 
 WindowImpl::~WindowImpl()
 {
-
+	for (size_t i = 0, sz = m_elements.size(); i < sz; ++i)
+	{
+		delete(m_elements[i]);
+	}
 }
 
 void WindowImpl::SetTitle(const wchar_t* t)
@@ -215,6 +221,14 @@ Rectangle* WindowImpl::AddRectangle()
 {
 	RectangleImpl* e = new RectangleImpl(this);
 	m_elements.emplace_back(e);
+	return e;
+}
+
+Text* WindowImpl::AddText(int x, int y, const wchar_t* text, Font* f)
+{
+	TextImpl* e = new TextImpl(this, text, f);
+	m_elements.emplace_back(e);
+	e->SetPosition(x, y);
 	return e;
 }
 

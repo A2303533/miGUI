@@ -53,6 +53,7 @@ namespace mgf
 		
 		virtual void DeleteElement(Element*) = 0;
 		virtual Rectangle* AddRectangle() = 0;
+		virtual Text* AddText(int x, int y, const wchar_t* text, Font*) = 0;
 	};
 }
 

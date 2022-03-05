@@ -377,7 +377,7 @@ Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool ital
 	{
 		mgFont* f = (mgFont*)malloc(sizeof(mgFont));
 		HDC g_dc = GetWindowDC(this->m_window->m_hWnd);
-		f->implementation = CreateFontA(
+		f->implementation = CreateFontW(
 			-MulDiv(size, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
 			0, 0, 0,
 			bold ? FW_BOLD : FW_NORMAL,
@@ -389,7 +389,7 @@ Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool ital
 			CLIP_DEFAULT_PRECIS,
 			CLEARTYPE_QUALITY,
 			VARIABLE_PITCH,
-			0);
+			file);
 		ReleaseDC(this->m_window->m_hWnd, g_dc);
 		newFont->m_font = f;
 	}

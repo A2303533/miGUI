@@ -29,6 +29,9 @@
     <ClCompile Include="..\..\src\framework\ElementImpl.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\TextImpl.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">
@@ -58,6 +61,9 @@
       <Filter>migui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\framework\ElementImpl.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\TextImpl.h">
       <Filter>migui</Filter>
     </ClInclude>
   </ItemGroup>

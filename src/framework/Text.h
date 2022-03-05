@@ -26,29 +26,23 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MGF_CONTEXT_H_
-#define _MGF_CONTEXT_H_
+#ifndef _MGF_TEXT_H_
+#define _MGF_TEXT_H_
 
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
+#include "Element.h"
+#include "ElementImpl.h"
 
 namespace mgf
 {
-	using ContextOnDraw = void(*)(Context*,Backend*);
-
-	class Context : public BaseClass
+	class Text : public ElementImpl
 	{
 	public:
-		virtual mgf::SystemWindow* GetSystemWindow() = 0;
-		virtual mgf::Backend* GetBackend() = 0;
-
-		virtual void OnWindowSize() = 0;
-		
-		virtual mgf::Window* CreateWindow() = 0;
-
-		// Will draw after drawing all windows
-		virtual void SetOnDraw(ContextOnDraw) = 0;
+		virtual void SetText(const wchar_t*) = 0;
+		virtual void SetFont(Font*) = 0;
+		virtual void SetPosition(mgPoint*) = 0;
+		virtual void SetPosition(int x, int y) = 0;
+		virtual void SetColor(mgColor*) = 0;
+		virtual void SetColor(int) = 0; // ARGB 0xFFrrggbb
 	};
 }
 

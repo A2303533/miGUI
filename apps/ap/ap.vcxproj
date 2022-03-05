@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\src\framework\mgfImpl.cpp" />
     <ClCompile Include="..\..\src\framework\RectangleImpl.cpp" />
     <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp" />
+    <ClCompile Include="..\..\src\framework\TextImpl.cpp" />
     <ClCompile Include="..\..\src\framework\WindowImpl.cpp" />
     <ClCompile Include="..\..\src\miGUILoader.c" />
     <ClCompile Include="main.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="..\..\src\framework\mgfImpl.h" />
     <ClInclude Include="..\..\src\framework\RectangleImpl.h" />
     <ClInclude Include="..\..\src\framework\SystemWindowImpl.h" />
+    <ClInclude Include="..\..\src\framework\TextImpl.h" />
     <ClInclude Include="..\..\src\framework\WindowImpl.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -61,12 +61,14 @@ namespace mgf
 		
 		virtual void DeleteElement(Element*) override;
 		virtual Rectangle* AddRectangle() override;
+		virtual Text* AddText(int x, int y, const wchar_t* text, Font*) override;
+
 
 
 		mgWindow* m_window = 0;
 
 		std::wstring m_title;
-		std::vector<Rectangle*> m_elements;
+		std::vector<Element*> m_elements;
 	};
 }
 

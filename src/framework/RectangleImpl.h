@@ -45,6 +45,9 @@ namespace mgf
 
 		virtual void SetRect(mgRect*) override;
 		virtual void SetRect(int left, int top, int right, int bottom) override;
+		virtual void SetColor(mgColor* c1, mgColor* c2) override;
+		virtual void SetColor(int, int) override; // ARGB 0xFFrrggbb
+		virtual void SetColor(int) override; // ARGB 0xFFrrggbb
 	};
 }
 

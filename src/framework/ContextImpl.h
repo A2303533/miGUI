@@ -47,6 +47,8 @@ namespace mgf
 		virtual ~ContextImpl();
 
 		virtual mgf::SystemWindow* GetSystemWindow() override;
+		virtual mgf::Backend* GetBackend() override;
+
 		virtual void OnWindowSize() override;
 		virtual mgf::Window* CreateWindow() override;
 		virtual void SetOnDraw(ContextOnDraw) override;

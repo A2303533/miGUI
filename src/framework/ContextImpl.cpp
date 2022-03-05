@@ -99,6 +99,11 @@ mgf::SystemWindow* ContextImpl::GetSystemWindow()
 	return m_window;
 }
 
+mgf::Backend* ContextImpl::GetBackend()
+{
+	return m_backend;
+}
+
 void ContextImpl::OnWindowSize()
 {
 	m_gui_context->needRebuild = 1;
