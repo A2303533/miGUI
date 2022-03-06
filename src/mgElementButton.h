@@ -38,6 +38,8 @@ typedef struct mgElementButton_s {
 
 	int enabled;
 	int pushButton;
+	
+	int drawBG; 
 
 	mgFont* font;
 	const wchar_t* text;
@@ -49,7 +51,6 @@ typedef struct mgElementButton_s {
 	int iconID_hover;
 	int iconID_push;
 	int iconID_disable;
-	int drawBG; /*only if icons*/
 
 } mgElementButton;
 

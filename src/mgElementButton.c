@@ -85,10 +85,13 @@ miGUI_onDraw_button(mgElement* e)
 		impl->colorFinal2 = style->buttonColorDisabled2;
 	}
 
-	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG, 
-		impl,
-		&e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, 0, 0);
+	if (impl->drawBG)
+	{
+		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
+		e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG,
+			impl,
+			&e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, 0, 0);
+	}
 
 	if (impl->text && impl->textLen)
 	{
@@ -164,7 +167,6 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const w
 	newElement->creationRect = newElement->transformLocal.buildArea;
 	
 	newElement->window = w;
-
 	newElement->visible = 1;
 	newElement->onDraw = miGUI_onDraw_button;
 	newElement->onUpdate = miGUI_onUpdate_button;
@@ -174,6 +176,7 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const w
 	newElement->implementation = calloc(1, sizeof(mgElementButton));
 	mgElementButton* impl = (mgElementButton*)newElement->implementation;
 	impl->enabled = 1;
+	impl->drawBG = 1;
 	
 	impl->font = font;
 	impl->text = text;

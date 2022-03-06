@@ -478,6 +478,22 @@ typedef void (*PFNMGDESTROYMENUPROC)(mgMenu*);
 extern PFNMGDESTROYMENUPROC mgDestroyMenu;
 #endif
 
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgInitStyleLight_f(mgStyle*);
+#define mgInitStyleLight mgInitStyleLight_f
+#else
+typedef void (*PFNMGINITSTYLELIGHTPROC)(mgStyle*);
+extern PFNMGINITSTYLELIGHTPROC mgInitStyleLight;
+#endif
+
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgInitStyleDark_f(mgStyle*);
+#define mgInitStyleDark mgInitStyleDark_f
+#else
+typedef void (*PFNMGINITSTYLEDARKPROC)(mgStyle*);
+extern PFNMGINITSTYLEDARKPROC mgInitStyleDark;
+#endif
+
 
 #if defined(__cplusplus)
 }

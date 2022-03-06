@@ -105,6 +105,7 @@ int main()
 		auto butt = window.m_data->AddButton();
 		butt->SetRect(100, 0, 200, 40);
 		butt->SetText(L"GO!!!");
+		//butt->SetDrawBG(false);
 		//butt->SetEnabled(false);
 
 		// also rebuild all gui

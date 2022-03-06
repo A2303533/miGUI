@@ -92,6 +92,56 @@ mgDestroyElement_f(mgElement* e)
 	}
 }
 
+MG_API
+int MG_C_DECL
+mgInitStyleDark_f(mgStyle* s)
+{
+	assert(s);
+}
+
+MG_API
+int MG_C_DECL
+mgInitStyleLight_f(mgStyle* s)
+{
+	assert(s);
+	mgColorSetAsIntegerRGB(&s->buttonColor1, 0x999999);
+	mgColorSetAsIntegerRGB(&s->buttonColor2, 0x666666);
+	mgColorSetAsIntegerRGB(&s->buttonColorDisabled1, 0x999999);
+	mgColorSetAsIntegerRGB(&s->buttonColorDisabled2, 0x666666);
+	mgColorSetAsIntegerRGB(&s->buttonColorHover1, 0xAAAAAA);
+	mgColorSetAsIntegerRGB(&s->buttonColorHover2, 0x777777);
+	mgColorSetAsIntegerRGB(&s->buttonColorPress1, 0x777777);
+	mgColorSetAsIntegerRGB(&s->buttonColorPress2, 0x444444);
+	mgColorSetAsIntegerRGB(&s->buttonTextColor, 0x0);
+	mgColorSetAsIntegerRGB(&s->buttonTextColorHover, 0x222222);
+	mgColorSetAsIntegerRGB(&s->buttonTextColorPress, 0x0);
+	mgColorSetAsIntegerRGB(&s->buttonTextColorDisabled, 0x555555);
+	mgColorSetAsIntegerRGB(&s->windowBG, 0xE1E6F7);
+	mgColorSetAsIntegerRGB(&s->windowTitlebar, 0xC9D6F2);
+	mgColorSetAsIntegerRGB(&s->windowBGTopWindow, 0xE8EDFF);
+	mgColorSetAsIntegerRGB(&s->windowTitlebarTopWindow, 0xB5CCFF);
+	mgColorSetAsIntegerRGB(&s->windowTitlebarText, 0x0);
+	mgColorSetAsIntegerRGB(&s->dockpanelBG, 0xFFFFFF);
+	mgColorSetAsIntegerRGB(&s->dockpanelWindowToDock, 0x009BFF);
+	mgColorSetAsIntegerRGB(&s->dockpanelTabBG, 0x009BFF);
+	mgColorSetAsIntegerRGB(&s->dockpanelSplitterBG, 0xC4C4C4);
+	mgColorSetAsIntegerRGB(&s->dockpanelPanelSplitterBG, 0xC8C8C8);
+	mgColorSetAsIntegerRGB(&s->dockpanelTabWindowTitleBG, 0xE5F3FF);
+	mgColorSetAsIntegerRGB(&s->dockpanelTabActiveWindowTitleBG, 0xB2D2FF);
+	mgColorSetAsIntegerRGB(&s->popupBG, 0xE8EDFF);
+	mgColorSetAsIntegerRGB(&s->popupText, 0x0);
+	mgColorSetAsIntegerRGB(&s->popupTextShortcut, 0x555555);
+	mgColorSetAsIntegerRGB(&s->popupHoverElementBG, 0xC1C1C1);
+	mgColorSetAsIntegerRGB(&s->windowScrollbarBG, 0xD4D2EF);
+	mgColorSetAsIntegerRGB(&s->windowScrollbarElement, 0xB3C4DB);
+	mgColorSetAsIntegerRGB(&s->popupSeparator, 0xC1C1C1);
+	mgColorSetAsIntegerRGB(&s->windowMenuBG, 0xD6E1FF);
+	mgColorSetAsIntegerRGB(&s->windowMenuHoverItemBG, 0x9EC0FF);
+	mgColorSetAsIntegerRGB(&s->windowMenuActiveItemBG, 0x00E1FF);
+	mgColorSetAsIntegerRGB(&s->tooltipBG, 0xD6E5FF);
+	mgColorSetAsIntegerRGB(&s->tooltipText, 0x0);
+}
+
 MG_API 
 mgContext* MG_C_DECL
 mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
@@ -107,43 +157,7 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->activeStyle = &c->styleLight;
 	c->deltaTime = 0.f;
 
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonColor1, 0x999999);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonColor2, 0x666666);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorDisabled1, 0x999999);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorDisabled2, 0x666666);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorHover1, 0xAAAAAA);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorHover2, 0x777777);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorPress1, 0x777777);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorPress2, 0x444444);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonTextColor, 0x0);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonTextColorHover, 0x222222);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonTextColorPress, 0x0);
-	mgColorSetAsIntegerRGB(&c->styleLight.buttonTextColorDisabled, 0x555555);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowBG, 0xE1E6F7);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebar, 0xC9D6F2);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowBGTopWindow, 0xE8EDFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarTopWindow, 0xB5CCFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebarText, 0x0);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelBG, 0xFFFFFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelWindowToDock, 0x009BFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabBG, 0x009BFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelSplitterBG, 0xC4C4C4);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelPanelSplitterBG, 0xC8C8C8);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabWindowTitleBG, 0xE5F3FF);
-	mgColorSetAsIntegerRGB(&c->styleLight.dockpanelTabActiveWindowTitleBG, 0xB2D2FF);
-	mgColorSetAsIntegerRGB(&c->styleLight.popupBG, 0xE8EDFF);
-	mgColorSetAsIntegerRGB(&c->styleLight.popupText, 0x0);
-	mgColorSetAsIntegerRGB(&c->styleLight.popupTextShortcut, 0x555555);	
-	mgColorSetAsIntegerRGB(&c->styleLight.popupHoverElementBG, 0xC1C1C1);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarBG, 0xD4D2EF);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowScrollbarElement, 0xB3C4DB);
-	mgColorSetAsIntegerRGB(&c->styleLight.popupSeparator, 0xC1C1C1);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuBG, 0xD6E1FF);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuHoverItemBG, 0x9EC0FF);
-	mgColorSetAsIntegerRGB(&c->styleLight.windowMenuActiveItemBG, 0x00E1FF);
-	mgColorSetAsIntegerRGB(&c->styleLight.tooltipBG, 0xD6E5FF);
-	mgColorSetAsIntegerRGB(&c->styleLight.tooltipText, 0x0);
-
+	mgInitStyleLight_f(&c->styleLight);
 	c->functions.SetCursor_p = mgSetCursor_f;
 
 	mgInitDefaultCursors(c);

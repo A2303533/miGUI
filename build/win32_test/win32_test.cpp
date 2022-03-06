@@ -359,7 +359,6 @@ void draw_gui()
     if (!g_gui_context)
         return;
 
-
     g_gui_context->gpu->beginDraw();
 
     /*draw elements*/

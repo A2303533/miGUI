@@ -40,12 +40,27 @@ namespace mgf
 	{
 		mgElementButton_s* m_elementButton = 0;
 		std::wstring m_text;
+		mgStyle_s* m_userStyle = 0;
 	public:
 		Button(Window* w);
 		virtual ~Button();
 
 		virtual void SetText(const wchar_t*);
 		virtual void SetEnabled(bool);
+		virtual void SetDrawBG(bool);
+
+		/*next methods will allocate memory for m_userStyle
+		* and will use this style instead default
+		*/
+		virtual mgStyle_s* GetStyle();
+		virtual void SetColorBG(int argb1, int argb2);
+		virtual void SetColorBGHover(int argb1, int argb2);
+		virtual void SetColorBGPush(int argb1, int argb2);
+		virtual void SetColorBGDisable(int argb1, int argb2);
+		virtual void SetTextColor(int argb);
+		virtual void SetTextColorHover(int argb);
+		virtual void SetTextColorPush(int argb);
+		virtual void SetTextColorDisable(int argb);
 
 	};
 }

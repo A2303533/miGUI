@@ -65,6 +65,8 @@ PFNMGDOCKGETSAVEDATAPROC mgDockGetSaveData;
 PFNMGDOCKLOADDATAPROC mgDockLoadData;
 PFNMGCREATEMENUPROC mgCreateMenu;
 PFNMGDESTROYMENUPROC mgDestroyMenu;
+PFNMGINITSTYLELIGHTPROC mgInitStyleLight;
+PFNMGINITSTYLEDARKPROC mgInitStyleDark;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -127,6 +129,9 @@ mgLoad()
 	mgCreateMenu = mgGetProc(lib, "mgCreateMenu_f");
 	mgDestroyMenu = mgGetProc(lib, "mgDestroyMenu_f");
 	mgDestroyElement = mgGetProc(lib, "mgDestroyElement_f");
+	mgInitStyleLight = mgGetProc(lib, "mgInitStyleLight_f");
+	mgInitStyleDark = mgGetProc(lib, "mgInitStyleDark_f");
+	
 
 	return lib;
 }
