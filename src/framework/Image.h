@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -27,17 +27,25 @@
 */
 
 #pragma once
-#ifndef _MG_IMAGE_H_
-#define _MG_IMAGE_H_
+#ifndef _MGF_IMAGE_H_
+#define _MGF_IMAGE_H_
 
-/* RGBA */
-typedef struct mgImage_s {
-	unsigned int width;
-	unsigned int height;
-	unsigned int dataSize;
-	unsigned int bits;
-	unsigned int pitch;
-	unsigned char* data;
-} mgImage;
+
+namespace mgf
+{
+	class Image : public BaseClass
+	{
+		friend class Framework;
+		friend Image* Image_bmp(const char* fn);
+
+		mgImage_s* m_image = 0;
+	public:
+		Image();
+		virtual ~Image();
+	};
+	
+	Image* Image_bmp(const char* fn);
+}
+
 
 #endif

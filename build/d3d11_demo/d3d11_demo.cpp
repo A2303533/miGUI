@@ -719,8 +719,8 @@ public:
         if (!texture)
             texture = m_whiteTexture;
 
-        m_d3d11DevCon->PSSetShaderResources(0, 1, &((MyD3D11Texture*)texture)->m_textureResView);
-        m_d3d11DevCon->PSSetSamplers(0, 1, &((MyD3D11Texture*)texture)->m_samplerState);
+        m_d3d11DevCon->PSSetShaderResources(0, 1, &texture->m_textureResView);
+        m_d3d11DevCon->PSSetSamplers(0, 1, &texture->m_samplerState);
 
         auto old_depth = UseDepth(false);
         m_d3d11DevCon->RSSetState(m_RasterizerSolidNoBackFaceCulling);
@@ -796,14 +796,17 @@ void gui_endDraw()
 {
 }
 
-mgTexture gui_createTexture(mgImage* img)
+mgTexture* gui_createTexture(mgImage* img)
 {
-    return (mgTexture)g_d3d11->CreateTexture(img);
+    mgTexture* t = new mgTexture;
+    t->implementation = g_d3d11->CreateTexture(img);
+    return t;
 }
 
-void gui_destroyTexture(mgTexture t)
+void gui_destroyTexture(mgTexture* t)
 {
-    g_d3d11->DestroyTexture((MyD3D11Texture*)t);
+    g_d3d11->DestroyTexture((MyD3D11Texture*)t->implementation);
+    delete t;
 }
 
 mgRect gui_setClipRect(mgRect* r)
@@ -821,7 +824,7 @@ void gui_drawRectangle(
     mgRect* rct,
     mgColor* color1,
     mgColor* color2,
-    mgTexture texture, /*optional*/
+    mgTexture* texture, /*optional*/
     mgVec4* UVRegion)
 {
     mgVec4 corners;
@@ -858,7 +861,7 @@ void gui_drawText(
             corners.z = corners.x + glyph->width;
             corners.w = corners.y + glyph->height;
             
-            MyD3D11Texture* texture = (MyD3D11Texture*)((mgFontBitmap*)font->implementation)[glyph->textureSlot].gpuTexture;
+            MyD3D11Texture* texture = (MyD3D11Texture*)((mgFontBitmap*)font->implementation)[glyph->textureSlot].gpuTexture->implementation;
             g_d3d11->DrawRectangle(corners, *color, *color, &g_proj, texture, &glyph->UV);
 
             _position.x += glyph->width + glyph->overhang + font->characterSpacing;

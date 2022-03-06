@@ -50,6 +50,8 @@ class MyImage
 public:
     MyImage() {}
     ~MyImage() {
+        if (m_gdiimage)
+            delete m_gdiimage;
     }
     void load(const wchar_t* f)
     {
@@ -58,7 +60,8 @@ public:
 
     Gdiplus::Image * m_gdiimage = 0;
 };
-MyImage g_iconsImage;
+//MyImage g_iconsImage;
+mgTexture* g_iconsImage = 0;
 
 
 /*double buffering*/
@@ -115,12 +118,12 @@ void gui_endDraw()
     ReleaseDC(g_hwnd, g_dc);
 }
 
-mgTexture gui_createTexture(mgImage* img)
+mgTexture* gui_createTexture(mgImage* img)
 {
     return 0;
 }
 
-void gui_destroyTexture(mgTexture t)
+void gui_destroyTexture(mgTexture* t)
 {
 
 }
@@ -144,7 +147,7 @@ void gui_drawRectangle(
     mgRect* rct,
     mgColor* color1,
     mgColor* color2,
-    mgTexture texture, /*optional*/
+    mgTexture* texture, /*optional*/
     mgVec4* UVRegion)
 {
     if (texture)
@@ -153,14 +156,14 @@ void gui_drawRectangle(
             || reason == mgDrawRectangleReason_windowCollapseButton
             || reason == mgDrawRectangleReason_popupNextIcon)
         {
-            MyImage* myimg = (MyImage*)texture;
+            Gdiplus::Image* myimg = (Gdiplus::Image*)texture->implementation;
             Gdiplus::Graphics graphics(hdcMem);
             Gdiplus::Rect gdirct;
             gdirct.X = rct->left + borderSize.x;
             gdirct.Y = rct->top + borderSize.y;
             gdirct.Width = rct->right - rct->left;
             gdirct.Height = rct->bottom - rct->top;
-            graphics.DrawImage(myimg->m_gdiimage, gdirct, 
+            graphics.DrawImage(myimg, gdirct,
                 g_gui_context->currentIcon.left, 
                 g_gui_context->currentIcon.top, 
                 g_gui_context->currentIcon.right, 
@@ -598,8 +601,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         g_gui_context->windowSize.y = rc.bottom - rc.top;
     }
 
-    g_iconsImage.load(L"../data/icons.png");
-    mgInitDefaultIcons(g_gui_context, &g_iconsImage);
+    MyImage* myim = new MyImage;
+    myim->load(L"../data/icons.png");
+    g_iconsImage = new mgTexture;
+    g_iconsImage->implementation = myim->m_gdiimage;
+
+    mgInitDefaultIcons(g_gui_context, g_iconsImage);
 
 
     g_win32font = gui_createFont("Segoe", 0, 10);
@@ -808,6 +815,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     if (g_icons)
         mgDestroyIcons(g_icons);
 
+    if (g_iconsImage)
+        delete g_iconsImage;
+
     DeleteObject(g_win32font->implementation);
     free(g_win32font);
 
@@ -816,6 +826,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     mgDestroyContext(g_gui_context);
     mgUnload(gui_lib);
 
+    if (myim)
+        delete myim;
     Gdiplus::GdiplusShutdown(gdiplusToken);
     return (int) msg.wParam;
 }

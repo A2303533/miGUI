@@ -53,15 +53,15 @@ namespace mgf
 		virtual void BeginDraw() = 0;
 		virtual void EndDraw() = 0;
 
-		virtual mgTexture CreateTexture(mgImage* img) = 0;
-		virtual void DestroyTexture(mgTexture) = 0;
+		virtual mgTexture* CreateTexture(mgImage* img) = 0;
+		virtual void DestroyTexture(mgTexture*) = 0;
 		virtual void DrawRectangle(
 			int reason,
 			void* object,
 			mgRect* rct,
 			mgColor* color1,
 			mgColor* color2,
-			mgTexture texture, /*optional*/
+			mgTexture* texture, /*optional*/
 			mgVec4* UVRegion /*optional*/
 		) = 0;
 		virtual void DrawText(
@@ -87,7 +87,7 @@ namespace mgf
 
 		void (*m_getTextSize)(const wchar_t* text, mgFont*, mgPoint*) = 0;
 
-		virtual void* GetDefaultIcons() = 0;
+		virtual mgTexture_s* GetDefaultIcons() = 0;
 
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) = 0;
 		virtual void DestroyFont(Font*) = 0;

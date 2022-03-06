@@ -46,13 +46,14 @@ void BackendGDI_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 	g_backend->GetTextSize(text, font, sz);
 }
 
-mgTexture BackendGDI_createTexture(mgImage* img)
+mgTexture* BackendGDI_createTexture(mgImage* img)
 {
-	return g_backend;
+	return g_backend->CreateTexture(img);
 }
 
-void BackendGDI_destroyTexture(mgTexture t)
+void BackendGDI_destroyTexture(mgTexture* t)
 {
+	g_backend->DestroyTexture(t);
 }
 
 void BackendGDI_beginDraw()
@@ -71,7 +72,7 @@ void BackendGDI_drawRectangle(
 	mgRect* rct,
 	mgColor* color1,
 	mgColor* color2,
-	mgTexture texture, /*optional*/
+	mgTexture* texture, /*optional*/
 	mgVec4* UVRegion)
 {
 	g_backend->DrawRectangle(reason, object, rct, color1, color2, texture, UVRegion);
@@ -126,11 +127,12 @@ BackendGDI::~BackendGDI()
 	if (m_defaultFont)
 		m_defaultFont->Release();
 
-	if (m_gdiimage_defaultIcons)
-		delete m_gdiimage_defaultIcons;
-	
-	if (m_gdigraphics)
-		delete m_gdigraphics;
+	if (m_defaultIcons)
+	{
+		if(m_defaultIcons->implementation)
+			delete ((Gdiplus::Bitmap*)m_defaultIcons->implementation);
+		delete m_defaultIcons;
+	}
 
 	if(m_gdiplusToken)
 		Gdiplus::GdiplusShutdown(m_gdiplusToken);
@@ -138,13 +140,15 @@ BackendGDI::~BackendGDI()
 	delete m_gpu;
 }
 
-void* BackendGDI::GetDefaultIcons()
+mgTexture_s* BackendGDI::GetDefaultIcons()
 {
-	if (m_gdiimage_defaultIcons)
-		return m_gdiimage_defaultIcons;
 
-	m_gdiimage_defaultIcons = new Gdiplus::Image(L"../data/icons.png");
-	return m_gdiimage_defaultIcons;
+	if (m_defaultIcons)
+		return m_defaultIcons;
+
+	m_defaultIcons = new mgTexture_s;
+	m_defaultIcons->implementation = new Gdiplus::Bitmap(L"../data/icons.png");
+	return m_defaultIcons;
 }
 
 void* BackendGDI::GetVideoDriverAPI()
@@ -176,18 +180,42 @@ void BackendGDI::EndDraw()
 	ReleaseDC(m_window->m_hWnd, dc);
 }
 
-mgTexture BackendGDI::CreateTexture(mgImage* img)
+mgTexture* BackendGDI::CreateTexture(mgImage* img)
 {
-	return 0;
+	/*BITMAP bitmap;
+	memset(&bitmap, 0, sizeof(BITMAP));
+	bitmap.bmWidth = img->width;
+	bitmap.bmHeight = img->height;
+	bitmap.bmBitsPixel = img->bits;
+	bitmap.bmWidthBytes = img->pitch;
+	bitmap.bmPlanes = 1;
+	bitmap.bmBits = img->data;
+
+	CreateStreamOnHGlobal();*/
+	Gdiplus::Bitmap* myImage = new Gdiplus::Bitmap(img->width, img->height, img->pitch, PixelFormat24bppRGB, img->data);
+
+	Gdiplus::Rect rect;
+	rect.X = 0;
+	rect.Y = 0;
+	rect.Width = img->width;
+	rect.Height = img->height;
+
+	mgTexture* newT = new mgTexture;
+	newT->implementation = myImage;
+	newT->sourceCopy = img;
+	img->data = 0;
+
+	return newT;
 }
 
-void BackendGDI::DestroyTexture(mgTexture)
+void BackendGDI::DestroyTexture(mgTexture* t)
 {
-
+	delete ((Gdiplus::Bitmap*)t->implementation);
+	delete t;
 }
 
 void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* color1, mgColor* color2,
-	mgTexture texture, mgVec4* UVRegion)
+	mgTexture* texture, mgVec4* UVRegion)
 {
 	unsigned int c1 = mgColorGetAsIntegerARGB(color1);
 	unsigned int c2 = mgColorGetAsIntegerARGB(color2);
@@ -216,6 +244,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	}break;
 	case mgDrawRectangleReason_windowCloseButton:
 	case mgDrawRectangleReason_windowCollapseButton:
+	case mgDrawRectangleReason_buttonIcon:
 	case mgDrawRectangleReason_popupNextIcon:
 	{
 		if (texture)
@@ -223,9 +252,12 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			Gdiplus::Rect gdirct;
 			gdirct.X = rct->left + m_window->m_borderSize.x;
 			gdirct.Y = rct->top + m_window->m_borderSize.y;
-			gdirct.Width = rct->right - rct->left;
-			gdirct.Height = rct->bottom - rct->top;
-			m_gdigraphics->DrawImage((Gdiplus::Image*)texture, gdirct,
+			gdirct.Width = 64;
+			gdirct.Height = 64;
+			
+			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
+
+			auto status = graphics.DrawImage((Gdiplus::Bitmap*)texture->implementation, gdirct,
 				m_context->m_gui_context->currentIcon.left,
 				m_context->m_gui_context->currentIcon.top,
 				m_context->m_gui_context->currentIcon.right,
@@ -302,9 +334,9 @@ void BackendGDI::DrawLine(
 	mgColor* color,
 	int size)
 {
-	/*Gdiplus::Graphics graphics(hdc);*/
+	Gdiplus::Graphics graphics(m_window->m_hdcMem);
 	Gdiplus::Pen      pen(Gdiplus::Color(255, 0, 0, 255));
-	m_gdigraphics->DrawLine(&pen, 0, 0, 200, 100);
+	graphics.DrawLine(&pen, 0, 0, 200, 100);
 }
 
 mgRect BackendGDI::SetClipRect(mgRect* r)
@@ -325,10 +357,6 @@ void BackendGDI::_createBackbuffer(mgf::SystemWindowImpl* impl)
 		r.right - r.left,
 		r.bottom - r.top);
 	ReleaseDC(impl->m_hWnd, dc);
-
-	if (m_gdigraphics)
-		delete m_gdigraphics;
-	m_gdigraphics = new Gdiplus::Graphics(impl->m_hdcMem);
 }
 
 void BackendGDI::InitWindow(mgf::SystemWindow* w)

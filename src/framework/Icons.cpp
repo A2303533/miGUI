@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -26,18 +26,48 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MG_IMAGE_H_
-#define _MG_IMAGE_H_
 
-/* RGBA */
-typedef struct mgImage_s {
-	unsigned int width;
-	unsigned int height;
-	unsigned int dataSize;
-	unsigned int bits;
-	unsigned int pitch;
-	unsigned char* data;
-} mgImage;
+#include "miGUI.h"
 
-#endif
+#include "framework/mgf.h"
+#include "framework/Icons.h"
+
+
+using namespace mgf;
+
+Icons::Icons(Backend* b)
+	:
+	m_backend(b)
+{
+}
+
+Icons::~Icons()
+{
+	if (m_texture)
+		m_backend->DestroyTexture(m_texture);
+}
+
+int Icons::Add(int left, int top, int sizeX, int sizeY)
+{
+	int id = (int)m_rects.size();
+
+	mgRect r;
+	mgRectSet(&r, left, top, sizeX, sizeY);
+	m_rects.push_back(r);
+
+	if (m_icons)
+		mgDestroyIcons(m_icons);
+
+	int sz = (int)m_rects.size();
+	m_icons = mgCreateIcons(m_texture, m_textureSize.x, m_textureSize.y, sz);
+	for (int i = 0; i < sz; ++i)
+	{
+		auto& rct = m_rects[i];
+		mgSetIcon(m_icons, i, rct.left, rct.top, rct.right, rct.bottom);
+	}
+
+	return id;
+}
+
+
+

@@ -33,6 +33,7 @@
 #include "framework/Framework.h"
 #include "framework/Context.h"
 #include "framework/SystemWindowImpl.h"
+#include "framework/Icons.h"
 
 
 using namespace mgf;
@@ -119,3 +120,42 @@ Context* Framework::CreateContext(
 	m_contexts.push_back(c);
 	return c;
 }
+
+Image* Framework::LoadImage(const char* imageFile)
+{
+	const char* pch = strrchr(imageFile, '.');
+
+	if (!pch)
+		return 0;
+
+	char* pfn = (char*)pch;
+
+	pch = strtok(pfn, " .");
+	while (pch != 0)
+	{
+		if (strcmp(pch, "bmp") == 0)
+		{
+			return Image_bmp(imageFile);
+		}
+		pch = strtok(0, " .");
+	}
+	return 0;
+}
+
+Icons* Framework::CreateIcons(const char* imageFile, Backend* backend)
+{
+	Icons* icons = 0;
+	Image* image = LoadImage(imageFile);
+	if (image)
+	{
+		icons = new Icons(backend);
+		icons->m_texture = backend->CreateTexture(image->m_image);
+		mgPointSet(&icons->m_textureSize, image->m_image->width, image->m_image->height);
+		image->Release();
+		
+		/*icons->m_icons = mgCreateIcons(t, image->m_image->width, image->m_image->height, iconsNum);*/
+	}
+	return icons;
+}
+
+

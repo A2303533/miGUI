@@ -64,5 +64,6 @@ struct mgInputContext_s;
 struct mgCursor_s;
 struct mgFunctions_s;
 struct mgContext_s;
+struct mgTexture_s;
 
 #endif

@@ -42,6 +42,8 @@ namespace mgf
 	class Context;
 	class Element;
 	class Rectangle;
+	class Icons;
+	class Image;
 }
 
 #endif

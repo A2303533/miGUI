@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -26,18 +26,28 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MG_IMAGE_H_
-#define _MG_IMAGE_H_
 
-/* RGBA */
-typedef struct mgImage_s {
-	unsigned int width;
-	unsigned int height;
-	unsigned int dataSize;
-	unsigned int bits;
-	unsigned int pitch;
-	unsigned char* data;
-} mgImage;
+#include "miGUI.h"
 
-#endif
+#include "framework/mgf.h"
+#include "framework/Image.h"
+
+using namespace mgf;
+
+Image::Image()
+{
+
+}
+
+Image::~Image()
+{
+	if (m_image)
+	{
+		if (m_image->data)
+			free(m_image->data);
+		free(m_image);
+	}
+}
+
+
+

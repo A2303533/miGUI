@@ -48,6 +48,10 @@
 #undef CreateWindow
 #endif
 
+#ifdef LoadImage
+#undef LoadImage
+#endif
+
 namespace mgf
 {
 	class SystemWindowImpl;
@@ -64,11 +68,11 @@ namespace mgf
 		Gdiplus::GdiplusStartupInput m_gdiplusStartupInput = 0;
 		ULONG_PTR m_gdiplusToken = 0;
 
-		Gdiplus::Image* m_gdiimage_defaultIcons = 0;
+		//Gdiplus::Bitmap* m_gdiimage_defaultIcons = 0;
+		mgTexture_s* m_defaultIcons = 0;
 		Font* m_defaultFont = 0;
 
 		mgRect m_clipRect;
-		Gdiplus::Graphics * m_gdigraphics = 0;
 
 		void _createBackbuffer(mgf::SystemWindowImpl* impl);
 
@@ -87,17 +91,17 @@ namespace mgf
 		virtual void BeginDraw() override;
 		virtual void EndDraw() override;
 
-		virtual mgTexture CreateTexture(mgImage* img)  override;
-		virtual void DestroyTexture(mgTexture)  override;
+		virtual mgTexture* CreateTexture(mgImage* img)  override;
+		virtual void DestroyTexture(mgTexture*)  override;
 		virtual void DrawRectangle(int reason,void* object,mgRect* rct,mgColor* color1,mgColor* color2,
-			mgTexture texture,  mgVec4* UVRegion ) override;
+			mgTexture* texture,  mgVec4* UVRegion ) override;
 		virtual void DrawText(int reason,void* object,mgPoint* position,const wchar_t* text,int textLen,
 			mgColor* color, mgFont* font) override;
 		virtual void DrawLine( int reason, void* object, mgPoint* position, mgPoint* where,
 			mgColor* color, int size) override;
 		virtual mgRect SetClipRect(mgRect* r) override;
 		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) override;
-		virtual void* GetDefaultIcons() override;
+		virtual mgTexture_s* GetDefaultIcons() override;
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) override;
 		virtual void DestroyFont(Font*) override;
 		virtual Font* GetDefaultFont() override;

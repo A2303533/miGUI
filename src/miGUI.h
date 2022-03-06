@@ -70,6 +70,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_tooltip,
 	mgDrawRectangleReason_rectangle,
 	mgDrawRectangleReason_buttonBG,
+	mgDrawRectangleReason_buttonIcon,
 	mgDrawRectangleReason_dockBG,
 	mgDrawRectangleReason_dockElementBG,
 	mgDrawRectangleReason_dockSplitterBGHor,
@@ -103,10 +104,10 @@ enum mgDrawTextReason
 typedef struct mgVideoDriverAPI_s {
 	/* Create GPU texture using RGBA data.
 	 Library can generate fonts, fonts is a textures.*/
-	mgTexture(*createTexture)(mgImage*);
+	mgTexture*(*createTexture)(mgImage*);
 
 	/* Destroy texture.For fonts. */
-	void(*destroyTexture)(mgTexture);
+	void(*destroyTexture)(mgTexture*);
 
 	void(*beginDraw)(); /*prepare for drawing, set shaders and other things*/
 	void(*endDraw)();
@@ -117,7 +118,7 @@ typedef struct mgVideoDriverAPI_s {
 		mgRect* rect,
 		mgColor* color1, 
 		mgColor* color2, 
-		mgTexture texture, /*optional*/
+		mgTexture* texture, /*optional*/
 		mgVec4* UVRegion); /*optional*/
 
 	void(*drawText)( 
@@ -343,10 +344,10 @@ extern PFNMGSETCURSORPROC mgSetCursor;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgIcons* MG_C_DECL mgCreateIcons_f(mgTexture, int textureSizeX, int textureSizeY, int iconNum);
+MG_API mgIcons* MG_C_DECL mgCreateIcons_f(mgTexture*, int textureSizeX, int textureSizeY, int iconNum);
 #define mgCreateIcons mgCreateIcons_f
 #else
-typedef mgIcons* (*PFNMGCREATEICONSPROC)(mgTexture, int textureSizeX, int textureSizeY, int iconNum);
+typedef mgIcons* (*PFNMGCREATEICONSPROC)(mgTexture*, int textureSizeX, int textureSizeY, int iconNum);
 extern PFNMGCREATEICONSPROC mgCreateIcons;
 #endif
 
@@ -416,10 +417,10 @@ extern PFNMGSHOWPOPUPPROC mgShowPopup;
 
 /*return 0 if bad*/
 #ifdef MG_NO_DLL
-MG_API int MG_C_DECL mgInitDefaultIcons_f(struct mgContext_s*, mgTexture);
+MG_API int MG_C_DECL mgInitDefaultIcons_f(struct mgContext_s*, mgTexture*);
 #define mgInitDefaultIcons mgInitDefaultIcons_f
 #else
-typedef int (*PFNMGINITDEFAULTICONSPROC)(struct mgContext_s*, mgTexture);
+typedef int (*PFNMGINITDEFAULTICONSPROC)(struct mgContext_s*, mgTexture*);
 extern PFNMGINITDEFAULTICONSPROC mgInitDefaultIcons;
 #endif
 
@@ -533,6 +534,7 @@ typedef struct mgContext_s {
 
 	struct mgDockPanel_s* dockPanel;
 
+	mgColor whiteColor;
 	mgRect currentIcon;
 
 	mgStyle styleLight;

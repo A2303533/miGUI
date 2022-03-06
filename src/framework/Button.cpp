@@ -33,6 +33,7 @@
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 #include "framework/Button.h"
+#include "framework/Icons.h"
 
 using namespace mgf;
 
@@ -140,5 +141,20 @@ void Button::SetTextColorDisable(int argb)
 	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextColorDisabled, argb);
 }
 
+void Button::SetIcons(
+	Icons* icons,
+	int id1,
+	int id2,
+	int id3,
+	int id4
+)
+{
+	m_icons = icons;
+	m_elementButton->icons = icons->m_icons;
+	m_elementButton->iconID_default = id1;
+	m_elementButton->iconID_hover = id2;
+	m_elementButton->iconID_push = id3;
+	m_elementButton->iconID_disable = id4;
+}
 
 

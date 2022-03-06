@@ -93,14 +93,14 @@ mgDestroyElement_f(mgElement* e)
 }
 
 MG_API
-int MG_C_DECL
+void MG_C_DECL
 mgInitStyleDark_f(mgStyle* s)
 {
 	assert(s);
 }
 
 MG_API
-int MG_C_DECL
+void MG_C_DECL
 mgInitStyleLight_f(mgStyle* s)
 {
 	assert(s);
@@ -150,6 +150,7 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	assert(input);
 
 	mgContext* c = calloc(1, sizeof(mgContext));
+	mgColorSet(&c->whiteColor, 1.f, 1.f, 1.f, 1.f);
 	c->gpu = gpu;
 	c->input = input;
 	c->needUpdateTransform = 1;
@@ -214,7 +215,7 @@ mgDestroyContext_f(mgContext* c)
 
 MG_API
 int MG_C_DECL
-mgInitDefaultIcons_f(struct mgContext_s* c, mgTexture t)
+mgInitDefaultIcons_f(struct mgContext_s* c, mgTexture* t)
 {
 	if (c->defaultIconGroup)
 		return 0;
@@ -684,7 +685,7 @@ mgDraw_f(mgContext* c)
 
 MG_API
 mgIcons* MG_C_DECL
-mgCreateIcons_f(mgTexture t, int textureSizeX, int textureSizeY, int iconNum)
+mgCreateIcons_f(mgTexture* t, int textureSizeX, int textureSizeY, int iconNum)
 {
 	assert(t);
 	assert(textureSizeX > 0);

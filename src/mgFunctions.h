@@ -56,7 +56,7 @@ MG_API void MG_C_DECL mgDestroyPopup_f(struct mgPopup_s* p);
 MG_API void MG_C_DECL mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position);
 MG_API void MG_C_DECL mgShowWindow_f(struct mgWindow_s* w, int i);
 MG_API void MG_C_DECL mgDestroyIcons_f(mgIcons* ic);
-MG_API mgIcons* MG_C_DECL mgCreateIcons_f(mgTexture t, int textureSizeX, int textureSizeY, int iconNum);
+MG_API mgIcons* MG_C_DECL mgCreateIcons_f(mgTexture* t, int textureSizeX, int textureSizeY, int iconNum);
 MG_API void MG_C_DECL mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy);
 MG_API mgMenu* MG_C_DECL mgCreateMenu_f(struct mgContext_s*, mgMenuItemInfo* items, int itemsSize, mgFont* f);
 MG_API void MG_C_DECL mgDestroyMenu_f(mgMenu* m);

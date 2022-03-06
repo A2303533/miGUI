@@ -41,7 +41,7 @@ enum {
 * It must be inside mgFont_s
 */
 typedef struct mgFontBitmap_s {
-	void * gpuTexture;
+	struct mgTexture_s* gpuTexture;
 } mgFontBitmap;
 
 typedef struct mgFontGlyph_s

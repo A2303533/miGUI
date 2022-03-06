@@ -35,6 +35,15 @@
     <ClCompile Include="..\..\src\framework\Button.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\Icons.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Image.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Image_bmp.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">

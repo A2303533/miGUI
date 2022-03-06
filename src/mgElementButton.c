@@ -56,6 +56,7 @@ miGUI_onDraw_button(mgElement* e)
 	mgElementButton* impl = (mgElementButton*)e->implementation;
 	
 	mgStyle* style = e->userStyle;
+	int iconID = 0;
 
 	if(!e->userStyle)
 		style = e->window->context->activeStyle;
@@ -91,6 +92,23 @@ miGUI_onDraw_button(mgElement* e)
 		e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG,
 			impl,
 			&e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, 0, 0);
+	}
+
+	if (impl->icons)
+	{
+		if (!impl->drawBG)
+			e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
+
+		e->window->context->currentIcon.left = impl->icons->iconNodes[iconID].lt.x;
+		e->window->context->currentIcon.top = impl->icons->iconNodes[iconID].lt.y;
+		e->window->context->currentIcon.right = impl->icons->iconNodes[iconID].sz.x;
+		e->window->context->currentIcon.bottom = impl->icons->iconNodes[iconID].sz.y;
+		e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonIcon,
+			e->window,
+			&e->transformWorld.buildArea, 
+			&e->window->context->whiteColor, 
+			&e->window->context->whiteColor,
+			impl->icons->texture, 0);
 	}
 
 	if (impl->text && impl->textLen)

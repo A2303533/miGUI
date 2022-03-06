@@ -83,11 +83,7 @@ void
 WriteINT(int i, FILE* f)
 {
 	char itoaBuf[20];
-#ifdef _MSC_VER
-	_itoa_s(i, itoaBuf, 20, 10);
-#else
 	_itoa(i, itoaBuf, 10);
-#endif
 	itoaBuf[19] = 0;
 	int sz = strlen(itoaBuf);
 	for (int i = 0; i < sz; ++i)
@@ -116,12 +112,7 @@ mgSaveImageToFile(const char* fn, mgImage* img)
 	head.ddspf.BBitMask = 0x00ff0000;
 	head.ddspf.ABitMask = 0xff000000;
 
-	FILE* f = 0;
-#ifdef _MSC_VER
-	fopen_s(&f, fn, "wb");
-#else
-	f = fopen(fn, "wb");
-#endif
+	FILE* f = fopen(fn, "wb");
 
 	if (f)
 	{
@@ -160,26 +151,14 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 	{
 		char pathBuffer[2000];
 
-#ifdef _MSC_VER
-		sprintf_s(pathBuffer, 2000, "../data/fonts/%s/", saveIt);
-#else
 		sprintf(pathBuffer, "../data/fonts/%s/", saveIt);
-#endif
 		CreateDirectoryA("../data/", 0);
 		CreateDirectoryA("../data/fonts/", 0);
 		CreateDirectoryA(pathBuffer, 0);
 		
-#ifdef _MSC_VER
-		sprintf_s(pathBuffer, 2000, "../data/fonts/%s/%s.txt", saveIt, saveIt);
-#else
 		sprintf(pathBuffer, "../data/fonts/%s/%s.txt", saveIt, saveIt);
-#endif
 
-#ifdef _MSC_VER
-		fopen_s(&textFile, pathBuffer, "wb");
-#else
 		textFile = fopen(pathBuffer, "wb");
-#endif
 
 		if (textFile)
 		{
@@ -451,11 +430,7 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 		if(saveIt)
 		{
 			char pathBuffer[2000];
-#ifdef _MSC_VER
-			sprintf_s(pathBuffer, 2000, "../data/fonts/%s/%i.dds", saveIt, i);
-#else
 			sprintf(pathBuffer, "../data/fonts/%s/%i.dds", saveIt, i);
-#endif
 			mgSaveImageToFile(pathBuffer, &image);
 		}
 
@@ -505,24 +480,14 @@ mgCreateFont_from_file(mgContext* c, const char* fn, unsigned int flags, int siz
 
 	char* pfn = pch;
 
-#ifdef _MSC_VER
-	char* pp = 0;
-	pch = strtok_s(pfn, " .", &pp);
-#else
 	pch = strtok(pfn, " .");
-#endif
-
 	while (pch != 0)
 	{
 		if (strcmp(pch, "txt") == 0)
 		{
 			return mgCreateFont_read_file(c, fn, flags, size, saveIt);
 		}
-#ifdef _MSC_VER
-		pch = strtok_s(0, " .", &pp);
-#else
 		pch = strtok(0, " .");
-#endif
 	}
 
 	return mgCreateFont_generate(c, fn, flags, size, saveIt);
@@ -532,12 +497,7 @@ MG_API
 mgFont* MG_C_DECL
 mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size, const char* saveIt)
 {
-	FILE* f = 0;
-#ifdef _MSC_VER
-	fopen_s(&f, fn, "rb");
-#else
-	f = fopen(fn, "rb");
-#endif
+	FILE* f =  fopen(fn, "rb");
 	if (f)
 	{
 		fclose(f);

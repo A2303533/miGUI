@@ -39,7 +39,7 @@ typedef struct mgIconsNode_s {
 } mgIconsNode;
 
 typedef struct mgIcons_s {
-	mgTexture texture;
+	mgTexture* texture;
 	mgPoint textureSize;
 	mgIconsNode* iconNodes;
 	int iconNodesSize;

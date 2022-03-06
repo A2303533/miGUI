@@ -30,7 +30,13 @@
 #ifndef _MGF_FMWK_H_
 #define _MGF_FMWK_H_
 
+#include "Image.h"
+
 #include <vector>
+
+#ifdef LoadImage
+#undef LoadImage
+#endif
 
 namespace mgf
 {
@@ -50,6 +56,10 @@ namespace mgf
 			const mgPoint& windowSize,
 			Backend* backend
 		);
+
+		Icons* CreateIcons(const char* imageFile, Backend* backend);
+
+		Image* LoadImage(const char* imageFile);
 
 		/*
 		* Call every frame.

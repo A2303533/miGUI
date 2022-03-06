@@ -255,9 +255,6 @@ mgDrawWindow(struct mgWindow_s* w)
 
 					text_move = sz.x + 3;
 
-					mgColor wh;
-					mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
-
 					{
 						float ichalfsz = (float)sz.y * 0.5f;
 						pos.y += (int)(tbhalfsz - ichalfsz);
@@ -273,7 +270,8 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
 					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, w,
-						&w->collapseButtonRect, &wh, &wh, iconGroup->icons->texture, 0);
+						&w->collapseButtonRect, &w->context->whiteColor, &w->context->whiteColor, 
+						iconGroup->icons->texture, 0);
 				}
 			}
 
@@ -328,7 +326,8 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
 					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, w,
-						&w->closeButtonRect, &wh, &wh, iconGroup->icons->texture, 0);
+						&w->closeButtonRect, &wh, &wh, 
+						iconGroup->icons->texture, 0);
 				}
 			}
 		}

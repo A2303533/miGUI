@@ -41,6 +41,7 @@ namespace mgf
 		mgElementButton_s* m_elementButton = 0;
 		std::wstring m_text;
 		mgStyle_s* m_userStyle = 0;
+		Icons* m_icons = 0;
 	public:
 		Button(Window* w);
 		virtual ~Button();
@@ -61,6 +62,14 @@ namespace mgf
 		virtual void SetTextColorHover(int argb);
 		virtual void SetTextColorPush(int argb);
 		virtual void SetTextColorDisable(int argb);
+		
+		virtual void SetIcons(
+			Icons*, 
+			int id1, //default
+			int id2, //hover
+			int id3, //push
+			int id4  //disabled
+		);
 
 	};
 }

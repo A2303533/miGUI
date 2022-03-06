@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -27,17 +27,30 @@
 */
 
 #pragma once
-#ifndef _MG_IMAGE_H_
-#define _MG_IMAGE_H_
+#ifndef _MGF_ICONS_H_
+#define _MGF_ICONS_H_
 
-/* RGBA */
-typedef struct mgImage_s {
-	unsigned int width;
-	unsigned int height;
-	unsigned int dataSize;
-	unsigned int bits;
-	unsigned int pitch;
-	unsigned char* data;
-} mgImage;
+#include <vector>
+
+namespace mgf
+{
+	class Icons : public BaseClass
+	{
+		friend class Framework;
+		friend class Button;
+
+		mgIcons_s* m_icons = 0;
+		mgTexture* m_texture = 0;
+		mgPoint m_textureSize;
+
+		Backend* m_backend = 0;
+		std::vector<mgRect> m_rects;
+	public:
+		Icons(Backend*);
+		virtual ~Icons();
+
+		int Add(int left, int top, int right, int bottom);
+	};
+}
 
 #endif

@@ -5,6 +5,7 @@
 #include "framework/Font.h"
 #include "framework/Text.h"
 #include "framework/Button.h"
+#include "framework/Icons.h"
 #include <stdio.h>
 
 #define AP_PLAYLISTAREASIZE 180
@@ -58,6 +59,7 @@ int main()
 	mgf::Ptr<mgf::Context> context = 0;
 	mgf::Ptr<mgf::Window> window = 0;
 	mgf::Ptr<mgf::Font> fontImpact = 0;
+	mgf::Ptr<mgf::Icons> icons = 0;
 	try
 	{
 		framework = mgf::InitFramework();
@@ -75,6 +77,7 @@ int main()
 		context.m_data->GetSystemWindow()->SetOnSize(window_OnSize);
 		context.m_data->GetSystemWindow()->Show();
 		context.m_data->SetOnDraw(context_onDraw);
+		
 
 		window = context.m_data->CreateWindow();
 		window.m_data->SetTitle(L"Window");
@@ -87,6 +90,8 @@ int main()
 		window.m_data->SetSize(
 			context.m_data->GetSystemWindow()->GetSize().x, 
 			context.m_data->GetSystemWindow()->GetSize().y);
+		
+		context.m_data->CreateWindow();
 
 		g_data.playlistArea = window.m_data->AddRectangle();
 		g_data.playlistArea->SetColor(0xFFFF1122);
@@ -105,8 +110,12 @@ int main()
 		auto butt = window.m_data->AddButton();
 		butt->SetRect(100, 0, 200, 40);
 		butt->SetText(L"GO!!!");
-		//butt->SetDrawBG(false);
+		butt->SetDrawBG(false);
 		//butt->SetEnabled(false);
+
+		icons = framework.m_data->CreateIcons("E:/1_24bit.bmp", context.m_data->GetBackend());
+		int iconID = icons.m_data->Add(0, 0, 64, 64);
+		butt->SetIcons(icons.m_data, iconID, iconID, iconID, iconID);
 
 		// also rebuild all gui
 		window_OnSize(context.m_data->GetSystemWindow());

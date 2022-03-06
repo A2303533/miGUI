@@ -30,6 +30,10 @@
 #ifndef _MG_TEXTURE_H_
 #define _MG_TEXTURE_H_
 
-typedef void* mgTexture;
+typedef struct mgTexture_s {
+	void* implementation;
+	struct mgImage_s* sourceCopy; /*for GDI*/
+} mgTexture;
+
 
 #endif
