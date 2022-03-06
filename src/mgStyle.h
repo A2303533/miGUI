@@ -59,6 +59,20 @@ typedef struct mgStyle_s {
 	mgColor popupHoverElementBG;
 	mgColor popupSeparator;
 
+	mgColor buttonColor1;
+	mgColor buttonColor2;
+	mgColor buttonColorHover1;
+	mgColor buttonColorHover2;
+	mgColor buttonColorPress1;
+	mgColor buttonColorPress2;
+	mgColor buttonColorDisabled1;
+	mgColor buttonColorDisabled2;
+
+	mgColor buttonTextColor;
+	mgColor buttonTextColorHover;
+	mgColor buttonTextColorPress;
+	mgColor buttonTextColorDisabled;
+
 } mgStyle;
 
 #endif

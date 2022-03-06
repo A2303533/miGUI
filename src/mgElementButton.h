@@ -31,22 +31,9 @@
 #define _MG_ELEMENTBUTTON_H_
 
 typedef struct mgElementButton_s {
-	mgColor color1;
-	mgColor color2;
-	mgColor colorHover1;
-	mgColor colorHover2;
-	mgColor colorPress1;
-	mgColor colorPress2;
-	mgColor colorDisabled1;
-	mgColor colorDisabled2;
-
 	mgColor colorFinal1;
 	mgColor colorFinal2;
 
-	mgColor textColor;
-	mgColor textColorHover;
-	mgColor textColorPress;
-	mgColor textColorDisabled;
 	mgColor textColorFinal;
 
 	int enabled;

@@ -42,6 +42,7 @@ namespace mgf
 		friend class Text;
 		friend class Context;
 		friend class Rectangle;
+		friend class Button;
 
 		mgWindow_s* m_window = 0;
 		std::basic_string<wchar_t> m_title;

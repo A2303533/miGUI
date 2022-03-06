@@ -107,6 +107,18 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->activeStyle = &c->styleLight;
 	c->deltaTime = 0.f;
 
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonColor1, 0x999999);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonColor2, 0x666666);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorDisabled1, 0x999999);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorDisabled2, 0x666666);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorHover1, 0xAAAAAA);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorHover2, 0x777777);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorPress1, 0x777777);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonColorPress2, 0x444444);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonTextColor, 0x0);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonTextColorHover, 0x222222);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonTextColorPress, 0x0);
+	mgColorSetAsIntegerRGB(&c->styleLight.buttonTextColorDisabled, 0x555555);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowBG, 0xE1E6F7);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowTitlebar, 0xC9D6F2);
 	mgColorSetAsIntegerRGB(&c->styleLight.windowBGTopWindow, 0xE8EDFF);

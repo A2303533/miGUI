@@ -47,40 +47,13 @@ Rectangle::Rectangle(Window* w)
 	mgColorSet(&c, 1.f, 1.f, 1.f, 1.f);
 	m_element = mgCreateRectangle(w->m_window, &p, &p, &c, &c);
 	m_elementRectangle = (mgElementRectangle*)m_element->implementation;
+	Element::PostInit();
 }
 
 Rectangle::~Rectangle()
 {
 	if (m_element)
 		mgDestroyElement(m_element);
-}
-
-void Rectangle::SetRect(mgRect* r)
-{
-	assert(m_element);
-	m_element->transformLocal.buildArea = *r;
-	m_element->transformLocal.clipArea = *r;
-	m_element->creationRect = *r;
-	m_element->transformWorld = m_element->transformLocal;
-}
-
-void Rectangle::SetRect(int left, int top, int right, int bottom)
-{
-	assert(m_element);
-	m_element->transformLocal.buildArea.left = left;
-	m_element->transformLocal.buildArea.top = top;
-	m_element->transformLocal.buildArea.right = right;
-	m_element->transformLocal.buildArea.bottom = bottom;
-	m_element->transformLocal.clipArea.left = left;
-	m_element->transformLocal.clipArea.top = top;
-	m_element->transformLocal.clipArea.right = right;
-	m_element->transformLocal.clipArea.bottom = bottom;
-	m_element->creationRect.left = left;
-	m_element->creationRect.top = top;
-	m_element->creationRect.right = right;
-	m_element->creationRect.bottom = bottom;
-	
-	m_element->transformWorld = m_element->transformLocal;
 }
 
 void Rectangle::SetColor(mgColor* c1, mgColor* c2)

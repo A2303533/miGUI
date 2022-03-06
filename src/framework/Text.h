@@ -32,11 +32,13 @@
 
 #include "Element.h"
 
+#include <string>
+
 namespace mgf
 {
 	class Text : public Element
 	{
-		std::basic_string<wchar_t>* m_text = 0;
+		std::wstring m_text;
 		mgElementText_s* m_elementText = 0;
 	public:
 		Text(Window* w, const wchar_t* t, Font* f);

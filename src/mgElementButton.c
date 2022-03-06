@@ -55,29 +55,34 @@ miGUI_onDraw_button(mgElement* e)
 {
 	mgElementButton* impl = (mgElementButton*)e->implementation;
 	
+	mgStyle* style = e->userStyle;
+
+	if(!e->userStyle)
+		style = e->window->context->activeStyle;
+
 	if (impl->enabled)
 	{
 		if (e->elementState & 0x1)
 		{
-			impl->colorFinal1 = impl->colorHover1;
-			impl->colorFinal2 = impl->colorHover2;
+			impl->colorFinal1 = style->buttonColorHover1;
+			impl->colorFinal2 = style->buttonColorHover2;
 		}
 		else
 		{
-			impl->colorFinal1 = impl->color1;
-			impl->colorFinal2 = impl->color2;
+			impl->colorFinal1 = style->buttonColor1;
+			impl->colorFinal2 = style->buttonColor2;
 		}
 
 		if (e->elementState & 0x2)
 		{
-			impl->colorFinal1 = impl->colorPress1;
-			impl->colorFinal2 = impl->colorPress2;
+			impl->colorFinal1 = style->buttonColorPress1;
+			impl->colorFinal2 = style->buttonColorPress2;
 		}
 	}
 	else
 	{
-		impl->colorFinal1 = impl->colorDisabled1;
-		impl->colorFinal2 = impl->colorDisabled2;
+		impl->colorFinal1 = style->buttonColorDisabled1;
+		impl->colorFinal2 = style->buttonColorDisabled2;
 	}
 
 	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
@@ -90,16 +95,16 @@ miGUI_onDraw_button(mgElement* e)
 		if (impl->enabled)
 		{
 			if (e->elementState & 0x1)
-				impl->textColorFinal = impl->textColorHover;
+				impl->textColorFinal = style->buttonTextColorHover;
 			else
-				impl->textColorFinal = impl->textColor;
+				impl->textColorFinal = style->buttonTextColor;
 
 			if (e->elementState & 0x2)
-				impl->textColorFinal = impl->textColorPress;
+				impl->textColorFinal = style->buttonTextColorPress;
 		}
 		else
 		{
-			impl->textColorFinal = impl->textColorDisabled;
+			impl->textColorFinal = style->buttonTextColorDisabled;
 		}
 
 		mgPoint pos;
@@ -169,23 +174,11 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const w
 	newElement->implementation = calloc(1, sizeof(mgElementButton));
 	mgElementButton* impl = (mgElementButton*)newElement->implementation;
 	impl->enabled = 1;
-	mgColorSetAsIntegerRGB(&impl->color1, 0x999999);
-	mgColorSetAsIntegerRGB(&impl->color2, 0x666666);
-	mgColorSetAsIntegerRGB(&impl->colorDisabled1, 0x999999);
-	mgColorSetAsIntegerRGB(&impl->colorDisabled2, 0x666666);
-	mgColorSetAsIntegerRGB(&impl->colorHover1, 0xAAAAAA);
-	mgColorSetAsIntegerRGB(&impl->colorHover2, 0x777777);
-	mgColorSetAsIntegerRGB(&impl->colorPress1, 0x777777);
-	mgColorSetAsIntegerRGB(&impl->colorPress2, 0x444444);
 	
 	impl->font = font;
 	impl->text = text;
 	impl->textLen = wcslen(text);
-	mgColorSetAsIntegerRGB(&impl->textColor, 0x0);
-	mgColorSetAsIntegerRGB(&impl->textColorHover, 0x222222);
-	mgColorSetAsIntegerRGB(&impl->textColorPress, 0x0);
-	mgColorSetAsIntegerRGB(&impl->textColorDisabled, 0x555555);
-
+	
 	mgSetParent_f(newElement, 0);
 
 	miGUI_onRebuild_button(newElement);

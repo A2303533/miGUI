@@ -32,13 +32,21 @@
 
 #include "Rectangle.h"
 
+#include <string>
+
 namespace mgf
 {
-	class Button : public Rectangle
+	class Button : public Element
 	{
+		mgElementButton_s* m_elementButton = 0;
+		std::wstring m_text;
 	public:
-		Button();
+		Button(Window* w);
 		virtual ~Button();
+
+		virtual void SetText(const wchar_t*);
+		virtual void SetEnabled(bool);
+
 	};
 }
 

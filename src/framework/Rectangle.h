@@ -45,11 +45,11 @@ namespace mgf
 		Rectangle(Window* w);
 		virtual  ~Rectangle();
 
-		virtual void SetRect(mgRect*);
-		virtual void SetRect(int left, int top, int right, int bottom);
 		virtual void SetColor(mgColor* c1, mgColor* c2);
 		virtual void SetColor(int, int); // ARGB 0xFFrrggbb
 		virtual void SetColor(int); // ARGB 0xFFrrggbb
+
+
 	};
 }
 

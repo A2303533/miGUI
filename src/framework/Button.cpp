@@ -36,14 +36,45 @@
 
 using namespace mgf;
 
-Button::Button()
-{
+extern Backend* g_backend;
 
+Button::Button(Window* w)
+{
+	mgPoint p;
+	mgPointSet(&p, 0, 0);
+	
+	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
+	m_text.assign(L" ");
+	m_element = mgCreateButton(w->m_window, &p, &p, m_text.data(), fi->m_font );
+	m_elementButton = (mgElementButton*)m_element->implementation;
+	Element::PostInit();
 }
 
 Button::~Button()
 {
+	if (m_element)
+		mgDestroyElement(m_element);
+}
 
+void Button::SetText(const wchar_t* t)
+{
+	m_text.clear();
+	m_elementButton->text = 0;
+	int slen = 0;
+	if (t)
+		slen = wcslen(t);
+
+	if (slen)
+	{
+		m_text.assign(t);
+		m_elementButton->text = m_text.data();
+		m_elementButton->textLen = slen;
+	}
+}
+
+void Button::SetEnabled(bool v)
+{
+	m_elementButton->enabled = (int)v;
 }
 
 

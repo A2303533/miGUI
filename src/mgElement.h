@@ -73,6 +73,7 @@ typedef struct mgElement_s {
 
 	int id;
 	void* userData;
+	void* userStyle;
 
 	int visible;/* != 0 - visible*/
 	
@@ -84,14 +85,15 @@ typedef struct mgElement_s {
 	struct mgElementTransform_s transformLocal;
 	struct mgElementTransform_s transformWorld; /*transformLocal + parent->transformLocal*/
 
+	/*internal*/
 	void(*onDraw)(struct mgElement_s* e);
 	void(*onUpdate)(struct mgElement_s* e);
 	void(*onUpdateTransform)(struct mgElement_s* e);
 	void(*onRebuild)(struct mgElement_s* e);/*must call when change window size*/
 
+	/*----*/
 	void(*onMouseEnter)(struct mgElement_s* e);
-	void(*onMouseLeave)(struct mgElement_s* e);
-	
+	void(*onMouseLeave)(struct mgElement_s* e);	
 	void(*onClickLMB)(struct mgElement_s* e);
 	void(*onClickRMB)(struct mgElement_s* e);
 	void(*onClickMMB)(struct mgElement_s* e);

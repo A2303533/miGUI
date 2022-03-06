@@ -32,6 +32,7 @@
 #include "framework/Window.h"
 #include "framework/Rectangle.h"
 #include "framework/Text.h"
+#include "framework/Button.h"
 
 using namespace mgf;
 
@@ -227,3 +228,9 @@ Text* Window::AddText(int x, int y, const wchar_t* text, Font* f)
 	return e;
 }
 
+Button* Window::AddButton()
+{
+	Button* e = new Button(this);
+	m_elements.emplace_back(e);
+	return e;
+}

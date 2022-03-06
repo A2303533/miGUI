@@ -4,6 +4,7 @@
 #include "framework/Rectangle.h"
 #include "framework/Font.h"
 #include "framework/Text.h"
+#include "framework/Button.h"
 #include <stdio.h>
 
 #define AP_PLAYLISTAREASIZE 180
@@ -100,6 +101,11 @@ int main()
 
 		auto text = window.m_data->AddText(0,0, L"Hello world", fontImpact.m_data);
 		text->SetColor(0xFF337722);
+		
+		auto butt = window.m_data->AddButton();
+		butt->SetRect(100, 0, 200, 40);
+		butt->SetText(L"GO!!!");
+		//butt->SetEnabled(false);
 
 		// also rebuild all gui
 		window_OnSize(context.m_data->GetSystemWindow());

@@ -36,40 +36,34 @@
 
 using namespace mgf;
 
-#include <string>
-
 Text::Text(Window* w, const wchar_t* t, Font* f)
 {
 	assert(t);
 	assert(f);
-
-	m_text = new std::basic_string<wchar_t>;
 
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 	mgColor c;
 	mgColorSet(&c, 1.f, 1.f, 1.f, 1.f);
 
-	m_text->assign(t);
+	m_text.assign(t);
 
-	m_element = mgCreateText(w->m_window, &p, m_text->data(), ((FontImpl*)f)->m_font);
+	m_element = mgCreateText(w->m_window, &p, m_text.data(), ((FontImpl*)f)->m_font);
 	m_elementText = (mgElementText*)m_element->implementation;
+	Element::PostInit();
 }
 
 Text::~Text()
 {
-	if (m_text)
-		delete m_text;
-
 	if (m_element)
 		mgDestroyElement(m_element);
 }
 
 void Text::SetText(const wchar_t* t)
 {
-	m_text->assign(t);
-	m_elementText->text = m_text->data();
-	m_elementText->textLen = m_text->size();
+	m_text.assign(t);
+	m_elementText->text = m_text.data();
+	m_elementText->textLen = m_text.size();
 }
 
 void Text::SetFont(Font* f)
