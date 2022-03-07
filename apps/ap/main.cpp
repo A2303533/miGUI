@@ -117,9 +117,12 @@ int main()
 		butt->SetDrawBG(false);
 		//butt->SetEnabled(false);
 
-		icons = framework.m_data->CreateIcons("E:/1_32bit.bmp", context.m_data->GetBackend());
-		int iconID = icons.m_data->Add(0, 0, 64, 64);
-		butt->SetIcons(icons.m_data, iconID, iconID, iconID, iconID);
+		icons = framework.m_data->CreateIcons("../data/ap/icons.png", context.m_data->GetBackend());
+		if (icons.m_data)
+		{
+			int iconID = icons.m_data->Add(0, 0, 64, 64);
+			butt->SetIcons(icons.m_data, iconID, iconID, iconID, iconID);
+		}
 
 		// also rebuild all gui
 		context.m_data->GetSystemWindow()->OnSize();

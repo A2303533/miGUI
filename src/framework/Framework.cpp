@@ -123,7 +123,20 @@ Context* Framework::CreateContext(
 
 Image* Framework::LoadImage(const char* imageFile)
 {
-	const char* pch = strrchr(imageFile, '.');
+	assert(imageFile);
+
+	int slen = strlen(imageFile);
+	if (!slen || slen > 1999)
+		return 0;
+
+	char buffer[2000];
+	for (int i = 0; i < slen; ++i)
+	{
+		buffer[i] = tolower(imageFile[i]);
+	}
+	buffer[slen] = 0;
+
+	const char* pch = strrchr(buffer, '.');
 
 	if (!pch)
 		return 0;
@@ -134,9 +147,9 @@ Image* Framework::LoadImage(const char* imageFile)
 	while (pch != 0)
 	{
 		if (strcmp(pch, "bmp") == 0)
-		{
-			return Image_bmp(imageFile);
-		}
+			return Image_bmp(buffer);
+		if (strcmp(pch, "png") == 0)
+			return Image_png(buffer);
 		pch = strtok(0, " .");
 	}
 	return 0;
