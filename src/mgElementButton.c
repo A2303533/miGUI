@@ -56,7 +56,7 @@ miGUI_onDraw_button(mgElement* e)
 	mgElementButton* impl = (mgElementButton*)e->implementation;
 	
 	mgStyle* style = e->userStyle;
-	int iconID = 0;
+	int iconID = impl->iconID_default;
 
 	if(!e->userStyle)
 		style = e->window->context->activeStyle;
@@ -67,23 +67,27 @@ miGUI_onDraw_button(mgElement* e)
 		{
 			impl->colorFinal1 = style->buttonColorHover1;
 			impl->colorFinal2 = style->buttonColorHover2;
+			iconID = impl->iconID_hover;
 		}
 		else
 		{
 			impl->colorFinal1 = style->buttonColor1;
 			impl->colorFinal2 = style->buttonColor2;
+			iconID = impl->iconID_default;
 		}
 
 		if (e->elementState & 0x2)
 		{
 			impl->colorFinal1 = style->buttonColorPress1;
 			impl->colorFinal2 = style->buttonColorPress2;
+			iconID = impl->iconID_push;
 		}
 	}
 	else
 	{
 		impl->colorFinal1 = style->buttonColorDisabled1;
 		impl->colorFinal2 = style->buttonColorDisabled2;
+		iconID = impl->iconID_disable;
 	}
 
 	if (impl->drawBG)

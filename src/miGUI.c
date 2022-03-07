@@ -153,6 +153,8 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	mgColorSet(&c->whiteColor, 1.f, 1.f, 1.f, 1.f);
 	c->gpu = gpu;
 	c->input = input;
+	c->input->mousePosition.x = -1000;
+	c->input->mousePosition.y = -1000;
 	c->needUpdateTransform = 1;
 	c->needRebuild = 1;
 	c->activeStyle = &c->styleLight;

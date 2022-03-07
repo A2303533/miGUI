@@ -18,6 +18,7 @@ struct global_data
 	mgf::Rectangle* playlistArea = 0;
 	mgf::Rectangle* controlArea = 0;
 	mgf::Rectangle* tracklistArea = 0;
+	mgf::Button* buttonNewPlaylist = 0;
 }
 g_data;
 
@@ -95,36 +96,38 @@ int main()
 			context.m_data->GetSystemWindow()->GetSize().x, 
 			context.m_data->GetSystemWindow()->GetSize().y);
 		
-		context.m_data->CreateWindow();
+		//context.m_data->CreateWindow();
 
 		g_data.mainWindow = window.m_data;
 
 		g_data.playlistArea = window.m_data->AddRectangle();
-		g_data.playlistArea->SetColor(0xFFFF1122);
+		g_data.playlistArea->SetColor(0xFF77ADFF);
 
 		g_data.controlArea = window.m_data->AddRectangle();
-		g_data.controlArea->SetColor(0xFF00ff22);
+		g_data.controlArea->SetColor(0xFFBAC5C6);
 		
 		g_data.tracklistArea = window.m_data->AddRectangle();
-		g_data.tracklistArea->SetColor(0xFF0011ff);
+		g_data.tracklistArea->SetColor(0xFFE1EEEF);
 
-		auto text = window.m_data->AddText(0,0, L"Hello world", fontImpact.m_data);
-		text->SetColor(0xFF337722);
+	//	auto text = window.m_data->AddText(0,0, L"Hello world", fontImpact.m_data);
+	//	text->SetColor(0xFF337722);
 		
-		auto butt = window.m_data->AddButton();
-		butt->SetRect(100, 0, 200, 40);
-		butt->SetText(L"GO!!!");
-		butt->SetDrawBG(false);
-		//butt->SetEnabled(false);
+		g_data.buttonNewPlaylist = window.m_data->AddButton();
+		g_data.buttonNewPlaylist->SetRect(0, 5, 180, 20);
+		//g_data.buttonNewPlaylist->SetText(L"GO!!!");
+		g_data.buttonNewPlaylist->SetDrawBG(false);
+		//g_data.buttonNewPlaylist->SetEnabled(false);
 
 		icons = framework.m_data->CreateIcons("../data/ap/icons.png", context.m_data->GetBackend());
 		if (icons.m_data)
 		{
-			int iconID = icons.m_data->Add(0, 0, 64, 64);
-			butt->SetIcons(icons.m_data, iconID, iconID, iconID, iconID);
+			int iconID1 = icons.m_data->Add(0, 0, 180, 20);
+			int iconID2 = icons.m_data->Add(0, 19, 180, 20);
+			g_data.buttonNewPlaylist->SetIcons(icons.m_data, iconID1, iconID2, iconID1, iconID1);
 		}
 
 		// also rebuild all gui
+		//window_OnSize(context.m_data->GetSystemWindow());
 		context.m_data->GetSystemWindow()->OnSize();
 
 		bool sleep = true;
