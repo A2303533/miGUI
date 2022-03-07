@@ -86,6 +86,11 @@ void Button::SetDrawBG(bool v)
 	m_elementButton->drawBG = (int)v;
 }
 
+void Button::SetAsPush(bool v)
+{
+	m_elementButton->pushButton = (int)v;
+}
+
 mgStyle_s* Button::GetStyle()
 {
 	if (!m_userStyle)
@@ -156,5 +161,8 @@ void Button::SetIcons(
 	m_elementButton->iconID_push = id3;
 	m_elementButton->iconID_disable = id4;
 }
+
+
+
 
 

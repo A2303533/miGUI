@@ -38,6 +38,10 @@ typedef struct mgElementButton_s {
 
 	int enabled;
 	int pushButton;
+	int pushButtonState; /*0 not active, not 0 is active*/
+	void(*onPushOn)(struct mgElement_s* e); /*only when pushButton */
+	void(*onPushOff)(struct mgElement_s* e);
+
 	
 	int drawBG; 
 

@@ -49,6 +49,7 @@ namespace mgf
 		virtual void SetText(const wchar_t*);
 		virtual void SetEnabled(bool);
 		virtual void SetDrawBG(bool);
+		virtual void SetAsPush(bool);
 
 		/*next methods will allocate memory for m_userStyle
 		* and will use this style instead default

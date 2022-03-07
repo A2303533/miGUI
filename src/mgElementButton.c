@@ -48,6 +48,27 @@ miGUI_onUpdate_button(mgElement* e)
 	mgElementButton* impl = (mgElementButton*)e->implementation;
 	if(impl->enabled)
 		miGUI_onUpdate_rectangle(e);
+
+	if (impl->pushButton)
+	{
+		int inRect = mgPointInRect(&e->transformWorld.clipArea, &e->window->context->input->mousePosition);
+		
+		if ((e->window->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN) && inRect)
+		{
+			if (impl->pushButtonState)
+			{
+				impl->pushButtonState = 0;
+				if (impl->onPushOff)
+					impl->onPushOff(e);
+			}
+			else
+			{
+				impl->pushButtonState = 1;
+				if (impl->onPushOn)
+					impl->onPushOn(e);
+			}
+		}
+	}
 }
 
 void 
@@ -63,24 +84,51 @@ miGUI_onDraw_button(mgElement* e)
 
 	if (impl->enabled)
 	{
-		if (e->elementState & 0x1)
+		if (impl->pushButton)
 		{
-			impl->colorFinal1 = style->buttonColorHover1;
-			impl->colorFinal2 = style->buttonColorHover2;
-			iconID = impl->iconID_hover;
+			if (impl->pushButtonState)
+			{
+				impl->colorFinal1 = style->buttonColorPress1;
+				impl->colorFinal2 = style->buttonColorPress2;
+				iconID = impl->iconID_push;
+			}
+			else
+			{
+				if (e->elementState & 0x1)
+				{
+					impl->colorFinal1 = style->buttonColorHover1;
+					impl->colorFinal2 = style->buttonColorHover2;
+					iconID = impl->iconID_hover;
+				}
+				else
+				{
+					impl->colorFinal1 = style->buttonColor1;
+					impl->colorFinal2 = style->buttonColor2;
+					iconID = impl->iconID_default;
+				}
+			}
 		}
 		else
 		{
-			impl->colorFinal1 = style->buttonColor1;
-			impl->colorFinal2 = style->buttonColor2;
-			iconID = impl->iconID_default;
-		}
+			if (e->elementState & 0x1)
+			{
+				impl->colorFinal1 = style->buttonColorHover1;
+				impl->colorFinal2 = style->buttonColorHover2;
+				iconID = impl->iconID_hover;
+			}
+			else
+			{
+				impl->colorFinal1 = style->buttonColor1;
+				impl->colorFinal2 = style->buttonColor2;
+				iconID = impl->iconID_default;
+			}
 
-		if (e->elementState & 0x2)
-		{
-			impl->colorFinal1 = style->buttonColorPress1;
-			impl->colorFinal2 = style->buttonColorPress2;
-			iconID = impl->iconID_push;
+			if (e->elementState & 0x2)
+			{
+				impl->colorFinal1 = style->buttonColorPress1;
+				impl->colorFinal2 = style->buttonColorPress2;
+				iconID = impl->iconID_push;
+			}
 		}
 	}
 	else

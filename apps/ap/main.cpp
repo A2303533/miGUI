@@ -127,7 +127,6 @@ int main()
 		}
 
 		// also rebuild all gui
-		//window_OnSize(context.m_data->GetSystemWindow());
 		context.m_data->GetSystemWindow()->OnSize();
 
 		bool sleep = true;
