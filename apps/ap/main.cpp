@@ -39,9 +39,12 @@ void window_OnSize(mgf::SystemWindow* w)
 	auto & sz = w->GetSize();
 	g_data.mainWindow->SetSize(sz.x, sz.y);
 	
-	g_data.playlistArea->SetRect(0, 0, AP_PLAYLISTAREASIZE, sz.y - AP_CONTROLAREASIZE);
-	g_data.controlArea->SetRect(0, sz.y - AP_CONTROLAREASIZE, sz.x, sz.y);
-	g_data.tracklistArea->SetRect(AP_PLAYLISTAREASIZE, 0, sz.x, sz.y - AP_CONTROLAREASIZE);
+	if(g_data.playlistArea)
+		g_data.playlistArea->SetRect(0, 0, AP_PLAYLISTAREASIZE, sz.y - AP_CONTROLAREASIZE);
+	if(g_data.controlArea)
+		g_data.controlArea->SetRect(0, sz.y - AP_CONTROLAREASIZE, sz.x, sz.y);
+	if(g_data.tracklistArea)
+		g_data.tracklistArea->SetRect(AP_PLAYLISTAREASIZE, 0, sz.x, sz.y - AP_CONTROLAREASIZE);
 }
 
 void context_onDraw(mgf::Context* c, mgf::Backend* b)
@@ -87,11 +90,14 @@ int main()
 		window.m_data->DrawBG(false);
 		window.m_data->CanMove(false);
 		window.m_data->CanResize(false);
+		window.m_data->CanToTop(false);
 		window.m_data->SetSize(
 			context.m_data->GetSystemWindow()->GetSize().x, 
 			context.m_data->GetSystemWindow()->GetSize().y);
 		
 		context.m_data->CreateWindow();
+
+		g_data.mainWindow = window.m_data;
 
 		g_data.playlistArea = window.m_data->AddRectangle();
 		g_data.playlistArea->SetColor(0xFFFF1122);
@@ -102,8 +108,6 @@ int main()
 		g_data.tracklistArea = window.m_data->AddRectangle();
 		g_data.tracklistArea->SetColor(0xFF0011ff);
 
-		g_data.mainWindow = window.m_data;
-
 		auto text = window.m_data->AddText(0,0, L"Hello world", fontImpact.m_data);
 		text->SetColor(0xFF337722);
 		
@@ -113,12 +117,12 @@ int main()
 		butt->SetDrawBG(false);
 		//butt->SetEnabled(false);
 
-		icons = framework.m_data->CreateIcons("E:/1_24bit.bmp", context.m_data->GetBackend());
+		icons = framework.m_data->CreateIcons("E:/1_32bit.bmp", context.m_data->GetBackend());
 		int iconID = icons.m_data->Add(0, 0, 64, 64);
 		butt->SetIcons(icons.m_data, iconID, iconID, iconID, iconID);
 
 		// also rebuild all gui
-		window_OnSize(context.m_data->GetSystemWindow());
+		context.m_data->GetSystemWindow()->OnSize();
 
 		bool sleep = true;
 

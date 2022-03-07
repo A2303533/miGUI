@@ -178,6 +178,19 @@ void Window::CanResize(bool v)
 	}
 }
 
+void Window::CanToTop(bool v)
+{
+	if (v)
+	{
+		if (m_window->flags & mgWindowFlag_noToTop)
+			m_window->flags ^= mgWindowFlag_noToTop;
+	}
+	else
+	{
+		m_window->flags |= mgWindowFlag_noToTop;
+	}
+}
+
 void Window::SetID(int i)
 {
 	m_window->id = i;

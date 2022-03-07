@@ -30,6 +30,13 @@
 #ifndef _MG_IMAGE_H_
 #define _MG_IMAGE_H_
 
+enum mgImageType {
+	mgImageType_unknown,
+	mgImageType_r8g8b8,
+	mgImageType_r8g8b8a8,
+	mgImageType_a8r8g8b8,
+};
+
 /* RGBA */
 typedef struct mgImage_s {
 	unsigned int width;
@@ -38,6 +45,7 @@ typedef struct mgImage_s {
 	unsigned int bits;
 	unsigned int pitch;
 	unsigned char* data;
+	unsigned int type;
 } mgImage;
 
 #endif

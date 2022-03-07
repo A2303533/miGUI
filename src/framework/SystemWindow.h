@@ -94,6 +94,7 @@ namespace mgf
 
 		virtual void SetOnClose(SystemWindowOnClose) = 0;
 		virtual void SetOnSize(SystemWindowOnSize) = 0;
+		virtual void OnSize() = 0;
 
 		virtual bool IsVisible() = 0;
 	};

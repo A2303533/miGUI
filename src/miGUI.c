@@ -361,6 +361,15 @@ mgUpdate_f(mgContext* c)
 
 			if (cw->flagsInternal & mgWindowFlag_internal_visible)
 			{
+				if (cw->flagsInternal & mgWindowFlag_internal_isExpand)
+				{
+					if (c->needUpdateTransform)
+						mgUpdateTransformElement(cw->rootElement);
+
+					if (c->needRebuild)
+						mgRebuildElement(cw->rootElement);
+				}
+
 				if (!c->windowUnderCursor)
 				{
 					mgUpdateWindow(cw);
@@ -368,22 +377,11 @@ mgUpdate_f(mgContext* c)
 					if (!c->activePopup)
 					{
 						if (cw->flagsInternal & mgWindowFlag_internal_isExpand)
-						{
 							mgUpdateElement(cw->rootElement);
-
-							if (c->needUpdateTransform)
-							{
-								mgUpdateTransformElement(cw->rootElement);
-							}
-
-							if (c->needRebuild)
-							{
-								mgRebuildElement(cw->rootElement);
-								c->needRebuild = 0;
-							}
-						}
 					}
 				}
+
+				
 			}
 
 		skip:;
@@ -392,6 +390,7 @@ mgUpdate_f(mgContext* c)
 			cw = cw->left;
 		}
 		c->needUpdateTransform = 0;
+		c->needRebuild = 0;
 	}
 
 	if (c->dockPanel)

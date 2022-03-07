@@ -170,6 +170,19 @@ void SystemWindowImpl::SetOnSize(SystemWindowOnSize c)
     m_onSize = c;
 }
 
+void SystemWindowImpl::OnSize()
+{
+    RECT rc;
+    GetClientRect(m_hWnd, &rc);
+    m_size.x = rc.right - rc.left;
+    m_size.y = rc.bottom - rc.top;
+    if (m_onSize)
+        m_onSize(this);
+
+    UpdateBackbuffer();
+    m_context->OnWindowSize();
+}
+
 bool SystemWindowImpl::IsVisible()
 {
     return m_isVisible;
@@ -206,17 +219,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         if (pW)
         {
-
-            RECT rc;
-            GetClientRect(hWnd, &rc);
-            pW->m_size.x = rc.right - rc.left;
-            pW->m_size.y = rc.bottom - rc.top;
-            if (pW->m_onSize)
-                pW->m_onSize(pW);
-
-            pW->UpdateBackbuffer();
-            pW->m_context->OnWindowSize();
-
+            pW->OnSize();
             int wmId = LOWORD(wParam);
             switch (wmId)
             {

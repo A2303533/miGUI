@@ -63,6 +63,7 @@ namespace mgf
 		void DrawBG(bool);
 		void CanDock(bool);
 		void CanResize(bool);
+		void CanToTop(bool);
 		void SetID(int);
 		int GetID();
 		void SetUserData(void*);

@@ -42,6 +42,7 @@ namespace mgf
 	public:
 		Image();
 		virtual ~Image();
+
 	};
 	
 	Image* Image_bmp(const char* fn);

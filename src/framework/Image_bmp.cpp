@@ -51,28 +51,28 @@ struct ciexyzTriple {
 };
 
 struct BitmapInfoHeader_v5 {
-	uint32_t			bV5Size;		//	размер header в файле
-	uint32_t			bV5Width;		//	ширина
-	uint32_t			bV5Height;		//	высота
-	uint16_t			bV5Planes;		//	хз что это, всегда 1
-	uint16_t			bV5BitCount;	//	биты
-	uint32_t			bV5Compression;	//	1 - RLE 8bit, 2 - RLE 4bit, 3 или что-то, видимо, специальные обозначения у разработчиков 2D редакторов.
-	uint32_t			bV5SizeImage;	//	размер массива пикселей/индексов
-	uint32_t			bV5XPelsPerMeter;// размер в чём-то, видимо для печати или вывода ещё кудато
-	uint32_t			bV5YPelsPerMeter;//	для обычного использования в ПК не играет никакой роли
-	uint32_t			bV5ClrUsed;		//	обычно тут ноль
-	uint32_t			bV5ClrImportant;//	и тут ноль
-	uint32_t			bV5RedMask;		//	для определения позиции цветов
-	uint32_t			bV5GreenMask;	//	в форматах типа x1r5g5b5
+	uint32_t			bV5Size;
+	uint32_t			bV5Width;
+	uint32_t			bV5Height;
+	uint16_t			bV5Planes;
+	uint16_t			bV5BitCount;
+	uint32_t			bV5Compression;
+	uint32_t			bV5SizeImage;	
+	uint32_t			bV5XPelsPerMeter;
+	uint32_t			bV5YPelsPerMeter;
+	uint32_t			bV5ClrUsed;		
+	uint32_t			bV5ClrImportant;
+	uint32_t			bV5RedMask;		
+	uint32_t			bV5GreenMask;	
 	uint32_t			bV5BlueMask;
 	uint32_t			bV5AlphaMask;
-	uint32_t			bV5CSType;		//	далее информация для более специализированного
-	ciexyzTriple bV5Endpoints;	//	использования.
-	uint32_t			bV5GammaRed;	//	для передачи простой картинки достаточно того
-	uint32_t			bV5GammaGreen;	//	что указано выше. А эта часть нужна для, например,
-	uint32_t			bV5GammaBlue;	//	тех кто делает видео плеер, видео редактор
-	uint32_t			bV5Intent;		//	что-то типа этого. Как бы универсальное решение
-	uint32_t			bV5ProfileData;	//	от Microsoft
+	uint32_t			bV5CSType;		
+	ciexyzTriple bV5Endpoints;
+	uint32_t			bV5GammaRed;	
+	uint32_t			bV5GammaGreen;	
+	uint32_t			bV5GammaBlue;	
+	uint32_t			bV5Intent;		
+	uint32_t			bV5ProfileData;	
 	uint32_t			bV5ProfileSize;
 	uint32_t			bV5Reserved;
 };
@@ -113,17 +113,34 @@ Image* mgf::Image_bmp(const char* fn)
 	int pitch = 0;
 	int dataSize = 0;
 	unsigned char* data = 0;
+	
+	int type = mgImageType_unknown;
 
 	if (bits == 24)
 	{
+		type = mgImageType_r8g8b8;
 		pitch = width * 3;
 		dataSize = pitch * height;
 		data = (unsigned char*)malloc(dataSize);
+		
+		unsigned char * tmpData = (unsigned char*)malloc(dataSize);
+
 		fseek(file, 54, SEEK_SET);
-		fread(data, 1, dataSize, file);
+		fread(tmpData, 1, dataSize, file);
+
+		unsigned char* rowSrc = tmpData + dataSize - pitch;
+		unsigned char* rowDst = data;
+		for (int i = 0; i < height; ++i)
+		{
+			memcpy(rowDst, rowSrc, pitch);
+			rowDst += pitch;
+			rowSrc -= pitch;
+		}
+		free(tmpData);
 	}
 	else if (bits == 32)
 	{
+		type = mgImageType_a8r8g8b8;
 		pitch = width * 4;
 		uint32_t offset = header.bfOffBits;
 
@@ -132,9 +149,20 @@ Image* mgf::Image_bmp(const char* fn)
 			fseek(file, offset, SEEK_SET);
 			dataSize = pitch * height;
 			data = (unsigned char*)malloc(dataSize);
+			unsigned char* tmpData = (unsigned char*)malloc(dataSize);
 
-			fread(data, 1, dataSize, file);
-			/*image.m_data->flipPixel();*/
+			fread(tmpData, 1, dataSize, file);
+
+			unsigned char* rowSrc = tmpData + dataSize - pitch;
+			unsigned char* rowDst = data;
+			for (int i = 0; i < height; ++i)
+			{
+				memcpy(rowDst, rowSrc, pitch);
+				rowDst += pitch;
+				rowSrc -= pitch;
+			}
+
+			free(tmpData);
 		}
 		else
 		{
@@ -153,6 +181,7 @@ Image* mgf::Image_bmp(const char* fn)
 	img->m_image->height = height;
 	img->m_image->bits = bits;
 	img->m_image->pitch = pitch;
+	img->m_image->type = type;
 
 	return img;
 }

@@ -192,7 +192,24 @@ mgTexture* BackendGDI::CreateTexture(mgImage* img)
 	bitmap.bmBits = img->data;
 
 	CreateStreamOnHGlobal();*/
-	Gdiplus::Bitmap* myImage = new Gdiplus::Bitmap(img->width, img->height, img->pitch, PixelFormat24bppRGB, img->data);
+	if (img->type == mgImageType_unknown)
+		return 0;
+
+	unsigned int pixelFormat = 0;
+	switch (img->type)
+	{
+	case mgImageType_r8g8b8:
+		pixelFormat = PixelFormat24bppRGB;
+		break;
+	case mgImageType_r8g8b8a8:
+		pixelFormat = PixelFormat32bppRGB;
+		break;
+	case mgImageType_a8r8g8b8:
+		pixelFormat = PixelFormat32bppARGB;
+		break;
+	}
+
+	Gdiplus::Bitmap* myImage = new Gdiplus::Bitmap(img->width, img->height, img->pitch, pixelFormat, img->data);
 
 	Gdiplus::Rect rect;
 	rect.X = 0;
@@ -252,8 +269,8 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			Gdiplus::Rect gdirct;
 			gdirct.X = rct->left + m_window->m_borderSize.x;
 			gdirct.Y = rct->top + m_window->m_borderSize.y;
-			gdirct.Width = 64;
-			gdirct.Height = 64;
+			gdirct.Width = rct->right - rct->left;
+			gdirct.Height = rct->bottom - rct->top;
 			
 			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
 

@@ -52,6 +52,7 @@ namespace mgf
 		virtual void UpdateBackbuffer() override;
 		virtual void SetOnClose(SystemWindowOnClose) override;
 		virtual void SetOnSize(SystemWindowOnSize) override;
+		virtual void OnSize() override;
 		virtual bool IsVisible() override;
 
 		bool m_isVisible = false;

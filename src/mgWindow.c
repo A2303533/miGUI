@@ -176,6 +176,9 @@ void
 MG_C_DECL
 mgBringWindowToTop_f(struct mgWindow_s* w)
 {
+	if (w->flags & mgWindowFlag_noToTop)
+		return;
+
 	struct mgContext_s* c = w->context;
 
 	mgWindow* r = w->right;
