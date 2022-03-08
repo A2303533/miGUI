@@ -104,18 +104,18 @@ void MG_C_DECL
 mgInitStyleLight_f(mgStyle* s)
 {
 	assert(s);
-	mgColorSetAsIntegerRGB(&s->buttonColor1, 0x999999);
-	mgColorSetAsIntegerRGB(&s->buttonColor2, 0x666666);
-	mgColorSetAsIntegerRGB(&s->buttonColorDisabled1, 0x999999);
-	mgColorSetAsIntegerRGB(&s->buttonColorDisabled2, 0x666666);
-	mgColorSetAsIntegerRGB(&s->buttonColorHover1, 0xAAAAAA);
-	mgColorSetAsIntegerRGB(&s->buttonColorHover2, 0x777777);
-	mgColorSetAsIntegerRGB(&s->buttonColorPress1, 0x777777);
-	mgColorSetAsIntegerRGB(&s->buttonColorPress2, 0x444444);
-	mgColorSetAsIntegerRGB(&s->buttonTextColor, 0x0);
-	mgColorSetAsIntegerRGB(&s->buttonTextColorHover, 0x222222);
-	mgColorSetAsIntegerRGB(&s->buttonTextColorPress, 0x0);
-	mgColorSetAsIntegerRGB(&s->buttonTextColorDisabled, 0x555555);
+	mgColorSetAsIntegerRGB(&s->button1, 0x999999);
+	mgColorSetAsIntegerRGB(&s->button2, 0x666666);
+	mgColorSetAsIntegerRGB(&s->buttonDisabled1, 0x999999);
+	mgColorSetAsIntegerRGB(&s->buttonDisabled2, 0x666666);
+	mgColorSetAsIntegerRGB(&s->buttonHover1, 0xAAAAAA);
+	mgColorSetAsIntegerRGB(&s->buttonHover2, 0x777777);
+	mgColorSetAsIntegerRGB(&s->buttonPress1, 0x777777);
+	mgColorSetAsIntegerRGB(&s->buttonPress2, 0x444444);
+	mgColorSetAsIntegerRGB(&s->buttonText, 0x0);
+	mgColorSetAsIntegerRGB(&s->buttonTextHover, 0x222222);
+	mgColorSetAsIntegerRGB(&s->buttonTextPress, 0x0);
+	mgColorSetAsIntegerRGB(&s->buttonTextDisabled, 0x555555);
 	mgColorSetAsIntegerRGB(&s->windowBG, 0xE1E6F7);
 	mgColorSetAsIntegerRGB(&s->windowTitlebar, 0xC9D6F2);
 	mgColorSetAsIntegerRGB(&s->windowBGTopWindow, 0xE8EDFF);
@@ -140,6 +140,9 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->windowMenuActiveItemBG, 0x00E1FF);
 	mgColorSetAsIntegerRGB(&s->tooltipBG, 0xD6E5FF);
 	mgColorSetAsIntegerRGB(&s->tooltipText, 0x0);
+	mgColorSetAsIntegerRGB(&s->textInputBGActive, 0x333333);
+	mgColorSetAsIntegerRGB(&s->textInputBGNotActive, 0x999999);
+	mgColorSetAsIntegerRGB(&s->textInputDefaultText, 0x666666);
 }
 
 MG_API 

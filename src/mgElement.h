@@ -46,7 +46,8 @@ enum mgAlignment
 enum {
 	MG_TYPE_RECTANGLE = 1,
 	MG_TYPE_TEXT,
-	MG_TYPE_BUTTON
+	MG_TYPE_BUTTON,
+	MG_TYPE_TEXTINPUT,
 };
 
 struct mgElement_s;
@@ -123,5 +124,6 @@ typedef struct mgElement_s {
 #include "mgElementRectangle.h"
 #include "mgElementText.h"
 #include "mgElementButton.h"
+#include "mgElementTextInput.h"
 
 #endif

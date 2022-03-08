@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -26,59 +26,43 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MG_FONT_H_
-#define _MG_FONT_H_
+#include "miGUI.h"
 
-enum {
-	MG_FNTFL_BOLD = 1,
-	MG_FNTFL_ITALIC = 2,
-	MG_FNTFL_UNDERLINE = 4,
-	MG_FNTFL_STRIKEOUT = 8,
-};
+#include "framework/mgf.h"
+#include "framework/Window.h"
+#include "framework/Font.h"
+#include "framework/FontImpl.h"
+#include "framework/TextInput.h"
 
-/*bitmap fonts implementation
-* It must be inside mgFont_s
-*/
-typedef struct mgFontBitmap_s {
-	struct mgTexture_s* gpuTexture;
-} mgFontBitmap;
+using namespace mgf;
 
-typedef struct mgFontGlyph_s
+TextInput::TextInput(Window* w, Font* f)
 {
-	wchar_t symbol;
-	mgVec4 UV;
-	mgRect rect;
-	int underhang;
-	int overhang;
-	int width;
-	int height;
-	int textureSlot;
-} mgFontGlyph;
+	assert(w);
+	assert(f);
 
-typedef struct mgFont_s {
+	mgRect r;
+	mgRectSet(&r, 0, 0, 0, 0);
 
-	/*miGUI will create mgFontBitmap_s and will put address here.
-	* (this is array, textureCount for size)
-	* 
-	* but you can create your own font inside your app, just put
-	* address here, and then use it as you wish (don't forget to
-	* delete your own font).
-	*/
-	void* implementation; /*it can be HFONT from windows*/
-	int textureCount;
+	m_element = mgCreateTextInput(w->m_window, &r, ((FontImpl*)f)->m_font);
+	m_elementText = (mgElementTextInput_s*)m_element->implementation;
 
-	int characterSpacing;
-	int spaceSize;
-	int tabSize;
+	Element::PostInit();
+}
 
-	int glyphNum; /*how many chars in this font*/
-	mgFontGlyph* glyphs;
+TextInput::~TextInput()
+{
+	if (m_element)
+		mgDestroyElement(m_element);
+}
 
-	mgPoint maxSize;
+void TextInput::SetText(const wchar_t* text)
+{
+	mgTextInputSetText(m_elementText, text);
+}
 
-	mgFontGlyph* glyphMap[0xFFFF];
-} mgFont;
+void TextInput::SetFont(Font* f)
+{
+	m_elementText->font = ((FontImpl*)f)->m_font;
+}
 
-
-#endif

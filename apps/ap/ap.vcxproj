@@ -33,6 +33,7 @@
     <ClCompile Include="..\..\src\framework\Rectangle.cpp" />
     <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp" />
     <ClCompile Include="..\..\src\framework\Text.cpp" />
+    <ClCompile Include="..\..\src\framework\TextInput.cpp" />
     <ClCompile Include="..\..\src\framework\Window.cpp" />
     <ClCompile Include="..\..\src\miGUILoader.c" />
     <ClCompile Include="main.cpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="..\..\src\framework\BackendGDI.h" />
     <ClInclude Include="..\..\src\framework\FontImpl.h" />
     <ClInclude Include="..\..\src\framework\SystemWindowImpl.h" />
+    <ClInclude Include="..\..\src\framework\TextInput.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

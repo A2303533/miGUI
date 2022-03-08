@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -27,58 +27,26 @@
 */
 
 #pragma once
-#ifndef _MG_FONT_H_
-#define _MG_FONT_H_
+#ifndef _MG_ELEMENTTEXTIN_H_
+#define _MG_ELEMENTTEXTIN_H_
 
-enum {
-	MG_FNTFL_BOLD = 1,
-	MG_FNTFL_ITALIC = 2,
-	MG_FNTFL_UNDERLINE = 4,
-	MG_FNTFL_STRIKEOUT = 8,
-};
+typedef struct mgElementTextInput_s {
+	mgFont* font;
+	wchar_t* text;
+	int textLen;
+	
+	const wchar_t* defaultText; /*default text like 'click to edit'*/
+	int defaultTextLen;
 
-/*bitmap fonts implementation
-* It must be inside mgFont_s
-*/
-typedef struct mgFontBitmap_s {
-	struct mgTexture_s* gpuTexture;
-} mgFontBitmap;
+	int allocated; /*wchar_t*/
 
-typedef struct mgFontGlyph_s
-{
-	wchar_t symbol;
-	mgVec4 UV;
-	mgRect rect;
-	int underhang;
-	int overhang;
-	int width;
-	int height;
-	int textureSlot;
-} mgFontGlyph;
+	int drawBG;/*1*/
 
-typedef struct mgFont_s {
+	int multiline;/*0 default*/
+	int monospace;/*0 default*/
 
-	/*miGUI will create mgFontBitmap_s and will put address here.
-	* (this is array, textureCount for size)
-	* 
-	* but you can create your own font inside your app, just put
-	* address here, and then use it as you wish (don't forget to
-	* delete your own font).
-	*/
-	void* implementation; /*it can be HFONT from windows*/
-	int textureCount;
+} mgElementTextInput;
 
-	int characterSpacing;
-	int spaceSize;
-	int tabSize;
-
-	int glyphNum; /*how many chars in this font*/
-	mgFontGlyph* glyphs;
-
-	mgPoint maxSize;
-
-	mgFontGlyph* glyphMap[0xFFFF];
-} mgFont;
 
 
 #endif

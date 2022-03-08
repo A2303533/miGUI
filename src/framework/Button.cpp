@@ -104,46 +104,46 @@ mgStyle_s* Button::GetStyle()
 
 void Button::SetColorBG(int argb1, int argb2)
 {
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonColor1, argb1);
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonColor2, argb2);
+	mgColorSetAsIntegerARGB(&GetStyle()->button1, argb1);
+	mgColorSetAsIntegerARGB(&GetStyle()->button2, argb2);
 }
 
 void Button::SetColorBGHover(int argb1, int argb2)
 {
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonColorHover1, argb1);
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonColorHover1, argb2);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonHover1, argb1);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonHover1, argb2);
 }
 
 void Button::SetColorBGPush(int argb1, int argb2)
 {
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonColorPress1, argb1);
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonColorPress1, argb2);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonPress1, argb1);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonPress1, argb2);
 }
 
 void Button::SetColorBGDisable(int argb1, int argb2)
 {
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonColorDisabled1, argb1);
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonColorDisabled1, argb2);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonDisabled1, argb1);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonDisabled1, argb2);
 }
 
 void Button::SetTextColor(int argb)
 {
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextColor, argb);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonText, argb);
 }
 
 void Button::SetTextColorHover(int argb)
 {
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextColorHover, argb);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextHover, argb);
 }
 
 void Button::SetTextColorPush(int argb)
 {
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextColorPress, argb);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextPress, argb);
 }
 
 void Button::SetTextColorDisable(int argb)
 {
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextColorDisabled, argb);
+	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextDisabled, argb);
 }
 
 void Button::SetIcons(

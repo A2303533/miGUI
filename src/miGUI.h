@@ -84,6 +84,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_popupHoverElement,
 	mgDrawRectangleReason_popupSeparator,
 	mgDrawRectangleReason_popupNextIcon,
+	mgDrawRectangleReason_textInputBG,
 };
 
 enum mgDrawTextReason
@@ -96,6 +97,7 @@ enum mgDrawTextReason
 	mgDrawTextReason_popup,
 	mgDrawTextReason_popupShortcut,
 	mgDrawTextReason_tooltip,
+	mgDrawTextReason_textInputDefaultText,
 };
 
 /* Before creating GUI context you must create this objects.
@@ -495,6 +497,33 @@ typedef void (*PFNMGINITSTYLEDARKPROC)(mgStyle*);
 extern PFNMGINITSTYLEDARKPROC mgInitStyleDark;
 #endif
 
+#ifdef MG_NO_DLL
+MG_API mgElement* MG_C_DECL mgCreateTextInput_f(struct mgWindow_s* w, mgRect* r, mgFont* font);
+#define mgCreateTextInput mgCreateTextInput_f
+#else
+typedef mgElement* (*PFNMGCREATETEXTINPUTPROC)(struct mgWindow_s* w, mgRect* r, mgFont* font);
+extern PFNMGCREATETEXTINPUTPROC mgCreateTextInput;
+#endif
+
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text);
+#define mgTextInputSetText mgTextInputSetText_f
+#else
+typedef void (*PFNMGTEXTINPUTSETTEXTPROC)(struct mgElementTextInput_s* e, const wchar_t* text);
+extern PFNMGTEXTINPUTSETTEXTPROC mgTextInputSetText;
+#endif
+
+/*
+* freeMemory: 1 for free
+*/
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory);
+#define mgTextInputClear mgTextInputClear_f
+#else
+typedef void (*PFNMGTEXTINPUTCLEARPROC)(struct mgElementTextInput_s* e, int freeMemory);
+extern PFNMGTEXTINPUTCLEARPROC mgTextInputClear;
+#endif
+
 
 #if defined(__cplusplus)
 }
@@ -544,6 +573,7 @@ typedef struct mgContext_s {
 	mgPopup* activePopup;
 	mgPopup* popupUnderCursor;
 	mgMenu* activeMenu;
+	mgElementTextInput* activeTextInput;
 
 	mgFont* defaultPopupFont;
 	int cursorInPopup;

@@ -33,6 +33,7 @@
 #include "framework/Rectangle.h"
 #include "framework/Text.h"
 #include "framework/Button.h"
+#include "framework/TextInput.h"
 
 using namespace mgf;
 
@@ -247,3 +248,11 @@ Button* Window::AddButton()
 	m_elements.emplace_back(e);
 	return e;
 }
+
+TextInput* Window::AddTextInput(Font* f)
+{
+	TextInput* e = new TextInput(this, f);
+	m_elements.emplace_back(e);
+	return e;
+}
+

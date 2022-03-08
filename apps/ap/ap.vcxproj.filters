@@ -50,6 +50,9 @@
     <ClCompile Include="..\..\src\framework\lodepng.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\TextInput.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">
@@ -64,6 +67,9 @@
       <Filter>migui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\framework\FontImpl.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\TextInput.h">
       <Filter>migui</Filter>
     </ClInclude>
   </ItemGroup>

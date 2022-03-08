@@ -88,22 +88,22 @@ miGUI_onDraw_button(mgElement* e)
 		{
 			if (impl->pushButtonState)
 			{
-				impl->colorFinal1 = style->buttonColorPress1;
-				impl->colorFinal2 = style->buttonColorPress2;
+				impl->colorFinal1 = style->buttonPress1;
+				impl->colorFinal2 = style->buttonPress2;
 				iconID = impl->iconID_push;
 			}
 			else
 			{
 				if (e->elementState & 0x1)
 				{
-					impl->colorFinal1 = style->buttonColorHover1;
-					impl->colorFinal2 = style->buttonColorHover2;
+					impl->colorFinal1 = style->buttonHover1;
+					impl->colorFinal2 = style->buttonHover2;
 					iconID = impl->iconID_hover;
 				}
 				else
 				{
-					impl->colorFinal1 = style->buttonColor1;
-					impl->colorFinal2 = style->buttonColor2;
+					impl->colorFinal1 = style->button1;
+					impl->colorFinal2 = style->button2;
 					iconID = impl->iconID_default;
 				}
 			}
@@ -112,29 +112,29 @@ miGUI_onDraw_button(mgElement* e)
 		{
 			if (e->elementState & 0x1)
 			{
-				impl->colorFinal1 = style->buttonColorHover1;
-				impl->colorFinal2 = style->buttonColorHover2;
+				impl->colorFinal1 = style->buttonHover1;
+				impl->colorFinal2 = style->buttonHover2;
 				iconID = impl->iconID_hover;
 			}
 			else
 			{
-				impl->colorFinal1 = style->buttonColor1;
-				impl->colorFinal2 = style->buttonColor2;
+				impl->colorFinal1 = style->button1;
+				impl->colorFinal2 = style->button2;
 				iconID = impl->iconID_default;
 			}
 
 			if (e->elementState & 0x2)
 			{
-				impl->colorFinal1 = style->buttonColorPress1;
-				impl->colorFinal2 = style->buttonColorPress2;
+				impl->colorFinal1 = style->buttonPress1;
+				impl->colorFinal2 = style->buttonPress2;
 				iconID = impl->iconID_push;
 			}
 		}
 	}
 	else
 	{
-		impl->colorFinal1 = style->buttonColorDisabled1;
-		impl->colorFinal2 = style->buttonColorDisabled2;
+		impl->colorFinal1 = style->buttonDisabled1;
+		impl->colorFinal2 = style->buttonDisabled2;
 		iconID = impl->iconID_disable;
 	}
 
@@ -168,16 +168,16 @@ miGUI_onDraw_button(mgElement* e)
 		if (impl->enabled)
 		{
 			if (e->elementState & 0x1)
-				impl->textColorFinal = style->buttonTextColorHover;
+				impl->textColorFinal = style->buttonTextHover;
 			else
-				impl->textColorFinal = style->buttonTextColor;
+				impl->textColorFinal = style->buttonText;
 
 			if (e->elementState & 0x2)
-				impl->textColorFinal = style->buttonTextColorPress;
+				impl->textColorFinal = style->buttonTextPress;
 		}
 		else
 		{
-			impl->textColorFinal = style->buttonTextColorDisabled;
+			impl->textColorFinal = style->buttonTextDisabled;
 		}
 
 		mgPoint pos;

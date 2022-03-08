@@ -420,7 +420,7 @@ Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool ital
 	FontImpl* newFont = new FontImpl;
 	newFont->m_context = this->m_context;
 	{
-		mgFont* f = (mgFont*)malloc(sizeof(mgFont));
+		mgFont* f = (mgFont*)calloc(1, sizeof(mgFont));
 		HDC g_dc = GetWindowDC(this->m_window->m_hWnd);
 		f->implementation = CreateFontW(
 			-MulDiv(size, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
@@ -435,6 +435,14 @@ Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool ital
 			CLEARTYPE_QUALITY,
 			VARIABLE_PITCH,
 			file);
+		
+		SelectObject(m_window->m_hdcMem, f->implementation);
+
+		TEXTMETRICW tm;
+		GetTextMetrics(m_window->m_hdcMem, &tm);
+		f->maxSize.x = tm.tmMaxCharWidth;
+		f->maxSize.y = tm.tmHeight;
+
 		ReleaseDC(this->m_window->m_hWnd, g_dc);
 		newFont->m_font = f;
 	}

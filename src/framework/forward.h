@@ -44,6 +44,7 @@ namespace mgf
 	class Rectangle;
 	class Icons;
 	class Image;
+	class TextInput;
 }
 
 #endif

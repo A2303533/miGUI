@@ -67,6 +67,9 @@ PFNMGCREATEMENUPROC mgCreateMenu;
 PFNMGDESTROYMENUPROC mgDestroyMenu;
 PFNMGINITSTYLELIGHTPROC mgInitStyleLight;
 PFNMGINITSTYLEDARKPROC mgInitStyleDark;
+PFNMGCREATETEXTINPUTPROC mgCreateTextInput;
+PFNMGTEXTINPUTSETTEXTPROC mgTextInputSetText;
+PFNMGTEXTINPUTCLEARPROC mgTextInputClear;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -131,7 +134,9 @@ mgLoad()
 	mgDestroyElement = mgGetProc(lib, "mgDestroyElement_f");
 	mgInitStyleLight = mgGetProc(lib, "mgInitStyleLight_f");
 	mgInitStyleDark = mgGetProc(lib, "mgInitStyleDark_f");
-	
+	mgCreateTextInput = mgGetProc(lib, "mgCreateTextInput_f");
+	mgTextInputSetText = mgGetProc(lib, "mgTextInputSetText_f");
+	mgTextInputClear = mgGetProc(lib, "mgTextInputClear_f");
 
 	return lib;
 }

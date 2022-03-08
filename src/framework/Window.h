@@ -43,6 +43,7 @@ namespace mgf
 		friend class Context;
 		friend class Rectangle;
 		friend class Button;
+		friend class TextInput;
 
 		mgWindow_s* m_window = 0;
 		std::basic_string<wchar_t> m_title;
@@ -73,6 +74,7 @@ namespace mgf
 		Rectangle* AddRectangle();
 		Text* AddText(int x, int y, const wchar_t* text, Font*);
 		Button* AddButton();
+		TextInput* AddTextInput(Font*);
 
 		void UpdateRect();
 

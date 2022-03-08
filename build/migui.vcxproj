@@ -150,6 +150,7 @@
     <ClCompile Include="..\src\mgElementButton.c" />
     <ClCompile Include="..\src\mgElementRectangle.c" />
     <ClCompile Include="..\src\mgElementText.c" />
+    <ClCompile Include="..\src\mgElementTextInput.c" />
     <ClCompile Include="..\src\mgFont.c" />
     <ClCompile Include="..\src\mgMenu.c" />
     <ClCompile Include="..\src\mgPopup.c" />

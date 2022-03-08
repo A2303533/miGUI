@@ -6,6 +6,7 @@
 #include "framework/Text.h"
 #include "framework/Button.h"
 #include "framework/Icons.h"
+#include "framework/TextInput.h"
 #include <stdio.h>
 
 #define AP_PLAYLISTAREASIZE 180
@@ -125,6 +126,10 @@ int main()
 			int iconID2 = icons.m_data->Add(0, 19, 180, 20);
 			g_data.buttonNewPlaylist->SetIcons(icons.m_data, iconID1, iconID2, iconID1, iconID1);
 		}
+
+		auto textInput = window.m_data->AddTextInput(fontImpact.m_data);
+		textInput->SetRect(0, 200, 500, 250);
+	//	textInput->SetText(L"Hello world");
 
 		// also rebuild all gui
 		context.m_data->GetSystemWindow()->OnSize();

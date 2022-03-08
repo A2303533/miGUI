@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -27,58 +27,25 @@
 */
 
 #pragma once
-#ifndef _MG_FONT_H_
-#define _MG_FONT_H_
+#ifndef _MGF_TEXTINPUT_H_
+#define _MGF_TEXTINPUT_H_
 
-enum {
-	MG_FNTFL_BOLD = 1,
-	MG_FNTFL_ITALIC = 2,
-	MG_FNTFL_UNDERLINE = 4,
-	MG_FNTFL_STRIKEOUT = 8,
-};
+#include "Element.h"
 
-/*bitmap fonts implementation
-* It must be inside mgFont_s
-*/
-typedef struct mgFontBitmap_s {
-	struct mgTexture_s* gpuTexture;
-} mgFontBitmap;
+#include <string>
 
-typedef struct mgFontGlyph_s
+namespace mgf
 {
-	wchar_t symbol;
-	mgVec4 UV;
-	mgRect rect;
-	int underhang;
-	int overhang;
-	int width;
-	int height;
-	int textureSlot;
-} mgFontGlyph;
+	class TextInput : public Element
+	{
+		mgElementTextInput_s* m_elementText = 0;
+	public:
+		TextInput(Window* w, Font* f);
+		virtual ~TextInput();
 
-typedef struct mgFont_s {
-
-	/*miGUI will create mgFontBitmap_s and will put address here.
-	* (this is array, textureCount for size)
-	* 
-	* but you can create your own font inside your app, just put
-	* address here, and then use it as you wish (don't forget to
-	* delete your own font).
-	*/
-	void* implementation; /*it can be HFONT from windows*/
-	int textureCount;
-
-	int characterSpacing;
-	int spaceSize;
-	int tabSize;
-
-	int glyphNum; /*how many chars in this font*/
-	mgFontGlyph* glyphs;
-
-	mgPoint maxSize;
-
-	mgFontGlyph* glyphMap[0xFFFF];
-} mgFont;
-
+		void SetText(const wchar_t*);
+		void SetFont(Font*);
+	};
+}
 
 #endif
