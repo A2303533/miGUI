@@ -143,6 +143,8 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->textInputBGActive, 0x333333);
 	mgColorSetAsIntegerRGB(&s->textInputBGNotActive, 0x999999);
 	mgColorSetAsIntegerRGB(&s->textInputDefaultText, 0x666666);
+	mgColorSetAsIntegerRGB(&s->textInputCursor, 0xffffff);
+	
 }
 
 MG_API 
@@ -426,6 +428,7 @@ mgStartFrame_f(mgContext* c)
 	c->input->mousePositionOld = c->input->mousePosition;
 	c->input->mouseButtonFlags1 = 0;
 	c->input->mouseWheelDelta = 0;
+	c->input->character = 0;
 
 	if ((c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN) == MG_MBFL_LMBDOWN)
 		c->input->mouseButtonFlags1 ^= MG_MBFL_LMBDOWN;

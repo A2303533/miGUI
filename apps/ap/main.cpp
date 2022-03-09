@@ -129,7 +129,7 @@ int main()
 
 		auto textInput = window.m_data->AddTextInput(fontImpact.m_data);
 		textInput->SetRect(0, 200, 500, 250);
-	//	textInput->SetText(L"Hello world");
+		textInput->SetText(L"Hello world");
 
 		// also rebuild all gui
 		context.m_data->GetSystemWindow()->OnSize();

@@ -70,6 +70,8 @@ PFNMGINITSTYLEDARKPROC mgInitStyleDark;
 PFNMGCREATETEXTINPUTPROC mgCreateTextInput;
 PFNMGTEXTINPUTSETTEXTPROC mgTextInputSetText;
 PFNMGTEXTINPUTCLEARPROC mgTextInputClear;
+PFNMGTEXTINPUTPUTTEXTPROC mgTextInputPutText;
+PFNMGTEXTINPUTDELETESELECTEDPROC mgTextInputDeleteSelected;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -137,6 +139,8 @@ mgLoad()
 	mgCreateTextInput = mgGetProc(lib, "mgCreateTextInput_f");
 	mgTextInputSetText = mgGetProc(lib, "mgTextInputSetText_f");
 	mgTextInputClear = mgGetProc(lib, "mgTextInputClear_f");
+	mgTextInputPutText = mgGetProc(lib, "mgTextInputPutText_f");
+	mgTextInputDeleteSelected = mgGetProc(lib, "mgTextInputDeleteSelected_f");
 
 	return lib;
 }

@@ -34,6 +34,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdint.h>
 
 struct mgContext_s;
 
@@ -85,6 +86,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_popupSeparator,
 	mgDrawRectangleReason_popupNextIcon,
 	mgDrawRectangleReason_textInputBG,
+	mgDrawRectangleReason_textInputCursor,
 };
 
 enum mgDrawTextReason
@@ -522,6 +524,23 @@ MG_API void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int fre
 #else
 typedef void (*PFNMGTEXTINPUTCLEARPROC)(struct mgElementTextInput_s* e, int freeMemory);
 extern PFNMGTEXTINPUTCLEARPROC mgTextInputClear;
+#endif
+
+/*return width in pixels (max width)*/
+#ifdef MG_NO_DLL
+MG_API int MG_C_DECL mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
+#define mgTextInputPutText mgTextInputPutText_f
+#else
+typedef int (*PFNMGTEXTINPUTPUTTEXTPROC)(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
+extern PFNMGTEXTINPUTPUTTEXTPROC mgTextInputPutText;
+#endif
+
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e);
+#define mgTextInputDeleteSelected mgTextInputDeleteSelected_f
+#else
+typedef void (*PFNMGTEXTINPUTDELETESELECTEDPROC)(struct mgElementTextInput_s* e);
+extern PFNMGTEXTINPUTDELETESELECTEDPROC mgTextInputDeleteSelected;
 #endif
 
 

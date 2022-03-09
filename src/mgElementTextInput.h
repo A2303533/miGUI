@@ -31,19 +31,49 @@
 #define _MG_ELEMENTTEXTIN_H_
 
 typedef struct mgElementTextInput_s {
+	struct mgElement_s* element;
+
 	mgFont* font;
 	wchar_t* text;
-	int textLen;
+	uint32_t textLen;
+	uint32_t allocated; /*in wchar_t*/
 	
 	const wchar_t* defaultText; /*default text like 'click to edit'*/
-	int defaultTextLen;
+	uint32_t defaultTextLen;         /*set this too*/
 
-	int allocated; /*wchar_t*/
+	/*
+	* this points to place where to put new char.
+	* from 0 to textLen
+	* 0 - put in front
+	* textLen - push_back
+	*/
+	uint32_t textCursor;
+	mgPoint textCursorPosition; /*will set when draw text*/
+	float textCursorTimer;
+	float textCursorTimerLimit; /*0.5f*/
+	uint32_t drawTextCursor;/*bool, internal*/
+	mgRect textCursorRect;
+	
+	uint32_t textBeginDrawIndex;
 
-	int drawBG;/*1*/
+	uint32_t drawBG;/*1*/
+	uint32_t multiline;/*0*/
+	uint32_t monospace;/*0*/
+	uint32_t canEdit;/*1*/
 
-	int multiline;/*0 default*/
-	int monospace;/*0 default*/
+	void(*onActivate)(struct mgElementTextInput_s*);
+	void(*onEndEdit)(struct mgElementTextInput_s*);
+	wchar_t(*onCharEnter)(wchar_t);
+
+	uint32_t isSelected;
+	uint32_t selectionStart;
+	uint32_t selectionEnd;
+
+	double h_scroll;
+	double h_scrollCurr;
+	double h_scrollLimit;
+
+	uint32_t textWidth;/*in pixels*/
 
 } mgElementTextInput;
 

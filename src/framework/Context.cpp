@@ -56,6 +56,7 @@ Context::Context(
 	m_window->m_context = this;
 	
 	m_input = new mgInputContext_s;
+	memset(m_input, 0, sizeof(mgInputContext));
 
 	m_backend = backend;
 	m_backend->SetActiveWindow(m_window);
