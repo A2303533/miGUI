@@ -107,6 +107,27 @@ MG_API
 void MG_C_DECL 
 mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e)
 {
+	if (!e->isSelected)
+		return;
+
+	uint32_t s1 = e->selectionStart;
+	uint32_t s2 = e->selectionEnd;
+	if (s1 > s2)
+	{
+		s1 = s2;
+		s2 = e->selectionStart;
+	}
+
+	uint32_t num_to_delete = s2 - s1;
+	uint32_t str_len = e->textLen;
+	wchar_t * buf = e->text;
+	for (size_t i = s2, i2 = s1; i < str_len; ++i, ++i2)
+	{
+		buf[i2] = buf[i];
+	}
+	buf[str_len - num_to_delete] = 0;
+	e->textCursor = s1;
+	e->textLen -= num_to_delete;
 	mgTextInputDeselect(e);
 }
 
@@ -213,16 +234,73 @@ mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32
 void
 miGUI_textinput_goLeft(mgElementTextInput* impl)
 {
+	mgContext* ctx = impl->element->window->context;
 	if (impl->textCursor)
+	{
+		if (ctx->input->keyboardModifier == MG_KBMOD_SHIFT)
+		{
+			if ((impl->selectionStart == 0) && (impl->selectionEnd == 0))
+			{
+				impl->isSelected = 1;
+				impl->selectionStart = impl->textCursor;
+			}
+			impl->selectionEnd = impl->textCursor - 1;
+		}
+		else
+		{
+			if (impl->isSelected)
+			{
+				if (impl->selectionStart < impl->selectionEnd)
+					impl->textCursor = impl->selectionStart + 1;
+				else
+					++impl->textCursor;
+				mgTextInputDeselect(impl);
+			}
+		}
 		--impl->textCursor;
+	}
+	else
+	{
+		if(impl->isSelected && ctx->input->keyboardModifier != MG_KBMOD_SHIFT)
+			mgTextInputDeselect(impl);
+	}
 }
 
 void
 miGUI_textinput_goRight(mgElementTextInput* impl)
 {
-	++impl->textCursor;
-	if (impl->textCursor > impl->textLen)
-		impl->textCursor = impl->textLen;
+	mgContext* ctx = impl->element->window->context;
+	if (impl->textCursor < impl->textLen)
+	{
+		if (ctx->input->keyboardModifier == MG_KBMOD_SHIFT)
+		{
+			if ((impl->selectionStart == 0) && (impl->selectionEnd == 0))
+			{
+				impl->isSelected = 1;
+				impl->selectionStart = impl->textCursor;
+			}
+			impl->selectionEnd = impl->textCursor + 1;
+		}
+		else
+		{
+			if (impl->isSelected)
+			{
+				if (impl->selectionStart > impl->selectionEnd)
+					impl->textCursor = impl->selectionStart - 1;
+				else
+					--impl->textCursor;
+				mgTextInputDeselect(impl);
+			}
+		}
+		++impl->textCursor;
+		if (impl->textCursor > impl->textLen)
+			impl->textCursor = impl->textLen;
+	}
+	else
+	{
+		if (impl->isSelected && ctx->input->keyboardModifier != MG_KBMOD_SHIFT)
+			mgTextInputDeselect(impl);
+	}
 }
 
 void
@@ -244,8 +322,53 @@ miGUI_textinput_goDown(mgElementTextInput* impl)
 }
 
 void
+miGUI_textinput_goHomeOfText(mgElementTextInput* impl)
+{
+	mgContext* ctx = impl->element->window->context;
+	if (ctx->input->keyboardModifier == MG_KBMOD_CTRLSHIFT)
+	{
+		if ((impl->selectionStart == 0) && (impl->selectionEnd == 0))
+		{
+			impl->isSelected = 1;
+			impl->selectionStart = impl->textCursor;
+		}
+	}
+	else
+	{
+		if (impl->isSelected)
+			mgTextInputDeselect(impl);
+	}
+	impl->textCursor = 0;
+
+	if (ctx->input->keyboardModifier == MG_KBMOD_CTRLSHIFT)
+		impl->selectionEnd = impl->textCursor;
+}
+
+void
 miGUI_textinput_goHome(mgElementTextInput* impl)
 {
+	mgContext* ctx = impl->element->window->context;
+	if (ctx->input->keyboardModifier == MG_KBMOD_CTRL
+		|| ctx->input->keyboardModifier == MG_KBMOD_CTRLSHIFT)
+	{
+		miGUI_textinput_goHomeOfText(impl);
+		return;
+	}
+	if (ctx->input->keyboardModifier == MG_KBMOD_SHIFT
+		|| ctx->input->keyboardModifier == MG_KBMOD_CTRLSHIFT)
+	{
+		if ((impl->selectionStart == 0) && (impl->selectionEnd == 0))
+		{
+			impl->isSelected = 1;
+			impl->selectionStart = impl->textCursor;
+		}
+	}
+	else 
+	{
+		if (impl->isSelected)
+			mgTextInputDeselect(impl);
+	}
+
 	if (impl->multiline)
 	{
 	}
@@ -253,11 +376,61 @@ miGUI_textinput_goHome(mgElementTextInput* impl)
 	{
 		impl->textCursor = 0;
 	}
+
+	if (ctx->input->keyboardModifier == MG_KBMOD_SHIFT
+		|| ctx->input->keyboardModifier == MG_KBMOD_CTRLSHIFT)
+		impl->selectionEnd = impl->textCursor;
+}
+
+void
+miGUI_textinput_goEndOfText(mgElementTextInput* impl)
+{
+	mgContext* ctx = impl->element->window->context;
+	if (ctx->input->keyboardModifier == MG_KBMOD_CTRLSHIFT)
+	{
+		if ((impl->selectionStart == 0) && (impl->selectionEnd == 0))
+		{
+			impl->isSelected = 1;
+			impl->selectionStart = impl->textCursor;
+		}
+	}
+	else
+	{
+		if (impl->isSelected)
+			mgTextInputDeselect(impl);
+	}
+
+	impl->textCursor = impl->textLen;
+
+	if (ctx->input->keyboardModifier == MG_KBMOD_CTRLSHIFT)
+		impl->selectionEnd = impl->textCursor;
 }
 
 void
 miGUI_textinput_goEnd(mgElementTextInput* impl)
 {
+	mgContext* ctx = impl->element->window->context;
+	if (ctx->input->keyboardModifier == MG_KBMOD_CTRL
+		|| ctx->input->keyboardModifier == MG_KBMOD_CTRLSHIFT)
+	{
+		miGUI_textinput_goEndOfText(impl);
+		return;
+	}
+	
+	if (ctx->input->keyboardModifier == MG_KBMOD_SHIFT)
+	{
+		if ((impl->selectionStart == 0) && (impl->selectionEnd == 0))
+		{
+			impl->isSelected = 1;
+			impl->selectionStart = impl->textCursor;
+		}
+	}
+	else
+	{
+		if (impl->isSelected)
+			mgTextInputDeselect(impl);
+	}
+
 	if (impl->multiline)
 	{
 	}
@@ -265,6 +438,8 @@ miGUI_textinput_goEnd(mgElementTextInput* impl)
 	{
 		impl->textCursor = impl->textLen;
 	}
+	if (ctx->input->keyboardModifier == MG_KBMOD_SHIFT)
+		impl->selectionEnd = impl->textCursor;
 }
 
 void
@@ -337,16 +512,12 @@ miGUI_onUpdate_textinput(mgElement* e)
 	else
 	{
 		if (e->elementState & 0x1)
-		{
 			mgSetCursor_f(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
-		}
 
 		if (impl->canEdit)
 		{
 			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-			{
 				miGUI_textinput_activate(e, 0);
-			}
 		}
 	}
 
@@ -355,22 +526,35 @@ miGUI_onUpdate_textinput(mgElement* e)
 	int isActive = impl == e->window->context->activeTextInput;
 	if (isActive)
 	{
-		if (c->input->keyboardModifier == MG_KBMOD_CTRL)
+		if (c->input->character)
 		{
-		}
-		else
-		{
-			if (c->input->character)
+			if (c->input->keyboardModifier != MG_KBMOD_CTRL)
 			{
 				switch (c->input->character)
 				{
 				case MG_KEY_ESCAPE:
+				{
+					if (!impl->multiline)
+					{
+						if (impl->isSelected)
+						{
+							mgTextInputDeselect(impl);
+						}
+						else
+						{
+							if (impl->onEndEdit)
+								impl->onEndEdit(impl);
+							miGUI_textinput_activate(e, 0);
+						}
+						return;
+					}
+				}break;
 				case MG_KEY_ENTER:
 					break;
 				case MG_KEY_BACKSPACE:
 					mgTextInput_backspace(impl);
 					break;
-				
+
 				default:
 				{
 					if (impl->onCharEnter)
@@ -390,27 +574,27 @@ miGUI_onUpdate_textinput(mgElement* e)
 				}break;
 				}
 			}
-			else
-			{
-				if (mgIsKeyHit(c->input, MG_KEY_LEFT))
-					miGUI_textinput_move(e, MG_KEY_LEFT);
-				else if (mgIsKeyHit(c->input, MG_KEY_RIGHT))
-					miGUI_textinput_move(e, MG_KEY_RIGHT);
-				else if (mgIsKeyHit(c->input, MG_KEY_UP))
-					miGUI_textinput_move(e, MG_KEY_UP);
-				else if (mgIsKeyHit(c->input, MG_KEY_DOWN))
-					miGUI_textinput_move(e, MG_KEY_DOWN);
-				else if (mgIsKeyHit(c->input, MG_KEY_HOME))
-					miGUI_textinput_move(e, MG_KEY_HOME);
-				else if (mgIsKeyHit(c->input, MG_KEY_END))
-					miGUI_textinput_move(e, MG_KEY_END);
-				else if (mgIsKeyHit(c->input, MG_KEY_PGDOWN))
-					miGUI_textinput_move(e, MG_KEY_PGDOWN);
-				else if (mgIsKeyHit(c->input, MG_KEY_PGUP))
-					miGUI_textinput_move(e, MG_KEY_PGUP);
-				else if (mgIsKeyHit(c->input, MG_KEY_DELETE))
-					mgTextInput_delete(impl);
-			}
+		}
+		else
+		{
+			if (mgIsKeyHit(c->input, MG_KEY_LEFT))
+				miGUI_textinput_move(e, MG_KEY_LEFT);
+			else if (mgIsKeyHit(c->input, MG_KEY_RIGHT))
+				miGUI_textinput_move(e, MG_KEY_RIGHT);
+			else if (mgIsKeyHit(c->input, MG_KEY_UP))
+				miGUI_textinput_move(e, MG_KEY_UP);
+			else if (mgIsKeyHit(c->input, MG_KEY_DOWN))
+				miGUI_textinput_move(e, MG_KEY_DOWN);
+			else if (mgIsKeyHit(c->input, MG_KEY_HOME))
+				miGUI_textinput_move(e, MG_KEY_HOME);
+			else if (mgIsKeyHit(c->input, MG_KEY_END))
+				miGUI_textinput_move(e, MG_KEY_END);
+			else if (mgIsKeyHit(c->input, MG_KEY_PGDOWN))
+				miGUI_textinput_move(e, MG_KEY_PGDOWN);
+			else if (mgIsKeyHit(c->input, MG_KEY_PGUP))
+				miGUI_textinput_move(e, MG_KEY_PGUP);
+			else if (mgIsKeyHit(c->input, MG_KEY_DELETE))
+				mgTextInput_delete(impl);
 		}
 
 		impl->textCursorRect.left = e->transformWorld.buildArea.left;
@@ -496,19 +680,14 @@ miGUI_onDraw_textinput(mgElement* e)
 			mgPoint pos;
 			pos.x = e->transformWorld.buildArea.left - (int)impl->h_scrollCurr;
 			pos.y = e->transformWorld.buildArea.top;
+
+			mgRect rect;
 			for (uint32_t i = 0; i < impl->textLen; ++i)
 			{
-				e->window->context->gpu->drawText(
-					mgDrawTextReason_textInputDefaultText,
-					impl,
-					&pos,
-					&impl->text[i],
-					1,
-					&style->textInputDefaultText,
-					impl->font);
+				rect.left = pos.x;
+				rect.top = pos.y;				
 
-				if (i == impl->textCursor)
-					impl->textCursorPosition = pos;
+				mgPoint pos2 = pos;
 
 				if (impl->monospace)
 				{
@@ -526,6 +705,42 @@ miGUI_onDraw_textinput(mgElement* e)
 					pos.x += p.x + impl->font->characterSpacing;
 					impl->textWidth += v;
 				}
+				rect.right = pos.x;
+				rect.bottom = pos.y + impl->font->maxSize.y;
+
+				if (impl->isSelected)
+				{
+					uint32_t start = impl->selectionStart;
+					uint32_t end = impl->selectionEnd;
+					if (start > end)
+					{
+						end = impl->selectionStart;
+						start = impl->selectionEnd;
+					}
+
+					if ((i >= start) && (i < end))
+					{
+						mgColor* selcol = &style->textInputSelectionBGNotActive;
+						if (isActive)
+							selcol = &style->textInputSelectionBGActive;
+
+						e->window->context->gpu->drawRectangle(
+							mgDrawRectangleReason_textInputSelectionBG,
+							impl, &rect, selcol, selcol, 0, 0);
+					}
+				}
+
+				e->window->context->gpu->drawText(
+					mgDrawTextReason_textInputDefaultText,
+					impl,
+					&pos2,
+					&impl->text[i],
+					1,
+					&style->textInputDefaultText,
+					impl->font);
+
+				if (i == impl->textCursor)
+					impl->textCursorPosition = pos2;
 			}
 
 			if(impl->textCursor == impl->textLen)
@@ -608,7 +823,7 @@ mgCreateTextInput_f(struct mgWindow_s* w, mgRect* r, mgFont* font)
 	impl->canEdit = 1;
 	impl->textCursorTimerLimit = 0.5f;
 	impl->element = newElement;
-
+	
 	mgTextInputClear_f(impl, 1);
 
 	mgSetParent_f(newElement, 0);

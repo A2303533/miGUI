@@ -87,6 +87,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_popupNextIcon,
 	mgDrawRectangleReason_textInputBG,
 	mgDrawRectangleReason_textInputCursor,
+	mgDrawRectangleReason_textInputSelectionBG,
 };
 
 enum mgDrawTextReason

@@ -144,7 +144,8 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->textInputBGNotActive, 0x999999);
 	mgColorSetAsIntegerRGB(&s->textInputDefaultText, 0x666666);
 	mgColorSetAsIntegerRGB(&s->textInputCursor, 0xffffff);
-	
+	mgColorSetAsIntegerRGB(&s->textInputSelectionBGActive, 0x009BFF);
+	mgColorSetAsIntegerRGB(&s->textInputSelectionBGNotActive, 0x888888);
 }
 
 MG_API 

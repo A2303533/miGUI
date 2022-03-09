@@ -77,6 +77,8 @@ typedef struct mgStyle_s {
 	mgColor textInputBGNotActive;
 	mgColor textInputDefaultText;
 	mgColor textInputCursor;
+	mgColor textInputSelectionBGActive;
+	mgColor textInputSelectionBGNotActive;
 
 } mgStyle;
 
