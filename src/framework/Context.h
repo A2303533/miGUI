@@ -66,6 +66,8 @@ namespace mgf
 		// Will draw after drawing all windows
 		void SetOnDraw(ContextOnDraw);
 		
+		void SetDefaultPopupFont(Font*);
+		
 		void DrawAll();
 	};
 }

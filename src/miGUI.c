@@ -133,6 +133,8 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->popupBG, 0xE8EDFF);
 	mgColorSetAsIntegerRGB(&s->popupText, 0x0);
 	mgColorSetAsIntegerRGB(&s->popupTextShortcut, 0x555555);
+	mgColorSetAsIntegerRGB(&s->popupTextDisabled, 0x888888);
+	mgColorSetAsIntegerRGB(&s->popupTextShortcutDisabled, 0x888888);
 	mgColorSetAsIntegerRGB(&s->popupHoverElementBG, 0xC1C1C1);
 	mgColorSetAsIntegerRGB(&s->windowScrollbarBG, 0xD4D2EF);
 	mgColorSetAsIntegerRGB(&s->windowScrollbarElement, 0xB3C4DB);
@@ -173,7 +175,27 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 
 	mgInitDefaultCursors(c);
 
+
 	return c;
+}
+
+struct mgPopup_s*
+mgGetDefaultPopupTextInput(mgContext* c)
+{
+	assert(c);
+	assert(c->defaultPopupFont);
+
+	if (c->defaultPopupForTextInput)
+		return c->defaultPopupForTextInput;
+	struct mgPopupItemInfo_s items[] = {
+		{0, L"Cut", 0, 0, mgPopupItemType_default, 0, L"Ctl+X", 1},
+		{0, L"Copy", 0, 0, mgPopupItemType_default, 0, L"Ctl+C", 1},
+		{0, L"Paste", 0, 0, mgPopupItemType_default, 0, L"Ctl+V", 1},
+		{0, L"Delete", 0, 0, mgPopupItemType_default, 0, 0, 1},
+		{0, L"Select All", 0, 0, mgPopupItemType_default, 0, L"Ctrl+A", 1},
+	};
+	c->defaultPopupForTextInput = mgCreatePopup_f(items, 5, c->defaultPopupFont);
+	return c->defaultPopupForTextInput;
 }
 
 MG_API 
@@ -190,6 +212,9 @@ mgDestroyContext_f(mgContext* c)
 			mgDestroyIcons_f(c->defaultIconGroup->icons);
 		free(c->defaultIconGroup);
 	}
+
+	if (c->defaultPopupForTextInput)
+		mgDestroyPopup_f(c->defaultPopupForTextInput);
 
 	mgWindow* cw = c->firstWindow;
 	if (cw)

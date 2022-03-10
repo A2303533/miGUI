@@ -45,6 +45,7 @@ lerpd(double v0, double v1, double t)
 void miGUI_onUpdateTransform_rectangle(mgElement* e);
 void miGUI_onUpdate_rectangle(mgElement* e);
 void mgTextInput_updateScrollLimit(mgElement* e);
+void mgTextInput_selectAll(struct mgElementTextInput_s* e);
 
 void
 mgTextInput_copy(mgElement* e)
@@ -129,6 +130,55 @@ mgTextInput_paste(mgElement* e)
 	}
 
 	mgTextInput_updateScrollLimit(e);
+}
+
+void
+mgTextInput_defaultPopup_onCut(int id, struct mgPopupItem_s* item)
+{
+	mgTextInput_cut(item->userData);
+}
+void
+mgTextInput_defaultPopup_onCopy(int id, struct mgPopupItem_s* item)
+{
+	mgTextInput_copy(item->userData);
+}
+void
+mgTextInput_defaultPopup_onPaste(int id, struct mgPopupItem_s* item)
+{
+	mgTextInput_paste(item->userData);
+}
+void
+mgTextInput_defaultPopup_onDelete(int id, struct mgPopupItem_s* item)
+{
+	mgTextInputDeleteSelected_f(((mgElement*)item->userData)->implementation);
+}
+void
+mgTextInput_defaultPopup_onSelectAll(int id, struct mgPopupItem_s* item)
+{
+	mgTextInput_selectAll(((mgElement*)item->userData)->implementation);
+}
+
+void
+mgTextInput_defaultPopupOnShow(struct mgContext_s* c, struct mgPopup_s* p)
+{
+	if (!c->activeTextInput)
+		return;
+
+	p->items[0].info.isEnabled = c->activeTextInput->isSelected ? 1 : 0;/*cut*/
+	p->items[1].info.isEnabled = c->activeTextInput->isSelected ? 1 : 0;/*copy*/
+	p->items[3].info.isEnabled = c->activeTextInput->isSelected ? 1 : 0;/*delete*/
+
+	p->items[0].info.callback = mgTextInput_defaultPopup_onCut;
+	p->items[1].info.callback = mgTextInput_defaultPopup_onCopy;
+	p->items[2].info.callback = mgTextInput_defaultPopup_onPaste;
+	p->items[3].info.callback = mgTextInput_defaultPopup_onDelete;
+	p->items[4].info.callback = mgTextInput_defaultPopup_onSelectAll;
+	
+	p->items[0].userData = c->activeTextInput->element;
+	p->items[1].userData = c->activeTextInput->element;
+	p->items[2].userData = c->activeTextInput->element;
+	p->items[3].userData = c->activeTextInput->element;
+	p->items[4].userData = c->activeTextInput->element;
 }
 
 void
@@ -602,11 +652,14 @@ miGUI_onUpdate_textinput(mgElement* e)
 
 		if (impl->canEdit)
 		{
-			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			if ((c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+				|| (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+				|| (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN))
 			{
 				if(impl != e->window->context->activeTextInput)
 					miGUI_textinput_activate(e, 1);
 			}
+			
 		}
 	}
 	else
@@ -780,7 +833,16 @@ miGUI_onUpdate_textinput(mgElement* e)
 			if (impl->h_scroll < 0.f)
 				impl->h_scroll = 0.f;
 		}
-
+		
+		if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+		{
+			if (impl->rightClickPopup)
+			{
+				if (!impl->rightClickPopup->onShow)
+					impl->rightClickPopup->onShow = mgTextInput_defaultPopupOnShow;
+				mgShowPopup_f(c, impl->rightClickPopup, &c->input->mousePosition);
+			}
+		}
 	}
 }
 
@@ -983,6 +1045,7 @@ mgCreateTextInput_f(struct mgWindow_s* w, mgRect* r, mgFont* font)
 	impl->canEdit = 1;
 	impl->textCursorTimerLimit = 0.5f;
 	impl->element = newElement;
+	impl->rightClickPopup = mgGetDefaultPopupTextInput(w->context);
 	
 	mgTextInputClear_f(impl, 1);
 

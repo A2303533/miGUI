@@ -66,9 +66,9 @@ void mgDrawWindow(struct mgWindow_s* w);
 void mgUpdateWindow(struct mgWindow_s* w);
 void mgUpdateElement(mgElement* e);
 
-void dockPanel_popupCallback_makeFirst(int id);
-void dockPanel_popupCallback_unpin(int id);
-void dockPanel_popupCallback_close(int id);
+void dockPanel_popupCallback_makeFirst(int id, struct mgPopupItem_s*);
+void dockPanel_popupCallback_unpin(int id, struct mgPopupItem_s*);
+void dockPanel_popupCallback_close(int id, struct mgPopupItem_s*);
 
 void
 _mgDockPanelRebuild(struct mgContext_s* c)
@@ -999,10 +999,10 @@ mgInitDockPanel_f(
 	{
 		struct mgPopupItemInfo_s popupItems[] =
 		{
-			{0, L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A"},
-			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0},
-			{0, L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove"},
-			{0, L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide"},
+			{0, L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A", 1},
+			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+			{0, L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove", 1},
+			{0, L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide", 1},
 		};
 		c->dockPanel->windowTabPopup = mgCreatePopup_f(popupItems, 4, c->defaultPopupFont);
 	}
@@ -1223,7 +1223,7 @@ mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 	return pnlWnd;
 }
 
-void dockPanel_popupCallback_makeFirst(int id)
+void dockPanel_popupCallback_makeFirst(int id, struct mgPopupItem_s* item)
 {
 	mgWindow* aw = 0;
 	for (int i = g_pnlWnd_onPopup->windowsSize; i > 1; i--)
@@ -1244,7 +1244,7 @@ void dockPanel_popupCallback_makeFirst(int id)
 	}
 }
 
-void dockPanel_popupCallback_unpin(int id)
+void dockPanel_popupCallback_unpin(int id, struct mgPopupItem_s* item)
 {
 	mgWindow * w = g_pnlWnd_onPopup->activeWindow;
 	
@@ -1332,10 +1332,10 @@ void dockPanel_popupCallback_unpin(int id)
 	mgDockPanelUpdateWindow(w->context);
 }
 
-void dockPanel_popupCallback_close(int id)
+void dockPanel_popupCallback_close(int id, struct mgPopupItem_s* item)
 {
 	mgWindow* w = g_pnlWnd_onPopup->activeWindow;
-	dockPanel_popupCallback_unpin(id);
+	dockPanel_popupCallback_unpin(id, item);
 	mgShowWindow_f(w, 0);
 }
 

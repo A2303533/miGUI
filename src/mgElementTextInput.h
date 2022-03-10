@@ -80,6 +80,8 @@ typedef struct mgElementTextInput_s {
 
 	uint32_t textWidth;/*in pixels*/
 
+	struct mgPopup_s* rightClickPopup;
+
 } mgElementTextInput;
 
 

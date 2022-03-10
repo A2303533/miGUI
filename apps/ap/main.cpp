@@ -64,6 +64,7 @@ int main()
 	mgf::Ptr<mgf::Context> context = 0;
 	mgf::Ptr<mgf::Window> window = 0;
 	mgf::Ptr<mgf::Font> fontImpact = 0;
+	mgf::Ptr<mgf::Font> popupFont = 0;
 	mgf::Ptr<mgf::Icons> icons = 0;
 	try
 	{
@@ -77,6 +78,8 @@ int main()
 		);
 
 		fontImpact = context.m_data->GetBackend()->CreateFont(L"Impact", 20, true, false);
+		popupFont = context.m_data->GetBackend()->CreateFont(L"Arial", 8, true, false);
+		context.m_data->SetDefaultPopupFont(popupFont.m_data);
 
 		context.m_data->GetSystemWindow()->SetOnClose(window_OnClose);
 		context.m_data->GetSystemWindow()->SetOnSize(window_OnSize);

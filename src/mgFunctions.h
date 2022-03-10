@@ -64,5 +64,6 @@ MG_API mgElement* MG_C_DECL mgCreateTextInput_f(struct mgWindow_s* w, mgRect* r,
 MG_API void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory);
 MG_API void MG_C_DECL mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e);
 MG_API int MG_C_DECL mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
+struct mgPopup_s* mgGetDefaultPopupTextInput(mgContext* c);
 
 #endif

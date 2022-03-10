@@ -198,24 +198,33 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 					0, 0);
 			}
 
+			mgColor* textColor = &c->activeStyle->popupText;
+			if(!p->items[i].info.isEnabled)
+				textColor = &c->activeStyle->popupTextDisabled;
+
 			c->gpu->drawText(mgDrawTextReason_popup, 
 				p,
 				&pt,
 				p->items[i].info.text,
 				p->items[i].textLen,
-				&c->activeStyle->popupText,
+				textColor,
 				p->font);
 
 			if (p->items[i].info.shortcutText)
 			{
 				pt2 = pt;
 				pt2.x += p->items[i].indentForShortcutText;
+
+				textColor = &c->activeStyle->popupTextShortcut;
+				if (!p->items[i].info.isEnabled)
+					textColor = &c->activeStyle->popupTextShortcutDisabled;
+
 				c->gpu->drawText(mgDrawTextReason_popupShortcut, 
 					p,
 					&pt2,
 					p->items[i].info.shortcutText,
 					p->items[i].shortcutTextLen,
-					&c->activeStyle->popupTextShortcut,
+					textColor,
 					p->font);
 			}
 
@@ -294,24 +303,27 @@ _mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 				r.bottom = r.top + p->itemHeight;
 				if (mgPointInRect(&r, &c->input->mousePosition))
 				{
-					p->nodeUnderCursor = &p->items[i];
-					p->nodeUnderCursorRect = r;
-
-					if (p->items[i].info.subMenu)
+					if (p->items[i].info.isEnabled)
 					{
-						mgPoint pt2;
-						pt2.x = r.right - p->indent.x;
-						pt2.y = r.top - p->indent.y;
-						mgPopupSetPosition(c, p->items[i].info.subMenu, &pt2);
+						p->nodeUnderCursor = &p->items[i];
+						p->nodeUnderCursorRect = r;
 
-						mgPopupFixPosition(c, p->items[i].info.subMenu);
-						p->items[i].info.subMenu->subVisible = 1;
-					}
-					else
-					{
+						if (p->items[i].info.subMenu)
+						{
+							mgPoint pt2;
+							pt2.x = r.right - p->indent.x;
+							pt2.y = r.top - p->indent.y;
+							mgPopupSetPosition(c, p->items[i].info.subMenu, &pt2);
 
+							mgPopupFixPosition(c, p->items[i].info.subMenu);
+							p->items[i].info.subMenu->subVisible = 1;
+						}
+						else
+						{
+
+						}
+						break;
 					}
-					break;
 				}
 				pt.y += p->itemHeight;
 			}
@@ -321,7 +333,7 @@ _mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 			if (!p->nodeUnderCursor->info.subMenu)
 			{
 				if (p->nodeUnderCursor->info.callback)
-					p->nodeUnderCursor->info.callback(p->nodeUnderCursor->info.id);
+					p->nodeUnderCursor->info.callback(p->nodeUnderCursor->info.id, p->nodeUnderCursor);
 				mgShowPopup_f(c, 0, 0);
 
 				if (c->activeMenu)
@@ -429,10 +441,10 @@ mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 	c->activePopup = p;
 
 	if (!p)
-	{
-
 		return;
-	}
+
+	if (p->onShow)
+		p->onShow(c, p);
 
 	for (int i = 0; i < p->itemsSize; ++i)
 	{
@@ -441,4 +453,5 @@ mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 	}
 
 	mgPopupSetPosition(c, p, position);
+	mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 }

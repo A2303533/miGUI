@@ -147,3 +147,7 @@ mgf::Backend* Context::GetBackend()
 	return m_backend;
 }
 
+void Context::SetDefaultPopupFont(Font* f)
+{
+	m_gui_context->defaultPopupFont = ((mgf::FontImpl*)f)->m_font;
+}
