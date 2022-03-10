@@ -84,7 +84,7 @@ mgWindowUpdateContentHeight(mgWindow* w, mgElement* e)
 		if (h > w->contentHeight)
 			w->contentHeight = h;
 	}
-	for (int i = 0; i < e->childrenCount; ++i)
+	for (uint32_t i = 0; i < e->childrenCount; ++i)
 	{
 		mgWindowUpdateContentHeight(w, e->children[i].pointer);
 	}

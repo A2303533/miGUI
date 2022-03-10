@@ -190,9 +190,9 @@ miGUI_onUpdateTransform_rectangle(mgElement* e)
 void 
 miGUI_onUpdate_rectangle(mgElement* e)
 {
-	int inRect = mgPointInRect(&e->transformWorld.clipArea, &e->window->context->input->mousePosition);
+	e->cursorInRect = mgPointInRect(&e->transformWorld.clipArea, &e->window->context->input->mousePosition);
 
-	if (inRect)
+	if (e->cursorInRect)
 	{
 		if (!e->elementState & 0x1)
 		{
@@ -304,7 +304,7 @@ miGUI_onUpdate_rectangle(mgElement* e)
 			e->elementState ^= 0x20;
 	}
 
-	if (inRect)
+	if (e->cursorInRect)
 		e->elementState |= 0x1;
 	else if(e->elementState & 0x1)
 		e->elementState ^= 0x1;

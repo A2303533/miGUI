@@ -45,6 +45,7 @@ namespace mgf
 
 		void SetText(const wchar_t*);
 		void SetFont(Font*);
+
 	};
 }
 

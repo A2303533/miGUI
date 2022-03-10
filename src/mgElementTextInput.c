@@ -33,6 +33,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef MG_PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
+
 inline double
 lerpd(double v0, double v1, double t)
 {
@@ -40,6 +44,92 @@ lerpd(double v0, double v1, double t)
 }
 void miGUI_onUpdateTransform_rectangle(mgElement* e);
 void miGUI_onUpdate_rectangle(mgElement* e);
+void mgTextInput_updateScrollLimit(mgElement* e);
+
+void
+mgTextInput_copy(mgElement* e)
+{
+	mgElementTextInput* impl = (mgElementTextInput*)e->implementation;
+	if (!impl->isSelected)
+		return;
+
+	uint32_t s1 = impl->selectionStart;
+	uint32_t s2 = impl->selectionEnd;
+	if (s1 > s2)
+	{
+		s1 = s2;
+		s2 = impl->selectionStart;
+	}
+	uint32_t num_to_select = s2 - s1;
+
+#ifdef MG_PLATFORM_WINDOWS
+	if (!OpenClipboard(0))
+		return;
+
+	uint32_t len = num_to_select;
+	EmptyClipboard();
+	HGLOBAL clipbuffer;
+	clipbuffer = GlobalAlloc(GMEM_DDESHARE, (len + 1) * sizeof(WCHAR));
+
+	wchar_t* buffer;
+	buffer = (wchar_t*)GlobalLock(clipbuffer);
+
+	memcpy(buffer, &impl->text[s1], len * sizeof(wchar_t));
+	buffer[len] = 0;
+
+	GlobalUnlock(clipbuffer);
+	SetClipboardData(CF_UNICODETEXT, clipbuffer);
+	CloseClipboard();
+#else
+#error Need implementation....
+#endif
+}
+void
+mgTextInput_cut(mgElement* e)
+{
+	mgTextInput_copy(e);
+	mgTextInputDeleteSelected_f(e->implementation);
+}
+void
+mgTextInput_paste(mgElement* e)
+{
+	mgElementTextInput* impl = (mgElementTextInput*)e->implementation;
+	if(impl->isSelected)
+		mgTextInputDeleteSelected_f(e->implementation);
+
+#ifdef MG_PLATFORM_WINDOWS
+	if (!OpenClipboard(0))
+		return;
+
+	HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+	if (hData)
+	{
+		wchar_t* buffer = (wchar_t*)GlobalLock(hData);
+		if (buffer)
+		{
+			uint32_t len = wcslen(buffer);
+			if(len)
+				mgTextInputPutText_f(impl, buffer, len);
+		}
+		GlobalUnlock(hData);
+	}
+	CloseClipboard();
+#else
+#error Need implementation....
+#endif
+	if (impl->multiline)
+	{
+
+	}
+	else
+	{
+		mgPoint tsz;
+		e->window->context->getTextSize(impl->text, impl->font, &tsz);
+		impl->textWidth = tsz.x;
+	}
+
+	mgTextInput_updateScrollLimit(e);
+}
 
 void
 mgTextInput_updateScrollLimit(mgElement* e)
@@ -76,6 +166,18 @@ miGUI_onUpdateTransform_textinput(mgElement* e)
 }
 
 void
+mgTextInput_selectAll(struct mgElementTextInput_s* e)
+{
+	if (!e->textLen)
+		return;
+
+	e->selectionStart = 0;
+	e->selectionEnd = e->textLen;
+	e->isSelected = 1;
+	e->textCursor = e->textLen;
+}
+
+void
 miGUI_textinput_activate(mgElement* e, int is)
 {
 	mgElementTextInput* impl = (mgElementTextInput*)e->implementation;
@@ -90,8 +192,6 @@ miGUI_textinput_activate(mgElement* e, int is)
 	else
 	{
 		e->window->context->activeTextInput = 0;
-		if (impl->onEndEdit)
-			impl->onEndEdit(impl);
 	}
 }
 
@@ -493,10 +593,10 @@ miGUI_onUpdate_textinput(mgElement* e)
 {
 	mgContext* c = e->window->context;
 
-	int inRect = mgPointInRect(&e->transformWorld.clipArea, &c->input->mousePosition);
+	e->cursorInRect = mgPointInRect(&e->transformWorld.clipArea, &c->input->mousePosition);
 	mgElementTextInput* impl = (mgElementTextInput*)e->implementation;
 	
-	if (inRect)
+	if (e->cursorInRect)
 	{
 		mgSetCursor_f(c, c->defaultCursors[mgCursorType_IBeam], mgCursorType_Arrow);
 
@@ -517,7 +617,17 @@ miGUI_onUpdate_textinput(mgElement* e)
 		if (impl->canEdit)
 		{
 			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-				miGUI_textinput_activate(e, 0);
+			{
+				if (impl->onEndEdit)
+				{
+					if(impl->onEndEdit(impl, 2))
+						miGUI_textinput_activate(e, 0);
+				}
+				else
+				{
+					miGUI_textinput_activate(e, 0);
+				}
+			}
 		}
 	}
 
@@ -543,14 +653,34 @@ miGUI_onUpdate_textinput(mgElement* e)
 						else
 						{
 							if (impl->onEndEdit)
-								impl->onEndEdit(impl);
-							miGUI_textinput_activate(e, 0);
+							{
+								if(impl->onEndEdit(impl, 3))
+									miGUI_textinput_activate(e, 0);
+							}
+							else
+							{
+								miGUI_textinput_activate(e, 0);
+							}
 						}
 						return;
 					}
 				}break;
 				case MG_KEY_ENTER:
-					break;
+				{
+					if (!impl->multiline)
+					{
+						if (impl->onEndEdit)
+						{
+							if (impl->onEndEdit(impl, 1))
+								miGUI_textinput_activate(e, 0);
+						}
+						else
+						{
+							miGUI_textinput_activate(e, 0);
+						}
+						return;
+					}
+				}break;
 				case MG_KEY_BACKSPACE:
 					mgTextInput_backspace(impl);
 					break;
@@ -595,6 +725,36 @@ miGUI_onUpdate_textinput(mgElement* e)
 				miGUI_textinput_move(e, MG_KEY_PGUP);
 			else if (mgIsKeyHit(c->input, MG_KEY_DELETE))
 				mgTextInput_delete(impl);
+		}
+
+		if (c->input->keyboardModifier == MG_KBMOD_CTRL)
+		{
+			if (mgIsKeyHit(c->input, MG_KEY_A))
+				mgTextInput_selectAll(impl);
+			else if (mgIsKeyHit(c->input, MG_KEY_C))
+				mgTextInput_copy(e);
+			else if (mgIsKeyHit(c->input, MG_KEY_INSERT))
+				mgTextInput_copy(e);
+			else if (mgIsKeyHit(c->input, MG_KEY_X))
+				mgTextInput_cut(e);
+			else if (mgIsKeyHit(c->input, MG_KEY_V))
+				mgTextInput_paste(e);
+		}
+		
+		if (c->input->keyboardModifier == MG_KBMOD_SHIFT)
+		{
+			if (mgIsKeyHit(c->input, MG_KEY_INSERT))
+				mgTextInput_paste(e);
+			else if (mgIsKeyHit(c->input, MG_KEY_DELETE))
+				mgTextInput_cut(e);
+		}
+
+		if (c->input->mouseButtonFlags2 & MG_MBFL_LMBDBL)
+		{
+			if ((c->clickedElements[0] == e) && (c->clickedElements[1] == e))
+			{
+				mgTextInput_selectAll(impl);
+			}
 		}
 
 		impl->textCursorRect.left = e->transformWorld.buildArea.left;

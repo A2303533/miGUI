@@ -43,11 +43,13 @@ void mgDrawPopup(struct mgContext_s* c, mgPopup* p);
 void mgUpdatePopup(struct mgContext_s* c, mgPopup* p);
 void mgDockPanelClear(struct mgContext_s* c);
 
+int g_lmbElement_oncePerFrame = 0;
+
 void 
 mgDestroyElement_internal(mgElement* e)
 {
 	assert(e);
-	for (int i = 0; i < e->childrenCount; ++i)
+	for (uint32_t i = 0; i < e->childrenCount; ++i)
 	{
 		mgDestroyElement_internal(e->children[i].pointer);
 	}
@@ -77,7 +79,7 @@ mgDestroyElement_f(mgElement* e)
 	else
 	{
 		struct mgElementNode_s* newChildren = malloc(sizeof(struct mgElementNode_s) * (parent->childrenCount - 1));
-		for (int i = 0, i2 = 0; i < parent->childrenCount; ++i)
+		for (uint32_t i = 0, i2 = 0; i < parent->childrenCount; ++i)
 		{
 			if (parent->children[i].pointer == e)
 				continue;
@@ -256,9 +258,32 @@ void
 mgUpdateElement(mgElement* e) 
 {
 	e->onUpdate(e);
-	for (int i = 0; i < e->childrenCount; ++i)
+
+	/*for (uint32_t i = 0; i < e->childrenCount; ++i)
 	{
 		mgUpdateElement(e->children[i].pointer);
+	}*/
+	if (e->childrenCount)
+	{
+		for (uint32_t i = e->childrenCount - 1; i >= 0; --i)
+		{
+			mgUpdateElement(e->children[i].pointer);
+
+			if (!i)
+				break;
+		}
+	}
+
+	if (e->cursorInRect && !g_lmbElement_oncePerFrame)
+	{
+		g_lmbElement_oncePerFrame = 1;
+		if (e->window->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+		{
+			e->window->context->clickedElements[e->window->context->clickedElementsCurrent] = e;
+			++e->window->context->clickedElementsCurrent;
+			if (e->window->context->clickedElementsCurrent == mgClickedElementsSize)
+				e->window->context->clickedElementsCurrent = 0;
+		}
 	}
 }
 
@@ -269,7 +294,7 @@ mgUpdateTransformElement(mgElement* e)
 		return;
 
 	e->onUpdateTransform(e);
-	for (int i = 0; i < e->childrenCount; ++i)
+	for (uint32_t i = 0; i < e->childrenCount; ++i)
 	{
 		mgUpdateTransformElement(e->children[i].pointer);
 	}
@@ -282,7 +307,7 @@ mgRebuildElement(mgElement* e)
 		return;*/
 
 	e->onRebuild(e);
-	for (int i = 0; i < e->childrenCount; ++i)
+	for (uint32_t i = 0; i < e->childrenCount; ++i)
 	{
 		mgRebuildElement(e->children[i].pointer);
 	}
@@ -328,8 +353,23 @@ mgUpdate_f(mgContext* c)
 	c->deltaTime = (float)(now - then) / CLOCKS_PER_SEC;
 	then = now;
 
-	c->windowUnderCursor = 0;
+	static float lmb_dbl_timer = 0.f;
+	lmb_dbl_timer += c->deltaTime;
+	if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+	{
+		++c->input->LMBClickCount;
 
+		if (c->input->mouseButtonFlags2 & MG_MBFL_LMBDBL)
+			c->input->mouseButtonFlags2 ^= MG_MBFL_LMBDBL;
+		if (c->input->LMBClickCount == 2)
+			c->input->mouseButtonFlags2 |= MG_MBFL_LMBDBL;
+
+		lmb_dbl_timer = 0.f;
+	}
+	if (lmb_dbl_timer > 0.3f)
+		c->input->LMBClickCount = 0;
+
+	c->windowUnderCursor = 0;
 	c->popupUnderCursor = 0;
 	if (c->activePopup)
 	{
@@ -346,6 +386,8 @@ mgUpdate_f(mgContext* c)
 				mgShowPopup_f(c, 0, 0);
 		}
 
+		if (!c->activeMenu)
+			return;
 	}
 
 	mgWindow* cw = c->firstWindow;
@@ -403,7 +445,7 @@ mgUpdate_f(mgContext* c)
 
 	if (c->dockPanel)
 	{
-		if (!c->windowUnderCursor)
+		if (!c->windowUnderCursor && !c->popupUnderCursor)
 			mgDockPanelUpdate(c);
 
 		if (c->activeMenu && !c->activePopup)
@@ -423,6 +465,8 @@ void MG_C_DECL
 mgStartFrame_f(mgContext* c)
 {
 	assert(c);
+
+	g_lmbElement_oncePerFrame = 0;
 	
 	c->input->mouseMoveDeltaOld = c->input->mouseMoveDelta;
 	c->input->mouseWheelDeltaOld = c->input->mouseWheelDelta;
@@ -452,6 +496,9 @@ mgStartFrame_f(mgContext* c)
 		c->input->mouseButtonFlags1 ^= MG_MBFL_X1MBUP;
 	if ((c->input->mouseButtonFlags1 & MG_MBFL_X2MBUP) == MG_MBFL_X2MBUP)
 		c->input->mouseButtonFlags1 ^= MG_MBFL_X2MBUP;
+
+	if ((c->input->mouseButtonFlags2 & MG_MBFL_LMBDBL) == MG_MBFL_LMBDBL)
+		c->input->mouseButtonFlags2 ^= MG_MBFL_LMBDBL;
 	
 	for (int i = 0; i < 256; ++i)
 	{
@@ -472,8 +519,8 @@ mgSetParent_f(mgElement* object, mgElement* parent)
 
 	if (object->parent)
 	{
-		int chCount = 0;
-		for (int i = 0; i < object->parent->childrenCount; ++i)
+		uint32_t chCount = 0;
+		for (uint32_t i = 0; i < object->parent->childrenCount; ++i)
 		{
 			if (object->parent->children[i].pointer != object)
 				++chCount;
@@ -485,8 +532,8 @@ mgSetParent_f(mgElement* object, mgElement* parent)
 		{
 			newChildren = malloc(chCount * sizeof(struct mgElementNode_s));
 
-			int i2 = 0;
-			for (int i = 0; i < object->parent->childrenCount; ++i)
+			uint32_t i2 = 0;
+			for (uint32_t i = 0; i < object->parent->childrenCount; ++i)
 			{
 				if (object->parent->children[i].pointer != object)
 				{
@@ -511,7 +558,7 @@ mgSetParent_f(mgElement* object, mgElement* parent)
 		int chCount = object->parent->childrenCount + 1;
 		struct mgElementNode_s* newChildren = malloc(chCount * sizeof(struct mgElementNode_s));
 
-		for (int i = 0; i < object->parent->childrenCount; ++i)
+		for (uint32_t i = 0; i < object->parent->childrenCount; ++i)
 		{
 			newChildren[i].pointer = object->parent->children[i].pointer;
 		}
@@ -535,7 +582,7 @@ mgSetVisible_f(mgElement* e, int v)
 {
 	assert(e);
 	e->visible = v;
-	for (int i = 0; i < e->childrenCount; ++i)
+	for (uint32_t i = 0; i < e->childrenCount; ++i)
 	{
 		mgSetVisible_f(e->children[i].pointer, v);
 	}
@@ -549,7 +596,7 @@ mgDrawElement(mgElement* e)
 
 	e->onDraw(e);
 
-	for (int i = 0; i < e->childrenCount; ++i)
+	for (uint32_t i = 0; i < e->childrenCount; ++i)
 	{
 		mgDrawElement(e->children[i].pointer);
 	}

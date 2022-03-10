@@ -51,9 +51,9 @@ miGUI_onUpdate_button(mgElement* e)
 
 	if (impl->pushButton)
 	{
-		int inRect = mgPointInRect(&e->transformWorld.clipArea, &e->window->context->input->mousePosition);
+		/*int inRect = mgPointInRect(&e->transformWorld.clipArea, &e->window->context->input->mousePosition);*/
 		
-		if ((e->window->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN) && inRect)
+		if ((e->window->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN) && e->cursorInRect)
 		{
 			if (impl->pushButtonState)
 			{

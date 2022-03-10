@@ -65,22 +65,22 @@ struct mgElementTransform_s {
 
 /* base data for all GUI widgets*/
 typedef struct mgElement_s {
-	unsigned int type; /*MG_TYPE...*/
+	uint32_t type; /*MG_TYPE...*/
 	void* implementation;
 
 	struct mgWindow_s* window;
 
-	int align; /*mgAlignment*/
+	uint32_t align; /*mgAlignment*/
 
 	int id;
 	void* userData;
 	void* userStyle;
 
-	int visible;/* != 0 - visible*/
+	uint32_t visible;/* != 0 - visible*/
 	
 	struct mgElement_s* parent;
 	struct mgElementNode_s* children;
-	int childrenCount;
+	uint32_t childrenCount;
 
 	mgRect creationRect;
 	struct mgElementTransform_s transformLocal;
@@ -114,11 +114,13 @@ typedef struct mgElement_s {
 	*  0x10 X1MB click
 	*  0x20 X2MB click
 	*/
-	int elementState;
+	uint32_t elementState;
 
 	float scrollValue;
 	float scrollValueTarget;
 	float scrollValueWorld;
+
+	uint32_t cursorInRect; /*1\0*/
 } mgElement;
 
 #include "mgElementRectangle.h"

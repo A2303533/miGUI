@@ -75,7 +75,7 @@ void mgRectSetPoint(mgRect* r, mgPoint* p1, mgPoint* p2)
 }
 
 inline
-int mgPointInRect(mgRect* r, mgPoint* p)
+unsigned int mgPointInRect(mgRect* r, mgPoint* p)
 {
 	if (p->x >= r->left) { if (p->x <= r->right) { if (p->y >= r->top) { if (p->y <= r->bottom) { return 1; } } } }
 	return 0;

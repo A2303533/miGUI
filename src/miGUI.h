@@ -557,11 +557,19 @@ struct mgFunctions_s {
 	PFNMGSETCURSORPROC SetCursor_p;
 };
 
+#define mgClickedElementsSize 2
+
 typedef struct mgContext_s {
 	mgVideoDriverAPI* gpu;
 	mgInputContext* input;
 	int needUpdateTransform;
 	int needRebuild;
+
+	/*every lmb remember element under cursor
+	* for double click
+	*/
+	mgElement* clickedElements[mgClickedElementsSize];
+	uint32_t clickedElementsCurrent;
 
 	float deltaTime;
 	mgPoint windowSize;/*system window size*/

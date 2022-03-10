@@ -62,5 +62,7 @@ MG_API mgMenu* MG_C_DECL mgCreateMenu_f(struct mgContext_s*, mgMenuItemInfo* ite
 MG_API void MG_C_DECL mgDestroyMenu_f(mgMenu* m);
 MG_API mgElement* MG_C_DECL mgCreateTextInput_f(struct mgWindow_s* w, mgRect* r, mgFont* font);
 MG_API void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory);
+MG_API void MG_C_DECL mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e);
+MG_API int MG_C_DECL mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
 
 #endif

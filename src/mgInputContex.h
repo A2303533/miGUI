@@ -160,6 +160,7 @@ enum {
 	MG_MBFL_MMBHOLD = 0x1000,
 	MG_MBFL_X1MBHOLD = 0x2000,
 	MG_MBFL_X2MBHOLD = 0x4000,
+	MG_MBFL_LMBDBL = 0x8000,
 };
 
 enum {
@@ -193,28 +194,30 @@ typedef struct mgInputContext_s {
 	float   mouseWheelDelta;
 	float   mouseWheelDeltaOld;
 
-	unsigned int mouseButtonFlags1;/*MG_MBFL...*/
-	unsigned int mouseButtonFlags2;/*MG_MBFL... HOLD*/
+	uint32_t mouseButtonFlags1;/*MG_MBFL...*/
+	uint32_t mouseButtonFlags2;/*MG_MBFL... HOLD, DOUBLE*/
+
+	uint32_t LMBClickCount;
 
 	wchar_t character;
-	unsigned char keyFlags[256]; /**/
+	uint8_t keyFlags[256]; /**/
 
-	unsigned int keyboardModifier; /*MG_KBMOD...*/
+	uint8_t keyboardModifier; /*MG_KBMOD...*/
 
 } mgInputContext;
 
 inline
-int mgIsKeyHit(mgInputContext* c, unsigned char key) {
+int mgIsKeyHit(mgInputContext* c, uint8_t key) {
 	return (c->keyFlags[key] & MG_KEYFL_HIT) == MG_KEYFL_HIT;
 }
 
 inline
-int mgIsKeyHold(mgInputContext* c, unsigned char key) {
+int mgIsKeyHold(mgInputContext* c, uint8_t key) {
 	return (c->keyFlags[key] & MG_KEYFL_HOLD) == MG_KEYFL_HOLD;
 }
 
 inline
-int mgIsKeyRelease(mgInputContext* c, unsigned char key) {
+int mgIsKeyRelease(mgInputContext* c, uint8_t key) {
 	return (c->keyFlags[key] & MG_KEYFL_RELEASE) == MG_KEYFL_RELEASE;
 }
 
