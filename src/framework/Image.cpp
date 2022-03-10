@@ -41,13 +41,77 @@ Image::Image()
 
 Image::~Image()
 {
+	Free();
+}
+
+void Image::Free()
+{
 	if (m_image)
 	{
 		if (m_image->data)
 			free(m_image->data);
 		free(m_image);
+		m_image = 0;
 	}
 }
 
+void Image::Create(uint32_t x, uint32_t y, const mgColor& c)
+{
+	Free();
+	m_image = (mgImage_s*)calloc(1, sizeof(mgImage_s));
+	m_image->width = x;
+	m_image->height = y;
+	m_image->bits = 32;
+	m_image->pitch = m_image->width * 4;
+	m_image->type = mgImageType_r8g8b8a8;
+	m_image->dataSize = m_image->pitch * m_image->height;
+	m_image->data = (unsigned char*)malloc(m_image->dataSize);
+	struct rgba
+	{
+		uint8_t r, g, b, a;
+	};
+	rgba* ptr = (rgba*)m_image->data;
+	for (uint32_t i = 0, sz = x * y; i < sz; ++i)
+	{
+		ptr->a = c.getAsByteAlpha();
+		ptr->r = c.getAsByteRed();
+		ptr->g = c.getAsByteGreen();
+		ptr->b = c.getAsByteBlue();
+		++ptr;
+	}
+}
 
+uint32_t Image::GetPitch()
+{
+	if (!m_image)
+		return 0;
+	return m_image->pitch;
+}
 
+uint32_t Image::GetWidth()
+{
+	if (!m_image)
+		return 0;
+	return m_image->width;
+}
+
+uint32_t Image::GetHeight()
+{
+	if (!m_image)
+		return 0;
+	return m_image->height;
+}
+
+uint8_t* Image::GetData()
+{
+	if (!m_image)
+		return 0;
+	return m_image->data;
+}
+
+uint32_t Image::GetDataSize()
+{
+	if (!m_image)
+		return 0;
+	return m_image->dataSize;
+}

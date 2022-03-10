@@ -44,6 +44,14 @@ namespace mgf
 		Image();
 		virtual ~Image();
 
+		void Create(uint32_t x, uint32_t y, const mgColor&);
+		void Free();
+
+		uint32_t GetPitch();
+		uint32_t GetWidth();
+		uint32_t GetHeight();
+		uint8_t* GetData();
+		uint32_t GetDataSize();
 	};
 	
 	Image* Image_bmp(const char* fn);

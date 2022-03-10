@@ -33,6 +33,7 @@
 
 #include <Windows.h>
 #include <objidl.h>
+#define GDIPVER 0x0110
 #include <gdiplus.h>
 //#pragma comment (lib,"Gdiplus.lib")
 
@@ -75,6 +76,9 @@ namespace mgf
 		mgRect m_clipRect;
 
 		void _createBackbuffer(mgf::SystemWindowImpl* impl);
+
+		Image* blackImage = 0;
+		Gdiplus::Bitmap* blackBitmap = 0;
 
 	public:
 		BackendGDI();

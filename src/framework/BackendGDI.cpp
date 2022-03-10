@@ -120,10 +120,20 @@ BackendGDI::BackendGDI()
 	((mgVideoDriverAPI*)m_gpu)->drawRectangle = BackendGDI_drawRectangle;
 	((mgVideoDriverAPI*)m_gpu)->drawText = BackendGDI_drawText;
 	((mgVideoDriverAPI*)m_gpu)->setClipRect = BackendGDI_setClipRect;
+
+	blackImage = new Image;
+	blackImage->Create(20, 20, mgColor(0xff000000));
+	blackBitmap = new Gdiplus::Bitmap(blackImage->GetWidth(), blackImage->GetHeight(), blackImage->GetPitch(), 
+		PixelFormat32bppARGB, blackImage->GetData());
 }
 
 BackendGDI::~BackendGDI()
 {
+	if (blackBitmap)
+		delete blackBitmap;
+	if (blackImage)
+		delete blackImage;
+
 	if (m_defaultFont)
 		m_defaultFont->Release();
 
@@ -259,6 +269,39 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 		SelectClipRgn(m_window->m_hdcMem, rgn);
 		FillRect(m_window->m_hdcMem, &r, brsh);
 	}break;
+	case mgDrawRectangleReason_popupBG:
+	{
+		{
+			Gdiplus::Rect gdirct;
+			gdirct.X = rct->left + m_window->m_borderSize.x;
+			gdirct.Y = rct->top + m_window->m_borderSize.y;
+			gdirct.Width = rct->right - rct->left + 5;
+			gdirct.Height = rct->bottom - rct->top + 4;
+
+			Gdiplus::BlurParams blurParams;
+			blurParams.radius = 2;
+			blurParams.expandEdge = 0;
+			Gdiplus::Blur blur;
+			blur.SetParameters(&blurParams);
+			RECT rectOfInterest = { -1, -1, 21, 21 };
+
+			Gdiplus::Bitmap* outputBitmap = NULL;
+			Gdiplus::Bitmap::ApplyEffect(&blackBitmap, 1, &blur, &rectOfInterest, 0, &outputBitmap);
+
+			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
+			auto status = graphics.DrawImage(outputBitmap, gdirct,
+				-1, -1, 21, 21, Gdiplus::UnitPixel);
+			delete outputBitmap;
+		}
+		
+		rgn = CreateRectRgn(
+				m_clipRect.left + m_window->m_borderSize.x,
+				m_clipRect.top + m_window->m_borderSize.y,
+				m_clipRect.right + m_window->m_borderSize.x,
+				m_clipRect.bottom + m_window->m_borderSize.y);
+			SelectClipRgn(m_window->m_hdcMem, rgn);
+		FillRect(m_window->m_hdcMem, &r, brsh);
+	}break;
 	case mgDrawRectangleReason_windowCloseButton:
 	case mgDrawRectangleReason_windowCollapseButton:
 	case mgDrawRectangleReason_buttonIcon:
@@ -273,7 +316,6 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			gdirct.Height = rct->bottom - rct->top;
 			
 			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
-
 			auto status = graphics.DrawImage((Gdiplus::Bitmap*)texture->implementation, gdirct,
 				m_context->m_gui_context->currentIcon.left,
 				m_context->m_gui_context->currentIcon.top,

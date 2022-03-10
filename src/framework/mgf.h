@@ -30,6 +30,8 @@
 #ifndef _MG_FRAMEWORK_H_
 #define _MG_FRAMEWORK_H_
 
+#include <stdint.h>
+
 #include "config.h"
 
 #include "mgDefs.h"
