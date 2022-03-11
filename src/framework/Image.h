@@ -47,6 +47,8 @@ namespace mgf
 		void Create(uint32_t x, uint32_t y, const mgColor&);
 		void Free();
 
+		void Fill(const mgColor&);
+
 		uint32_t GetPitch();
 		uint32_t GetWidth();
 		uint32_t GetHeight();

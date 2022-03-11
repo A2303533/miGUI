@@ -55,6 +55,23 @@ void Image::Free()
 	}
 }
 
+void Image::Fill(const mgColor& c)
+{
+	struct rgba
+	{
+		uint8_t r, g, b, a;
+	};
+	rgba* ptr = (rgba*)m_image->data;
+	for (uint32_t i = 0, sz = m_image->width * m_image->height; i < sz; ++i)
+	{
+		ptr->a = c.getAsByteAlpha();
+		ptr->r = c.getAsByteRed();
+		ptr->g = c.getAsByteGreen();
+		ptr->b = c.getAsByteBlue();
+		++ptr;
+	}
+}
+
 void Image::Create(uint32_t x, uint32_t y, const mgColor& c)
 {
 	Free();
@@ -66,19 +83,7 @@ void Image::Create(uint32_t x, uint32_t y, const mgColor& c)
 	m_image->type = mgImageType_r8g8b8a8;
 	m_image->dataSize = m_image->pitch * m_image->height;
 	m_image->data = (unsigned char*)malloc(m_image->dataSize);
-	struct rgba
-	{
-		uint8_t r, g, b, a;
-	};
-	rgba* ptr = (rgba*)m_image->data;
-	for (uint32_t i = 0, sz = x * y; i < sz; ++i)
-	{
-		ptr->a = c.getAsByteAlpha();
-		ptr->r = c.getAsByteRed();
-		ptr->g = c.getAsByteGreen();
-		ptr->b = c.getAsByteBlue();
-		++ptr;
-	}
+	Fill(c);
 }
 
 uint32_t Image::GetPitch()

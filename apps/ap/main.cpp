@@ -78,7 +78,7 @@ int main()
 		);
 
 		fontImpact = context.m_data->GetBackend()->CreateFont(L"Impact", 20, true, false);
-		popupFont = context.m_data->GetBackend()->CreateFont(L"Arial", 8, true, false);
+		popupFont = context.m_data->GetBackend()->CreateFont(L"Arial", 9, false, false);
 		context.m_data->SetDefaultPopupFont(popupFont.m_data);
 
 		context.m_data->GetSystemWindow()->SetOnClose(window_OnClose);
@@ -131,7 +131,7 @@ int main()
 		}
 
 		auto textInput = window.m_data->AddTextInput(fontImpact.m_data);
-		textInput->SetRect(0, 200, 500, 250);
+		textInput->SetRect(50, 200, 500, 250);
 		textInput->SetText(L"Hello world");
 
 		// also rebuild all gui

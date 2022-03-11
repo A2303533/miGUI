@@ -82,6 +82,8 @@ typedef struct mgElementTextInput_s {
 
 	struct mgPopup_s* rightClickPopup;
 
+	uint32_t charIndexUnderCursor;
+
 } mgElementTextInput;
 
 

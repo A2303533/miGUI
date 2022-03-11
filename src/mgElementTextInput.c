@@ -203,7 +203,7 @@ mgTextInputSetText_reallocate(struct mgElementTextInput_s* e, int newSize)
 	{
 		newBuffer[i] = e->text[i];
 	}
-	newBuffer[newSize] = 0;
+	newBuffer[e->textLen] = 0;
 	e->allocated = newSize;
 	free(e->text);
 	e->text = newBuffer;
@@ -356,7 +356,7 @@ mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32
 	w = pt.x;
 
 	uint32_t newLen = e->textLen + len;
-	if ((newLen + 1) > e->allocated)
+	if (newLen > e->allocated)
 		mgTextInputSetText_reallocate(e, newLen);
 
 	uint32_t i = e->textLen;
@@ -802,6 +802,37 @@ miGUI_onUpdate_textinput(mgElement* e)
 				mgTextInput_cut(e);
 		}
 
+		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+		{
+			impl->textCursor = impl->charIndexUnderCursor;
+			impl->textCursorTimer = 0.f;
+			impl->drawTextCursor = 1;
+			if (c->input->keyboardModifier != MG_KBMOD_SHIFT)
+			{
+				mgTextInputDeselect(impl);
+				impl->selectionStart = impl->textCursor;
+				impl->selectionEnd = impl->textCursor;
+			}
+			else
+			{
+				impl->selectionEnd = impl->textCursor;
+				if (impl->selectionEnd != impl->selectionStart)
+					impl->isSelected = 1;
+				else
+					impl->isSelected = 0;
+			}
+		}
+
+		if (c->input->mouseButtonFlags2 & MG_MBFL_LMBHOLD)
+		{
+			if (c->input->mouseMoveDelta.x || c->input->mouseMoveDelta.y)
+			{
+				impl->textCursor = impl->charIndexUnderCursor;
+				impl->selectionEnd = impl->textCursor;
+				impl->isSelected = 1;
+			}
+		}
+
 		if (c->input->mouseButtonFlags2 & MG_MBFL_LMBDBL)
 		{
 			if ((c->clickedElements[0] == e) && (c->clickedElements[1] == e))
@@ -810,7 +841,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 			}
 		}
 
-		impl->textCursorRect.left = e->transformWorld.buildArea.left;
+		impl->textCursorRect.left = 0;
 		impl->textCursorRect.top = e->transformWorld.buildArea.top;
 		impl->textCursorRect.right = impl->textCursorRect.left + 2;
 		impl->textCursorRect.bottom = impl->textCursorRect.top + impl->font->maxSize.y;
@@ -889,6 +920,7 @@ miGUI_onDraw_textinput(mgElement* e)
 			impl, &e->transformWorld.buildArea, c, c, 0, 0);
 	}
 
+	impl->charIndexUnderCursor = 0;
 
 	if (impl->text && impl->textLen)
 	{
@@ -902,7 +934,6 @@ miGUI_onDraw_textinput(mgElement* e)
 			mgPoint pos;
 			pos.x = e->transformWorld.buildArea.left - (int)impl->h_scrollCurr;
 			pos.y = e->transformWorld.buildArea.top;
-
 			mgRect rect;
 			for (uint32_t i = 0; i < impl->textLen; ++i)
 			{
@@ -961,8 +992,31 @@ miGUI_onDraw_textinput(mgElement* e)
 					&style->textInputDefaultText,
 					impl->font);
 
+				{
+					uint32_t rw = rect.right - rect.left;
+					uint32_t halfw = rw / 2;
+					mgRect r1, r2;
+					r1 = rect;
+					r2 = rect;
+					r1.right = r1.right - halfw;
+					r2.left = r2.left + halfw;
+					
+					if (e->window->context->input->mousePosition.x >= r1.left
+						&& e->window->context->input->mousePosition.x < r1.right)
+						impl->charIndexUnderCursor = i;
+					else if (e->window->context->input->mousePosition.x >= r2.left
+						&& e->window->context->input->mousePosition.x < r2.right)
+						impl->charIndexUnderCursor = i+1;
+				}
+
 				if (i == impl->textCursor)
 					impl->textCursorPosition = pos2;
+			}
+
+			if (!impl->charIndexUnderCursor)
+			{
+				if (e->window->context->input->mousePosition.x > pos.x)
+					impl->charIndexUnderCursor = impl->textLen;
 			}
 
 			if(impl->textCursor == impl->textLen)

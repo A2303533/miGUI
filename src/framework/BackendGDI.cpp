@@ -122,7 +122,7 @@ BackendGDI::BackendGDI()
 	((mgVideoDriverAPI*)m_gpu)->setClipRect = BackendGDI_setClipRect;
 
 	blackImage = new Image;
-	blackImage->Create(20, 20, mgColor(0xff000000));
+	blackImage->Create(20, 20, mgColor(0xff020202));
 	blackBitmap = new Gdiplus::Bitmap(blackImage->GetWidth(), blackImage->GetHeight(), blackImage->GetPitch(), 
 		PixelFormat32bppARGB, blackImage->GetData());
 }
@@ -285,13 +285,23 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			blur.SetParameters(&blurParams);
 			RECT rectOfInterest = { -1, -1, 21, 21 };
 
-			Gdiplus::Bitmap* outputBitmap = NULL;
-			Gdiplus::Bitmap::ApplyEffect(&blackBitmap, 1, &blur, &rectOfInterest, 0, &outputBitmap);
+			Gdiplus::Bitmap* outputBitmapBlur = NULL;
+			Gdiplus::Bitmap::ApplyEffect(&blackBitmap, 1, &blur, &rectOfInterest, 0, &outputBitmapBlur);
+
+			Gdiplus::BrightnessContrastParams brtParams;
+			brtParams.brightnessLevel = 100;
+			brtParams.contrastLevel = 1;
+			Gdiplus::BrightnessContrast brt;
+			brt.SetParameters(&brtParams);
+			Gdiplus::Bitmap* outputBitmapBlurAndBrt = NULL;
+			Gdiplus::Bitmap::ApplyEffect(&outputBitmapBlur, 1, &brt, &rectOfInterest, 0, &outputBitmapBlurAndBrt);
 
 			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
-			auto status = graphics.DrawImage(outputBitmap, gdirct,
+			auto status = graphics.DrawImage(outputBitmapBlurAndBrt, gdirct,
 				-1, -1, 21, 21, Gdiplus::UnitPixel);
-			delete outputBitmap;
+			delete outputBitmapBlur;
+			delete outputBitmapBlurAndBrt;
+
 		}
 		
 		rgn = CreateRectRgn(
