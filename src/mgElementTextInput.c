@@ -650,7 +650,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 	{
 		mgSetCursor_f(c, c->defaultCursors[mgCursorType_IBeam], mgCursorType_Arrow);
 
-		if (impl->canEdit)
+		if (e->enabled)
 		{
 			if ((c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 				|| (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
@@ -667,7 +667,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 		if (e->elementState & 0x1)
 			mgSetCursor_f(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
-		if (impl->canEdit)
+		if (e->enabled)
 		{
 			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 			{
@@ -909,7 +909,7 @@ miGUI_onDraw_textinput(mgElement* e)
 
 	ctx->gpu->setClipRect(&e->transformWorld.clipArea);
 
-	if (impl->drawBG)
+	if (e->drawBG)
 	{
 		mgColor* c = &style->textInputBGNotActive;
 
@@ -1071,18 +1071,24 @@ miGUI_onRebuild_textinput(mgElement* e) {
 
 MG_API
 mgElement* MG_C_DECL
-mgCreateTextInput_f(struct mgWindow_s* w, mgRect* r, mgFont* font)
+mgCreateTextInput_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFont* font)
 {
 	assert(w);
-	assert(r);
+	assert(position);
+	assert(size);
 	assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
 	newElement->type = MG_TYPE_TEXTINPUT;
 	
-	newElement->transformLocal.buildArea = *r;
+	newElement->transformLocal.buildArea.left = position->x;
+	newElement->transformLocal.buildArea.top = position->y;
+	newElement->transformLocal.buildArea.right = position->x + size->x;
+	newElement->transformLocal.buildArea.bottom = position->y + size->y;
 	newElement->transformLocal.clipArea = newElement->transformLocal.buildArea;
 	newElement->creationRect = newElement->transformLocal.buildArea;
 	
+	newElement->drawBG = 1;
+	newElement->enabled = 1;
 	newElement->window = w;
 	newElement->visible = 1;
 	newElement->onDraw = miGUI_onDraw_textinput;
@@ -1093,10 +1099,9 @@ mgCreateTextInput_f(struct mgWindow_s* w, mgRect* r, mgFont* font)
 	newElement->implementation = calloc(1, sizeof(mgElementTextInput));
 	mgElementTextInput* impl = (mgElementTextInput*)newElement->implementation;
 	impl->font = font;
-	impl->drawBG = 1;
 	impl->defaultText = L"Click...";
 	impl->defaultTextLen = 9;
-	impl->canEdit = 1;
+	impl->canSelect = 1;
 	impl->textCursorTimerLimit = 0.5f;
 	impl->element = newElement;
 	impl->rightClickPopup = mgGetDefaultPopupTextInput(w->context);

@@ -29,6 +29,7 @@
     <ClCompile Include="..\..\src\framework\Image.cpp" />
     <ClCompile Include="..\..\src\framework\Image_bmp.cpp" />
     <ClCompile Include="..\..\src\framework\Image_png.cpp" />
+    <ClCompile Include="..\..\src\framework\ListBox.cpp" />
     <ClCompile Include="..\..\src\framework\lodepng.cpp" />
     <ClCompile Include="..\..\src\framework\Rectangle.cpp" />
     <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp" />

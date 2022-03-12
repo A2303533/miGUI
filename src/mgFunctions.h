@@ -60,10 +60,11 @@ MG_API mgIcons* MG_C_DECL mgCreateIcons_f(mgTexture* t, int textureSizeX, int te
 MG_API void MG_C_DECL mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy);
 MG_API mgMenu* MG_C_DECL mgCreateMenu_f(struct mgContext_s*, mgMenuItemInfo* items, int itemsSize, mgFont* f);
 MG_API void MG_C_DECL mgDestroyMenu_f(mgMenu* m);
-MG_API mgElement* MG_C_DECL mgCreateTextInput_f(struct mgWindow_s* w, mgRect* r, mgFont* font);
+MG_API mgElement* MG_C_DECL mgCreateTextInput_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFont* font);
 MG_API void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory);
 MG_API void MG_C_DECL mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e);
 MG_API int MG_C_DECL mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
 struct mgPopup_s* mgGetDefaultPopupTextInput(mgContext* c);
+MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* array, uint32_t arraySize, uint32_t dataTypeSizeOf);
 
 #endif

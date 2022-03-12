@@ -41,10 +41,10 @@ TextInput::TextInput(Window* w, Font* f)
 	assert(w);
 	assert(f);
 
-	mgRect r;
-	mgRectSet(&r, 0, 0, 0, 0);
+	mgPoint p;
+	mgPointSet(&p, 0, 0);
 
-	m_element = mgCreateTextInput(w->m_window, &r, ((FontImpl*)f)->m_font);
+	m_element = mgCreateTextInput(w->m_window, &p, &p, ((FontImpl*)f)->m_font);
 	m_elementText = (mgElementTextInput_s*)m_element->implementation;
 
 	Element::PostInit();

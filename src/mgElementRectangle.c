@@ -185,12 +185,18 @@ miGUI_onUpdateTransform_rectangle(mgElement* e)
 		e->transformWorld.clipArea.right = e->parent->transformWorld.clipArea.right;
 	if (e->transformWorld.clipArea.bottom > e->parent->transformWorld.clipArea.bottom)
 		e->transformWorld.clipArea.bottom = e->parent->transformWorld.clipArea.bottom;
+
+	e->clientHeight = e->transformWorld.buildArea.bottom - e->transformWorld.buildArea.top;
+	e->contentHeight = 0;
 }
 
 void 
 miGUI_onUpdate_rectangle(mgElement* e)
 {
 	e->cursorInRect = mgPointInRect(&e->transformWorld.clipArea, &e->window->context->input->mousePosition);
+
+	if (!e->enabled)
+		goto end;
 
 	if (e->cursorInRect)
 	{
@@ -304,6 +310,7 @@ miGUI_onUpdate_rectangle(mgElement* e)
 			e->elementState ^= 0x20;
 	}
 
+end:;
 	if (e->cursorInRect)
 		e->elementState |= 0x1;
 	else if(e->elementState & 0x1)
@@ -348,6 +355,8 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgCo
 	newElement->window = w;
 
 	newElement->visible = 1;
+	newElement->drawBG = 1;
+	newElement->enabled = 1;
 	newElement->onDraw = miGUI_onDraw_rectangle;
 	newElement->onUpdate = miGUI_onUpdate_rectangle;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_rectangle;

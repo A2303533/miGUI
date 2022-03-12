@@ -66,5 +66,6 @@ struct mgFunctions_s;
 struct mgContext_s;
 struct mgTexture_s;
 struct mgElementTextInput_s;
+struct mgElementList_s;
 
 #endif

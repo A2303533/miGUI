@@ -45,6 +45,7 @@ namespace mgf
 	class Icons;
 	class Image;
 	class TextInput;
+	class ListBox;
 }
 
 #endif

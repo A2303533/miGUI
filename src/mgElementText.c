@@ -94,21 +94,17 @@ mgCreateText_f(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgF
 	mgElement* newElement = calloc(1, sizeof(mgElement));
 	newElement->type = MG_TYPE_TEXT;
 	
-	/*newElement->buildArea.left = position->x;
-	newElement->buildArea.top = position->y;
-	newElement->buildArea.right = position->x;
-	newElement->buildArea.bottom = position->y;
-	newElement->clipArea = newElement->buildArea;*/
 	newElement->transformLocal.buildArea.left = position->x;
 	newElement->transformLocal.buildArea.top = position->y;
 	newElement->transformLocal.buildArea.right = position->x;
 	newElement->transformLocal.buildArea.bottom = position->y;
 	newElement->transformLocal.clipArea = newElement->transformLocal.buildArea;
-	/*newElement->transformLocal.sz = *size;*/
 	newElement->creationRect = newElement->transformLocal.buildArea;
 	
 	newElement->window = w;
 	newElement->visible = 1;
+	newElement->drawBG = 1;
+	newElement->enabled = 1;
 	newElement->onDraw = miGUI_onDraw_text;
 	newElement->onUpdate = miGUI_onUpdate_text;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_text;

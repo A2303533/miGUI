@@ -27,8 +27,8 @@
 */
 
 #pragma once
-#ifndef _MGF_BUTTON_H_
-#define _MGF_BUTTON_H_
+#ifndef _MGF_LISTBOX_H_
+#define _MGF_LISTBOX_H_
 
 #include "Rectangle.h"
 
@@ -36,26 +36,28 @@
 
 namespace mgf
 {
-	class Button : public Element
+	enum ListBoxFlag
 	{
-		mgElementButton_s* m_elementButton = 0;
-		std::wstring m_text;
-		Icons* m_icons = 0;
+		ListBoxFlag_select = 0x1,
+	};
+
+	class ListBox : public Element
+	{
+		mgElementList_s* m_elementList = 0;
 	public:
-		Button(Window* w);
-		virtual ~Button();
+		ListBox(Window* w, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font*);
+		virtual ~ListBox();
 
-		virtual void SetText(const wchar_t*);
-		virtual void SetAsPush(bool);
-		
-		virtual void SetIcons(
-			Icons*, 
-			int id1, //default
-			int id2, //hover
-			int id3, //push
-			int id4  //disabled
-		);
+		virtual void SetMultiselect(bool);
 
+		// Only for NOT multiselect
+		virtual void SetCurSel(uint32_t);
+		virtual uint32_t GetCurSel();
+
+		virtual uint32_t GetArraySize();
+
+		virtual void SetFont(Font*);
+		virtual void SetItemHeight(uint32_t);
 	};
 }
 

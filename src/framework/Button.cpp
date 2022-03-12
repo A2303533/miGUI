@@ -53,9 +53,6 @@ Button::Button(Window* w)
 
 Button::~Button()
 {
-	if (m_userStyle)
-		delete m_userStyle;
-
 	if (m_element)
 		mgDestroyElement(m_element);
 }
@@ -76,74 +73,9 @@ void Button::SetText(const wchar_t* t)
 	}
 }
 
-void Button::SetEnabled(bool v)
-{
-	m_elementButton->enabled = (int)v;
-}
-
-void Button::SetDrawBG(bool v)
-{
-	m_elementButton->drawBG = (int)v;
-}
-
 void Button::SetAsPush(bool v)
 {
 	m_elementButton->pushButton = (int)v;
-}
-
-mgStyle_s* Button::GetStyle()
-{
-	if (!m_userStyle)
-	{
-		m_userStyle = new mgStyle_s;
-		mgInitStyleLight(m_userStyle);
-		m_element->userStyle = m_userStyle;
-	}
-	return m_userStyle;
-}
-
-void Button::SetColorBG(int argb1, int argb2)
-{
-	mgColorSetAsIntegerARGB(&GetStyle()->button1, argb1);
-	mgColorSetAsIntegerARGB(&GetStyle()->button2, argb2);
-}
-
-void Button::SetColorBGHover(int argb1, int argb2)
-{
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonHover1, argb1);
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonHover1, argb2);
-}
-
-void Button::SetColorBGPush(int argb1, int argb2)
-{
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonPress1, argb1);
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonPress1, argb2);
-}
-
-void Button::SetColorBGDisable(int argb1, int argb2)
-{
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonDisabled1, argb1);
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonDisabled1, argb2);
-}
-
-void Button::SetTextColor(int argb)
-{
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonText, argb);
-}
-
-void Button::SetTextColorHover(int argb)
-{
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextHover, argb);
-}
-
-void Button::SetTextColorPush(int argb)
-{
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextPress, argb);
-}
-
-void Button::SetTextColorDisable(int argb)
-{
-	mgColorSetAsIntegerARGB(&GetStyle()->buttonTextDisabled, argb);
 }
 
 void Button::SetIcons(

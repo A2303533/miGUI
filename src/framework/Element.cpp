@@ -254,3 +254,23 @@ void Element::SetUserStyle(mgStyle_s* s)
 	m_element->userStyle = s;
 }
 
+void Element::SetDrawBG(bool v)
+{
+	m_element->drawBG = v ? 1 : 0;
+}
+
+bool Element::IsDrawBG()
+{
+	return m_element->drawBG;
+}
+
+void Element::SetEnabled(bool v)
+{
+	m_element->enabled = v ? 1 : 0;
+}
+
+bool Element::IsEnabled()
+{
+	return m_element->enabled;
+}
+

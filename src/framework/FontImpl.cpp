@@ -43,3 +43,8 @@ FontImpl::~FontImpl()
 {
 	m_backend->DestroyFont(this);
 }
+
+mgPoint FontImpl::GetMaxSize()
+{
+	return m_font->maxSize;
+}

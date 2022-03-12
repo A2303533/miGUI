@@ -74,6 +74,12 @@ namespace mgf
 		
 		virtual void SetID(int);
 		virtual int GetID();
+		
+		virtual void SetDrawBG(bool);
+		virtual bool IsDrawBG();
+
+		virtual void SetEnabled(bool);
+		virtual bool IsEnabled();
 
 		virtual void SetRect(mgRect*);
 		virtual void SetRect(int left, int top, int right, int bottom);

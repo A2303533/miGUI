@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2022 Basov Artyom
+  Copyright (C) 2021 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -27,36 +27,33 @@
 */
 
 #pragma once
-#ifndef _MGF_BUTTON_H_
-#define _MGF_BUTTON_H_
+#ifndef _MG_ELEMENTLIST_H_
+#define _MG_ELEMENTLIST_H_
 
-#include "Rectangle.h"
-
-#include <string>
-
-namespace mgf
-{
-	class Button : public Element
-	{
-		mgElementButton_s* m_elementButton = 0;
-		std::wstring m_text;
-		Icons* m_icons = 0;
-	public:
-		Button(Window* w);
-		virtual ~Button();
-
-		virtual void SetText(const wchar_t*);
-		virtual void SetAsPush(bool);
+typedef struct mgElementList_s {
+	uint32_t isSelected;
+	uint32_t curSel;
+	uint32_t multiselect;/*0*/
 		
-		virtual void SetIcons(
-			Icons*, 
-			int id1, //default
-			int id2, //hover
-			int id3, //push
-			int id4  //disabled
-		);
+	void* array;
+	uint32_t arraySize;
 
-	};
-}
+	uint32_t firstItemIndexForDraw;/*internal*/
+	uint32_t numOfLines;/*internal*/
+	int32_t itemHeight;
+	struct mgFont_s* font;
+
+	float itemScrollValue;
+	float itemScrollValueTarget;
+	float itemScrollValueWorld;
+
+	uint32_t dataTypeSizeOf;
+	uint8_t* hoverItem;
+
+	/*return 1 if need to select*/
+	int(*onSelect)(struct mgElement_s* e);
+} mgElementList;
+
+
 
 #endif

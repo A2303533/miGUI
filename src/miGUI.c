@@ -150,6 +150,10 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->textInputCursor, 0xffffff);
 	mgColorSetAsIntegerRGB(&s->textInputSelectionBGActive, 0x009BFF);
 	mgColorSetAsIntegerRGB(&s->textInputSelectionBGNotActive, 0x888888);
+	mgColorSetAsIntegerRGB(&s->listBG, 0x888888);
+	mgColorSetAsIntegerRGB(&s->listItemText, 0x0);
+	mgColorSetAsIntegerRGB(&s->listItemHoverBG, 0xC1C1C1);
+	mgColorSetAsIntegerRGB(&s->listItemSelectedBG, 0x009BFF);
 }
 
 MG_API 

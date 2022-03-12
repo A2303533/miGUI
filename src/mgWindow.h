@@ -103,8 +103,8 @@ typedef struct mgWindow_s {
 	struct mgDockPanelWindow_s* dockPanelWindow;
 	mgRect dockPanelTabRect;
 
-	int contentHeight;
 	int scrollbarWidth;
+	int contentHeight;
 	int clientHeight;
 	mgRect scrollbarBGRect;
 	mgRect scrollbarElementRect;

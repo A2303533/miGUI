@@ -657,7 +657,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         mgPointSet(&pos, 100, 120);
         eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Save dock", g_win32font);
         eb->onClickLMB = saveDock;
-        ((mgElementButton*)eb->implementation)->enabled = 0;
+        eb->enabled = 0;
 
         mgPointSet(&pos, 100, 160);
         eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Load dock", g_win32font);

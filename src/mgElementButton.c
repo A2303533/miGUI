@@ -46,7 +46,7 @@ void
 miGUI_onUpdate_button(mgElement* e)
 {
 	mgElementButton* impl = (mgElementButton*)e->implementation;
-	if(impl->enabled)
+	if(e->enabled)
 		miGUI_onUpdate_rectangle(e);
 
 	if (impl->pushButton)
@@ -82,7 +82,7 @@ miGUI_onDraw_button(mgElement* e)
 	if(!e->userStyle)
 		style = e->window->context->activeStyle;
 
-	if (impl->enabled)
+	if (e->enabled)
 	{
 		if (impl->pushButton)
 		{
@@ -138,7 +138,7 @@ miGUI_onDraw_button(mgElement* e)
 		iconID = impl->iconID_disable;
 	}
 
-	if (impl->drawBG)
+	if (e->drawBG)
 	{
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 		e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG,
@@ -148,7 +148,7 @@ miGUI_onDraw_button(mgElement* e)
 
 	if (impl->icons)
 	{
-		if (!impl->drawBG)
+		if (!e->drawBG)
 			e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 
 		e->window->context->currentIcon.left = impl->icons->iconNodes[iconID].lt.x;
@@ -165,7 +165,7 @@ miGUI_onDraw_button(mgElement* e)
 
 	if (impl->text && impl->textLen)
 	{
-		if (impl->enabled)
+		if (e->enabled)
 		{
 			if (e->elementState & 0x1)
 				impl->textColorFinal = style->buttonTextHover;
@@ -238,6 +238,8 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const w
 	
 	newElement->window = w;
 	newElement->visible = 1;
+	newElement->enabled = 1;
+	newElement->drawBG = 1;
 	newElement->onDraw = miGUI_onDraw_button;
 	newElement->onUpdate = miGUI_onUpdate_button;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_button;
@@ -245,8 +247,6 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const w
 
 	newElement->implementation = calloc(1, sizeof(mgElementButton));
 	mgElementButton* impl = (mgElementButton*)newElement->implementation;
-	impl->enabled = 1;
-	impl->drawBG = 1;
 	
 	impl->font = font;
 	impl->text = text;

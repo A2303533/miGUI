@@ -44,6 +44,7 @@ namespace mgf
 		friend class Rectangle;
 		friend class Button;
 		friend class TextInput;
+		friend class ListBox;
 
 		mgWindow_s* m_window = 0;
 		std::basic_string<wchar_t> m_title;
@@ -75,6 +76,15 @@ namespace mgf
 		Text* AddText(int x, int y, const wchar_t* text, Font*);
 		Button* AddButton();
 		TextInput* AddTextInput(Font*);
+
+		/*
+		* arr - user data type.
+		* first field must be a const wchar_t* for text
+		* if multiselect then second field must be a uint32_t for flags:
+		*  flags:
+		*		0x1 - selected or not
+		*/
+		ListBox* AddListBox(void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font*);
 
 		void UpdateRect();
 

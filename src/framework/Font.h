@@ -35,7 +35,7 @@ namespace mgf
 	class Font : public BaseClass
 	{
 	public:
-
+		virtual mgPoint GetMaxSize() = 0;
 	};
 }
 

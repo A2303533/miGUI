@@ -26,37 +26,64 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MGF_BUTTON_H_
-#define _MGF_BUTTON_H_
+#include "miGUI.h"
 
-#include "Rectangle.h"
+#include "framework/mgf.h"
+#include "framework/Window.h"
+#include "framework/Font.h"
+#include "framework/FontImpl.h"
+#include "framework/ListBox.h"
 
-#include <string>
+using namespace mgf;
 
-namespace mgf
+extern Backend* g_backend;
+
+ListBox::ListBox(Window* w, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font* f)
 {
-	class Button : public Element
-	{
-		mgElementButton_s* m_elementButton = 0;
-		std::wstring m_text;
-		Icons* m_icons = 0;
-	public:
-		Button(Window* w);
-		virtual ~Button();
-
-		virtual void SetText(const wchar_t*);
-		virtual void SetAsPush(bool);
-		
-		virtual void SetIcons(
-			Icons*, 
-			int id1, //default
-			int id2, //hover
-			int id3, //push
-			int id4  //disabled
-		);
-
-	};
+	mgPoint p;
+	mgPointSet(&p, 0, 0);
+	
+	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
+	m_element = mgCreateListBox(w->m_window, &p, &p, arr, arrSz, dataTypeSizeOf);
+	m_elementList = (mgElementList*)m_element->implementation;
+	this->SetFont(f);
+	Element::PostInit();
 }
 
-#endif
+ListBox::~ListBox()
+{
+	if (m_element)
+		mgDestroyElement(m_element);
+}
+
+void ListBox::SetMultiselect(bool v)
+{
+	m_elementList->multiselect = (int)v;
+}
+
+void ListBox::SetCurSel(uint32_t c)
+{
+	m_elementList->curSel = c;
+}
+uint32_t ListBox::GetCurSel()
+{
+	return m_elementList->curSel;
+}
+
+uint32_t ListBox::GetArraySize()
+{
+	return m_elementList->arraySize;
+}
+
+void ListBox::SetFont(Font* f)
+{
+	m_elementList->font = ((FontImpl*)f)->m_font;
+}
+
+void ListBox::SetItemHeight(uint32_t i)
+{
+	m_elementList->itemHeight = i;
+}
+
+
+

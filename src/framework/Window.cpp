@@ -34,6 +34,7 @@
 #include "framework/Text.h"
 #include "framework/Button.h"
 #include "framework/TextInput.h"
+#include "framework/ListBox.h"
 
 using namespace mgf;
 
@@ -256,3 +257,9 @@ TextInput* Window::AddTextInput(Font* f)
 	return e;
 }
 
+ListBox* Window::AddListBox(void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font* f)
+{
+	ListBox* e = new ListBox(this, arr, arrSz, dataTypeSizeOf, f);
+	m_elements.emplace_back(e);
+	return e;
+}

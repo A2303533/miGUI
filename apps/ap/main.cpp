@@ -7,6 +7,7 @@
 #include "framework/Button.h"
 #include "framework/Icons.h"
 #include "framework/TextInput.h"
+#include "framework/ListBox.h"
 #include <stdio.h>
 
 #define AP_PLAYLISTAREASIZE 180
@@ -65,6 +66,7 @@ int main()
 	mgf::Ptr<mgf::Window> window = 0;
 	mgf::Ptr<mgf::Font> fontImpact = 0;
 	mgf::Ptr<mgf::Font> popupFont = 0;
+	mgf::Ptr<mgf::Font> listboxFont = 0;
 	mgf::Ptr<mgf::Icons> icons = 0;
 	try
 	{
@@ -79,6 +81,7 @@ int main()
 
 		fontImpact = context.m_data->GetBackend()->CreateFont(L"Impact", 20, true, false);
 		popupFont = context.m_data->GetBackend()->CreateFont(L"Arial", 9, false, false);
+		listboxFont = context.m_data->GetBackend()->CreateFont(L"Arial", 9, false, false);
 		context.m_data->SetDefaultPopupFont(popupFont.m_data);
 
 		context.m_data->GetSystemWindow()->SetOnClose(window_OnClose);
@@ -100,7 +103,6 @@ int main()
 			context.m_data->GetSystemWindow()->GetSize().x, 
 			context.m_data->GetSystemWindow()->GetSize().y);
 		
-		//context.m_data->CreateWindow();
 
 		g_data.mainWindow = window.m_data;
 
@@ -130,9 +132,34 @@ int main()
 			g_data.buttonNewPlaylist->SetIcons(icons.m_data, iconID1, iconID2, iconID1, iconID1);
 		}
 
-		auto textInput = window.m_data->AddTextInput(fontImpact.m_data);
+		auto window2 = context.m_data->CreateWindow();
+		/*auto textInput = window.m_data->AddTextInput(fontImpact.m_data);
 		textInput->SetRect(50, 200, 500, 250);
-		textInput->SetText(L"Hello world");
+		textInput->SetText(L"Hello world");*/
+
+		struct lbData
+		{
+			const wchar_t* text = 0;
+			uint32_t flags = 0; /*0x1 - selected or not*/
+			std::string someData;
+		};
+		lbData listboxData[] =
+		{
+			{L"Item1", 0, "string"},
+			{L"Item2", mgf::ListBoxFlag_select, "string"},
+			{L"Item3", mgf::ListBoxFlag_select, "string"},
+			{L"Item4", 0, "string"},
+			{L"Item5", 0, "string"},
+			{L"Item6", 0, "string"},
+			{L"Item7", 0, "string"},
+			{L"Item8", 0, "string"},
+			{L"Item9", 0, "string"},
+			{L"Item10", 0, "string"},
+		};
+		auto list = window2->AddListBox(listboxData, 10, sizeof(lbData), listboxFont.m_data);
+		list->SetRect(50, 50, 200, 300);
+		list->SetItemHeight(listboxFont.m_data->GetMaxSize().y);
+		list->SetMultiselect(true);
 
 		// also rebuild all gui
 		context.m_data->GetSystemWindow()->OnSize();

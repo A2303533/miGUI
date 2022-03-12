@@ -48,6 +48,7 @@ enum {
 	MG_TYPE_TEXT,
 	MG_TYPE_BUTTON,
 	MG_TYPE_TEXTINPUT,
+	MG_TYPE_LIST,
 };
 
 struct mgElement_s;
@@ -77,6 +78,8 @@ typedef struct mgElement_s {
 	void* userStyle;
 
 	uint32_t visible;/* != 0 - visible*/
+	uint32_t enabled;/*1*/
+	uint32_t drawBG;/*1*/
 	
 	struct mgElement_s* parent;
 	struct mgElementNode_s* children;
@@ -120,6 +123,9 @@ typedef struct mgElement_s {
 	float scrollValueTarget;
 	float scrollValueWorld;
 
+	uint32_t contentHeight; /*everything inside element. */
+	uint32_t clientHeight;  /*rect.bottom - rect.top*/
+
 	uint32_t cursorInRect; /*1\0*/
 } mgElement;
 
@@ -127,5 +133,6 @@ typedef struct mgElement_s {
 #include "mgElementText.h"
 #include "mgElementButton.h"
 #include "mgElementTextInput.h"
+#include "mgElementList.h"
 
 #endif
