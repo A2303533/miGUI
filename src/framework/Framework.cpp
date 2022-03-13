@@ -121,6 +121,13 @@ Context* Framework::CreateContext(
 	return c;
 }
 
+mgStyle_s Framework::GetNewStyle(int isLightTheme)
+{
+	mgStyle_s style;
+	mgInitStyleLight(&style);
+	return style;
+}
+
 Image* Framework::LoadImage(const char* imageFile)
 {
 	assert(imageFile);

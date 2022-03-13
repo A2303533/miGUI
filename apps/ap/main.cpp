@@ -10,6 +10,7 @@
 #include "framework/ListBox.h"
 #include <stdio.h>
 
+
 #define AP_PLAYLISTAREASIZE 180
 #define AP_CONTROLAREASIZE 70
 
@@ -21,6 +22,8 @@ struct global_data
 	mgf::Rectangle* controlArea = 0;
 	mgf::Rectangle* tracklistArea = 0;
 	mgf::Button* buttonNewPlaylist = 0;
+	mgf::ListBox* listboxPlaylist = 0;
+	mgStyle_s style;
 }
 g_data;
 
@@ -48,6 +51,8 @@ void window_OnSize(mgf::SystemWindow* w)
 		g_data.controlArea->SetRect(0, sz.y - AP_CONTROLAREASIZE, sz.x, sz.y);
 	if(g_data.tracklistArea)
 		g_data.tracklistArea->SetRect(AP_PLAYLISTAREASIZE, 0, sz.x, sz.y - AP_CONTROLAREASIZE);
+	if (g_data.listboxPlaylist)
+		g_data.listboxPlaylist->SetRect(5, 25, AP_PLAYLISTAREASIZE, sz.y - AP_CONTROLAREASIZE);
 }
 
 void context_onDraw(mgf::Context* c, mgf::Backend* b)
@@ -95,7 +100,7 @@ int onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, uint8_t* edi
 	if (str)
 	{
 		/*wprintf(L"END: %s\n", str);*/
-		if (i == 1)
+		if (i == 1 || i == 2)
 		{
 			uint32_t len = wcslen(str);
 			if (len < 30)
@@ -124,6 +129,11 @@ int main()
 	try
 	{
 		framework = mgf::InitFramework();
+
+		g_data.style = framework.m_data->GetNewStyle(1);
+		g_data.style.listItemBG1.setAsIntegerARGB(0xFFBFDDFF);
+		g_data.style.listItemBG2.setAsIntegerARGB(0xFFBFDDFF);
+		g_data.style.listItemHoverBG.setAsIntegerARGB(0xFFA8D2FF);
 
 		context = framework.m_data->CreateContext(
 			MGWS_OVERLAPPEDWINDOW,
@@ -209,14 +219,17 @@ int main()
 			{strings[8], 0, "string"},
 			{strings[9], 0, "string"},
 		};
-		auto list = window.m_data->AddListBox(listboxData, 10, sizeof(lbData), listboxFont.m_data);
-		list->SetRect(50, 200, 200, 300);
-		list->SetItemHeight(listboxFont.m_data->GetMaxSize().y);
-		list->SetMultiselect(true);
-		list->SetDrawBG(true);
-		list->CanEdit(true);
-		list->onTextInputCharEnter = testLB_onTextInputCharEnter;
-		list->onTextInputEndEdit = onTextInputEndEdit;
+		g_data.listboxPlaylist = window.m_data->AddListBox(listboxData, 10, sizeof(lbData), listboxFont.m_data);
+		g_data.listboxPlaylist->SetRect(50, 200, 200, 300);
+		g_data.listboxPlaylist->SetItemHeight(listboxFont.m_data->GetMaxSize().y);
+		g_data.listboxPlaylist->SetDrawBG(false);
+		g_data.listboxPlaylist->CanEdit(true);
+		g_data.listboxPlaylist->SetSelectWithRMB(true);
+		g_data.listboxPlaylist->SetDrawItemBG(true);
+		g_data.listboxPlaylist->onTextInputCharEnter = testLB_onTextInputCharEnter;
+		g_data.listboxPlaylist->onTextInputEndEdit = onTextInputEndEdit;
+
+		g_data.listboxPlaylist->SetUserStyle(&g_data.style);
 
 		// also rebuild all gui
 		context.m_data->GetSystemWindow()->OnSize();

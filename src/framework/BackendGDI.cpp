@@ -269,6 +269,21 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 		SelectClipRgn(m_window->m_hdcMem, rgn);
 		FillRect(m_window->m_hdcMem, &r, brsh);
 	}break;
+	case mgDrawRectangleReason_listItemBG1:
+	case mgDrawRectangleReason_listItemBG2:
+	{
+		rgn = CreateRectRgn(
+			m_clipRect.left + m_window->m_borderSize.x,
+			m_clipRect.top + m_window->m_borderSize.y,
+			m_clipRect.right + m_window->m_borderSize.x,
+			m_clipRect.bottom + m_window->m_borderSize.y);
+		SelectClipRgn(m_window->m_hdcMem, rgn);
+		MoveToEx(m_window->m_hdcMem, r.left, r.bottom, 0);
+		HPEN p = CreatePen(0, 2, RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
+		SelectObject(m_window->m_hdcMem, p);
+		LineTo(m_window->m_hdcMem, r.right, r.bottom);
+		DeleteObject(p);
+	}break;
 	case mgDrawRectangleReason_popupBG:
 	{
 		{

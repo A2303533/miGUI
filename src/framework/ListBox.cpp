@@ -119,13 +119,12 @@ int LB_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, uint8_t* e
 	return type;
 }
 
-//
-//wchar_t LB_onCharEnter(struct mgElement_s* e, wchar_t t)
-//{
-//
-//}
-//
-//void LB_onActivate(struct mgElement_s* e)
-//{
-//
-//}
+void ListBox::SetSelectWithRMB(bool v)
+{
+	m_elementList->selectWithRMB = (int)v;
+}
+
+void ListBox::SetDrawItemBG(bool v)
+{
+	m_elementList->drawItemBG = (int)v;
+}

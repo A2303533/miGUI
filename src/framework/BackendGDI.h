@@ -31,6 +31,7 @@
 
 #ifdef MGF_BACKEND_GDI
 
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <objidl.h>
 #define GDIPVER 0x0110

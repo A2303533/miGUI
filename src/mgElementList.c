@@ -31,7 +31,6 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <wchar.h>
 
 void miGUI_onUpdateTransform_rectangle(mgElement* e);
@@ -106,7 +105,7 @@ miGUI_onUpdateTransform_list(mgElement* e)
 		if (impl->itemHeight < 2)
 			impl->itemHeight = 2;
 
-		impl->numOfLines = (w / impl->itemHeight) + 2;
+		impl->numOfLines = (w / impl->itemHeight) + 4;
 	}
 
 	e->contentHeight = impl->arraySize * impl->itemHeight;
@@ -171,32 +170,43 @@ miGUI_onUpdate_list(mgElement* e)
 
 	if (impl->hoverItem)
 	{
-		if ((e->lmbClickCount == 2) && (impl->editText))
+		int issel = 0;
+		
+		int edit = 0;
+		if ((e->lmbClickCount == 2) && (impl->editText) && (impl->clickedItems[0] == impl->clickedItems[1]))
+			edit = 1;
+
+		if (!edit && impl->useF2ForEdit)
 		{
-			mgElementTextInput* ti = (mgElementTextInput*)impl->textInput->implementation;
-			impl->textInput->visible = 1;
-
-			mgTextInputActivate_f(c, ti, 1, 0);
-			mgRect r;
-			r.left = 0;
-			r.right = e->transformWorld.buildArea.right - e->transformWorld.buildArea.left;
-			r.top = impl->hoverItemBuildRect.top - e->transformWorld.buildArea.top;
-			r.bottom = r.top + impl->itemHeight;
-
-			impl->textInput->transformLocal.buildArea = r;
-			impl->textInput->transformLocal.clipArea = r;
-
-			impl->editItem = impl->hoverItem;
-
-			miGUI_onUpdateTransform_textinput(impl->textInput);
+			if ((impl->clickedItems[0] == impl->hoverItem) || (impl->clickedItems[1] == impl->hoverItem))
+			{
+				if (mgIsKeyHit(c->input, MG_KEY_F2))
+					edit = 2;
+			}
 		}
-		else
+
+		if(!edit)
 		{
 			if (impl->multiselect)
 			{
 				struct lbData2* dptr = (struct lbData2*)impl->hoverItem;
+
 				if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+					issel = 1;
+
+				if (impl->selectWithRMB && !issel)
 				{
+					if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+						issel = 1;
+				}
+
+				if (issel)
+				{
+					impl->clickedItems[impl->clickedItemsCurr] = impl->hoverItem;
+					++impl->clickedItemsCurr;
+					if (impl->clickedItemsCurr > 2)
+						impl->clickedItemsCurr = 0;
+
 					if (dptr->flags & 0x1)
 						dptr->flags ^= 0x1;
 					else
@@ -216,7 +226,21 @@ miGUI_onUpdate_list(mgElement* e)
 			else
 			{
 				if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+					issel = 1;
+
+				if (impl->selectWithRMB && !issel)
 				{
+					if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+						issel = 1;
+				}
+
+				if (issel)
+				{
+					impl->clickedItems[impl->clickedItemsCurr] = impl->hoverItem;
+					++impl->clickedItemsCurr;
+					if (impl->clickedItemsCurr > 2)
+						impl->clickedItemsCurr = 0;
+
 					if (impl->isSelected)
 					{
 						uint32_t index = impl->hoverItem - (uint8_t*)impl->array;
@@ -259,6 +283,46 @@ miGUI_onUpdate_list(mgElement* e)
 						}
 					}
 				}
+			}
+		}
+
+		if (edit)
+		{
+			mgElementTextInput* ti = (mgElementTextInput*)impl->textInput->implementation;
+			impl->textInput->visible = 1;
+
+			mgTextInputActivate_f(c, ti, 1, 0);
+			mgRect r;
+			r.left = 0;
+			r.right = e->transformWorld.buildArea.right - e->transformWorld.buildArea.left;
+			r.top = impl->hoverItemBuildRect.top - e->transformWorld.buildArea.top;
+			r.bottom = r.top + impl->itemHeight;
+
+			r.top += (int)e->scrollValueWorld;
+			r.bottom += (int)e->scrollValueWorld;
+
+			impl->textInput->transformLocal.buildArea = r;
+			impl->textInput->transformLocal.clipArea = r;
+
+			impl->editItem = impl->hoverItem;
+
+			miGUI_onUpdateTransform_textinput(impl->textInput);
+
+			/*
+			* I need to select this item again...
+			*/
+			if (impl->multiselect)
+			{
+				struct lbData2* dptr = (struct lbData2*)impl->hoverItem;
+				dptr->flags |= 0x1;
+			}
+			else
+			{
+				uint32_t index = impl->hoverItem - (uint8_t*)impl->array;
+				index /= impl->dataTypeSizeOf;
+
+				impl->isSelected = 1;
+				impl->curSel = index;
 			}
 		}
 	}
@@ -309,6 +373,29 @@ miGUI_onDraw_list(mgElement* e)
 			mgRect rClip = r;
 			if (rClip.top < e->parent->transformWorld.clipArea.top)
 				rClip.top = e->parent->transformWorld.clipArea.top;
+
+			if (impl->drawItemBG)
+			{
+				mgColor* ibgc = &style->listItemBG2;
+				int rea = mgDrawRectangleReason_listItemBG2;
+
+				if (index)
+				{
+					if ((index % 2) != 0)
+					{
+						rea = mgDrawRectangleReason_listItemBG1;
+						ibgc = &style->listItemBG1;
+					}
+				}
+
+				e->window->context->gpu->drawRectangle(rea,
+					impl,
+					&r,
+					ibgc,
+					ibgc,
+					0, 0);
+			}
+
 
 			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverItem)
 			{
@@ -421,6 +508,7 @@ mgCreateListBox_f(
 	impl->curSel = 0;
 	impl->itemHeight = 12;
 	impl->font = f;
+	impl->useF2ForEdit = 1;
 	size->x = 20;
 	size->y = 20;
 	impl->textInput = mgCreateTextInput_f(w, position, size, f);

@@ -89,6 +89,8 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_textInputCursor,
 	mgDrawRectangleReason_textInputSelectionBG,
 	mgDrawRectangleReason_listBG,
+	mgDrawRectangleReason_listItemBG1,
+	mgDrawRectangleReason_listItemBG2,
 	mgDrawRectangleReason_listHoverItemBG,
 	mgDrawRectangleReason_listSelectedItemBG,
 };

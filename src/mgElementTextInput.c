@@ -47,6 +47,8 @@ void miGUI_onUpdate_rectangle(mgElement* e);
 void mgTextInput_updateScrollLimit(mgElement* e);
 void mgTextInput_selectAll(struct mgElementTextInput_s* e);
 
+extern int g_skipFrame;
+
 void
 mgTextInput_copy(mgElement* e)
 {
@@ -243,6 +245,7 @@ miGUI_textinput_activate(mgElement* e, int is)
 	{
 		e->window->context->activeTextInput = 0;
 	}
+	g_skipFrame = 1;
 }
 
 MG_API 
@@ -950,6 +953,7 @@ miGUI_onDraw_textinput(mgElement* e)
 			pos.x = e->transformWorld.buildArea.left - (int)impl->h_scrollCurr;
 			pos.y = e->transformWorld.buildArea.top;
 			mgRect rect;
+			mgColor* textColor = 0;
 			for (uint32_t i = 0; i < impl->textLen; ++i)
 			{
 				rect.left = pos.x;
@@ -976,6 +980,7 @@ miGUI_onDraw_textinput(mgElement* e)
 				rect.right = pos.x;
 				rect.bottom = pos.y + impl->font->maxSize.y;
 
+				textColor = &style->textInputText;
 				if (impl->isSelected)
 				{
 					uint32_t start = impl->selectionStart;
@@ -995,6 +1000,7 @@ miGUI_onDraw_textinput(mgElement* e)
 						e->window->context->gpu->drawRectangle(
 							mgDrawRectangleReason_textInputSelectionBG,
 							impl, &rect, selcol, selcol, 0, 0);
+						textColor = &style->textInputTextSelected;
 					}
 				}
 
@@ -1004,7 +1010,7 @@ miGUI_onDraw_textinput(mgElement* e)
 					&pos2,
 					&impl->text[i],
 					1,
-					&style->textInputDefaultText,
+					textColor,
 					impl->font);
 
 				{

@@ -53,6 +53,9 @@ namespace mgf
 		// Only for NOT multiselect
 		void SetCurSel(uint32_t);
 		uint32_t GetCurSel();
+		
+		void SetSelectWithRMB(bool);
+		void SetDrawItemBG(bool);
 
 		uint32_t GetArraySize();
 

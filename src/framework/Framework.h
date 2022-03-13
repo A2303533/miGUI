@@ -61,6 +61,7 @@ namespace mgf
 
 		Image* LoadImage(const char* imageFile);
 
+		mgStyle_s GetNewStyle(int isLightTheme);
 		/*
 		* Call every frame.
 		* Return true if system work
