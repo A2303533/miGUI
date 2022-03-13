@@ -237,11 +237,31 @@ miGUI_textinput_activate(mgElement* e, int is)
 	{
 		e->window->context->activeTextInput = impl;
 		if (impl->onActivate)
-			impl->onActivate(impl);
+			impl->onActivate(e);
 	}
 	else
 	{
 		e->window->context->activeTextInput = 0;
+	}
+}
+
+MG_API 
+void MG_C_DECL 
+mgTextInputActivate_f(struct mgContext_s* c, struct mgElementTextInput_s* e, int isActive, int deactivateCode)
+{
+	assert(c);
+	assert(e);
+	if (isActive)
+	{
+		miGUI_textinput_activate(e->element, 1);
+	}
+	else
+	{
+		if (e->onEndEdit)
+		{
+			if (e->onEndEdit(e->element, deactivateCode))
+				miGUI_textinput_activate(e->element, 0);
+		}
 	}
 }
 
@@ -673,7 +693,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 			{
 				if (impl->onEndEdit)
 				{
-					if(impl->onEndEdit(impl, 2))
+					if(impl->onEndEdit(e, 2))
 						miGUI_textinput_activate(e, 0);
 				}
 				else
@@ -707,7 +727,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 						{
 							if (impl->onEndEdit)
 							{
-								if(impl->onEndEdit(impl, 3))
+								if(impl->onEndEdit(e, 3))
 									miGUI_textinput_activate(e, 0);
 							}
 							else
@@ -724,7 +744,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 					{
 						if (impl->onEndEdit)
 						{
-							if (impl->onEndEdit(impl, 1))
+							if (impl->onEndEdit(e, 1))
 								miGUI_textinput_activate(e, 0);
 						}
 						else
@@ -741,7 +761,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 				default:
 				{
 					if (impl->onCharEnter)
-						c->input->character = impl->onCharEnter(c->input->character);
+						c->input->character = impl->onCharEnter(e, c->input->character);
 
 					if (c->input->character)
 					{
@@ -833,13 +853,8 @@ miGUI_onUpdate_textinput(mgElement* e)
 			}
 		}
 
-		if (c->input->mouseButtonFlags2 & MG_MBFL_LMBDBL)
-		{
-			if ((c->clickedElements[0] == e) && (c->clickedElements[1] == e))
-			{
-				mgTextInput_selectAll(impl);
-			}
-		}
+		if (e->lmbClickCount == 2)
+			mgTextInput_selectAll(impl);
 
 		impl->textCursorRect.left = 0;
 		impl->textCursorRect.top = e->transformWorld.buildArea.top;
@@ -1087,10 +1102,9 @@ mgCreateTextInput_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFo
 	newElement->transformLocal.clipArea = newElement->transformLocal.buildArea;
 	newElement->creationRect = newElement->transformLocal.buildArea;
 	
-	newElement->drawBG = 1;
-	newElement->enabled = 1;
+	mgElementDefaultInit(newElement);
+
 	newElement->window = w;
-	newElement->visible = 1;
 	newElement->onDraw = miGUI_onDraw_textinput;
 	newElement->onUpdate = miGUI_onUpdate_textinput;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_textinput;
@@ -1164,4 +1178,5 @@ mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory)
 	e->textLen = 0;
 	e->text[0] = 0;
 }
+
 

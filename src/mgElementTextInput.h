@@ -60,14 +60,13 @@ typedef struct mgElementTextInput_s {
 	uint32_t canSelect;/*1*/
 	uint32_t multiline;/*0*/
 
-	void(*onActivate)(struct mgElementTextInput_s*);
-
 	/*
 	* type: 0 unknown, 1 enter key, 2 click somewhere, 3 escape key
 	* return 1 if need to deactivate input
 	*/
-	int(*onEndEdit)(struct mgElementTextInput_s*, int type);
-	wchar_t(*onCharEnter)(wchar_t);
+	int(*onEndEdit)(struct mgElement_s*, int type);
+	wchar_t(*onCharEnter)(struct mgElement_s*, wchar_t);
+	void(*onActivate)(struct mgElement_s*);
 
 	uint32_t isSelected;
 	uint32_t selectionStart;

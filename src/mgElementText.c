@@ -102,9 +102,7 @@ mgCreateText_f(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgF
 	newElement->creationRect = newElement->transformLocal.buildArea;
 	
 	newElement->window = w;
-	newElement->visible = 1;
-	newElement->drawBG = 1;
-	newElement->enabled = 1;
+	mgElementDefaultInit(newElement);
 	newElement->onDraw = miGUI_onDraw_text;
 	newElement->onUpdate = miGUI_onUpdate_text;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_text;

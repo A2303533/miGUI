@@ -43,7 +43,12 @@ void mgDrawPopup(struct mgContext_s* c, mgPopup* p);
 void mgUpdatePopup(struct mgContext_s* c, mgPopup* p);
 void mgDockPanelClear(struct mgContext_s* c);
 
-int g_lmbElement_oncePerFrame = 0;
+/*
+* sometimes need to stop update elements, like when double click in list box 
+* for activating text input.
+* Reset in StartFrame
+*/
+int g_skipFrame = 0;
 
 void 
 mgDestroyElement_internal(mgElement* e)
@@ -284,14 +289,38 @@ mgInitDefaultIcons_f(struct mgContext_s* c, mgTexture* t)
 }
 
 void
+mgUpdateElementLMBClick(mgElement* e)
+{
+	if (e->childrenCount)
+	{
+		for (uint32_t i = e->childrenCount - 1; i >= 0; --i)
+		{
+			mgUpdateElementLMBClick(e->children[i].pointer);
+
+			if (!i)
+				break;
+		}
+	}
+
+	e->lmb2ClickTimer += e->window->context->deltaTime;
+	if (e->cursorInRect)
+	{
+		if (e->window->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+		{
+			++e->lmbClickCount;
+			e->lmb2ClickTimer = 0.f;
+		}
+	}
+	if (e->lmb2ClickTimer > e->lmb2ClickTimerLimit)
+		e->lmbClickCount = 0;
+}
+
+void
 mgUpdateElement(mgElement* e) 
 {
-	e->onUpdate(e);
+	if (!e->visible)
+		return;
 
-	/*for (uint32_t i = 0; i < e->childrenCount; ++i)
-	{
-		mgUpdateElement(e->children[i].pointer);
-	}*/
 	if (e->childrenCount)
 	{
 		for (uint32_t i = e->childrenCount - 1; i >= 0; --i)
@@ -303,17 +332,7 @@ mgUpdateElement(mgElement* e)
 		}
 	}
 
-	if (e->cursorInRect && !g_lmbElement_oncePerFrame)
-	{
-		g_lmbElement_oncePerFrame = 1;
-		if (e->window->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-		{
-			e->window->context->clickedElements[e->window->context->clickedElementsCurrent] = e;
-			++e->window->context->clickedElementsCurrent;
-			if (e->window->context->clickedElementsCurrent == mgClickedElementsSize)
-				e->window->context->clickedElementsCurrent = 0;
-		}
-	}
+	e->onUpdate(e);
 }
 
 void
@@ -387,12 +406,6 @@ mgUpdate_f(mgContext* c)
 	if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 	{
 		++c->input->LMBClickCount;
-
-		if (c->input->mouseButtonFlags2 & MG_MBFL_LMBDBL)
-			c->input->mouseButtonFlags2 ^= MG_MBFL_LMBDBL;
-		if (c->input->LMBClickCount == 2)
-			c->input->mouseButtonFlags2 |= MG_MBFL_LMBDBL;
-
 		lmb_dbl_timer = 0.f;
 	}
 	if (lmb_dbl_timer > 0.3f)
@@ -427,6 +440,14 @@ mgUpdate_f(mgContext* c)
 		if (c->dockPanel->flags & mgDockPanelFlag_onSplitter)
 			ok = 0;
 	}
+	
+	if (c->activeTextInput)
+	{
+		mgUpdateElementLMBClick(c->activeTextInput->element->window->rootElement);
+
+		mgUpdateElement(c->activeTextInput->element);
+		return;
+	}
 
 	if (cw && ok)
 	{
@@ -456,7 +477,10 @@ mgUpdate_f(mgContext* c)
 					if (!c->activePopup)
 					{
 						if (cw->flagsInternal & mgWindowFlag_internal_isExpand)
+						{
+							mgUpdateElementLMBClick(cw->rootElement);
 							mgUpdateElement(cw->rootElement);
+						}
 					}
 				}
 
@@ -494,8 +518,7 @@ void MG_C_DECL
 mgStartFrame_f(mgContext* c)
 {
 	assert(c);
-
-	g_lmbElement_oncePerFrame = 0;
+	g_skipFrame = 0;
 	
 	c->input->mouseMoveDeltaOld = c->input->mouseMoveDelta;
 	c->input->mouseWheelDeltaOld = c->input->mouseWheelDelta;
@@ -526,9 +549,6 @@ mgStartFrame_f(mgContext* c)
 	if ((c->input->mouseButtonFlags1 & MG_MBFL_X2MBUP) == MG_MBFL_X2MBUP)
 		c->input->mouseButtonFlags1 ^= MG_MBFL_X2MBUP;
 
-	if ((c->input->mouseButtonFlags2 & MG_MBFL_LMBDBL) == MG_MBFL_LMBDBL)
-		c->input->mouseButtonFlags2 ^= MG_MBFL_LMBDBL;
-	
 	for (int i = 0; i < 256; ++i)
 	{
 		if ((c->input->keyFlags[i] & MG_KEYFL_HIT) == MG_KEYFL_HIT)

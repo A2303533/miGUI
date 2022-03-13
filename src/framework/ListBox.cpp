@@ -38,15 +38,25 @@ using namespace mgf;
 
 extern Backend* g_backend;
 
+//wchar_t LB_onCharEnter(struct mgElement_s*, wchar_t);
+//void LB_onActivate(struct mgElement_s*);
+wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c);
+int LB_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, uint8_t* editItem);
+
 ListBox::ListBox(Window* w, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font* f)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 	
 	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
-	m_element = mgCreateListBox(w->m_window, &p, &p, arr, arrSz, dataTypeSizeOf);
+	m_element = mgCreateListBox(w->m_window, &p, &p, arr, arrSz, dataTypeSizeOf, ((FontImpl*)f)->m_font);
+	m_element->userData = this;
 	m_elementList = (mgElementList*)m_element->implementation;
-	this->SetFont(f);
+	m_elementList->onTextInputCharEnter = LB_onTextInputCharEnter;
+	m_elementList->onTextInputEndEdit = LB_onEndEdit;
+	/*((mgElementTextInput_s*)m_elementList->textInput)->onActivate = LB_onActivate;
+	((mgElementTextInput_s*)m_elementList->textInput)->onCharEnter = LB_onActivate;
+	((mgElementTextInput_s*)m_elementList->textInput)->onActivate = LB_onActivate;*/
 	Element::PostInit();
 }
 
@@ -85,5 +95,37 @@ void ListBox::SetItemHeight(uint32_t i)
 	m_elementList->itemHeight = i;
 }
 
+void ListBox::CanEdit(bool v)
+{
+	m_elementList->editText = (int)v;
+}
 
+wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c)
+{
+	ListBox* lb = (ListBox*)e->userData;
+	if (lb->onTextInputCharEnter)
+		return lb->onTextInputCharEnter(lb, c);
 
+	return c;
+}
+
+int LB_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, uint8_t* editItem)
+{
+	ListBox* lb = (ListBox*)e->userData;
+
+	if (lb->onTextInputEndEdit)
+		return lb->onTextInputEndEdit(lb, type, str, editItem);
+
+	return type;
+}
+
+//
+//wchar_t LB_onCharEnter(struct mgElement_s* e, wchar_t t)
+//{
+//
+//}
+//
+//void LB_onActivate(struct mgElement_s* e)
+//{
+//
+//}

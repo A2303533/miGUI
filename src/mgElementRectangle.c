@@ -354,9 +354,7 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgCo
 
 	newElement->window = w;
 
-	newElement->visible = 1;
-	newElement->drawBG = 1;
-	newElement->enabled = 1;
+	mgElementDefaultInit(newElement);
 	newElement->onDraw = miGUI_onDraw_rectangle;
 	newElement->onUpdate = miGUI_onUpdate_rectangle;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_rectangle;

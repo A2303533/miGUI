@@ -48,16 +48,28 @@ namespace mgf
 		ListBox(Window* w, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font*);
 		virtual ~ListBox();
 
-		virtual void SetMultiselect(bool);
+		void SetMultiselect(bool);
 
 		// Only for NOT multiselect
-		virtual void SetCurSel(uint32_t);
-		virtual uint32_t GetCurSel();
+		void SetCurSel(uint32_t);
+		uint32_t GetCurSel();
 
-		virtual uint32_t GetArraySize();
+		uint32_t GetArraySize();
 
-		virtual void SetFont(Font*);
-		virtual void SetItemHeight(uint32_t);
+		void SetFont(Font*);
+		void SetItemHeight(uint32_t);
+		void CanEdit(bool);
+		
+		wchar_t(*onTextInputCharEnter)(ListBox*, wchar_t) = 0;
+		/*
+		* i:
+		*	1 - Enter
+		*   2 - click somewhere
+		*   3 - Escape
+		* str: new text
+		* editItem: first byte for edited item
+		*/
+		int(*onTextInputEndEdit)(ListBox*, int i, const wchar_t* str, uint8_t* editItem) = 0;
 	};
 }
 

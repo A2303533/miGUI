@@ -127,7 +127,21 @@ typedef struct mgElement_s {
 	uint32_t clientHeight;  /*rect.bottom - rect.top*/
 
 	uint32_t cursorInRect; /*1\0*/
+
+	uint32_t lmbClickCount;
+	float lmb2ClickTimer;
+	float lmb2ClickTimerLimit;/*0.3f*/
 } mgElement;
+
+inline
+void mgElementDefaultInit(mgElement* e)
+{
+	e->id = -1;
+	e->visible = 1;
+	e->enabled = 1;
+	e->drawBG = 1;
+	e->lmb2ClickTimerLimit = 0.3f;
+}
 
 #include "mgElementRectangle.h"
 #include "mgElementText.h"

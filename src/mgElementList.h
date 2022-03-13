@@ -34,7 +34,8 @@ typedef struct mgElementList_s {
 	uint32_t isSelected;
 	uint32_t curSel;
 	uint32_t multiselect;/*0*/
-		
+	uint32_t editText;/*0*/
+
 	void* array;
 	uint32_t arraySize;
 
@@ -49,9 +50,19 @@ typedef struct mgElementList_s {
 
 	uint32_t dataTypeSizeOf;
 	uint8_t* hoverItem;
+	uint8_t* editItem;
 
 	/*return 1 if need to select*/
 	int(*onSelect)(struct mgElement_s* e);
+	
+	wchar_t(*onTextInputCharEnter)(struct mgElement_s*, wchar_t);
+	int(*onTextInputEndEdit)(struct mgElement_s*, int, const wchar_t*, uint8_t* editItem);
+
+
+	struct mgElement_s* textInput;
+	mgRect hoverItemClipRect;
+	mgRect hoverItemBuildRect;
+	const wchar_t* hoverItemText;
 } mgElementList;
 
 

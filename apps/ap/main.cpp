@@ -59,6 +59,59 @@ void context_onDraw(mgf::Context* c, mgf::Backend* b)
 	b->DrawRectangle(0, 0, &r, &color, &color, 0, 0);*/
 }
 
+
+struct lbData
+{
+	const wchar_t* text = 0;
+	uint32_t flags = 0; /*0x1 - selected or not*/
+	std::string someData;
+};
+
+wchar_t testLB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c)
+{
+	bool good = false;
+
+	if (iswalnum(c))
+		good = true;
+
+	if (!good)
+	{
+		if (c == L'_')
+			good = true;
+	}
+
+	return good ? c : 0;
+}
+
+int onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, uint8_t* editItem)
+{
+	/*
+	* i:
+	*	1 - Enter
+	*   2 - click somewhere
+	*   3 - Escape
+	*/
+
+	if (str)
+	{
+		/*wprintf(L"END: %s\n", str);*/
+		if (i == 1)
+		{
+			uint32_t len = wcslen(str);
+			if (len < 30)
+			{
+				lbData* data = (lbData*)editItem;
+				/* data->text points to not const wchar_t 
+				*   so we can change text.
+				*/
+				wsprintf((wchar_t*)data->text, L"%s", str);
+			}
+		}
+	}
+
+	return i;
+}
+
 int main()
 {
 	mgf::Ptr<mgf::Framework> framework = 0;
@@ -132,34 +185,38 @@ int main()
 			g_data.buttonNewPlaylist->SetIcons(icons.m_data, iconID1, iconID2, iconID1, iconID1);
 		}
 
-		auto window2 = context.m_data->CreateWindow();
+		//auto window2 = context.m_data->CreateWindow();
 		/*auto textInput = window.m_data->AddTextInput(fontImpact.m_data);
 		textInput->SetRect(50, 200, 500, 250);
 		textInput->SetText(L"Hello world");*/
 
-		struct lbData
+		
+		wchar_t strings[10][30];
+		for (int i = 0; i < 10; ++i)
 		{
-			const wchar_t* text = 0;
-			uint32_t flags = 0; /*0x1 - selected or not*/
-			std::string someData;
-		};
+			wsprintf(strings[i], L"Item%i", i);
+		}
 		lbData listboxData[] =
 		{
-			{L"Item1", 0, "string"},
-			{L"Item2", mgf::ListBoxFlag_select, "string"},
-			{L"Item3", mgf::ListBoxFlag_select, "string"},
-			{L"Item4", 0, "string"},
-			{L"Item5", 0, "string"},
-			{L"Item6", 0, "string"},
-			{L"Item7", 0, "string"},
-			{L"Item8", 0, "string"},
-			{L"Item9", 0, "string"},
-			{L"Item10", 0, "string"},
+			{strings[0], 0, "string"},
+			{strings[1], mgf::ListBoxFlag_select, "string"},
+			{strings[2], mgf::ListBoxFlag_select, "string"},
+			{strings[3], 0, "some text"},
+			{strings[4], 0, "string"},
+			{strings[5], 0, "data"},
+			{strings[6], 0, "blabla"},
+			{strings[7], 0, "string"},
+			{strings[8], 0, "string"},
+			{strings[9], 0, "string"},
 		};
-		auto list = window2->AddListBox(listboxData, 10, sizeof(lbData), listboxFont.m_data);
-		list->SetRect(50, 50, 200, 300);
+		auto list = window.m_data->AddListBox(listboxData, 10, sizeof(lbData), listboxFont.m_data);
+		list->SetRect(50, 200, 200, 300);
 		list->SetItemHeight(listboxFont.m_data->GetMaxSize().y);
 		list->SetMultiselect(true);
+		list->SetDrawBG(true);
+		list->CanEdit(true);
+		list->onTextInputCharEnter = testLB_onTextInputCharEnter;
+		list->onTextInputEndEdit = onTextInputEndEdit;
 
 		// also rebuild all gui
 		context.m_data->GetSystemWindow()->OnSize();

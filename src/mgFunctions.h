@@ -65,6 +65,8 @@ MG_API void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int fre
 MG_API void MG_C_DECL mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e);
 MG_API int MG_C_DECL mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
 struct mgPopup_s* mgGetDefaultPopupTextInput(mgContext* c);
-MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* array, uint32_t arraySize, uint32_t dataTypeSizeOf);
+MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* array, uint32_t arraySize, uint32_t dataTypeSizeOf, mgFont* f);
+MG_API void MG_C_DECL mgTextInputActivate_f(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
+MG_API void MG_C_DECL mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text);
 
 #endif

@@ -297,10 +297,10 @@ extern PFNMGCREATEBUTTONPROC mgCreateButton;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* c, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf);
+MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* c, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, mgFont* f);
 #define mgCreateListBox mgCreateListBox_f
 #else
-typedef mgElement* (*PFNMGCREATELISTBOXPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf);
+typedef mgElement* (*PFNMGCREATELISTBOXPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, mgFont* f);
 extern PFNMGCREATELISTBOXPROC mgCreateListBox;
 #endif
 
@@ -555,6 +555,17 @@ typedef void (*PFNMGTEXTINPUTDELETESELECTEDPROC)(struct mgElementTextInput_s* e)
 extern PFNMGTEXTINPUTDELETESELECTEDPROC mgTextInputDeleteSelected;
 #endif
 
+/*
+* deactivateCode is optional
+*/
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgTextInputActivate_f(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
+#define mgTextInputActivate mgTextInputActivate_f
+#else
+typedef void (*PFNMGTEXTINPUTACTIVATEPROC)(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
+extern PFNMGTEXTINPUTACTIVATEPROC mgTextInputActivate;
+#endif
+
 
 #if defined(__cplusplus)
 }
@@ -575,12 +586,6 @@ typedef struct mgContext_s {
 	mgInputContext* input;
 	int needUpdateTransform;
 	int needRebuild;
-
-	/*every lmb remember element under cursor
-	* for double click
-	*/
-	mgElement* clickedElements[mgClickedElementsSize];
-	uint32_t clickedElementsCurrent;
 
 	float deltaTime;
 	mgPoint windowSize;/*system window size*/

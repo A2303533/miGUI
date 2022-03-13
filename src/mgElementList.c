@@ -31,10 +31,12 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <wchar.h>
 
 void miGUI_onUpdateTransform_rectangle(mgElement* e);
 void miGUI_onUpdate_rectangle(mgElement* e);
+void miGUI_onUpdateTransform_textinput(mgElement* e);
 float lerp(float v0, float v1, float t);
 
 struct lbData1
@@ -46,6 +48,50 @@ struct lbData2
 	const wchar_t* text;
 	uint32_t flags;
 };
+
+int mgElementList_textinput_onEndEdit(struct mgElement_s* e, int type)
+{
+	e->visible = 0;
+	e->window->context->activeTextInput = 0;
+	
+	mgSetCursor_f(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+
+	mgElementTextInput* ti = e->implementation;
+	mgElement* listBox = (mgElement*)e->userData;
+	mgElementList* listBoxImpl = (mgElementList*)listBox->implementation;
+
+	if (listBoxImpl->onTextInputEndEdit)
+		return listBoxImpl->onTextInputEndEdit(listBox, type, ti->text, listBoxImpl->editItem);
+
+	return 1;
+}
+
+wchar_t mgElementList_textinput_onCharEnter(struct mgElement_s* e, wchar_t c)
+{
+	mgElementTextInput* ti = e->implementation;
+	mgElement* listBox = (mgElement*)e->userData;
+	mgElementList* listBoxImpl = (mgElementList*)listBox->implementation;
+	
+	if (listBoxImpl->onTextInputCharEnter)
+		return listBoxImpl->onTextInputCharEnter(listBox, c);
+
+	return c;
+}
+void mgElementList_textinput_onActivate(struct mgElement_s* e)
+{
+	mgElement* listBox = (mgElement*)e->userData;
+	mgElementList* listBoxImpl = (mgElementList*)listBox->implementation;
+
+	mgElementTextInput* ti = e->implementation;
+	if(listBoxImpl->hoverItemText)
+		mgTextInputSetText_f(ti, listBoxImpl->hoverItemText);
+
+
+	ti->isSelected = 1;
+	ti->selectionStart = 0;
+	ti->selectionEnd = ti->textLen;
+	ti->textCursor = ti->textLen;
+}
 
 void
 miGUI_onUpdateTransform_list(mgElement* e)
@@ -125,70 +171,92 @@ miGUI_onUpdate_list(mgElement* e)
 
 	if (impl->hoverItem)
 	{
-		if (impl->multiselect)
+		if ((e->lmbClickCount == 2) && (impl->editText))
 		{
-			struct lbData2* dptr = (struct lbData2*)impl->hoverItem;
-			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-			{
-				if (dptr->flags & 0x1)
-					dptr->flags ^= 0x1;
-				else
-				{
-					if (impl->onSelect)
-					{
-						if (impl->onSelect(e))
-							dptr->flags |= 0x1;
-					}
-					else
-					{
-						dptr->flags |= 0x1;
-					}
-				}
-			}
+			mgElementTextInput* ti = (mgElementTextInput*)impl->textInput->implementation;
+			impl->textInput->visible = 1;
+
+			mgTextInputActivate_f(c, ti, 1, 0);
+			mgRect r;
+			r.left = 0;
+			r.right = e->transformWorld.buildArea.right - e->transformWorld.buildArea.left;
+			r.top = impl->hoverItemBuildRect.top - e->transformWorld.buildArea.top;
+			r.bottom = r.top + impl->itemHeight;
+
+			impl->textInput->transformLocal.buildArea = r;
+			impl->textInput->transformLocal.clipArea = r;
+
+			impl->editItem = impl->hoverItem;
+
+			miGUI_onUpdateTransform_textinput(impl->textInput);
 		}
 		else
 		{
-			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			if (impl->multiselect)
 			{
-				if (impl->isSelected)
+				struct lbData2* dptr = (struct lbData2*)impl->hoverItem;
+				if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 				{
-					uint32_t index = impl->hoverItem - (uint8_t*)impl->array;
-					index /= impl->dataTypeSizeOf;
-
-					if (index != impl->curSel)
+					if (dptr->flags & 0x1)
+						dptr->flags ^= 0x1;
+					else
 					{
 						if (impl->onSelect)
 						{
 							if (impl->onSelect(e))
-								impl->curSel = index;
+								dptr->flags |= 0x1;
 						}
 						else
 						{
-							impl->curSel = index;
+							dptr->flags |= 0x1;
+						}
+					}
+				}
+			}
+			else
+			{
+				if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+				{
+					if (impl->isSelected)
+					{
+						uint32_t index = impl->hoverItem - (uint8_t*)impl->array;
+						index /= impl->dataTypeSizeOf;
+
+						if (index != impl->curSel)
+						{
+							if (impl->onSelect)
+							{
+								if (impl->onSelect(e))
+									impl->curSel = index;
+							}
+							else
+							{
+								impl->curSel = index;
+							}
+						}
+						else
+						{
+							impl->isSelected = 0;
+							impl->curSel = 0;
 						}
 					}
 					else
 					{
-						impl->isSelected = 0;
-						impl->curSel = 0;
-					}
-				}
-				else
-				{
-					if (impl->onSelect)
-					{
-						if (impl->onSelect(e))
+						if (impl->onSelect)
+						{
+							if (impl->onSelect(e))
+							{
+								impl->isSelected = 1;
+								impl->curSel = impl->hoverItem - (uint8_t*)impl->array;
+								impl->curSel /= impl->dataTypeSizeOf;
+							}
+						}
+						else
 						{
 							impl->isSelected = 1;
 							impl->curSel = impl->hoverItem - (uint8_t*)impl->array;
 							impl->curSel /= impl->dataTypeSizeOf;
 						}
-					}
-					else
-					{
-						impl->isSelected = 1;
-						impl->curSel = impl->hoverItem - (uint8_t*)impl->array;
-						impl->curSel /= impl->dataTypeSizeOf;
 					}
 				}
 			}
@@ -245,6 +313,9 @@ miGUI_onDraw_list(mgElement* e)
 			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverItem)
 			{
 				impl->hoverItem = u8ptr_curr;
+				impl->hoverItemClipRect = rClip;
+				impl->hoverItemBuildRect = r;
+
 				e->window->context->gpu->drawRectangle(mgDrawRectangleReason_listHoverItemBG, 
 					impl,
 					&r,
@@ -280,6 +351,9 @@ miGUI_onDraw_list(mgElement* e)
 				}
 			}
 
+			if(impl->hoverItem == u8ptr_curr)
+				impl->hoverItemText = str;
+
 			e->window->context->gpu->drawText(mgDrawTextReason_text, impl, 
 				&pos,
 				str,
@@ -303,7 +377,14 @@ miGUI_onRebuild_list(mgElement* e)
 
 MG_API
 mgElement* MG_C_DECL
-mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* array, uint32_t arraySize, uint32_t dataTypeSizeOf)
+mgCreateListBox_f(
+	struct mgWindow_s* w, 
+	mgPoint* position, 
+	mgPoint* size, 
+	void* array, 
+	uint32_t arraySize, 
+	uint32_t dataTypeSizeOf,
+	mgFont* f)
 {
 	assert(w);
 	assert(position);
@@ -324,9 +405,7 @@ mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* 
 
 	newElement->window = w;
 
-	newElement->enabled = 1;
-	newElement->drawBG = 1;
-	newElement->visible = 1;
+	mgElementDefaultInit(newElement);
 	newElement->onDraw = miGUI_onDraw_list;
 	newElement->onUpdate = miGUI_onUpdate_list;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_list;
@@ -341,6 +420,16 @@ mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* 
 	impl->multiselect = 0;
 	impl->curSel = 0;
 	impl->itemHeight = 12;
+	impl->font = f;
+	size->x = 20;
+	size->y = 20;
+	impl->textInput = mgCreateTextInput_f(w, position, size, f);
+	impl->textInput->userData = newElement;
+	impl->textInput->visible = 0;
+	((mgElementTextInput*)impl->textInput->implementation)->onActivate = mgElementList_textinput_onActivate;
+	((mgElementTextInput*)impl->textInput->implementation)->onEndEdit = mgElementList_textinput_onEndEdit;
+	((mgElementTextInput*)impl->textInput->implementation)->onCharEnter = mgElementList_textinput_onCharEnter;
+	mgSetParent_f(impl->textInput, newElement);
 
 	mgSetParent_f(newElement, 0);
 	return newElement;

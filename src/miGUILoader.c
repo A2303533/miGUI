@@ -73,6 +73,7 @@ PFNMGTEXTINPUTCLEARPROC mgTextInputClear;
 PFNMGTEXTINPUTPUTTEXTPROC mgTextInputPutText;
 PFNMGTEXTINPUTDELETESELECTEDPROC mgTextInputDeleteSelected;
 PFNMGCREATELISTBOXPROC mgCreateListBox;
+PFNMGTEXTINPUTACTIVATEPROC mgTextInputActivate;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -143,6 +144,7 @@ mgLoad()
 	mgTextInputPutText = mgGetProc(lib, "mgTextInputPutText_f");
 	mgTextInputDeleteSelected = mgGetProc(lib, "mgTextInputDeleteSelected_f");
 	mgCreateListBox = mgGetProc(lib, "mgCreateListBox_f");
+	mgTextInputActivate = mgGetProc(lib, "mgTextInputActivate_f");
 
 	return lib;
 }

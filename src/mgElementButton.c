@@ -237,9 +237,7 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const w
 	newElement->creationRect = newElement->transformLocal.buildArea;
 	
 	newElement->window = w;
-	newElement->visible = 1;
-	newElement->enabled = 1;
-	newElement->drawBG = 1;
+	mgElementDefaultInit(newElement);
 	newElement->onDraw = miGUI_onDraw_button;
 	newElement->onUpdate = miGUI_onUpdate_button;
 	newElement->onUpdateTransform = miGUI_onUpdateTransform_button;

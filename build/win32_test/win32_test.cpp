@@ -656,12 +656,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         mgPointSet(&pos, 100, 120);
         eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Save dock", g_win32font);
-        eb->onClickLMB = saveDock;
+        eb->onReleaseLMB = saveDock;
         eb->enabled = 0;
 
         mgPointSet(&pos, 100, 160);
         eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Load dock", g_win32font);
-        eb->onClickLMB = loadDock;
+        eb->onReleaseLMB = loadDock;
 
         mgPointSet(&pos, 100, 100);
         mgElement* et = mgCreateText(test_guiWindow1, &pos, L"Text", g_win32font);
@@ -726,22 +726,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             mgPopupItemInfo items_file_popup[] =
             {
-                {0, L"Open", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O"},
-                {0, L"New", 0, 0, mgPopupItemType_default, 0, 0},
-                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0},
-                {0, L"Save", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S"},
-                {0, L"Save ass...", 0, 0, mgPopupItemType_default, 0, L"Ctrl+Shift+S"},
-                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0},
-                {0, L"Exit", 0, 0, mgPopupItemType_default, 0, L"Alt+F4"},
+                {0, L"Open", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O", 1},
+                {0, L"New", 0, 0, mgPopupItemType_default, 0, 0, 1},
+                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+                {0, L"Save", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S", 1},
+                {0, L"Save ass...", 0, 0, mgPopupItemType_default, 0, L"Ctrl+Shift+S", 1},
+                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+                {0, L"Exit", 0, 0, mgPopupItemType_default, 0, L"Alt+F4", 1},
             };
             mgPopup* file_popup = mgCreatePopup(items_file_popup, 7, g_win32font);
 
             mgPopupItemInfo items_edit_popup[] =
             {
-                {0, L"Copy", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O"},
-                {0, L"Paste", 0, 0, mgPopupItemType_default, 0, 0},
-                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0},
-                {0, L"Cut", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S"},
+                {0, L"Copy", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O", 1},
+                {0, L"Paste", 0, 0, mgPopupItemType_default, 0, 0, 1},
+                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+                {0, L"Cut", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S", 1},
             };
             mgPopup* edit_popup = mgCreatePopup(items_edit_popup, 4, g_win32font);
 
