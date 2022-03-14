@@ -21,7 +21,78 @@ PlayList::PlayList()
 
 PlayList::~PlayList()
 {
+	for (uint32_t i = 0, sz = m_nodes.size(); i < sz; ++i)
+	{
+		delete m_nodes[i];
+	}
+}
 
+void PlayList::Save()
+{
+	FILE* f = _wfopen(m_filePath.data(), L"wb");
+	if (f)
+	{
+		uint16_t bom = 0xFEFF;
+		fwrite(&bom, 2, 1, f);
+
+		fwrite(L"n:", 2 * sizeof(wchar_t), 1, f);
+		fwrite(m_name.data(), m_name.size() * sizeof(wchar_t), 1, f);
+		fwrite(L"\n", 1 * sizeof(wchar_t), 1, f);
+
+		mgf::StringW strForNumbers;
+
+		for (uint32_t i = 0, sz = m_nodes.size(); i < sz; ++i)
+		{
+			fwrite(L"s:", 2 * sizeof(wchar_t), 1, f);
+			fwrite(m_nodes[i]->m_audioFilePath.data(), m_nodes[i]->m_audioFilePath.size() * sizeof(wchar_t), 1, f);
+			fwrite(L"\n", 1 * sizeof(wchar_t), 1, f);
+
+			strForNumbers.clear();
+			strForNumbers += m_nodes[i]->m_begin;
+
+			fwrite(L"b:", 2 * sizeof(wchar_t), 1, f);
+			fwrite(strForNumbers.data(), strForNumbers.size() * sizeof(wchar_t), 1, f);
+			fwrite(L"\n", 1 * sizeof(wchar_t), 1, f);
+
+			strForNumbers.clear();
+			strForNumbers += m_nodes[i]->m_end;
+
+			fwrite(L"e:", 2 * sizeof(wchar_t), 1, f);
+			fwrite(strForNumbers.data(), strForNumbers.size() * sizeof(wchar_t), 1, f);
+			fwrite(L"\n", 1 * sizeof(wchar_t), 1, f);
+		}
+
+		fclose(f);
+	}
+}
+
+void PlayList::RenameFile()
+{
+	std::filesystem::path p(m_filePath.data());
+	std::filesystem::path pP = p.remove_filename();
+
+	mgf::StringW newFilePath = pP.c_str();
+	newFilePath += m_name.data();
+	newFilePath += L".appl";
+	newFilePath.flip_slash();
+
+	if (m_filePath == newFilePath)
+		return;
+
+	newFilePath = g_data.playlistMgr->CheckPLName(&newFilePath);
+	{
+		std::filesystem::path p = newFilePath.data();
+		std::filesystem::path fn = p.filename();
+
+		m_name = fn.c_str();
+		m_name.pop_back_before(L'.');
+		m_name.pop_back();
+	}
+
+	std::filesystem::rename(m_filePath.data(), newFilePath.data());
+
+	m_filePath = newFilePath;
+	Save();
 }
 
 PlayListManager::PlayListManager(mgf::ListBox* lb)
@@ -75,7 +146,16 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 	if (!std::filesystem::exists(m_playlistDir.data()))
 		std::filesystem::create_directory(m_playlistDir.data());
 
-
+	for (auto& entry : std::filesystem::directory_iterator(m_playlistDir.data()))
+	{
+		auto path = entry.path();
+		if (path.has_extension())
+		{
+			auto ex = path.extension();
+			if (ex == ".appl")
+				LoadPlaylist(path.c_str());
+		}
+	}
 }
 
 PlayListManager::~PlayListManager()
@@ -86,7 +166,7 @@ PlayListManager::~PlayListManager()
 	}
 }
 
-mgf::StringW PlayListManager::_checkPLName(mgf::StringW* str)
+mgf::StringW PlayListManager::CheckPLName(mgf::StringW* str)
 {
 	mgf::StringW s;
 
@@ -98,10 +178,12 @@ mgf::StringW PlayListManager::_checkPLName(mgf::StringW* str)
 		s.pop_back();
 		s.pop_back();
 		s.pop_back();
-		s.pop_back();
 
 		if (i)
 			s += i;
+
+		if (s[s.size() - 1] == L'/')
+			s += "_";
 
 		s += ".appl";
 
@@ -110,6 +192,24 @@ mgf::StringW PlayListManager::_checkPLName(mgf::StringW* str)
 	}
 
 	return s;
+}
+
+void PlayListManager::LoadPlaylist(const wchar_t* pth)
+{
+	PlayList* newPL = new PlayList;
+	newPL->m_filePath = pth;
+
+	std::filesystem::path p = pth;
+	std::filesystem::path fn = p.filename();
+
+	newPL->m_name = fn.c_str();
+	newPL->m_name.pop_back_before(L'.');
+	newPL->m_name.pop_back();
+
+	m_playlists.emplace_back(newPL);
+	m_playlistLBData.emplace_back(PlaylistListBoxData());
+
+	_updateGUIListbox();
 }
 
 void PlayListManager::AddNew()
@@ -125,7 +225,7 @@ void PlayListManager::AddNew()
 	plFilePath += newPL->m_name;
 	plFilePath += ".appl";
 
-	plFilePath = _checkPLName(&plFilePath);
+	plFilePath = CheckPLName(&plFilePath);
 	{
 		std::filesystem::path p = plFilePath.data();
 		std::filesystem::path fn = p.filename();
@@ -141,25 +241,27 @@ void PlayListManager::AddNew()
 	{
 		uint16_t bom = 0xFEFF;
 		fwrite(&bom, 2, 1, f);
-		fwrite(newPL->m_name.data(), newPL->m_name.size() * sizeof(wchar_t), 1, f);
-		wchar_t nl = '\n';
-		fwrite(&nl, 2, 1, f);
 		fclose(f);
 	}
-	//std::ofstream out(plFilePath.data());
-	//out.write():
 
-	m_playlists.emplace_back(newPL);
+	newPL->m_filePath = plFilePath.data();
+	m_playlists.emplace_back(newPL);	
 	m_playlistLBData.emplace_back(PlaylistListBoxData());
 
+	_updateGUIListbox();
+
+	newPL->Save();
+}
+
+void PlayListManager::_updateGUIListbox()
+{
 	for (uint32_t i = 0; i < m_playlists.size(); ++i)
 	{
 		m_playlistLBData[i].text = m_playlists[i]->m_name.data();
+		m_playlistLBData[i].playlist = m_playlists[i];
 	}
-
 	g_data.listboxPlaylist->SetData(m_playlistLBData.data(), m_playlistLBData.size());
 }
-
 
 wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c)
 {
@@ -189,7 +291,7 @@ int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, 
 	if (str)
 	{
 		/*wprintf(L"END: %s\n", str);*/
-		if (i == 1 || i == 2)
+		if (i == 1)
 		{
 			uint32_t len = wcslen(str);
 			//if (len < 30)
@@ -202,7 +304,10 @@ int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, 
 			//}
 			if (len)
 			{
-
+				PlaylistListBoxData* data = (PlaylistListBoxData*)editItem;
+				data->playlist->m_name = str;
+				data->text = data->playlist->m_name.data();
+				data->playlist->RenameFile();
 				/*std::filesystem::rename*/
 			}
 		}

@@ -549,7 +549,6 @@ namespace mgf
 
 		String_base<char> to_utf8() const
 		{
-			String_base<char> output;
 
 			/*size_t sz = m_size;
 			for (size_t i = 0u; i < sz; ++i)
@@ -566,10 +565,13 @@ namespace mgf
 				}
 			}*/
 
+			const wchar_t* old = m_data;
+
+			String_base<char> output;
 			std::mbstate_t state = std::mbstate_t();
-			std::size_t len = 1 + std::wcsrtombs(nullptr, (const wchar_t**)&m_data, 0, &state);
+			std::size_t len = 1 + std::wcsrtombs(nullptr, (const wchar_t**)&old, 0, &state);
 			std::vector<char> mbstr(len);
-			std::wcsrtombs(&mbstr[0], (const wchar_t**)&m_data, mbstr.size(), &state);
+			std::wcsrtombs(&mbstr[0], (const wchar_t**)&old, mbstr.size(), &state);
 			output.append(&mbstr[0]);
 			return output;
 		}
