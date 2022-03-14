@@ -8,24 +8,15 @@
 #include "framework/Icons.h"
 #include "framework/TextInput.h"
 #include "framework/ListBox.h"
-#include <stdio.h>
+
+#include "ap.h"
+#include "playlist.h"
 
 
 #define AP_PLAYLISTAREASIZE 180
 #define AP_CONTROLAREASIZE 70
 
-// for callbacks
-struct global_data
-{
-	mgf::Window* mainWindow = 0;
-	mgf::Rectangle* playlistArea = 0;
-	mgf::Rectangle* controlArea = 0;
-	mgf::Rectangle* tracklistArea = 0;
-	mgf::Button* buttonNewPlaylist = 0;
-	mgf::ListBox* listboxPlaylist = 0;
-	mgStyle_s style;
-}
-g_data;
+AP_global_data g_data;
 
 int window_OnClose(mgf::SystemWindow* w)
 {
@@ -65,60 +56,10 @@ void context_onDraw(mgf::Context* c, mgf::Backend* b)
 }
 
 
-struct lbData
-{
-	const wchar_t* text = 0;
-	uint32_t flags = 0; /*0x1 - selected or not*/
-	std::string someData;
-};
-
-wchar_t testLB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c)
-{
-	bool good = false;
-
-	if (iswalnum(c))
-		good = true;
-
-	if (!good)
-	{
-		if (c == L'_')
-			good = true;
-	}
-
-	return good ? c : 0;
-}
-
-int onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, uint8_t* editItem)
-{
-	/*
-	* i:
-	*	1 - Enter
-	*   2 - click somewhere
-	*   3 - Escape
-	*/
-
-	if (str)
-	{
-		/*wprintf(L"END: %s\n", str);*/
-		if (i == 1 || i == 2)
-		{
-			uint32_t len = wcslen(str);
-			if (len < 30)
-			{
-				lbData* data = (lbData*)editItem;
-				/* data->text points to not const wchar_t 
-				*   so we can change text.
-				*/
-				wsprintf((wchar_t*)data->text, L"%s", str);
-			}
-		}
-	}
-
-	return i;
-}
-
 int main()
 {
+	mgf::Ptr<PlayListManager> playlistMgr = 0;
+
 	mgf::Ptr<mgf::Framework> framework = 0;
 	mgf::Ptr<mgf::Context> context = 0;
 	mgf::Ptr<mgf::Window> window = 0;
@@ -183,9 +124,8 @@ int main()
 		
 		g_data.buttonNewPlaylist = window.m_data->AddButton();
 		g_data.buttonNewPlaylist->SetRect(0, 5, 180, 20);
-		//g_data.buttonNewPlaylist->SetText(L"GO!!!");
 		g_data.buttonNewPlaylist->SetDrawBG(false);
-		//g_data.buttonNewPlaylist->SetEnabled(false);
+		g_data.buttonNewPlaylist->onReleaseLMB = Playlist_BTN_newPL_onRelease;
 
 		icons = framework.m_data->CreateIcons("../data/ap/icons.png", context.m_data->GetBackend());
 		if (icons.m_data)
@@ -201,7 +141,7 @@ int main()
 		textInput->SetText(L"Hello world");*/
 
 		
-		wchar_t strings[10][30];
+		/*wchar_t strings[10][30];
 		for (int i = 0; i < 10; ++i)
 		{
 			wsprintf(strings[i], L"Item%i", i);
@@ -218,16 +158,21 @@ int main()
 			{strings[7], 0, "string"},
 			{strings[8], 0, "string"},
 			{strings[9], 0, "string"},
-		};
-		g_data.listboxPlaylist = window.m_data->AddListBox(listboxData, 10, sizeof(lbData), listboxFont.m_data);
+		};*/
+		g_data.listboxPlaylist = window.m_data->AddListBox(0, 0, sizeof(PlaylistListBoxData), listboxFont.m_data);
 		g_data.listboxPlaylist->SetRect(50, 200, 200, 300);
 		g_data.listboxPlaylist->SetItemHeight(listboxFont.m_data->GetMaxSize().y);
 		g_data.listboxPlaylist->SetDrawBG(false);
 		g_data.listboxPlaylist->CanEdit(true);
 		g_data.listboxPlaylist->SetSelectWithRMB(true);
 		g_data.listboxPlaylist->SetDrawItemBG(true);
-		g_data.listboxPlaylist->onTextInputCharEnter = testLB_onTextInputCharEnter;
-		g_data.listboxPlaylist->onTextInputEndEdit = onTextInputEndEdit;
+		g_data.listboxPlaylist->onTextInputCharEnter = Playlist_LB_onTextInputCharEnter;
+		g_data.listboxPlaylist->onTextInputEndEdit = Playlist_LB_onTextInputEndEdit;
+		g_data.listboxPlaylist->SetTextInputCharLimit(100);
+		//g_data.listboxPlaylist->SetData(listboxData, 10);
+
+		playlistMgr = new PlayListManager(g_data.listboxPlaylist);
+		g_data.playlistMgr = playlistMgr.m_data;
 
 		g_data.listboxPlaylist->SetUserStyle(&g_data.style);
 

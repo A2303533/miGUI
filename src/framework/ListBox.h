@@ -62,6 +62,11 @@ namespace mgf
 		void SetFont(Font*);
 		void SetItemHeight(uint32_t);
 		void CanEdit(bool);
+
+		// 0 - no limit;
+		void SetTextInputCharLimit(uint32_t);
+		
+		void SetData(void* arr, uint32_t arrSz);
 		
 		wchar_t(*onTextInputCharEnter)(ListBox*, wchar_t) = 0;
 		/*

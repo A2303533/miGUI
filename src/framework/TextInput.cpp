@@ -66,3 +66,8 @@ void TextInput::SetFont(Font* f)
 	m_elementText->font = ((FontImpl*)f)->m_font;
 }
 
+void TextInput::SetCharLimit(uint32_t i)
+{
+	m_elementText->charLimit = i;
+}
+

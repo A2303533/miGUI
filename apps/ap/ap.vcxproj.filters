@@ -56,6 +56,7 @@
     <ClCompile Include="..\..\src\framework\ListBox.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="playlist.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">
@@ -75,5 +76,6 @@
     <ClInclude Include="..\..\src\framework\TextInput.h">
       <Filter>migui</Filter>
     </ClInclude>
+    <ClInclude Include="playlist.h" />
   </ItemGroup>
 </Project>

@@ -100,6 +100,12 @@ void ListBox::CanEdit(bool v)
 	m_elementList->editText = (int)v;
 }
 
+void ListBox::SetData(void* arr, uint32_t arrSz)
+{
+	m_elementList->array = arr;
+	m_elementList->arraySize = arrSz;
+}
+
 wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c)
 {
 	ListBox* lb = (ListBox*)e->userData;
@@ -127,4 +133,11 @@ void ListBox::SetSelectWithRMB(bool v)
 void ListBox::SetDrawItemBG(bool v)
 {
 	m_elementList->drawItemBG = (int)v;
+}
+
+void ListBox::SetTextInputCharLimit(uint32_t i)
+{
+	mgElement* tie = m_elementList->textInput;
+	mgElementTextInput_s* ti = (mgElementTextInput_s*)tie->implementation;
+	ti->charLimit = i;
 }

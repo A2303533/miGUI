@@ -45,6 +45,9 @@ namespace mgf
 
 		void SetText(const wchar_t*);
 		void SetFont(Font*);
+
+		// 0 - no limit
+		void SetCharLimit(uint32_t);
 	};
 }
 

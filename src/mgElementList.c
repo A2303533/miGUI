@@ -476,8 +476,6 @@ mgCreateListBox_f(
 	assert(w);
 	assert(position);
 	assert(size);
-	assert(array);
-	assert(arraySize > 0);
 
 	mgElement* newElement = calloc(1, sizeof(mgElement));
 	newElement->type = MG_TYPE_LIST;

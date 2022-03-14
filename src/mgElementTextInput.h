@@ -56,6 +56,7 @@ typedef struct mgElementTextInput_s {
 	
 	uint32_t textBeginDrawIndex;
 
+	uint32_t charLimit;/*0*/
 	uint32_t monospace;/*0*/
 	uint32_t canSelect;/*1*/
 	uint32_t multiline;/*0*/

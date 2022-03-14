@@ -379,6 +379,20 @@ mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32
 	w = pt.x;
 
 	uint32_t newLen = e->textLen + len;
+
+	if (e->charLimit)
+	{
+		if (newLen > e->charLimit)
+		{
+			uint32_t dif = newLen - e->charLimit;
+			len -= dif;
+			newLen = e->charLimit;
+
+			if (!len)
+				return w;
+		}
+	}
+
 	if (newLen > e->allocated)
 		mgTextInputSetText_reallocate(e, newLen);
 
