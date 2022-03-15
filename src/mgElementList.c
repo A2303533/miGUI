@@ -213,7 +213,7 @@ miGUI_onUpdate_list(mgElement* e)
 					{
 						if (impl->onSelect)
 						{
-							if (impl->onSelect(e))
+							if (impl->onSelect(e, impl->hoverItem))
 								dptr->flags |= 0x1;
 						}
 						else
@@ -250,7 +250,7 @@ miGUI_onUpdate_list(mgElement* e)
 						{
 							if (impl->onSelect)
 							{
-								if (impl->onSelect(e))
+								if (impl->onSelect(e, impl->hoverItem))
 									impl->curSel = index;
 							}
 							else
@@ -258,7 +258,7 @@ miGUI_onUpdate_list(mgElement* e)
 								impl->curSel = index;
 							}
 						}
-						else
+						else if(!impl->noDeselect)
 						{
 							impl->isSelected = 0;
 							impl->curSel = 0;
@@ -268,7 +268,7 @@ miGUI_onUpdate_list(mgElement* e)
 					{
 						if (impl->onSelect)
 						{
-							if (impl->onSelect(e))
+							if (impl->onSelect(e, impl->hoverItem))
 							{
 								impl->isSelected = 1;
 								impl->curSel = impl->hoverItem - (uint8_t*)impl->array;

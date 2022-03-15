@@ -160,7 +160,7 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->listBG, 0x888888);
 	mgColorSetAsIntegerRGB(&s->listItemText, 0x0);
 	mgColorSetAsIntegerRGB(&s->listItemHoverBG, 0xC1C1C1);
-	mgColorSetAsIntegerRGB(&s->listItemSelectedBG, 0x009BFF);
+	mgColorSetAsIntegerRGB(&s->listItemSelectedBG, 0xE1EEEF);
 	mgColorSetAsIntegerRGB(&s->listItemBG1, 0x888888);
 	mgColorSetAsIntegerRGB(&s->listItemBG2, 0x999999);
 }

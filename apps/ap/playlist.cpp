@@ -12,6 +12,7 @@ extern AP_global_data g_data;
 
 int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, uint8_t* editItem);
 wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c);
+int Playlist_LB_onSelect(mgf::ListBox* lb, uint8_t* item);
 void Playlist_BTN_newPL_onRelease(mgf::Element* e);
 
 PlayList::PlayList()
@@ -99,6 +100,8 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 	:
 	m_listBox(lb)
 {
+	m_listBox->onSelect = Playlist_LB_onSelect;
+
 	IKnownFolderManager* pManager;
 	HRESULT hr = CoCreateInstance(CLSID_KnownFolderManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pManager));
 	if (SUCCEEDED(hr))
@@ -321,3 +324,11 @@ void Playlist_BTN_newPL_onRelease(mgf::Element* e)
 	if (g_data.playlistMgr)
 		g_data.playlistMgr->AddNew();
 }
+
+int Playlist_LB_onSelect(mgf::ListBox* lb, uint8_t* item)
+{
+	PlaylistListBoxData* data = (PlaylistListBoxData*)item;
+	wprintf(L"%s\n", data->text);
+	return 1;
+}
+

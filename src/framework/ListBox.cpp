@@ -38,10 +38,9 @@ using namespace mgf;
 
 extern Backend* g_backend;
 
-//wchar_t LB_onCharEnter(struct mgElement_s*, wchar_t);
-//void LB_onActivate(struct mgElement_s*);
 wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c);
 int LB_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, uint8_t* editItem);
+int LB_onSelect(struct mgElement_s* e, uint8_t* item);
 
 ListBox::ListBox(Window* w, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font* f)
 {
@@ -54,9 +53,7 @@ ListBox::ListBox(Window* w, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, 
 	m_elementList = (mgElementList*)m_element->implementation;
 	m_elementList->onTextInputCharEnter = LB_onTextInputCharEnter;
 	m_elementList->onTextInputEndEdit = LB_onEndEdit;
-	/*((mgElementTextInput_s*)m_elementList->textInput)->onActivate = LB_onActivate;
-	((mgElementTextInput_s*)m_elementList->textInput)->onCharEnter = LB_onActivate;
-	((mgElementTextInput_s*)m_elementList->textInput)->onActivate = LB_onActivate;*/
+	m_elementList->onSelect = LB_onSelect;
 	Element::PostInit();
 }
 
@@ -100,6 +97,11 @@ void ListBox::CanEdit(bool v)
 	m_elementList->editText = (int)v;
 }
 
+void ListBox::NoDeselect(bool v)
+{
+	m_elementList->noDeselect = (int)v;
+}
+
 void ListBox::SetData(void* arr, uint32_t arrSz)
 {
 	m_elementList->array = arr;
@@ -140,4 +142,14 @@ void ListBox::SetTextInputCharLimit(uint32_t i)
 	mgElement* tie = m_elementList->textInput;
 	mgElementTextInput_s* ti = (mgElementTextInput_s*)tie->implementation;
 	ti->charLimit = i;
+}
+
+int LB_onSelect(struct mgElement_s* e, uint8_t* item)
+{
+	ListBox* lb = (ListBox*)e->userData;
+
+	if (lb->onSelect)
+		return lb->onSelect(lb, item);
+
+	return 1;
 }

@@ -58,6 +58,9 @@ class PlayListManager : public mgf::BaseClass
 	mgf::StringW m_musicDir;
 	mgf::StringW m_playlistDir;
 
+	PlayList* m_playPlaylist = 0;
+	PlayList* m_editPlaylist = 0;
+
 	void _updateGUIListbox();
 public:
 	PlayListManager(mgf::ListBox*);

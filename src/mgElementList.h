@@ -38,6 +38,9 @@ typedef struct mgElementList_s {
 	uint32_t selectWithRMB;/*0*/
 	uint32_t drawItemBG;/*0*/
 	uint32_t useF2ForEdit;/*1*/
+	uint32_t noDeselect;/*0, Some item will be always selected. 
+						Select item by yourself. 
+						Only for not multisilect.*/
 
 	void* array;
 	uint32_t arraySize;
@@ -59,7 +62,7 @@ typedef struct mgElementList_s {
 	uint32_t clickedItemsCurr;
 
 	/*return 1 if need to select*/
-	int(*onSelect)(struct mgElement_s* e);
+	int(*onSelect)(struct mgElement_s* e, uint8_t* item);
 	
 	wchar_t(*onTextInputCharEnter)(struct mgElement_s*, wchar_t);
 	int(*onTextInputEndEdit)(struct mgElement_s*, int, const wchar_t*, uint8_t* editItem);

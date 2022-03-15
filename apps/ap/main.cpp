@@ -169,6 +169,7 @@ int main()
 		g_data.listboxPlaylist->onTextInputCharEnter = Playlist_LB_onTextInputCharEnter;
 		g_data.listboxPlaylist->onTextInputEndEdit = Playlist_LB_onTextInputEndEdit;
 		g_data.listboxPlaylist->SetTextInputCharLimit(100);
+		g_data.listboxPlaylist->NoDeselect(true);
 		//g_data.listboxPlaylist->SetData(listboxData, 10);
 
 		playlistMgr = new PlayListManager(g_data.listboxPlaylist);

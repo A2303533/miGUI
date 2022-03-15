@@ -62,6 +62,7 @@ namespace mgf
 		void SetFont(Font*);
 		void SetItemHeight(uint32_t);
 		void CanEdit(bool);
+		void NoDeselect(bool);
 
 		// 0 - no limit;
 		void SetTextInputCharLimit(uint32_t);
@@ -78,6 +79,9 @@ namespace mgf
 		* editItem: first byte for edited item
 		*/
 		int(*onTextInputEndEdit)(ListBox*, int i, const wchar_t* str, uint8_t* editItem) = 0;
+
+		/*return 1 if need to select*/
+		int(*onSelect)(ListBox*, uint8_t* item);
 	};
 }
 
