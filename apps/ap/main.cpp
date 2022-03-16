@@ -8,10 +8,12 @@
 #include "framework/Icons.h"
 #include "framework/TextInput.h"
 #include "framework/ListBox.h"
+#include "framework/Table.h"
 
 #include "ap.h"
 #include "playlist.h"
 
+#include <list>
 
 #define AP_PLAYLISTAREASIZE 180
 #define AP_CONTROLAREASIZE 70
@@ -42,8 +44,11 @@ void window_OnSize(mgf::SystemWindow* w)
 		g_data.controlArea->SetRect(0, sz.y - AP_CONTROLAREASIZE, sz.x, sz.y);
 	if(g_data.tracklistArea)
 		g_data.tracklistArea->SetRect(AP_PLAYLISTAREASIZE, 0, sz.x, sz.y - AP_CONTROLAREASIZE);
+
 	if (g_data.listboxPlaylist)
 		g_data.listboxPlaylist->SetRect(5, 25, AP_PLAYLISTAREASIZE, sz.y - AP_CONTROLAREASIZE);
+	if (g_data.tableTracklist)
+		g_data.tableTracklist->SetRect(AP_PLAYLISTAREASIZE, 0, sz.x, sz.y - AP_CONTROLAREASIZE);
 }
 
 void context_onDraw(mgf::Context* c, mgf::Backend* b)
@@ -55,6 +60,51 @@ void context_onDraw(mgf::Context* c, mgf::Backend* b)
 	b->DrawRectangle(0, 0, &r, &color, &color, 0, 0);*/
 }
 
+struct FileInfo // info for row
+{
+	mgf::StringW filename;
+	int fileSize = 0;
+	mgf::StringW fileType;
+	int date = 0;
+};
+int test_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
+{
+	if (row)
+	{
+		FileInfo* fi = (FileInfo*)row;
+		static mgf::StringW textBuffer;
+
+		switch (col)
+		{
+		case 0:
+			*text = fi->filename.data();
+			*textlen = fi->filename.size();
+			break;
+		case 1:
+			textBuffer.clear();
+			textBuffer += fi->fileSize;
+			textBuffer += L" Bytes";
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		case 2:
+			textBuffer.clear();
+			textBuffer += fi->fileType.data();
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		case 3:
+			textBuffer.clear();
+			textBuffer += fi->date;
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		}
+
+		return 1;
+	}
+	return 0;
+}
 
 int main()
 {
@@ -171,6 +221,47 @@ int main()
 		g_data.listboxPlaylist->SetTextInputCharLimit(100);
 		g_data.listboxPlaylist->NoDeselect(true);
 		//g_data.listboxPlaylist->SetData(listboxData, 10);
+		
+		
+		FileInfo** arrFileInfo = (FileInfo**)std::malloc(3 * sizeof(FileInfo*));
+		std::list<FileInfo*> lst;
+		{
+			FileInfo* fi = new FileInfo;
+			fi->filename = "E:\\Code\\miGUI\\bin32\\d3d11_demo.txt";
+			fi->fileSize = 117;
+			fi->fileType = "Text file";
+			fi->date = 2022;
+			lst.push_back(fi);
+
+			fi = new FileInfo;
+			fi->filename = "E:/app.exe";
+			fi->fileSize = 3131;
+			fi->fileType = "Application";
+			fi->date = 2019;
+			lst.push_back(fi);
+
+			fi = new FileInfo;
+			fi->filename = "E:/ass.png";
+			fi->fileSize = 512422;
+			fi->fileType = "PNG Image";
+			fi->date = 2021;
+			lst.push_back(fi);
+
+			int ic = 0;
+			for (auto ln : lst)
+			{
+				arrFileInfo[ic] = ln;
+				ic++;
+			}
+		}
+		/*for (int i = 0; i < 3; ++i)
+		{
+			FileInfo* fi = arrFileInfo[i];
+			wprintf(L"FILE: %s\n", fi->filename.data());
+		}*/
+		g_data.tableTracklist = window.m_data->AddTable(4, listboxFont.m_data);
+		g_data.tableTracklist->SetData((void**)arrFileInfo, 3);
+		g_data.tableTracklist->onDrawRow = test_onDrawRow;
 
 		playlistMgr = new PlayListManager(g_data.listboxPlaylist);
 		g_data.playlistMgr = playlistMgr.m_data;

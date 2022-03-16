@@ -37,6 +37,7 @@ void miGUI_onUpdateTransform_rectangle(mgElement* e);
 void miGUI_onUpdate_rectangle(mgElement* e);
 void miGUI_onUpdateTransform_textinput(mgElement* e);
 float lerp(float v0, float v1, float t);
+extern int g_skipFrame;
 
 struct lbData1
 {
@@ -397,7 +398,7 @@ miGUI_onDraw_list(mgElement* e)
 			}
 
 
-			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverItem)
+			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverItem && !g_skipFrame)
 			{
 				impl->hoverItem = u8ptr_curr;
 				impl->hoverItemClipRect = rClip;
@@ -441,7 +442,7 @@ miGUI_onDraw_list(mgElement* e)
 			if(impl->hoverItem == u8ptr_curr)
 				impl->hoverItemText = str;
 
-			e->window->context->gpu->drawText(mgDrawTextReason_text, impl, 
+			e->window->context->gpu->drawText(mgDrawTextReason_listbox, impl,
 				&pos,
 				str,
 				wcslen(str),

@@ -45,6 +45,7 @@ namespace mgf
 		friend class Button;
 		friend class TextInput;
 		friend class ListBox;
+		friend class Table;
 
 		mgWindow_s* m_window = 0;
 		std::basic_string<wchar_t> m_title;
@@ -85,6 +86,8 @@ namespace mgf
 		*		0x1 - selected or not
 		*/
 		ListBox* AddListBox(void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font*);
+		
+		Table* AddTable(uint32_t colNum, Font*);
 
 		void UpdateRect();
 

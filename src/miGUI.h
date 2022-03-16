@@ -93,6 +93,11 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_listItemBG2,
 	mgDrawRectangleReason_listHoverItemBG,
 	mgDrawRectangleReason_listSelectedItemBG,
+	mgDrawRectangleReason_tableBG,
+	mgDrawRectangleReason_tableItemBG1,
+	mgDrawRectangleReason_tableItemBG2,
+	mgDrawRectangleReason_tableHoverItemBG,
+	mgDrawRectangleReason_tableCellBG,
 };
 
 enum mgDrawTextReason
@@ -102,6 +107,8 @@ enum mgDrawTextReason
 	mgDrawTextReason_windowMenu,
 	mgDrawTextReason_buttonText,
 	mgDrawTextReason_text,
+	mgDrawTextReason_table,
+	mgDrawTextReason_listbox,
 	mgDrawTextReason_popup,
 	mgDrawTextReason_popupShortcut,
 	mgDrawTextReason_tooltip,
@@ -275,26 +282,26 @@ extern PFNMGSETPARENTPROC mgSetParent;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
+MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
 #define mgCreateRectangle mgCreateRectangle_f
 #else
-typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
+typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgColor* color1, mgColor* color2);
 extern PFNMGCREATERECTANGLEPROC mgCreateRectangle;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
+MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgFont* font);
 #define mgCreateText mgCreateText_f
 #else
-typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgWindow_s* c, mgPoint* position, const wchar_t* text, mgFont* font);
+typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgFont* font);
 extern PFNMGCREATETEXTPROC mgCreateText;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
+MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
 #define mgCreateButton mgCreateButton_f
 #else
-typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
+typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
 extern PFNMGCREATEBUTTONPROC mgCreateButton;
 #endif
 
@@ -302,11 +309,19 @@ extern PFNMGCREATEBUTTONPROC mgCreateButton;
 * arr and arrSz - can be 0, set this later
 */
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* c, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, mgFont* f);
+MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, mgFont* f);
 #define mgCreateListBox mgCreateListBox_f
 #else
-typedef mgElement* (*PFNMGCREATELISTBOXPROC)(struct mgWindow_s* c, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, mgFont* f);
+typedef mgElement* (*PFNMGCREATELISTBOXPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, mgFont* f);
 extern PFNMGCREATELISTBOXPROC mgCreateListBox;
+#endif
+
+#ifdef MG_NO_DLL
+MG_API mgElement* MG_C_DECL mgCreateTable_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** rows, uint32_t rowsSz, uint32_t colNum, mgFont* f);
+#define mgCreateTable mgCreateTable_f
+#else
+typedef mgElement* (*PFNMGCREATETABLEPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** rows, uint32_t rowsSz, uint32_t colNum, mgFont* f);
+extern PFNMGCREATETABLEPROC mgCreateTable;
 #endif
 
 /*

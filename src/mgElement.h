@@ -148,5 +148,6 @@ void mgElementDefaultInit(mgElement* e)
 #include "mgElementButton.h"
 #include "mgElementTextInput.h"
 #include "mgElementList.h"
+#include "mgElementTable.h"
 
 #endif

@@ -12,6 +12,7 @@ struct AP_global_data
 	mgf::Rectangle* tracklistArea = 0;
 	mgf::Button* buttonNewPlaylist = 0;
 	mgf::ListBox* listboxPlaylist = 0;
+	mgf::Table* tableTracklist = 0;
 	mgStyle_s style;
 
 	PlayListManager* playlistMgr = 0;

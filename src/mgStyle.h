@@ -91,6 +91,13 @@ typedef struct mgStyle_s {
 	mgColor listItemHoverBG;
 	mgColor listItemSelectedBG;
 
+	mgColor tableBG;
+	mgColor tableItemBG1;
+	mgColor tableItemBG2;
+	mgColor tableItemHoverBG;
+	mgColor tableItemText;
+	mgColor tableCellBG;
+
 } mgStyle;
 
 #endif

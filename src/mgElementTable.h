@@ -27,46 +27,43 @@
 */
 
 #pragma once
-#ifndef _MG_FORWARD_H_
-#define _MG_FORWARD_H_
+#ifndef _MG_ELEMENTTABLE_H_
+#define _MG_ELEMENTTABLE_H_
 
-struct mgPoint_s;
-struct mgRect_s;
-struct mgVec4_s;
-struct mgColor_s;
-struct mgFontBitmap_s;
-struct mgFontGlyph_s;
-struct mgFont_s;
-struct mgImage_s;
-struct mgIconsNode_s;
-struct mgIcons_s;
-struct mgIconGroup_s;
-struct mgStyle_s;
-struct mgPopupItemInfo_s;
-struct mgPopupItem_s;
-struct mgPopup_s;
-struct mgMenuItemInfo_s;
-struct mgMenuItem_s;
-struct mgMenu_s;
-struct mgDockPanelWindow_s;
-struct mgDockPanelElementCreationInfo_s;
-struct mgDockPanelElement_s;
-struct mgDockPanel_s;
-struct mgWindow_s;
-struct mgElementNode_s;
-struct mgElementTransform_s;
-struct mgElement_s;
-struct mgElementRectangle_s;
-struct mgElementText_s;
-struct mgElementButton_s;
-struct mgVideoDriverAPI_s;
-struct mgInputContext_s;
-struct mgCursor_s;
-struct mgFunctions_s;
-struct mgContext_s;
-struct mgTexture_s;
-struct mgElementTextInput_s;
-struct mgElementList_s;
-struct mgElementTable_s;
+typedef struct mgElementTable_s {
+	struct mgFont_s* font;
+	uint32_t numRows;
+	uint32_t numCols;
+
+	uint32_t multiselect;/*0*/
+
+	void** rows;
+	uint32_t rowHeight;
+	uint32_t* colsSizes; /*array[numCols], width for columns*/
+
+	struct mgElement_s* textInput;
+
+	/*
+	* Return 0 - no draw
+	*        1 - this is wchar_t* (you must set `text` and `textlen`)
+	*        
+	*/
+	int(*onDrawRow)(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+
+	uint32_t firstRowIndexForDraw;
+	float rowScrollValue;
+	float rowScrollValueTarget;
+	float rowScrollValueWorld;
+	void* hoverRow;
+	uint32_t numOfLines;
+
+	uint32_t drawItemBG;
+
+	mgRect hoverRowClipRect;
+	mgRect hoverRowBuildRect;
+
+} mgElementTable;
+
+
 
 #endif

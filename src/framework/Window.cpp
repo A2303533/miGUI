@@ -35,6 +35,7 @@
 #include "framework/Button.h"
 #include "framework/TextInput.h"
 #include "framework/ListBox.h"
+#include "framework/Table.h"
 
 using namespace mgf;
 
@@ -263,3 +264,11 @@ ListBox* Window::AddListBox(void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, 
 	m_elements.emplace_back(e);
 	return e;
 }
+
+Table* Window::AddTable(uint32_t colNum, Font* f)
+{
+	Table* e = new Table(this, colNum, f);
+	m_elements.emplace_back(e);
+	return e;
+}
+
