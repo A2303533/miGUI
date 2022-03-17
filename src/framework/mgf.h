@@ -45,6 +45,7 @@
 #include "mgTexture.h"
 #include "mgTexture.h"
 #include "mgStyle.h"
+#include "mgInputContex.h"
 
 #include "framework/forward.h"
 #include "framework/BaseClass.h"

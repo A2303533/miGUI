@@ -201,6 +201,7 @@ typedef struct mgInputContext_s {
 	wchar_t character;
 	uint8_t keyFlags[256]; /**/
 
+	/*keyboardModifier == MG_KBMOD_SHIFT*/
 	uint8_t keyboardModifier; /*MG_KBMOD...*/
 
 } mgInputContext;

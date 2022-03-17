@@ -105,7 +105,9 @@ namespace mgf
 		
 		void SetData(void** arr, uint32_t arrSz);
 		void SetScrollSpeed(float);
-		
+
+		void** GetData();
+
 		wchar_t(*onTextInputCharEnter)(Table*, wchar_t) = 0;
 		/*
 		* i:
@@ -128,7 +130,7 @@ namespace mgf
 		//Return 1 if this row selected
 		int(*onIsRowSelected)(Table*, void* row);
 		// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
-		void(*onRowClick)(Table*, void* item, int mouseButton);
+		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, int mouseButton, int kbm);
 	};
 }
 

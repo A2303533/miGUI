@@ -203,8 +203,8 @@ miGUI_onUpdate_table(mgElement* e)
 			else if (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
 				mouseBtn = 3;
 
-			if (impl->onRowClick)
-				impl->onRowClick(e, impl->hoverRow, mouseBtn);
+			if (impl->onRowClick && mouseBtn)
+				impl->onRowClick(e, impl->hoverRow, impl->hoverRowIndex, mouseBtn, c->input->keyboardModifier);
 			
 			//issel = 1;
 
@@ -339,6 +339,7 @@ miGUI_onDraw_table(mgElement* e)
 		//void* rowBegin = impl->rows[0];
 
 		impl->hoverRow = 0;
+		impl->hoverRowIndex = 0;
 		for (uint32_t i = 0; i < impl->numOfLines; ++i)
 		{
 			void* rowCurr = impl->rows[index];// rowBegin + (index * sizeof(void*));
@@ -385,6 +386,7 @@ miGUI_onDraw_table(mgElement* e)
 
 			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverRow && e->cursorInRect)
 			{
+				impl->hoverRowIndex = index;
 				impl->hoverRow = rowCurr;
 				impl->hoverRowClipRect = rClip;
 				impl->hoverRowBuildRect = r;

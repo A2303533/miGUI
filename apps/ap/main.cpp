@@ -122,16 +122,70 @@ int testTable_onIsRowSelected(mgf::Table* tb, void* row)
 	return fi->isSelected == true;
 }
 FileInfo* g_testTable_selectedRow = 0;
-void testTable_onRowClick(mgf::Table* tb, void* row, int mouseButton)
+void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mouseButton, int kbm)
 {
+	static uint32_t oldIndex = 0;
 	FileInfo* fi = (FileInfo*)row;
 
+	void** tableData = tb->GetData();
+
 	// MULTISELECTION
-	/*if (mouseButton)
-		fi->isSelected = fi->isSelected ? false : true;*/
+	if (mouseButton)
+	{
+		if (kbm == MG_KBMOD_SHIFT)
+		{
+			fi->isSelected = true;
+			if (oldIndex != rowIndex)
+			{
+				uint32_t s1 = rowIndex;
+				uint32_t s2 = oldIndex;
+				if (s2 < s1)
+				{
+					s1 = oldIndex;
+					s2 = rowIndex;
+				}
+
+				for (uint32_t i = s1; i <= s2; ++i)
+				{
+					FileInfo* fi2 = (FileInfo*)tableData[i];
+					fi2->isSelected = true;
+
+					if (i == s2)
+						break;
+				}
+			}
+		}
+		else if (kbm & MG_KBMOD_ALT)
+		{
+			fi->isSelected = false;
+			if (oldIndex != rowIndex)
+			{
+				uint32_t s1 = rowIndex;
+				uint32_t s2 = oldIndex;
+				if (s2 < s1)
+				{
+					s1 = oldIndex;
+					s2 = rowIndex;
+				}
+
+				for (uint32_t i = s1; i <= s2; ++i)
+				{
+					FileInfo* fi2 = (FileInfo*)tableData[i];
+					fi2->isSelected = false;
+
+					if (i == s2)
+						break;
+				}
+			}
+		}
+		else
+		{
+			fi->isSelected = fi->isSelected ? false : true;
+		}
+	}
 
 	// select only 1
-	if (mouseButton)
+	/*if (mouseButton)
 	{
 		if (g_testTable_selectedRow)
 		{
@@ -156,7 +210,8 @@ void testTable_onRowClick(mgf::Table* tb, void* row, int mouseButton)
 			fi->isSelected = 1;
 			g_testTable_selectedRow = fi;
 		}
-	}
+	}*/
+	oldIndex = rowIndex;
 }
 
 int main()
@@ -280,7 +335,7 @@ int main()
 		std::list<FileInfo*> lst;
 		{
 			uint32_t fn = 1;
-			for (auto& entry : std::filesystem::recursive_directory_iterator("E:\\My Web Sites\\"))
+			for (auto& entry : std::filesystem::recursive_directory_iterator("../"))
 			{
 				auto path = entry.path();
 				if (std::filesystem::is_regular_file(path))
@@ -311,6 +366,7 @@ int main()
 		g_data.tableTracklist->onDrawRow = testTable_onDrawRow;
 		g_data.tableTracklist->onIsRowSelected = testTable_onIsRowSelected;
 		g_data.tableTracklist->onRowClick = testTable_onRowClick;
+		printf("LIST SIZE: %u\n", lst.size());
 		
 
 		playlistMgr = new PlayListManager(g_data.listboxPlaylist);
