@@ -180,31 +180,27 @@ miGUI_onUpdate_table(mgElement* e)
 	{
 	//	int issel = 0;
 	//	
-		int edit = 0;
-	//	if ((e->lmbClickCount == 2) && (impl->editText) && (impl->clickedItems[0] == impl->clickedItems[1]))
-	//		edit = 1;
+		
+		int mouseBtn = 0;
+		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			mouseBtn = 1;
+		else if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+			mouseBtn = 2;
+		else if (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
+			mouseBtn = 3;
 
-	//	if (!edit && impl->useF2ForEdit)
-	//	{
-	//		if ((impl->clickedItems[0] == impl->hoverRow) || (impl->clickedItems[1] == impl->hoverRow))
-	//		{
-	//			if (mgIsKeyHit(c->input, MG_KEY_F2))
-	//				edit = 2;
-	//		}
-	//	}
+		if (impl->onRowClick && mouseBtn)
+			impl->onRowClick(e, impl->hoverRow, impl->hoverRowIndex, mouseBtn);
 
-		if(!edit)
+		if (impl->onCellClick && mouseBtn)
 		{
-			int mouseBtn = 0;
-			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-				mouseBtn = 1;
-			else if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
-				mouseBtn = 2;
-			else if (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
-				mouseBtn = 3;
+			if (impl->onCellClick(e, impl->hoverRow, impl->hoverRowIndex, impl->hoverColIndex, mouseBtn))
+			{
 
-			if (impl->onRowClick && mouseBtn)
-				impl->onRowClick(e, impl->hoverRow, impl->hoverRowIndex, mouseBtn, c->input->keyboardModifier);
+			}
+
+		}
+
 			
 			//issel = 1;
 
@@ -263,7 +259,6 @@ miGUI_onUpdate_table(mgElement* e)
 	//					}
 	//				}
 	//			}
-		}
 
 	//	if (edit)
 	//	{
@@ -340,6 +335,7 @@ miGUI_onDraw_table(mgElement* e)
 
 		impl->hoverRow = 0;
 		impl->hoverRowIndex = 0;
+		impl->hoverColIndex = 0xFFFFFFFF;
 		for (uint32_t i = 0; i < impl->numOfLines; ++i)
 		{
 			void* rowCurr = impl->rows[index];// rowBegin + (index * sizeof(void*));
@@ -479,6 +475,12 @@ miGUI_onDraw_table(mgElement* e)
 							rctCol.bottom = e->transformWorld.clipArea.bottom;
 
 						e->window->context->gpu->setClipRect(&rctCol);
+
+						if (impl->hoverRow == rowCurr)
+						{
+							if (mgPointInRect(&rctCol, &ctx->input->mousePosition))
+								impl->hoverColIndex = i2;
+						}
 
 						int drwBg = 0;
 						

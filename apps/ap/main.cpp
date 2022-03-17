@@ -122,7 +122,7 @@ int testTable_onIsRowSelected(mgf::Table* tb, void* row)
 	return fi->isSelected == true;
 }
 FileInfo* g_testTable_selectedRow = 0;
-void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mouseButton, int kbm)
+void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mouseButton, mgInputContext_s* input)
 {
 	static uint32_t oldIndex = 0;
 	FileInfo* fi = (FileInfo*)row;
@@ -132,7 +132,7 @@ void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mous
 	// MULTISELECTION
 	if (mouseButton)
 	{
-		if (kbm == MG_KBMOD_SHIFT)
+		if (input->keyboardModifier == MG_KBMOD_SHIFT)
 		{
 			fi->isSelected = true;
 			if (oldIndex != rowIndex)
@@ -155,7 +155,7 @@ void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mous
 				}
 			}
 		}
-		else if (kbm & MG_KBMOD_ALT)
+		else if (input->keyboardModifier & MG_KBMOD_ALT)
 		{
 			fi->isSelected = false;
 			if (oldIndex != rowIndex)
@@ -212,6 +212,29 @@ void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mous
 		}
 	}*/
 	oldIndex = rowIndex;
+}
+int testTable_onCellClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton, mgInputContext_s* input)
+{
+	int r = 0;
+	FileInfo* fi = (FileInfo*)row;
+	void** tableData = tb->GetData();
+	static uint32_t oldRowIndex = 0;
+	static uint32_t oldCellIndex = 0;
+	//printf("ROW: %u CELL: %u\n", rowIndex, cellIndex);
+
+	if (input->LMBClickCount == 2)
+	{
+		if ((oldRowIndex == rowIndex) && (oldCellIndex == cellIndex))
+		{
+			r = 1;
+			fi->isSelected = true;
+		}
+	}
+
+	oldRowIndex = rowIndex;
+	oldCellIndex = cellIndex;
+
+	return r;
 }
 
 int main()
@@ -366,8 +389,9 @@ int main()
 		g_data.tableTracklist->onDrawRow = testTable_onDrawRow;
 		g_data.tableTracklist->onIsRowSelected = testTable_onIsRowSelected;
 		g_data.tableTracklist->onRowClick = testTable_onRowClick;
+		g_data.tableTracklist->onCellClick = testTable_onCellClick;
 		printf("LIST SIZE: %u\n", lst.size());
-		
+		/*for (auto ln : lst){delete ln;}*/
 
 		playlistMgr = new PlayListManager(g_data.listboxPlaylist);
 		g_data.playlistMgr = playlistMgr.m_data;
@@ -386,6 +410,8 @@ int main()
 
 			framework.m_data->DrawAll();
 		}
+
+		
 	}
 	catch (const char* str)
 	{

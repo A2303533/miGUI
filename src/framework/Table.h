@@ -130,7 +130,9 @@ namespace mgf
 		//Return 1 if this row selected
 		int(*onIsRowSelected)(Table*, void* row);
 		// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
-		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, int mouseButton, int kbm);
+		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, int mouseButton, mgInputContext_s* input);
+		// return 1 if need to enable textinput
+		int(*onCellClick)(Table*, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton, mgInputContext_s* input);
 	};
 }
 

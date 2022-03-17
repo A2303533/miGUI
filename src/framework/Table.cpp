@@ -40,10 +40,10 @@ extern Backend* g_backend;
 
 wchar_t Table_onTextInputCharEnter(struct mgElement_s* e, wchar_t c);
 int Table_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, uint8_t* editItem);
-int Table_onSelect(struct mgElement_s* e, uint8_t* item);
 int Table_onDrawRow(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
 int Table_onIsRowSelected(struct mgElement_s*, void* row);
-void Table_onRowClick(struct mgElement_s*, void* row, uint32_t rowIndex, int mouseButton, int kbm);
+void Table_onRowClick(struct mgElement_s*, void* row, uint32_t rowIndex, int mouseButton);
+int Table_onCellClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton);
 
 Table::Table(Window* w, uint32_t colNum, Font* f)
 {
@@ -57,6 +57,7 @@ Table::Table(Window* w, uint32_t colNum, Font* f)
 	m_elementTable->onDrawRow = Table_onDrawRow;
 	m_elementTable->onIsRowSelected = Table_onIsRowSelected;
 	m_elementTable->onRowClick = Table_onRowClick;
+	m_elementTable->onCellClick = Table_onCellClick;
 
 	for (uint32_t i = 0; i < colNum; ++i)
 	{
@@ -143,16 +144,6 @@ void Table::SetTextInputCharLimit(uint32_t i)
 	ti->charLimit = i;
 }
 
-int Table_onSelect(struct mgElement_s* e, uint8_t* item)
-{
-	/*ListBox* lb = (ListBox*)e->userData;
-
-	if (lb->onSelect)
-		return lb->onSelect(lb, item);*/
-
-	return 1;
-}
-
 int Table_onDrawRow(struct mgElement_s* e, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
 {
 	Table* tb = (Table*)e->userData;
@@ -173,11 +164,19 @@ int Table_onIsRowSelected(struct mgElement_s* e, void* row)
 	return 0;
 }
 
-void Table_onRowClick(struct mgElement_s* e, void* row, uint32_t rowIndex, int mouseButton, int kbm)
+void Table_onRowClick(struct mgElement_s* e, void* row, uint32_t rowIndex, int mouseButton)
 {
 	Table* tb = (Table*)e->userData;
 
 	if (tb->onRowClick)
-		tb->onRowClick(tb, row, rowIndex, mouseButton, kbm);
+		tb->onRowClick(tb, row, rowIndex, mouseButton, e->window->context->input);
 }
 
+int Table_onCellClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onCellClick)
+		return tb->onCellClick(tb, row, rowIndex, cellIndex, mouseButton, e->window->context->input);
+	return 0;
+}

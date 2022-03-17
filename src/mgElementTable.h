@@ -60,7 +60,11 @@ typedef struct mgElementTable_s {
 	/*
 	* mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
 	*/
-	void(*onRowClick)(struct mgElement_s*, void* row, uint32_t rowIndex, int mouseButton, int kbm);
+	void(*onRowClick)(struct mgElement_s*, void* row, uint32_t rowIndex, int mouseButton);
+	/*
+	* return 1 for textInput
+	*/
+	int(*onCellClick)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton);
 
 	uint32_t firstRowIndexForDraw;
 	float rowScrollValue;
@@ -69,7 +73,10 @@ typedef struct mgElementTable_s {
 	float scrollSpeed;/*10.f*/
 	void* hoverRow;
 	uint32_t hoverRowIndex;
+	uint32_t hoverColIndex;
 	uint32_t numOfLines;
+
+
 
 	uint32_t drawItemBG;
 
