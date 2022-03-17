@@ -42,6 +42,8 @@ wchar_t Table_onTextInputCharEnter(struct mgElement_s* e, wchar_t c);
 int Table_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, uint8_t* editItem);
 int Table_onSelect(struct mgElement_s* e, uint8_t* item);
 int Table_onDrawRow(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+int Table_onIsRowSelected(struct mgElement_s*, void* row);
+void Table_onRowClick(struct mgElement_s*, void* item, int mouseButton);
 
 Table::Table(Window* w, uint32_t colNum, Font* f)
 {
@@ -53,6 +55,8 @@ Table::Table(Window* w, uint32_t colNum, Font* f)
 	m_element->userData = this;
 	m_elementTable = (mgElementTable*)m_element->implementation;
 	m_elementTable->onDrawRow = Table_onDrawRow;
+	m_elementTable->onIsRowSelected = Table_onIsRowSelected;
+	m_elementTable->onRowClick = Table_onRowClick;
 
 	for (uint32_t i = 0; i < colNum; ++i)
 	{
@@ -80,6 +84,11 @@ uint32_t Table::GetCurSel()
 {
 	/*return m_elementTable->curSel;*/
 	return 0;
+}
+
+void Table::SetScrollSpeed(float s)
+{
+	m_elementTable->scrollSpeed = s;
 }
 
 void Table::SetData(void** arr, uint32_t arrSz)
@@ -148,3 +157,22 @@ int Table_onDrawRow(struct mgElement_s* e, void* row, uint32_t col, wchar_t** te
 
 	return 0;
 }
+
+int Table_onIsRowSelected(struct mgElement_s* e, void* row)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onIsRowSelected)
+		return tb->onIsRowSelected(tb, row);
+
+	return 0;
+}
+
+void Table_onRowClick(struct mgElement_s* e, void* item, int mouseButton)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onRowClick)
+		tb->onRowClick(tb, item, mouseButton);
+}
+

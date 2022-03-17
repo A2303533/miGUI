@@ -164,10 +164,11 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->listItemBG1, 0x888888);
 	mgColorSetAsIntegerRGB(&s->listItemBG2, 0x999999);
 	mgColorSetAsIntegerRGB(&s->tableBG, 0xFFFFFF);
-	mgColorSetAsIntegerRGB(&s->tableItemBG1, 0xE1EEEF);
-	mgColorSetAsIntegerRGB(&s->tableItemBG2, 0xE1EEEF);
-	mgColorSetAsIntegerRGB(&s->tableItemHoverBG, 0xC1C1C1);
-	mgColorSetAsIntegerRGB(&s->tableItemText, 0x0);
+	mgColorSetAsIntegerRGB(&s->tableRowBG1, 0xE1EEEF);
+	mgColorSetAsIntegerRGB(&s->tableRowBG2, 0xE1EEEF);
+	mgColorSetAsIntegerRGB(&s->tableRowHoverBG, 0xEEEEEE);
+	mgColorSetAsIntegerRGB(&s->tableRowSelectedBG, 0xFAFFA3);
+	mgColorSetAsIntegerRGB(&s->tableCellText, 0x0);
 	mgColorSetAsIntegerRGB(&s->tableCellBG, 0xE1EEEF);
 
 }
@@ -857,10 +858,13 @@ mgOnWindowSize_f(struct mgContext_s* c, int x, int y)
 {
 	assert(c);
 	c->needRebuild = 1;
+	c->needUpdateTransform = 1;
 	c->windowSize.x = x;
 	c->windowSize.y = y;
 
 	g_skipFrame = 1;
+
+	mgUpdate_f(c);
 
 	if (c->dockPanel)
 		mgDockPanelOnSize(c);

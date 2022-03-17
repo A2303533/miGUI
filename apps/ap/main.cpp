@@ -14,6 +14,7 @@
 #include "playlist.h"
 
 #include <list>
+#include <filesystem>
 
 #define AP_PLAYLISTAREASIZE 180
 #define AP_CONTROLAREASIZE 70
@@ -48,7 +49,7 @@ void window_OnSize(mgf::SystemWindow* w)
 	if (g_data.listboxPlaylist)
 		g_data.listboxPlaylist->SetRect(5, 25, AP_PLAYLISTAREASIZE, sz.y - AP_CONTROLAREASIZE);
 	if (g_data.tableTracklist)
-		g_data.tableTracklist->SetRect(AP_PLAYLISTAREASIZE, 0, sz.x, sz.y - AP_CONTROLAREASIZE);
+		g_data.tableTracklist->SetRect(AP_PLAYLISTAREASIZE, 80, sz.x, sz.y - AP_CONTROLAREASIZE);
 }
 
 void context_onDraw(mgf::Context* c, mgf::Backend* b)
@@ -60,40 +61,50 @@ void context_onDraw(mgf::Context* c, mgf::Backend* b)
 	b->DrawRectangle(0, 0, &r, &color, &color, 0, 0);*/
 }
 
+// TABLE DEMO
 struct FileInfo // info for row
 {
+	//your data, no matter what you have this.
+	uint32_t number;
 	mgf::StringW filename;
 	int fileSize = 0;
 	mgf::StringW fileType;
 	int date = 0;
+	bool isSelected = false;
 };
-int test_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
+int testTable_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
 {
 	if (row)
 	{
 		FileInfo* fi = (FileInfo*)row;
 		static mgf::StringW textBuffer;
-
+		// col is where you want to show text for current row
 		switch (col)
 		{
 		case 0:
+			textBuffer.clear();
+			textBuffer += fi->number;
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		case 1:
 			*text = fi->filename.data();
 			*textlen = fi->filename.size();
 			break;
-		case 1:
+		case 2:
 			textBuffer.clear();
 			textBuffer += fi->fileSize;
 			textBuffer += L" Bytes";
 			*text = textBuffer.data();
 			*textlen = textBuffer.size();
 			break;
-		case 2:
+		case 3:
 			textBuffer.clear();
 			textBuffer += fi->fileType.data();
 			*text = textBuffer.data();
 			*textlen = textBuffer.size();
 			break;
-		case 3:
+		case 4:
 			textBuffer.clear();
 			textBuffer += fi->date;
 			*text = textBuffer.data();
@@ -104,6 +115,48 @@ int test_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint
 		return 1;
 	}
 	return 0;
+}
+int testTable_onIsRowSelected(mgf::Table* tb, void* row)
+{
+	FileInfo* fi = (FileInfo*)row;
+	return fi->isSelected == true;
+}
+FileInfo* g_testTable_selectedRow = 0;
+void testTable_onRowClick(mgf::Table* tb, void* row, int mouseButton)
+{
+	FileInfo* fi = (FileInfo*)row;
+
+	// MULTISELECTION
+	/*if (mouseButton)
+		fi->isSelected = fi->isSelected ? false : true;*/
+
+	// select only 1
+	if (mouseButton)
+	{
+		if (g_testTable_selectedRow)
+		{
+			if (g_testTable_selectedRow == fi)
+			{
+				g_testTable_selectedRow = 0;
+				fi->isSelected = false;
+			}
+			else
+			{
+				g_testTable_selectedRow->isSelected = 0;
+
+				fi->isSelected = 1;
+				g_testTable_selectedRow = fi;
+			}
+		}
+		else
+		{
+			if (g_testTable_selectedRow)
+				g_testTable_selectedRow->isSelected = 0;
+
+			fi->isSelected = 1;
+			g_testTable_selectedRow = fi;
+		}
+	}
 }
 
 int main()
@@ -222,46 +275,43 @@ int main()
 		g_data.listboxPlaylist->NoDeselect(true);
 		//g_data.listboxPlaylist->SetData(listboxData, 10);
 		
-		
-		FileInfo** arrFileInfo = (FileInfo**)std::malloc(3 * sizeof(FileInfo*));
+		// TABLE DEMO
+		FileInfo** arrFileInfo = 0;
 		std::list<FileInfo*> lst;
 		{
-			FileInfo* fi = new FileInfo;
-			fi->filename = "E:\\Code\\miGUI\\bin32\\d3d11_demo.txt";
-			fi->fileSize = 117;
-			fi->fileType = "Text file";
-			fi->date = 2022;
-			lst.push_back(fi);
-
-			fi = new FileInfo;
-			fi->filename = "E:/app.exe";
-			fi->fileSize = 3131;
-			fi->fileType = "Application";
-			fi->date = 2019;
-			lst.push_back(fi);
-
-			fi = new FileInfo;
-			fi->filename = "E:/ass.png";
-			fi->fileSize = 512422;
-			fi->fileType = "PNG Image";
-			fi->date = 2021;
-			lst.push_back(fi);
-
-			int ic = 0;
-			for (auto ln : lst)
+			uint32_t fn = 1;
+			for (auto& entry : std::filesystem::recursive_directory_iterator("E:\\My Web Sites\\"))
 			{
-				arrFileInfo[ic] = ln;
-				ic++;
+				auto path = entry.path();
+				if (std::filesystem::is_regular_file(path))
+				{
+					FileInfo* fi = new FileInfo;
+					fi->number = fn++;
+					fi->filename = path.c_str();
+					fi->fileSize = std::filesystem::file_size(path);
+					fi->fileType = "File";
+					fi->date = 2022;
+					lst.push_back(fi);
+				}
+			}
+			if (lst.size())
+			{
+				arrFileInfo = (FileInfo**)std::malloc(lst.size() * sizeof(FileInfo*));
+				int ic = 0;
+				for (auto ln : lst)
+				{
+					arrFileInfo[ic] = ln;
+					ic++;
+				}
 			}
 		}
-		/*for (int i = 0; i < 3; ++i)
-		{
-			FileInfo* fi = arrFileInfo[i];
-			wprintf(L"FILE: %s\n", fi->filename.data());
-		}*/
-		g_data.tableTracklist = window.m_data->AddTable(4, listboxFont.m_data);
-		g_data.tableTracklist->SetData((void**)arrFileInfo, 3);
-		g_data.tableTracklist->onDrawRow = test_onDrawRow;
+		g_data.tableTracklist = window.m_data->AddTable(5, listboxFont.m_data);
+		g_data.tableTracklist->SetScrollSpeed(50.f);
+		g_data.tableTracklist->SetData((void**)arrFileInfo, lst.size());
+		g_data.tableTracklist->onDrawRow = testTable_onDrawRow;
+		g_data.tableTracklist->onIsRowSelected = testTable_onIsRowSelected;
+		g_data.tableTracklist->onRowClick = testTable_onRowClick;
+		
 
 		playlistMgr = new PlayListManager(g_data.listboxPlaylist);
 		g_data.playlistMgr = playlistMgr.m_data;

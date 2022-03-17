@@ -119,60 +119,68 @@ miGUI_onUpdate_table(mgElement* e)
 	mgContext* c = e->window->context;
 	mgElementTable* impl = (mgElementTable*)e->implementation;
 
-	//if (e->contentHeight > e->clientHeight)
-	//{
-	//	if (mgPointInRect(&e->transformWorld.clipArea, &c->input->mousePosition))
-	//	{
-	//		if (c->input->mouseWheelDelta < 0.f)
-	//		{
-	//			impl->rowScrollValueTarget += 10.f;
-	//			if (impl->rowScrollValueTarget > (e->contentHeight - e->clientHeight))
-	//				impl->rowScrollValueTarget = (float)(e->contentHeight - e->clientHeight);
-	//		}
-	//		else if (c->input->mouseWheelDelta > 0.f)
-	//		{
-	//			impl->rowScrollValueTarget -= 10.f;
+	if (e->contentHeight > e->clientHeight)
+	{
+		if (mgPointInRect(&e->transformWorld.clipArea, &c->input->mousePosition))
+		{
+			if (c->input->mouseWheelDelta < 0.f)
+			{
+				impl->rowScrollValueTarget += impl->scrollSpeed;
+				if (impl->rowScrollValueTarget > (e->contentHeight - e->clientHeight))
+					impl->rowScrollValueTarget = (float)(e->contentHeight - e->clientHeight);
+			}
+			else if (c->input->mouseWheelDelta > 0.f)
+			{
+				impl->rowScrollValueTarget -= impl->scrollSpeed;
 
-	//			if (impl->rowScrollValueTarget < 0.f)
-	//				impl->rowScrollValueTarget = 0.f;
-	//		}
-	//	}
+				if (impl->rowScrollValueTarget < 0.f)
+					impl->rowScrollValueTarget = 0.f;
+			}
+		}
 
-	//	impl->rowScrollValue = lerp(impl->rowScrollValue, impl->rowScrollValueTarget, 0.1f);
+		impl->rowScrollValue = lerp(impl->rowScrollValue, impl->rowScrollValueTarget, 0.1f);
+		impl->rowScrollValueWorld = impl->rowScrollValue;/*parent must be somewhere*/
+	}
 
-	//	impl->rowScrollValueWorld = impl->rowScrollValue;/*parent must be somewhere*/
-	//}
+	if (impl->numRows && (impl->numRows > impl->numOfLines))
+	{
+		mgPoint pos;
+		pos.x = e->transformWorld.buildArea.left;
+		pos.y = e->transformWorld.buildArea.top;
+		
+		pos.y = pos.y + (impl->rowHeight * impl->firstRowIndexForDraw) - (int)impl->rowScrollValueWorld;
 
-	//if (impl->arraySize && (impl->arraySize > impl->numOfLines))
-	//{
-	//	mgPoint pos;
-	//	pos.x = e->transformWorld.buildArea.left;
-	//	pos.y = e->transformWorld.buildArea.top;
-	//	
-	//	pos.y = pos.y + (impl->itemHeight * impl->firstRowIndexForDraw) - (int)impl->rowScrollValueWorld;
+		int szY = e->transformWorld.buildArea.top - (int)impl->rowHeight;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+		int nm = 1;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+		if (pos.y < szY)
+		{
+			if (szY > (int)impl->rowHeight) /*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+				nm = szY / pos.y;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
 
-	//	if (pos.y < (e->transformWorld.buildArea.top - impl->itemHeight))
-	//	{
-	//		++impl->firstRowIndexForDraw;
+			impl->firstRowIndexForDraw += nm;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
 
-	//		uint32_t lastIndex = impl->arraySize - impl->numOfLines;
-	//		if (impl->firstRowIndexForDraw > lastIndex)
-	//		{
-	//			impl->firstRowIndexForDraw = lastIndex;
-	//		}
-	//	}
-	//	else if (pos.y > e->transformWorld.buildArea.top - impl->itemHeight)
-	//	{
-	//		if (impl->firstRowIndexForDraw)
-	//			--impl->firstRowIndexForDraw;
-	//	}
-	//}
+			uint32_t lastIndex = impl->numRows - impl->numOfLines;
+			if (impl->firstRowIndexForDraw > lastIndex)
+				impl->firstRowIndexForDraw = lastIndex;
+		}
+		
+		if (pos.y > szY)
+		{
 
-	//if (impl->hoverRow)
-	//{
+			/*it's still not good but better than nothing*/
+			if (pos.y > (int)impl->rowHeight)/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+				nm = pos.y / szY;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+
+			if (impl->firstRowIndexForDraw)
+				impl->firstRowIndexForDraw -= nm;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+		}
+	}
+
+	if (impl->hoverRow)
+	{
 	//	int issel = 0;
 	//	
-	//	int edit = 0;
+		int edit = 0;
 	//	if ((e->lmbClickCount == 2) && (impl->editText) && (impl->clickedItems[0] == impl->clickedItems[1]))
 	//		edit = 1;
 
@@ -185,48 +193,20 @@ miGUI_onUpdate_table(mgElement* e)
 	//		}
 	//	}
 
-	//	if(!edit)
-	//	{
-	//		if (impl->multiselect)
-	//		{
-	//			struct lbData2* dptr = (struct lbData2*)impl->hoverRow;
+		if(!edit)
+		{
+			int mouseBtn = 0;
+			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+				mouseBtn = 1;
+			else if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+				mouseBtn = 2;
+			else if (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
+				mouseBtn = 3;
 
-	//			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-	//				issel = 1;
-
-	//			if (impl->selectWithRMB && !issel)
-	//			{
-	//				if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
-	//					issel = 1;
-	//			}
-
-	//			if (issel)
-	//			{
-	//				impl->clickedItems[impl->clickedItemsCurr] = impl->hoverRow;
-	//				++impl->clickedItemsCurr;
-	//				if (impl->clickedItemsCurr > 2)
-	//					impl->clickedItemsCurr = 0;
-
-	//				if (dptr->flags & 0x1)
-	//					dptr->flags ^= 0x1;
-	//				else
-	//				{
-	//					if (impl->onSelect)
-	//					{
-	//						if (impl->onSelect(e, impl->hoverRow))
-	//							dptr->flags |= 0x1;
-	//					}
-	//					else
-	//					{
-	//						dptr->flags |= 0x1;
-	//					}
-	//				}
-	//			}
-	//		}
-	//		else
-	//		{
-	//			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-	//				issel = 1;
+			if (impl->onRowClick)
+				impl->onRowClick(e, impl->hoverRow, mouseBtn);
+			
+			//issel = 1;
 
 	//			if (impl->selectWithRMB && !issel)
 	//			{
@@ -283,8 +263,7 @@ miGUI_onUpdate_table(mgElement* e)
 	//					}
 	//				}
 	//			}
-	//		}
-	//	}
+		}
 
 	//	if (edit)
 	//	{
@@ -325,7 +304,7 @@ miGUI_onUpdate_table(mgElement* e)
 	//			impl->curSel = index;
 	//		}
 	//	}
-	//}
+	}
 }
 
 void 
@@ -374,18 +353,24 @@ miGUI_onDraw_table(mgElement* e)
 			if (rClip.top < e->parent->transformWorld.clipArea.top)
 				rClip.top = e->parent->transformWorld.clipArea.top;
 
+			if (r.bottom < e->transformWorld.clipArea.top)
+				goto end;
+
+			if (r.top > e->transformWorld.clipArea.bottom)
+				goto end;
+
 			e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 			if (impl->drawItemBG)
 			{
-				mgColor* ibgc = &style->tableItemBG2;
-				int rea = mgDrawRectangleReason_tableItemBG2;
+				mgColor* ibgc = &style->tableRowBG2;
+				int rea = mgDrawRectangleReason_tableRowBG2;
 
 				if (index)
 				{
 					if ((index % 2) != 0)
 					{
-						rea = mgDrawRectangleReason_tableItemBG1;
-						ibgc = &style->tableItemBG1;
+						rea = mgDrawRectangleReason_tableRowBG1;
+						ibgc = &style->tableRowBG1;
 					}
 				}
 
@@ -398,17 +383,17 @@ miGUI_onDraw_table(mgElement* e)
 			}
 
 
-			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverRow)
+			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverRow && e->cursorInRect)
 			{
 				impl->hoverRow = rowCurr;
 				impl->hoverRowClipRect = rClip;
 				impl->hoverRowBuildRect = r;
 
-				e->window->context->gpu->drawRectangle(mgDrawRectangleReason_listHoverItemBG, 
+				e->window->context->gpu->drawRectangle(mgDrawRectangleReason_tableHoverItemBG,
 					impl,
 					&r,
-					&style->tableItemHoverBG,
-					&style->tableItemHoverBG, 0, 0);
+					&style->tableRowHoverBG,
+					&style->tableRowHoverBG, 0, 0);
 			}
 
 /*
@@ -449,12 +434,29 @@ miGUI_onDraw_table(mgElement* e)
 			{
 				mgPoint pos2 = pos;
 
+				int isRowSelected = 0;
+				if (impl->onIsRowSelected)
+					isRowSelected = impl->onIsRowSelected(e, rowCurr);
+
+				if (isRowSelected)
+				{
+					e->window->context->gpu->drawRectangle(
+						mgDrawRectangleReason_tableRowSelectedBG,
+						impl,
+						&r,
+						&style->tableRowSelectedBG,
+						&style->tableRowSelectedBG,
+						0, 0);
+				}
+
 				wchar_t* str = 0;
 				uint32_t strLen = 0;
 				for (uint32_t i2 = 0; i2 < impl->numCols; ++i2)
 				{
 					str = 0;
 					strLen = 0;
+
+					pos2.x += 2;
 
 					mgRect rctCol;
 					rctCol.left = 0;
@@ -468,6 +470,11 @@ miGUI_onDraw_table(mgElement* e)
 						rctCol.top = pos2.y;
 						rctCol.right = rctCol.left + impl->colsSizes[i2];
 						rctCol.bottom = rctCol.top + impl->rowHeight;
+
+						if (rctCol.top < e->transformWorld.clipArea.top)
+							rctCol.top = e->transformWorld.clipArea.top;
+						if (rctCol.bottom > e->transformWorld.clipArea.bottom)
+							rctCol.bottom = e->transformWorld.clipArea.bottom;
 
 						e->window->context->gpu->setClipRect(&rctCol);
 
@@ -494,7 +501,7 @@ miGUI_onDraw_table(mgElement* e)
 								&pos2,
 								str,
 								strLen,
-								&style->tableItemText,
+								&style->tableCellText,
 								impl->font);
 						}
 					}
@@ -503,6 +510,7 @@ miGUI_onDraw_table(mgElement* e)
 				}
 			}
 
+		end:;
 			pos.y = pos.y + impl->rowHeight;
 
 			++index;
@@ -558,6 +566,7 @@ mgCreateTable_f(struct mgWindow_s* w,
 	impl->font = f;
 	impl->rowHeight = 16;
 	impl->drawItemBG = 1;
+	impl->scrollSpeed = 10.f;
 	size->x = 20;
 	size->y = 20;
 	impl->textInput = mgCreateTextInput_f(w, position, size, f);

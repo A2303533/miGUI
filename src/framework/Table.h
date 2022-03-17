@@ -104,6 +104,7 @@ namespace mgf
 		void SetTextInputCharLimit(uint32_t);
 		
 		void SetData(void** arr, uint32_t arrSz);
+		void SetScrollSpeed(float);
 		
 		wchar_t(*onTextInputCharEnter)(Table*, wchar_t) = 0;
 		/*
@@ -116,15 +117,18 @@ namespace mgf
 		*/
 		int(*onTextInputEndEdit)(Table*, int i, const wchar_t* str, uint8_t* editItem) = 0;
 
-		/*return 1 if need to select*/
-		int(*onSelect)(Table*, uint8_t* item);
-
 		/*
 	* Return 0 - no draw
 	*        1 - this is wchar_t* (you must set `text` and `textlen`)
 	*
 	*/
 		int(*onDrawRow)(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+
+		// If you want selection you must add this callbacks:
+		//Return 1 if this row selected
+		int(*onIsRowSelected)(Table*, void* row);
+		// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
+		void(*onRowClick)(Table*, void* item, int mouseButton);
 	};
 }
 

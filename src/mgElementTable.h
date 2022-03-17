@@ -49,11 +49,24 @@ typedef struct mgElementTable_s {
 	*        
 	*/
 	int(*onDrawRow)(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+	
+	/*
+	* If you want selection you must add this callbacks:
+	*/
+	/*
+	* Return 1 if this row selected
+	*/
+	int(*onIsRowSelected)(struct mgElement_s*, void* row);
+	/*
+	* mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
+	*/
+	void(*onRowClick)(struct mgElement_s*, void* row, int mouseButton);
 
 	uint32_t firstRowIndexForDraw;
 	float rowScrollValue;
 	float rowScrollValueTarget;
 	float rowScrollValueWorld;
+	float scrollSpeed;/*10.f*/
 	void* hoverRow;
 	uint32_t numOfLines;
 

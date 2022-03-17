@@ -94,10 +94,11 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_listHoverItemBG,
 	mgDrawRectangleReason_listSelectedItemBG,
 	mgDrawRectangleReason_tableBG,
-	mgDrawRectangleReason_tableItemBG1,
-	mgDrawRectangleReason_tableItemBG2,
+	mgDrawRectangleReason_tableRowBG1,
+	mgDrawRectangleReason_tableRowBG2,
 	mgDrawRectangleReason_tableHoverItemBG,
 	mgDrawRectangleReason_tableCellBG,
+	mgDrawRectangleReason_tableRowSelectedBG,
 };
 
 enum mgDrawTextReason
@@ -605,7 +606,7 @@ typedef struct mgContext_s {
 	mgVideoDriverAPI* gpu;
 	mgInputContext* input;
 	int needUpdateTransform;
-	int needRebuild;
+	int needRebuild;/*WHY I NEED THIS? needUpdateTransform is enough*/
 
 	float deltaTime;
 	mgPoint windowSize;/*system window size*/

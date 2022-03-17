@@ -286,8 +286,8 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 		LineTo(m_window->m_hdcMem, r.right - 1, r.bottom);
 		DeleteObject(p);
 	}break;
-	case mgDrawRectangleReason_tableItemBG1:
-	case mgDrawRectangleReason_tableItemBG2:
+	case mgDrawRectangleReason_tableRowBG1:
+	case mgDrawRectangleReason_tableRowBG2:
 	{
 		rgn = CreateRectRgn(
 			m_clipRect.left + m_window->m_borderSize.x,
