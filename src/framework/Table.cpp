@@ -43,7 +43,10 @@ int Table_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, uint8_t* 
 int Table_onDrawRow(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
 int Table_onIsRowSelected(struct mgElement_s*, void* row);
 void Table_onRowClick(struct mgElement_s*, void* row, uint32_t rowIndex, int mouseButton);
-int Table_onCellClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton);
+int Table_onCellClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton);
+const wchar_t* Table_onCellTextInputActivate(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
+wchar_t Table_onCellTextInputCharEnter(struct mgElement_s*, wchar_t c);
+int Table_onCellTextInputEndEdit(struct mgElement_s*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
 
 Table::Table(Window* w, uint32_t colNum, Font* f)
 {
@@ -58,6 +61,9 @@ Table::Table(Window* w, uint32_t colNum, Font* f)
 	m_elementTable->onIsRowSelected = Table_onIsRowSelected;
 	m_elementTable->onRowClick = Table_onRowClick;
 	m_elementTable->onCellClick = Table_onCellClick;
+	m_elementTable->onCellTextInputActivate = Table_onCellTextInputActivate;
+	m_elementTable->onCellTextInputCharEnter = Table_onCellTextInputCharEnter;
+	m_elementTable->onCellTextInputEndEdit = Table_onCellTextInputEndEdit;
 
 	for (uint32_t i = 0; i < colNum; ++i)
 	{
@@ -172,11 +178,38 @@ void Table_onRowClick(struct mgElement_s* e, void* row, uint32_t rowIndex, int m
 		tb->onRowClick(tb, row, rowIndex, mouseButton, e->window->context->input);
 }
 
-int Table_onCellClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton)
+int Table_onCellClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton)
 {
 	Table* tb = (Table*)e->userData;
 
 	if (tb->onCellClick)
-		return tb->onCellClick(tb, row, rowIndex, cellIndex, mouseButton, e->window->context->input);
+		return tb->onCellClick(tb, row, rowIndex, colIndex, mouseButton, e->window->context->input);
 	return 0;
+}
+
+const wchar_t* Table_onCellTextInputActivate(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onCellTextInputActivate)
+		return tb->onCellTextInputActivate(tb, row, rowIndex, colIndex);
+	return 0;
+}
+
+wchar_t Table_onCellTextInputCharEnter(struct mgElement_s* e, wchar_t c)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onCellTextInputCharEnter)
+		return tb->onCellTextInputCharEnter(tb, c);
+	return c;
+}
+
+int Table_onCellTextInputEndEdit(struct mgElement_s* e, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onCellTextInputEndEdit)
+		return tb->onCellTextInputEndEdit(tb, type, textinputText, row, rowIndex, colIndex);
+	return 1;
 }

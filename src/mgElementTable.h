@@ -64,7 +64,11 @@ typedef struct mgElementTable_s {
 	/*
 	* return 1 for textInput
 	*/
-	int(*onCellClick)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton);
+	int(*onCellClick)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton);
+	
+	const wchar_t* (*onCellTextInputActivate)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
+	wchar_t(*onCellTextInputCharEnter)(struct mgElement_s*, wchar_t c);
+	int(*onCellTextInputEndEdit)(struct mgElement_s*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
 
 	uint32_t firstRowIndexForDraw;
 	float rowScrollValue;
@@ -72,16 +76,16 @@ typedef struct mgElementTable_s {
 	float rowScrollValueWorld;
 	float scrollSpeed;/*10.f*/
 	void* hoverRow;
+	void* editRow;
 	uint32_t hoverRowIndex;
 	uint32_t hoverColIndex;
 	uint32_t numOfLines;
-
-
 
 	uint32_t drawItemBG;
 
 	mgRect hoverRowClipRect;
 	mgRect hoverRowBuildRect;
+	mgRect hoverCellClipRect;
 
 } mgElementTable;
 

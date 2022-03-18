@@ -131,8 +131,20 @@ namespace mgf
 		int(*onIsRowSelected)(Table*, void* row);
 		// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
 		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, int mouseButton, mgInputContext_s* input);
+		
 		// return 1 if need to enable textinput
-		int(*onCellClick)(Table*, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton, mgInputContext_s* input);
+		int(*onCellClick)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton, mgInputContext_s* input);
+		
+		// when onCellClick return 1, will be activated textInput, and need to put some text in it.
+		// return text that will be placed in textInput
+		const wchar_t* (*onCellTextInputActivate)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex);
+		
+		// return that character that you want to put in textInput. return 0 for skip.
+		wchar_t(*onCellTextInputCharEnter)(Table*, wchar_t c);
+		
+		// will be called when Escape or Enter or click somewhere (type: see onEndEdit in mgElementTextInput.h)
+		// return 1 if need to deactivate input
+		int(*onCellTextInputEndEdit)(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
 	};
 }
 

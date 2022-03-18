@@ -50,46 +50,46 @@ struct lbData2
 
 int mgElementTable_textinput_onEndEdit(struct mgElement_s* e, int type)
 {
-	/*e->visible = 0;
+	e->visible = 0;
 	e->window->context->activeTextInput = 0;
 	
 	mgSetCursor_f(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
 	mgElementTextInput* ti = e->implementation;
-	mgElement* listBox = (mgElement*)e->userData;
-	mgElementTable* listBoxImpl = (mgElementTable*)listBox->implementation;
+	mgElement* table = (mgElement*)e->userData;
+	mgElementTable* tableImpl = (mgElementTable*)table->implementation;
 
-	if (listBoxImpl->onTextInputEndEdit)
-		return listBoxImpl->onTextInputEndEdit(listBox, type, ti->text, listBoxImpl->editItem);*/
+	if (tableImpl->onCellTextInputEndEdit)
+		return tableImpl->onCellTextInputEndEdit(table, type, ti->text, tableImpl->hoverRow, tableImpl->hoverRowIndex, tableImpl->hoverColIndex);
 
 	return 1;
 }
 
 wchar_t mgElementTable_textinput_onCharEnter(struct mgElement_s* e, wchar_t c)
 {
-	/*mgElementTextInput* ti = e->implementation;
-	mgElement* listBox = (mgElement*)e->userData;
-	mgElementTable* listBoxImpl = (mgElementTable*)listBox->implementation;
+	mgElementTextInput* ti = e->implementation;
+	mgElement* table = (mgElement*)e->userData;
+	mgElementTable* tableImpl = (mgElementTable*)table->implementation;
 	
-	if (listBoxImpl->onTextInputCharEnter)
-		return listBoxImpl->onTextInputCharEnter(listBox, c);*/
+	if (tableImpl->onCellTextInputCharEnter)
+		return tableImpl->onCellTextInputCharEnter(table, c);
 
 	return c;
 }
 void mgElementTable_textinput_onActivate(struct mgElement_s* e)
 {
-	/*mgElement* listBox = (mgElement*)e->userData;
-	mgElementTable* listBoxImpl = (mgElementTable*)listBox->implementation;
+	mgElement* table = (mgElement*)e->userData;
+	mgElementTable* tableImpl = (mgElementTable*)table->implementation;
 
 	mgElementTextInput* ti = e->implementation;
-	if(listBoxImpl->hoverItemText)
-		mgTextInputSetText_f(ti, listBoxImpl->hoverItemText);
+	if (tableImpl->onCellTextInputActivate)
+		mgTextInputSetText_f(ti, tableImpl->onCellTextInputActivate(table, tableImpl->hoverRow, tableImpl->hoverRowIndex, tableImpl->hoverColIndex));
 
 
 	ti->isSelected = 1;
 	ti->selectionStart = 0;
 	ti->selectionEnd = ti->textLen;
-	ti->textCursor = ti->textLen;*/
+	ti->textCursor = ti->textLen;
 }
 
 void
@@ -196,7 +196,23 @@ miGUI_onUpdate_table(mgElement* e)
 		{
 			if (impl->onCellClick(e, impl->hoverRow, impl->hoverRowIndex, impl->hoverColIndex, mouseBtn))
 			{
+				mgElementTextInput* ti = (mgElementTextInput*)impl->textInput->implementation;
+				impl->textInput->visible = 1;
+				mgTextInputActivate_f(c, ti, 1, 0);
+				mgRect r;
+				r.left = impl->hoverCellClipRect.left - e->transformWorld.buildArea.left;
+				r.right = r.left + (impl->hoverCellClipRect.right - impl->hoverCellClipRect.left);
 
+				r.top = impl->hoverCellClipRect.top - e->transformWorld.buildArea.top;
+				r.bottom = r.top + impl->rowHeight;
+
+				r.top += (int)e->scrollValueWorld;
+				r.bottom += (int)e->scrollValueWorld;
+				impl->textInput->transformLocal.buildArea = r;
+				impl->textInput->transformLocal.clipArea = r;
+				impl->editRow = impl->hoverRow;
+
+				miGUI_onUpdateTransform_textinput(impl->textInput);
 			}
 
 		}
@@ -479,7 +495,10 @@ miGUI_onDraw_table(mgElement* e)
 						if (impl->hoverRow == rowCurr)
 						{
 							if (mgPointInRect(&rctCol, &ctx->input->mousePosition))
+							{
 								impl->hoverColIndex = i2;
+								impl->hoverCellClipRect = rctCol;
+							}
 						}
 
 						int drwBg = 0;

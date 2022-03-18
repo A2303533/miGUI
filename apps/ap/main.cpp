@@ -213,7 +213,7 @@ void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mous
 	}*/
 	oldIndex = rowIndex;
 }
-int testTable_onCellClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t cellIndex, int mouseButton, mgInputContext_s* input)
+int testTable_onCellClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton, mgInputContext_s* input)
 {
 	int r = 0;
 	FileInfo* fi = (FileInfo*)row;
@@ -224,17 +224,46 @@ int testTable_onCellClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t
 
 	if (input->LMBClickCount == 2)
 	{
-		if ((oldRowIndex == rowIndex) && (oldCellIndex == cellIndex))
+		if ((oldRowIndex == rowIndex) && (oldCellIndex == colIndex))
 		{
-			r = 1;
+			if(colIndex == 1) // edit only filename
+				r = 1;
+
 			fi->isSelected = true;
 		}
 	}
 
 	oldRowIndex = rowIndex;
-	oldCellIndex = cellIndex;
+	oldCellIndex = colIndex;
 
 	return r;
+}
+const wchar_t* testTable_onCellTextInputActivate(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	FileInfo* fi = (FileInfo*)row;
+	void** tableData = tb->GetData();
+	if (colIndex == 1)
+		return fi->filename.data();
+	return 0;
+}
+wchar_t testTable_onCellTextInputCharEnter(mgf::Table* tb, wchar_t c)
+{
+	if (c == L'\\')
+		return L'/';
+	return c;
+}
+int testTable_onCellTextInputEndEdit(mgf::Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	FileInfo* fi = (FileInfo*)row;
+	if (textinputText 
+		&& type == 1 // Enter
+		)
+	{
+		size_t l = wcslen(textinputText);
+		if (l)
+			fi->filename = textinputText;
+	}
+	return 1;
 }
 
 int main()
@@ -390,6 +419,9 @@ int main()
 		g_data.tableTracklist->onIsRowSelected = testTable_onIsRowSelected;
 		g_data.tableTracklist->onRowClick = testTable_onRowClick;
 		g_data.tableTracklist->onCellClick = testTable_onCellClick;
+		g_data.tableTracklist->onCellTextInputActivate = testTable_onCellTextInputActivate;
+		g_data.tableTracklist->onCellTextInputCharEnter = testTable_onCellTextInputCharEnter;
+		g_data.tableTracklist->onCellTextInputEndEdit = testTable_onCellTextInputEndEdit;
 		printf("LIST SIZE: %u\n", lst.size());
 		/*for (auto ln : lst){delete ln;}*/
 
