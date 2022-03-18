@@ -60,7 +60,11 @@ int mgElementTable_textinput_onEndEdit(struct mgElement_s* e, int type)
 	mgElementTable* tableImpl = (mgElementTable*)table->implementation;
 
 	if (tableImpl->onCellTextInputEndEdit)
-		return tableImpl->onCellTextInputEndEdit(table, type, ti->text, tableImpl->hoverRow, tableImpl->hoverRowIndex, tableImpl->hoverColIndex);
+		return tableImpl->onCellTextInputEndEdit(table, type, ti->text, 
+			tableImpl->editRow,
+			tableImpl->editRowIndex,
+			tableImpl->editColIndex
+		);
 
 	return 1;
 }
@@ -149,13 +153,16 @@ miGUI_onUpdate_table(mgElement* e)
 		pos.y = e->transformWorld.buildArea.top;
 		
 		pos.y = pos.y + (impl->rowHeight * impl->firstRowIndexForDraw) - (int)impl->rowScrollValueWorld;
+		if (!pos.y)
+			pos.y = 1;
 
 		int szY = e->transformWorld.buildArea.top - (int)impl->rowHeight;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
 		int nm = 1;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
 		if (pos.y < szY)
 		{
-			if (szY > (int)impl->rowHeight) /*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
-				nm = szY / pos.y;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+			//if (szY > (int)impl->rowHeight) /*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+			//	nm = pos.y / szY;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+			nm = (szY - pos.y) / impl->rowHeight;
 
 			impl->firstRowIndexForDraw += nm;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
 
@@ -166,10 +173,11 @@ miGUI_onUpdate_table(mgElement* e)
 		
 		if (pos.y > szY)
 		{
-
 			/*it's still not good but better than nothing*/
-			if (pos.y > (int)impl->rowHeight)/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
-				nm = pos.y / szY;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+			//if (pos.y > (int)impl->rowHeight)/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+			//	nm = pos.y / szY;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
+			
+			nm = (pos.y - szY) / impl->rowHeight; /*now better...maybe*/
 
 			if (impl->firstRowIndexForDraw)
 				impl->firstRowIndexForDraw -= nm;/*NEED TO MAKE SAME CHANGES FOR LISTBOX*/
@@ -211,6 +219,8 @@ miGUI_onUpdate_table(mgElement* e)
 				impl->textInput->transformLocal.buildArea = r;
 				impl->textInput->transformLocal.clipArea = r;
 				impl->editRow = impl->hoverRow;
+				impl->editRowIndex = impl->hoverRowIndex;
+				impl->editColIndex = impl->hoverColIndex;
 
 				miGUI_onUpdateTransform_textinput(impl->textInput);
 			}

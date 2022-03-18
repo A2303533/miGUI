@@ -76,9 +76,12 @@ typedef struct mgElementTable_s {
 	float rowScrollValueWorld;
 	float scrollSpeed;/*10.f*/
 	void* hoverRow;
-	void* editRow;
 	uint32_t hoverRowIndex;
 	uint32_t hoverColIndex;
+	void* editRow;
+	uint32_t editRowIndex;
+	uint32_t editColIndex;
+
 	uint32_t numOfLines;
 
 	uint32_t drawItemBG;

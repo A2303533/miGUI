@@ -213,3 +213,15 @@ int Table_onCellTextInputEndEdit(struct mgElement_s* e, int type, const wchar_t*
 		return tb->onCellTextInputEndEdit(tb, type, textinputText, row, rowIndex, colIndex);
 	return 1;
 }
+
+uint32_t Table::GetRowHeight()
+{
+	return m_elementTable->rowHeight;
+}
+
+void Table::SetRowHeight(uint32_t i)
+{
+	if (!i)
+		i = 15;
+	m_elementTable->rowHeight = i;
+}

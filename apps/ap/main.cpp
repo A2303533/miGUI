@@ -414,6 +414,7 @@ int main()
 		}
 		g_data.tableTracklist = window.m_data->AddTable(5, listboxFont.m_data);
 		g_data.tableTracklist->SetScrollSpeed(50.f);
+		g_data.tableTracklist->SetRowHeight(20);
 		g_data.tableTracklist->SetData((void**)arrFileInfo, lst.size());
 		g_data.tableTracklist->onDrawRow = testTable_onDrawRow;
 		g_data.tableTracklist->onIsRowSelected = testTable_onIsRowSelected;

@@ -108,6 +108,9 @@ namespace mgf
 
 		void** GetData();
 
+		uint32_t GetRowHeight();
+		void SetRowHeight(uint32_t);
+
 		wchar_t(*onTextInputCharEnter)(Table*, wchar_t) = 0;
 		/*
 		* i:
