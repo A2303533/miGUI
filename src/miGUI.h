@@ -99,6 +99,10 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_tableHoverItemBG,
 	mgDrawRectangleReason_tableCellBG,
 	mgDrawRectangleReason_tableRowSelectedBG,
+	mgDrawRectangleReason_tableColTitleBG,
+	mgDrawRectangleReason_tableColTitleColBG,
+	mgDrawRectangleReason_tableColTitleColHover,
+	mgDrawRectangleReason_tableColTitleColActive,
 };
 
 enum mgDrawTextReason
@@ -109,6 +113,7 @@ enum mgDrawTextReason
 	mgDrawTextReason_buttonText,
 	mgDrawTextReason_text,
 	mgDrawTextReason_table,
+	mgDrawTextReason_tableColTitle,
 	mgDrawTextReason_listbox,
 	mgDrawTextReason_popup,
 	mgDrawTextReason_popupShortcut,

@@ -49,7 +49,7 @@ void window_OnSize(mgf::SystemWindow* w)
 	if (g_data.listboxPlaylist)
 		g_data.listboxPlaylist->SetRect(5, 25, AP_PLAYLISTAREASIZE, sz.y - AP_CONTROLAREASIZE);
 	if (g_data.tableTracklist)
-		g_data.tableTracklist->SetRect(AP_PLAYLISTAREASIZE, 80, sz.x, sz.y - AP_CONTROLAREASIZE);
+		g_data.tableTracklist->SetRect(AP_PLAYLISTAREASIZE, 0, sz.x, sz.y - AP_CONTROLAREASIZE);
 }
 
 void context_onDraw(mgf::Context* c, mgf::Backend* b)
@@ -122,7 +122,7 @@ int testTable_onIsRowSelected(mgf::Table* tb, void* row)
 	return fi->isSelected == true;
 }
 FileInfo* g_testTable_selectedRow = 0;
-void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mouseButton, mgInputContext_s* input)
+void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input)
 {
 	static uint32_t oldIndex = 0;
 	FileInfo* fi = (FileInfo*)row;
@@ -213,7 +213,7 @@ void testTable_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, int mous
 	}*/
 	oldIndex = rowIndex;
 }
-int testTable_onCellClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton, mgInputContext_s* input)
+int testTable_onCellClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton, mgInputContext_s* input)
 {
 	int r = 0;
 	FileInfo* fi = (FileInfo*)row;
@@ -264,6 +264,32 @@ int testTable_onCellTextInputEndEdit(mgf::Table*, int type, const wchar_t* texti
 			fi->filename = textinputText;
 	}
 	return 1;
+}
+const wchar_t* testTable_onColTitleText(mgf::Table* tb, uint32_t* textLen, uint32_t colIndex)
+{
+	switch (colIndex)
+	{
+	case 0:
+		*textLen = 1;
+		return L"#";
+	case 1:
+		*textLen = 4;
+		return L"Name";
+	case 2:
+		*textLen = 4;
+		return L"File size";
+	case 3:
+		*textLen = 4;
+		return L"Type";
+	case 4:
+		*textLen = 4;
+		return L"Year";
+	}
+	return 0;
+}
+void testTable_onColTitleClick(mgf::Table* tb, uint32_t colIndex, uint32_t mouseButton)
+{
+
 }
 
 int main()
@@ -423,6 +449,8 @@ int main()
 		g_data.tableTracklist->onCellTextInputActivate = testTable_onCellTextInputActivate;
 		g_data.tableTracklist->onCellTextInputCharEnter = testTable_onCellTextInputCharEnter;
 		g_data.tableTracklist->onCellTextInputEndEdit = testTable_onCellTextInputEndEdit;
+		g_data.tableTracklist->onColTitleText = testTable_onColTitleText;
+		g_data.tableTracklist->onColTitleClick = testTable_onColTitleClick;
 		printf("LIST SIZE: %u\n", lst.size());
 		/*for (auto ln : lst){delete ln;}*/
 

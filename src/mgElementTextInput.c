@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #ifdef MG_PLATFORM_WINDOWS
 #include <Windows.h>
@@ -131,7 +132,6 @@ mgTextInput_paste(mgElement* e)
 		impl->textWidth = tsz.x;
 	}
 
-	mgTextInput_updateScrollLimit(e);
 }
 
 void
@@ -190,7 +190,6 @@ mgTextInput_updateScrollLimit(mgElement* e)
 	impl->h_scrollLimit = 0.0;
 
 	int rectSizeX = e->transformWorld.buildArea.right - e->transformWorld.buildArea.left;
-
 	if ((int)impl->textWidth > rectSizeX)
 	{
 		impl->h_scrollLimit = impl->textWidth - rectSizeX + 3;
@@ -672,7 +671,6 @@ miGUI_textinput_move(mgElement* e, int key)
 	}
 	impl->drawTextCursor = 1;
 	impl->textCursorTimer = 0.f;
-	mgTextInput_updateScrollLimit(e);
 }
 
 void 
@@ -726,6 +724,8 @@ miGUI_onUpdate_textinput(mgElement* e)
 	int isActive = impl == e->window->context->activeTextInput;
 	if (isActive)
 	{
+		mgTextInput_updateScrollLimit(e);
+
 		if (c->input->character)
 		{
 			if (c->input->keyboardModifier != MG_KBMOD_CTRL)
@@ -788,8 +788,6 @@ miGUI_onUpdate_textinput(mgElement* e)
 						wchar_t t[2] = { c->input->character, 0 };
 						int w = mgTextInputPutText_f(impl, t, 1);
 						impl->textWidth += w + impl->font->characterSpacing;
-
-						mgTextInput_updateScrollLimit(e);
 					}
 				}break;
 				}

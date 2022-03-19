@@ -98,6 +98,10 @@ typedef struct mgStyle_s {
 	mgColor tableRowSelectedBG;
 	mgColor tableCellText;
 	mgColor tableCellBG;
+	mgColor tableColTitleBG;
+	mgColor tableColTitleColBG;
+	mgColor tableColTitleColHover;
+	mgColor tableColTitleColActive;
 
 } mgStyle;
 

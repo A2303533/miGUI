@@ -42,11 +42,14 @@ wchar_t Table_onTextInputCharEnter(struct mgElement_s* e, wchar_t c);
 int Table_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, uint8_t* editItem);
 int Table_onDrawRow(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
 int Table_onIsRowSelected(struct mgElement_s*, void* row);
-void Table_onRowClick(struct mgElement_s*, void* row, uint32_t rowIndex, int mouseButton);
-int Table_onCellClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton);
+void Table_onRowClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t mouseButton);
+int Table_onCellClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton);
 const wchar_t* Table_onCellTextInputActivate(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
 wchar_t Table_onCellTextInputCharEnter(struct mgElement_s*, wchar_t c);
 int Table_onCellTextInputEndEdit(struct mgElement_s*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
+const wchar_t* Table_onColTitleText(struct mgElement_s*, uint32_t* textLen, uint32_t colIndex);
+void Table_onColTitleClick(struct mgElement_s*, uint32_t colIndex, uint32_t mouseButton);
+
 
 Table::Table(Window* w, uint32_t colNum, Font* f)
 {
@@ -64,6 +67,8 @@ Table::Table(Window* w, uint32_t colNum, Font* f)
 	m_elementTable->onCellTextInputActivate = Table_onCellTextInputActivate;
 	m_elementTable->onCellTextInputCharEnter = Table_onCellTextInputCharEnter;
 	m_elementTable->onCellTextInputEndEdit = Table_onCellTextInputEndEdit;
+	m_elementTable->onColTitleText = Table_onColTitleText;
+	m_elementTable->onColTitleClick = Table_onColTitleClick;
 
 	for (uint32_t i = 0; i < colNum; ++i)
 	{
@@ -81,6 +86,16 @@ Table::~Table()
 {
 	if (m_element)
 		mgDestroyElement(m_element);
+}
+
+void Table::SetRect(int left, int top, int right, int bottom)
+{
+	Element::SetRect(left, top, right, bottom);
+	if (m_elementTable->onColTitleText && m_elementTable->colTitleHeight)
+	{
+		m_element->transformWorld.clipArea.top += m_elementTable->colTitleHeight;
+		m_element->transformWorld.buildArea.top += m_elementTable->colTitleHeight;
+	}
 }
 
 void Table::SetCurSel(uint32_t c)
@@ -170,7 +185,7 @@ int Table_onIsRowSelected(struct mgElement_s* e, void* row)
 	return 0;
 }
 
-void Table_onRowClick(struct mgElement_s* e, void* row, uint32_t rowIndex, int mouseButton)
+void Table_onRowClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t mouseButton)
 {
 	Table* tb = (Table*)e->userData;
 
@@ -178,7 +193,7 @@ void Table_onRowClick(struct mgElement_s* e, void* row, uint32_t rowIndex, int m
 		tb->onRowClick(tb, row, rowIndex, mouseButton, e->window->context->input);
 }
 
-int Table_onCellClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton)
+int Table_onCellClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton)
 {
 	Table* tb = (Table*)e->userData;
 
@@ -224,4 +239,21 @@ void Table::SetRowHeight(uint32_t i)
 	if (!i)
 		i = 15;
 	m_elementTable->rowHeight = i;
+}
+
+const wchar_t* Table_onColTitleText(struct mgElement_s* e, uint32_t* textLen, uint32_t colIndex)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onColTitleText)
+		return tb->onColTitleText(tb, textLen, colIndex);
+	return 0;
+}
+
+void Table_onColTitleClick(struct mgElement_s* e, uint32_t colIndex, uint32_t mouseButton)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onColTitleClick)
+		tb->onColTitleClick(tb, colIndex, mouseButton);
 }

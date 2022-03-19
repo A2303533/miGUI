@@ -170,6 +170,10 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->tableRowSelectedBG, 0xFAFFA3);
 	mgColorSetAsIntegerRGB(&s->tableCellText, 0x0);
 	mgColorSetAsIntegerRGB(&s->tableCellBG, 0xE1EEEF);
+	mgColorSetAsIntegerRGB(&s->tableColTitleBG, 0xD1E4FF);
+	mgColorSetAsIntegerRGB(&s->tableColTitleColBG, 0xB2D2FF);
+	mgColorSetAsIntegerRGB(&s->tableColTitleColHover, 0xEFF6FF);
+	mgColorSetAsIntegerRGB(&s->tableColTitleColActive, 0xB2D2FF);
 
 }
 

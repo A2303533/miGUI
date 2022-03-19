@@ -60,11 +60,11 @@ typedef struct mgElementTable_s {
 	/*
 	* mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
 	*/
-	void(*onRowClick)(struct mgElement_s*, void* row, uint32_t rowIndex, int mouseButton);
+	void(*onRowClick)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t mouseButton);
 	/*
 	* return 1 for textInput
 	*/
-	int(*onCellClick)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton);
+	int(*onCellClick)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton);
 	
 	const wchar_t* (*onCellTextInputActivate)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
 	wchar_t(*onCellTextInputCharEnter)(struct mgElement_s*, wchar_t c);
@@ -89,6 +89,17 @@ typedef struct mgElementTable_s {
 	mgRect hoverRowClipRect;
 	mgRect hoverRowBuildRect;
 	mgRect hoverCellClipRect;
+
+	/*
+	* set this for column title, that can change column width.
+	* return text for current column, set also textLen.
+	* 
+	*/
+	const wchar_t* (*onColTitleText)(struct mgElement_s*, uint32_t* textLen, uint32_t colIndex);
+	uint32_t colTitleHeight; /*20*/
+	int activeColTitle;
+	int hoverColTitle;
+	void(*onColTitleClick)(struct mgElement_s*, uint32_t colIndex, uint32_t mouseButton);
 
 } mgElementTable;
 

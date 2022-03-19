@@ -102,6 +102,10 @@ miGUI_onUpdateTransform_table(mgElement* e)
 	miGUI_onUpdateTransform_rectangle(e);
 
 	mgElementTable* impl = (mgElementTable*)e->implementation;
+
+	e->transformWorld.buildArea.top += impl->colTitleHeight;
+	e->transformWorld.clipArea.top += impl->colTitleHeight;
+
 	impl->numOfLines = 0;
 	int w = e->transformWorld.buildArea.bottom - e->transformWorld.buildArea.top;
 	if (w > 0)
@@ -186,9 +190,6 @@ miGUI_onUpdate_table(mgElement* e)
 
 	if (impl->hoverRow)
 	{
-	//	int issel = 0;
-	//	
-		
 		int mouseBtn = 0;
 		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 			mouseBtn = 1;
@@ -226,105 +227,20 @@ miGUI_onUpdate_table(mgElement* e)
 			}
 
 		}
+	}
 
-			
-			//issel = 1;
+	if (impl->onColTitleClick && (impl->hoverColTitle > -1))
+	{
+		int mouseBtn = 0;
+		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			mouseBtn = 1;
+		else if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+			mouseBtn = 2;
+		else if (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
+			mouseBtn = 3;
 
-	//			if (impl->selectWithRMB && !issel)
-	//			{
-	//				if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
-	//					issel = 1;
-	//			}
-
-	//			if (issel)
-	//			{
-	//				impl->clickedItems[impl->clickedItemsCurr] = impl->hoverRow;
-	//				++impl->clickedItemsCurr;
-	//				if (impl->clickedItemsCurr > 2)
-	//					impl->clickedItemsCurr = 0;
-
-	//				if (impl->isSelected)
-	//				{
-	//					uint32_t index = impl->hoverRow - (uint8_t*)impl->array;
-	//					index /= impl->dataTypeSizeOf;
-
-	//					if (index != impl->curSel)
-	//					{
-	//						if (impl->onSelect)
-	//						{
-	//							if (impl->onSelect(e, impl->hoverRow))
-	//								impl->curSel = index;
-	//						}
-	//						else
-	//						{
-	//							impl->curSel = index;
-	//						}
-	//					}
-	//					else if(!impl->noDeselect)
-	//					{
-	//						impl->isSelected = 0;
-	//						impl->curSel = 0;
-	//					}
-	//				}
-	//				else
-	//				{
-	//					if (impl->onSelect)
-	//					{
-	//						if (impl->onSelect(e, impl->hoverRow))
-	//						{
-	//							impl->isSelected = 1;
-	//							impl->curSel = impl->hoverRow - (uint8_t*)impl->array;
-	//							impl->curSel /= impl->dataTypeSizeOf;
-	//						}
-	//					}
-	//					else
-	//					{
-	//						impl->isSelected = 1;
-	//						impl->curSel = impl->hoverRow - (uint8_t*)impl->array;
-	//						impl->curSel /= impl->dataTypeSizeOf;
-	//					}
-	//				}
-	//			}
-
-	//	if (edit)
-	//	{
-	//		mgElementTextInput* ti = (mgElementTextInput*)impl->textInput->implementation;
-	//		impl->textInput->visible = 1;
-
-	//		mgTextInputActivate_f(c, ti, 1, 0);
-	//		mgRect r;
-	//		r.left = 0;
-	//		r.right = e->transformWorld.buildArea.right - e->transformWorld.buildArea.left;
-	//		r.top = impl->hoverRowBuildRect.top - e->transformWorld.buildArea.top;
-	//		r.bottom = r.top + impl->itemHeight;
-
-	//		r.top += (int)e->scrollValueWorld;
-	//		r.bottom += (int)e->scrollValueWorld;
-
-	//		impl->textInput->transformLocal.buildArea = r;
-	//		impl->textInput->transformLocal.clipArea = r;
-
-	//		impl->editItem = impl->hoverRow;
-
-	//		miGUI_onUpdateTransform_textinput(impl->textInput);
-
-	//		/*
-	//		* I need to select this item again...
-	//		*/
-	//		if (impl->multiselect)
-	//		{
-	//			struct lbData2* dptr = (struct lbData2*)impl->hoverRow;
-	//			dptr->flags |= 0x1;
-	//		}
-	//		else
-	//		{
-	//			uint32_t index = impl->hoverRow - (uint8_t*)impl->array;
-	//			index /= impl->dataTypeSizeOf;
-
-	//			impl->isSelected = 1;
-	//			impl->curSel = index;
-	//		}
-	//	}
+		if (mouseBtn)
+			impl->onColTitleClick(e, impl->hoverColTitle, mouseBtn);
 	}
 }
 
@@ -338,6 +254,78 @@ miGUI_onDraw_table(mgElement* e)
 	mgContext* ctx = e->window->context;
 
 	mgElementTable* impl = (mgElementTable*)e->implementation;
+
+	if (impl->onColTitleText && impl->colTitleHeight)
+	{
+		mgRect rect = e->transformWorld.clipArea;
+		rect.top -= impl->colTitleHeight;
+		e->window->context->gpu->setClipRect(&rect);
+		e->window->context->gpu->drawRectangle(mgDrawRectangleReason_tableColTitleBG, 
+			impl,
+			&rect,
+			&style->tableColTitleBG,
+			&style->tableColTitleBG, 0, 0);
+
+		impl->hoverColTitle = -1;
+		const wchar_t* str = 0;
+		uint32_t strLen = 0;
+		mgPoint pos;
+		pos.x = rect.left;
+		pos.y = rect.top;
+		for (uint32_t i2 = 0; i2 < impl->numCols; ++i2)
+		{
+			str = 0;
+			strLen = 0;
+
+			str = impl->onColTitleText(e, &strLen, i2);
+			if (str && strLen)
+			{
+				pos.x += 2;
+				mgRect rctCol;
+				rctCol.left = pos.x-2;
+				rctCol.top = pos.y;
+				rctCol.right = rctCol.left + impl->colsSizes[i2]+2;
+				rctCol.bottom = rctCol.top + impl->colTitleHeight;
+
+				e->window->context->gpu->setClipRect(&rctCol);
+				e->window->context->gpu->drawRectangle(mgDrawRectangleReason_tableColTitleColBG,
+					impl,
+					&rctCol,
+					&style->tableColTitleColBG,
+					&style->tableColTitleColBG, 0, 0);
+
+				if (mgPointInRect(&rctCol, &ctx->input->mousePosition))
+				{
+					impl->hoverColTitle = (int)i2;
+					e->window->context->gpu->drawRectangle(mgDrawRectangleReason_tableColTitleColHover,
+						impl,
+						&rctCol,
+						&style->tableColTitleColHover,
+						&style->tableColTitleColHover, 0, 0);
+				}
+
+				if (impl->activeColTitle == i2)
+				{
+					e->window->context->gpu->drawRectangle(mgDrawRectangleReason_tableColTitleColActive,
+						impl,
+						&rctCol,
+						&style->tableColTitleColActive,
+						&style->tableColTitleColActive, 0, 0);
+				}
+				
+				e->window->context->gpu->drawText(mgDrawTextReason_tableColTitle,
+					impl,
+					&pos,
+					str,
+					strLen,
+					&style->tableCellText,
+					impl->font);
+			}
+
+			pos.x += impl->colsSizes[i2];
+		}
+	}
+
 	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 	if (e->drawBG)
 	{
@@ -600,6 +588,7 @@ mgCreateTable_f(struct mgWindow_s* w,
 	impl->rowHeight = 16;
 	impl->drawItemBG = 1;
 	impl->scrollSpeed = 10.f;
+	impl->colTitleHeight = 20;
 	size->x = 20;
 	size->y = 20;
 	impl->textInput = mgCreateTextInput_f(w, position, size, f);

@@ -87,6 +87,7 @@ namespace mgf
 	public:
 		Table(Window* w, uint32_t colNum, Font*);
 		virtual ~Table();
+		virtual void SetRect(int left, int top, int right, int bottom) override;
 
 		void SetCurSel(uint32_t);
 		uint32_t GetCurSel();
@@ -133,10 +134,10 @@ namespace mgf
 		//Return 1 if this row selected
 		int(*onIsRowSelected)(Table*, void* row);
 		// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
-		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, int mouseButton, mgInputContext_s* input);
+		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input);
 		
 		// return 1 if need to enable textinput
-		int(*onCellClick)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, int mouseButton, mgInputContext_s* input);
+		int(*onCellClick)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton, mgInputContext_s* input);
 		
 		// when onCellClick return 1, will be activated textInput, and need to put some text in it.
 		// return text that will be placed in textInput
@@ -148,6 +149,14 @@ namespace mgf
 		// will be called when Escape or Enter or click somewhere (type: see onEndEdit in mgElementTextInput.h)
 		// return 1 if need to deactivate input
 		int(*onCellTextInputEndEdit)(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
+
+		/*
+		* set this for column title, that can change column width.
+		* return text for current column, set also textLen.
+		*
+		*/
+		const wchar_t* (*onColTitleText)(Table*, uint32_t* textLen, uint32_t colIndex);
+		void(*onColTitleClick)(Table*, uint32_t colIndex, uint32_t mouseButton);
 	};
 }
 

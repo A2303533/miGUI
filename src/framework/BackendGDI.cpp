@@ -273,6 +273,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	case mgDrawRectangleReason_listItemBG2:
 		break;
 	case mgDrawRectangleReason_tableCellBG:
+	case mgDrawRectangleReason_tableColTitleColBG:
 	{
 		rgn = CreateRectRgn(
 			m_clipRect.left + m_window->m_borderSize.x,
