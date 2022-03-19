@@ -39,7 +39,7 @@ typedef struct mgElementTable_s {
 
 	void** rows;
 	uint32_t rowHeight;
-	uint32_t* colsSizes; /*array[numCols], width for columns*/
+	int* colsSizes; /*array[numCols], width for columns*/
 
 	struct mgElement_s* textInput;
 
@@ -101,6 +101,9 @@ typedef struct mgElementTable_s {
 	int hoverColTitle;
 	void(*onColTitleClick)(struct mgElement_s*, uint32_t colIndex, uint32_t mouseButton);
 
+	int cursorInColSplitter;
+	int colSplitterMode;
+	uint32_t colIndexSplitterMode;
 } mgElementTable;
 
 

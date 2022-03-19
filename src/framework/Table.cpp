@@ -257,3 +257,15 @@ void Table_onColTitleClick(struct mgElement_s* e, uint32_t colIndex, uint32_t mo
 	if (tb->onColTitleClick)
 		tb->onColTitleClick(tb, colIndex, mouseButton);
 }
+
+void Table::SetActiveColTitle(uint32_t i)
+{
+	if (i >= m_elementTable->numCols)
+		i = m_elementTable->numCols - 1;
+	m_elementTable->activeColTitle = i;
+}
+
+void Table::SetColTitleHeight(uint32_t h)
+{
+	m_elementTable->colTitleHeight = h;
+}

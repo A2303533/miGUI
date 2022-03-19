@@ -242,6 +242,45 @@ miGUI_onUpdate_table(mgElement* e)
 		if (mouseBtn)
 			impl->onColTitleClick(e, impl->hoverColTitle, mouseBtn);
 	}
+
+	static int cursorXOnLMB = 0;
+	static int saveColSize = 0;
+	static int cursorInColSplitterOld = 0;
+	if (impl->cursorInColSplitter || impl->colSplitterMode)
+	{
+		mgSetCursor_f(c, c->defaultCursors[mgCursorType_SizeWE], mgCursorType_Arrow);
+		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+		{
+			impl->colSplitterMode = 1;
+			cursorXOnLMB = c->input->mousePosition.x;
+			saveColSize = impl->colsSizes[impl->colIndexSplitterMode];
+		}
+	}
+
+	if (impl->colSplitterMode)
+	{
+		if (c->input->mouseMoveDelta.x)
+		{
+			//impl->colsSizes[impl->colIndexSplitterMode] += c->input->mouseMoveDelta.x;
+			int px = c->input->mousePosition.x - cursorXOnLMB;
+			impl->colsSizes[impl->colIndexSplitterMode] = px + saveColSize;
+
+			if (impl->colsSizes[impl->colIndexSplitterMode] < 10)
+				impl->colsSizes[impl->colIndexSplitterMode] = 10;
+			if (impl->colsSizes[impl->colIndexSplitterMode] > 500)
+				impl->colsSizes[impl->colIndexSplitterMode] = 500;
+		}
+
+		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
+		{
+			impl->colSplitterMode = 0;
+			mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+		}
+	}
+
+	if (cursorInColSplitterOld && !impl->cursorInColSplitter && !impl->colSplitterMode)
+		mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+	cursorInColSplitterOld = impl->cursorInColSplitter;
 }
 
 void 
@@ -267,6 +306,7 @@ miGUI_onDraw_table(mgElement* e)
 			&style->tableColTitleBG, 0, 0);
 
 		impl->hoverColTitle = -1;
+		impl->cursorInColSplitter = 0;
 		const wchar_t* str = 0;
 		uint32_t strLen = 0;
 		mgPoint pos;
@@ -302,6 +342,16 @@ miGUI_onDraw_table(mgElement* e)
 						&rctCol,
 						&style->tableColTitleColHover,
 						&style->tableColTitleColHover, 0, 0);
+				}
+				mgRect rctColSplt;
+				rctColSplt.left = rctCol.right - 2;
+				rctColSplt.right = rctCol.right;
+				rctColSplt.top = rctCol.top;
+				rctColSplt.bottom = rctCol.bottom;
+				if (mgPointInRect(&rctColSplt, &ctx->input->mousePosition) && !impl->colSplitterMode)
+				{
+					impl->cursorInColSplitter = 1;
+					impl->colIndexSplitterMode = i2;
 				}
 
 				if (impl->activeColTitle == i2)

@@ -81,7 +81,7 @@ namespace mgf
 		mgElementTable_s* m_elementTable = 0;
 
 		// size must be equal `column number`
-		std::vector<uint32_t> m_colSizes;
+		std::vector<int> m_colSizes;
 		
 		/*std::vector<mgTableRow_s*> m_rows;*/
 	public:
@@ -157,6 +157,8 @@ namespace mgf
 		*/
 		const wchar_t* (*onColTitleText)(Table*, uint32_t* textLen, uint32_t colIndex);
 		void(*onColTitleClick)(Table*, uint32_t colIndex, uint32_t mouseButton);
+		void SetActiveColTitle(uint32_t col);
+		void SetColTitleHeight(uint32_t h);
 	};
 }
 

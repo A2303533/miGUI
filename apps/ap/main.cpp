@@ -289,7 +289,10 @@ const wchar_t* testTable_onColTitleText(mgf::Table* tb, uint32_t* textLen, uint3
 }
 void testTable_onColTitleClick(mgf::Table* tb, uint32_t colIndex, uint32_t mouseButton)
 {
-
+	if (mouseButton == 1)
+	{
+		tb->SetActiveColTitle(colIndex);
+	}
 }
 
 int main()
