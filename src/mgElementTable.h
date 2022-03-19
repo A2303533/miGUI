@@ -104,6 +104,9 @@ typedef struct mgElementTable_s {
 	int cursorInColSplitter;
 	int colSplitterMode;
 	uint32_t colIndexSplitterMode;
+
+	int(*onGetUserElementNum)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
+	struct mgElement_s* (*onGetUserElement)(struct mgElement_s*, uint32_t index);
 } mgElementTable;
 
 

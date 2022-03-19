@@ -520,7 +520,7 @@ miGUI_onDraw_table(mgElement* e)
 
 					pos2.x += 2;
 
-					mgRect rctCol;
+					mgRect rctCol, rctColClip;
 					rctCol.left = 0;
 					rctCol.top = 0;
 					rctCol.right = 0;
@@ -533,19 +533,21 @@ miGUI_onDraw_table(mgElement* e)
 						rctCol.right = rctCol.left + impl->colsSizes[i2];
 						rctCol.bottom = rctCol.top + impl->rowHeight;
 
-						if (rctCol.top < e->transformWorld.clipArea.top)
-							rctCol.top = e->transformWorld.clipArea.top;
-						if (rctCol.bottom > e->transformWorld.clipArea.bottom)
-							rctCol.bottom = e->transformWorld.clipArea.bottom;
+						rctColClip = rctCol;
 
-						e->window->context->gpu->setClipRect(&rctCol);
+						if (rctColClip.top < e->transformWorld.clipArea.top)
+							rctColClip.top = e->transformWorld.clipArea.top;
+						if (rctColClip.bottom > e->transformWorld.clipArea.bottom)
+							rctColClip.bottom = e->transformWorld.clipArea.bottom;
+
+						e->window->context->gpu->setClipRect(&rctColClip);
 
 						if (impl->hoverRow == rowCurr)
 						{
-							if (mgPointInRect(&rctCol, &ctx->input->mousePosition))
+							if (mgPointInRect(&rctColClip, &ctx->input->mousePosition))
 							{
 								impl->hoverColIndex = i2;
-								impl->hoverCellClipRect = rctCol;
+								impl->hoverCellClipRect = rctColClip;
 							}
 						}
 
@@ -574,6 +576,36 @@ miGUI_onDraw_table(mgElement* e)
 								strLen,
 								&style->tableCellText,
 								impl->font);
+						}
+
+						if (impl->onGetUserElementNum && impl->onGetUserElement)
+						{
+							int userElementNum = impl->onGetUserElementNum(e, rowCurr, index, i2);
+							for (int i3 = 0; i3 < userElementNum; ++i3)
+							{
+								struct mgElement_s* userE = impl->onGetUserElement(e, i3);
+								if (userE)
+								{
+									userE->transformWorld = userE->transformLocal;
+									userE->transformWorld.buildArea.left += rctCol.left;
+									userE->transformWorld.buildArea.right += rctCol.left;
+									userE->transformWorld.buildArea.top += rctCol.top;
+									userE->transformWorld.buildArea.bottom += rctCol.top;
+									userE->transformWorld.clipArea.left += rctColClip.left;
+									userE->transformWorld.clipArea.right += rctColClip.left;
+									userE->transformWorld.clipArea.top += rctColClip.top;
+									userE->transformWorld.clipArea.bottom += rctColClip.top;
+
+									if (userE->transformWorld.clipArea.top < e->transformWorld.clipArea.top)
+										userE->transformWorld.clipArea.top = e->transformWorld.clipArea.top;
+									if (userE->transformWorld.clipArea.bottom > e->transformWorld.clipArea.bottom)
+										userE->transformWorld.clipArea.bottom = e->transformWorld.clipArea.bottom;
+
+									//userE->transformLocal.clipArea = userE->transformLocal.buildArea;
+									//userE->onUpdateTransform(userE);
+									userE->onDraw(userE);
+								}
+							}
 						}
 					}
 

@@ -49,6 +49,8 @@ wchar_t Table_onCellTextInputCharEnter(struct mgElement_s*, wchar_t c);
 int Table_onCellTextInputEndEdit(struct mgElement_s*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
 const wchar_t* Table_onColTitleText(struct mgElement_s*, uint32_t* textLen, uint32_t colIndex);
 void Table_onColTitleClick(struct mgElement_s*, uint32_t colIndex, uint32_t mouseButton);
+int Table_onGetUserElementNum(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
+struct mgElement_s* Table_onGetUserElement(struct mgElement_s*, uint32_t index);
 
 
 Table::Table(Window* w, uint32_t colNum, Font* f)
@@ -69,6 +71,8 @@ Table::Table(Window* w, uint32_t colNum, Font* f)
 	m_elementTable->onCellTextInputEndEdit = Table_onCellTextInputEndEdit;
 	m_elementTable->onColTitleText = Table_onColTitleText;
 	m_elementTable->onColTitleClick = Table_onColTitleClick;
+	m_elementTable->onGetUserElementNum = Table_onGetUserElementNum;
+	m_elementTable->onGetUserElement = Table_onGetUserElement;
 
 	for (uint32_t i = 0; i < colNum; ++i)
 	{
@@ -268,4 +272,25 @@ void Table::SetActiveColTitle(uint32_t i)
 void Table::SetColTitleHeight(uint32_t h)
 {
 	m_elementTable->colTitleHeight = h;
+}
+
+int Table_onGetUserElementNum(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onGetUserElementNum)
+		return tb->onGetUserElementNum(tb, row, rowIndex, colIndex);
+	return 0;
+}
+
+struct mgElement_s* Table_onGetUserElement(struct mgElement_s* e, uint32_t index)
+{
+	Table* tb = (Table*)e->userData;
+
+	if (tb->onGetUserElement)
+	{
+		Element* mgfElement = tb->onGetUserElement(tb, index);
+		return mgfElement->GetElement();
+	}
+	return 0;
 }

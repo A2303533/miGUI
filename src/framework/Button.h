@@ -47,6 +47,7 @@ namespace mgf
 
 		virtual void SetText(const wchar_t*);
 		virtual void SetAsPush(bool);
+		virtual void SetFont(Font*);
 		
 		virtual void SetIcons(
 			Icons*, 

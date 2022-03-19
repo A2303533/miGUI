@@ -94,7 +94,11 @@ void Button::SetIcons(
 	m_elementButton->iconID_disable = id4;
 }
 
-
+void Button::SetFont(Font* f)
+{
+	FontImpl* fi = (FontImpl*)f;
+	m_elementButton->font = fi->m_font;
+}
 
 
 

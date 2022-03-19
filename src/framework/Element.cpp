@@ -274,3 +274,7 @@ bool Element::IsEnabled()
 	return m_element->enabled;
 }
 
+mgElement_s* Element::GetElement()
+{
+	return m_element;
+}

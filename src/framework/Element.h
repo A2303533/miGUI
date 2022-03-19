@@ -61,6 +61,8 @@ namespace mgf
 		Element();
 		virtual ~Element();
 
+		virtual mgElement_s* GetElement();
+
 		virtual void SetUserData(void*);
 		virtual void* GetUserData();
 

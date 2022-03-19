@@ -294,6 +294,19 @@ void testTable_onColTitleClick(mgf::Table* tb, uint32_t colIndex, uint32_t mouse
 		tb->SetActiveColTitle(colIndex);
 	}
 }
+int testTable_onGetUserElementNum(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	if (colIndex == 0)
+	{
+
+		return 1;
+	}
+	return 0;
+}
+mgf::Element* testTable_onGetUserElement(mgf::Table* tb, uint32_t index)
+{
+	return g_data.tableTracklist_testButton;
+}
 
 int main()
 {
@@ -454,6 +467,13 @@ int main()
 		g_data.tableTracklist->onCellTextInputEndEdit = testTable_onCellTextInputEndEdit;
 		g_data.tableTracklist->onColTitleText = testTable_onColTitleText;
 		g_data.tableTracklist->onColTitleClick = testTable_onColTitleClick;
+		g_data.tableTracklist->onGetUserElementNum = testTable_onGetUserElementNum;
+		g_data.tableTracklist->onGetUserElement = testTable_onGetUserElement;
+		g_data.tableTracklist_testButton = window.m_data->AddButton();
+		g_data.tableTracklist_testButton->SetVisible(false);
+		g_data.tableTracklist_testButton->SetRect(40, 4, 70, 11);
+		g_data.tableTracklist_testButton->SetText(L"TEST");
+		g_data.tableTracklist_testButton->SetFont(listboxFont.m_data);
 		printf("LIST SIZE: %u\n", lst.size());
 		/*for (auto ln : lst){delete ln;}*/
 

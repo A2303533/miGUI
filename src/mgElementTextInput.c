@@ -243,6 +243,8 @@ miGUI_textinput_activate(mgElement* e, int is)
 	else
 	{
 		e->window->context->activeTextInput = 0;
+		impl->h_scrollCurr = 0.f;
+		impl->h_scroll = 0.f;
 	}
 	g_skipFrame = 1;
 }

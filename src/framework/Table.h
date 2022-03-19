@@ -128,37 +128,40 @@ namespace mgf
 	*        1 - this is wchar_t* (you must set `text` and `textlen`)
 	*
 	*/
-		int(*onDrawRow)(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+		int(*onDrawRow)(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen) = 0;
 
 		// If you want selection you must add this callbacks:
 		//Return 1 if this row selected
-		int(*onIsRowSelected)(Table*, void* row);
+		int(*onIsRowSelected)(Table*, void* row) = 0;
 		// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
-		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input);
+		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input) = 0;
 		
 		// return 1 if need to enable textinput
-		int(*onCellClick)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton, mgInputContext_s* input);
+		int(*onCellClick)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton, mgInputContext_s* input) = 0;
 		
 		// when onCellClick return 1, will be activated textInput, and need to put some text in it.
 		// return text that will be placed in textInput
-		const wchar_t* (*onCellTextInputActivate)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex);
+		const wchar_t* (*onCellTextInputActivate)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex) = 0;
 		
 		// return that character that you want to put in textInput. return 0 for skip.
-		wchar_t(*onCellTextInputCharEnter)(Table*, wchar_t c);
+		wchar_t(*onCellTextInputCharEnter)(Table*, wchar_t c) = 0;
 		
 		// will be called when Escape or Enter or click somewhere (type: see onEndEdit in mgElementTextInput.h)
 		// return 1 if need to deactivate input
-		int(*onCellTextInputEndEdit)(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
+		int(*onCellTextInputEndEdit)(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex) = 0;
 
 		/*
 		* set this for column title, that can change column width.
 		* return text for current column, set also textLen.
 		*
 		*/
-		const wchar_t* (*onColTitleText)(Table*, uint32_t* textLen, uint32_t colIndex);
-		void(*onColTitleClick)(Table*, uint32_t colIndex, uint32_t mouseButton);
+		const wchar_t* (*onColTitleText)(Table*, uint32_t* textLen, uint32_t colIndex) = 0;
+		void(*onColTitleClick)(Table*, uint32_t colIndex, uint32_t mouseButton) = 0;
 		void SetActiveColTitle(uint32_t col);
 		void SetColTitleHeight(uint32_t h);
+
+		int(*onGetUserElementNum)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex) = 0;
+		Element*(*onGetUserElement)(Table*, uint32_t index) = 0;
 	};
 }
 
