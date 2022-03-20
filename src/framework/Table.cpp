@@ -50,7 +50,8 @@ int Table_onCellTextInputEndEdit(struct mgElement_s*, int type, const wchar_t* t
 const wchar_t* Table_onColTitleText(struct mgElement_s*, uint32_t* textLen, uint32_t colIndex);
 void Table_onColTitleClick(struct mgElement_s*, uint32_t colIndex, uint32_t mouseButton);
 int Table_onGetUserElementNum(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
-struct mgElement_s* Table_onGetUserElement(struct mgElement_s*, uint32_t index);
+struct mgElement_s* Table_onGetUserElement(struct mgElement_s*, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex);
+void Table_onBeginGetUserElement(struct mgElement_s*);
 
 
 Table::Table(Window* w, uint32_t colNum, Font* f)
@@ -73,6 +74,7 @@ Table::Table(Window* w, uint32_t colNum, Font* f)
 	m_elementTable->onColTitleClick = Table_onColTitleClick;
 	m_elementTable->onGetUserElementNum = Table_onGetUserElementNum;
 	m_elementTable->onGetUserElement = Table_onGetUserElement;
+	m_elementTable->onBeginGetUserElement = Table_onBeginGetUserElement;
 
 	for (uint32_t i = 0; i < colNum; ++i)
 	{
@@ -283,14 +285,22 @@ int Table_onGetUserElementNum(struct mgElement_s* e, void* row, uint32_t rowInde
 	return 0;
 }
 
-struct mgElement_s* Table_onGetUserElement(struct mgElement_s* e, uint32_t index)
+struct mgElement_s* Table_onGetUserElement(struct mgElement_s* e, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
 
 	if (tb->onGetUserElement)
 	{
-		Element* mgfElement = tb->onGetUserElement(tb, index);
+		Element* mgfElement = tb->onGetUserElement(tb, index, row, rowIndex, colIndex);
 		return mgfElement->GetElement();
 	}
 	return 0;
 }
+
+void Table_onBeginGetUserElement(struct mgElement_s* e)
+{
+	Table* tb = (Table*)e->userData;
+	if (tb->onBeginGetUserElement)
+		tb->onBeginGetUserElement(tb);
+}
+

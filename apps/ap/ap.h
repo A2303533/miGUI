@@ -3,6 +3,8 @@
 
 class PlayListManager;
 
+#define testTable_buttonsSize 50
+
 // for callbacks
 struct AP_global_data
 {
@@ -13,7 +15,10 @@ struct AP_global_data
 	mgf::Button* buttonNewPlaylist = 0;
 	mgf::ListBox* listboxPlaylist = 0;
 	mgf::Table* tableTracklist = 0;
-	mgf::Button* tableTracklist_testButton = 0;
+	
+	mgf::Button* tableTracklist_testButton[testTable_buttonsSize];
+	int testTable_testButton_currBtn = 0;
+
 	mgStyle_s style;
 
 	PlayListManager* playlistMgr = 0;

@@ -81,6 +81,7 @@ typedef struct mgElementTable_s {
 	void* editRow;
 	uint32_t editRowIndex;
 	uint32_t editColIndex;
+	void* clickedRow;/*lmb*/
 
 	uint32_t numOfLines;
 
@@ -106,7 +107,8 @@ typedef struct mgElementTable_s {
 	uint32_t colIndexSplitterMode;
 
 	int(*onGetUserElementNum)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
-	struct mgElement_s* (*onGetUserElement)(struct mgElement_s*, uint32_t index);
+	struct mgElement_s* (*onGetUserElement)(struct mgElement_s*, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex);
+	void (*onBeginGetUserElement)(struct mgElement_s*);
 } mgElementTable;
 
 

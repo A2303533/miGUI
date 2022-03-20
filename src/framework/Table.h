@@ -161,7 +161,8 @@ namespace mgf
 		void SetColTitleHeight(uint32_t h);
 
 		int(*onGetUserElementNum)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex) = 0;
-		Element*(*onGetUserElement)(Table*, uint32_t index) = 0;
+		Element*(*onGetUserElement)(Table*, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex) = 0;
+		void (*onBeginGetUserElement)(Table*) = 0;
 	};
 }
 

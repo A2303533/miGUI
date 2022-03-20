@@ -188,6 +188,8 @@ miGUI_onUpdate_table(mgElement* e)
 		}
 	}
 
+	
+
 	if (impl->hoverRow)
 	{
 		int mouseBtn = 0;
@@ -200,6 +202,9 @@ miGUI_onUpdate_table(mgElement* e)
 
 		if (impl->onRowClick && mouseBtn)
 			impl->onRowClick(e, impl->hoverRow, impl->hoverRowIndex, mouseBtn);
+		
+		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			impl->clickedRow = impl->hoverRow;
 
 		if (impl->onCellClick && mouseBtn)
 		{
@@ -395,14 +400,15 @@ miGUI_onDraw_table(mgElement* e)
 		pos.y = e->transformWorld.buildArea.top - (int)impl->rowScrollValueWorld;
 		pos.y = pos.y + (impl->rowHeight * index);
 
-		//void* rowBegin = impl->rows[0];
+		if(impl->onBeginGetUserElement)
+			impl->onBeginGetUserElement(e);
 
 		impl->hoverRow = 0;
 		impl->hoverRowIndex = 0;
 		impl->hoverColIndex = 0xFFFFFFFF;
 		for (uint32_t i = 0; i < impl->numOfLines; ++i)
 		{
-			void* rowCurr = impl->rows[index];// rowBegin + (index * sizeof(void*));
+			void* rowCurr = impl->rows[index];
 		
 			mgRect r;
 			r.left = pos.x;
@@ -578,12 +584,13 @@ miGUI_onDraw_table(mgElement* e)
 								impl->font);
 						}
 
-						if (impl->onGetUserElementNum && impl->onGetUserElement)
+						if (impl->onGetUserElementNum && impl->onGetUserElement && impl->onBeginGetUserElement)
 						{
 							int userElementNum = impl->onGetUserElementNum(e, rowCurr, index, i2);
+
 							for (int i3 = 0; i3 < userElementNum; ++i3)
 							{
-								struct mgElement_s* userE = impl->onGetUserElement(e, i3);
+								struct mgElement_s* userE = impl->onGetUserElement(e, i3, rowCurr, index, i2);
 								if (userE)
 								{
 									userE->transformWorld = userE->transformLocal;
@@ -600,9 +607,8 @@ miGUI_onDraw_table(mgElement* e)
 										userE->transformWorld.clipArea.top = e->transformWorld.clipArea.top;
 									if (userE->transformWorld.clipArea.bottom > e->transformWorld.clipArea.bottom)
 										userE->transformWorld.clipArea.bottom = e->transformWorld.clipArea.bottom;
-
-									//userE->transformLocal.clipArea = userE->transformLocal.buildArea;
-									//userE->onUpdateTransform(userE);
+									
+									userE->onUpdate(userE);
 									userE->onDraw(userE);
 								}
 							}
