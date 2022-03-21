@@ -60,6 +60,9 @@
     <ClCompile Include="..\..\src\framework\Table.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\TextBuffer.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">
@@ -81,6 +84,9 @@
     </ClInclude>
     <ClInclude Include="playlist.h" />
     <ClInclude Include="..\..\src\framework\Table.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\TextBuffer.h">
       <Filter>migui</Filter>
     </ClInclude>
   </ItemGroup>

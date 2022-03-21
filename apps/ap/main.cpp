@@ -1,4 +1,4 @@
-#include "framework/mgf.h"
+﻿#include "framework/mgf.h"
 #include "framework/BackendGDI.h"
 #include "framework/Window.h"
 #include "framework/Rectangle.h"
@@ -9,6 +9,7 @@
 #include "framework/TextInput.h"
 #include "framework/ListBox.h"
 #include "framework/Table.h"
+#include "framework/TextBuffer.h"
 
 #include "ap.h"
 #include "playlist.h"
@@ -325,6 +326,22 @@ void context_onDraw(mgf::Context* c, mgf::Backend* b)
 
 int main()
 {
+	std::setlocale(LC_ALL, "en_US.utf8");
+	printf("locale: %s\n", setlocale(LC_ALL, NULL));
+	/*{
+		mgf::TextBuffer textBuf;
+		std::setlocale(LC_ALL, "en_US.utf8");
+		textBuf.FromFile(L"E:\\новая папка\\月曜日\\New Текстовый документ OpenDocument.odt");
+		mgf::StringW wstr;
+		wprintf(L"%s\n", L"BEGIN");
+		while (!textBuf.IsEnd())
+		{
+			textBuf.GetLine(&wstr);
+			wprintf(L"%s\n", wstr.data());
+		}
+		wprintf(L"%s\n", L"END");
+	}*/
+
 	mgf::Ptr<PlayListManager> playlistMgr = 0;
 
 	mgf::Ptr<mgf::Framework> framework = 0;
@@ -337,6 +354,7 @@ int main()
 	try
 	{
 		framework = mgf::InitFramework();
+		g_data.framework = framework.m_data;
 
 		g_data.style = framework.m_data->GetNewStyle(1);
 		g_data.style.listItemBG1.setAsIntegerARGB(0xFFBFDDFF);
@@ -524,3 +542,4 @@ int main()
 
 	return 0;
 }
+

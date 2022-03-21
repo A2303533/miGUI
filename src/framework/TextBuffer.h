@@ -27,53 +27,40 @@
 */
 
 #pragma once
-#ifndef _MGF_FMWK_H_
-#define _MGF_FMWK_H_
+#ifndef _MGF_TEXTBUFFER_H_
+#define _MGF_TEXTBUFFER_H_
 
-#include "Image.h"
 #include "String.h"
-
-#include <vector>
-
-#ifdef LoadImage
-#undef LoadImage
-#endif
 
 namespace mgf
 {
-	class Framework : public BaseClass
+
+	// A class that gives you the ability to work with text like a file.
+	class TextBuffer : public BaseClass
 	{
-		std::vector<Context*> m_contexts;
-		StringW m_appDirectory;
+		void _onInit();
 	public:
-		Framework();
-		virtual ~Framework();
+		TextBuffer();
+		virtual ~TextBuffer();
 		
-		bool m_run = true;
+		void Clear();
+		void Free();
+		
+		void FromBuffer(const char* u8char);
+		void FromBuffer(const wchar_t* u16char);
+		void FromFile(const char* fn);
+		void FromFile(const wchar_t* fn);
+		
+		bool GetLine(StringW* out);
 
-		Context* CreateContext(
-			int windowFlags, /*WinAPI flags*/
-			const mgPoint& windowPosition,
-			const mgPoint& windowSize,
-			Backend* backend
-		);
+		StringW m_buffer;
+		const wchar_t* m_begin = 0;
+		const wchar_t* m_end = 0;
+		const wchar_t* m_curr = 0;
 
-		Icons* CreateIcons(const char* imageFile, Backend* backend);
-
-		Image* LoadImage(const char* imageFile);
-
-		mgStyle_s GetNewStyle(int isLightTheme);
-		/*
-		* Call every frame.
-		* Return true if system work
-		*/
-		bool Run();
-		void DrawAll();
-
-		StringW* GetAppDir();
+		bool IsEnd();
 	};
-
-	Framework* InitFramework();
 }
+
 
 #endif

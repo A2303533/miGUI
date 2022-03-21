@@ -35,6 +35,7 @@
     <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp" />
     <ClCompile Include="..\..\src\framework\Table.cpp" />
     <ClCompile Include="..\..\src\framework\Text.cpp" />
+    <ClCompile Include="..\..\src\framework\TextBuffer.cpp" />
     <ClCompile Include="..\..\src\framework\TextInput.cpp" />
     <ClCompile Include="..\..\src\framework\Window.cpp" />
     <ClCompile Include="..\..\src\miGUILoader.c" />
@@ -46,6 +47,7 @@
     <ClInclude Include="..\..\src\framework\FontImpl.h" />
     <ClInclude Include="..\..\src\framework\SystemWindowImpl.h" />
     <ClInclude Include="..\..\src\framework\Table.h" />
+    <ClInclude Include="..\..\src\framework\TextBuffer.h" />
     <ClInclude Include="..\..\src\framework\TextInput.h" />
     <ClInclude Include="playlist.h" />
   </ItemGroup>

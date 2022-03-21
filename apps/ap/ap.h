@@ -8,6 +8,7 @@ class PlayListManager;
 // for callbacks
 struct AP_global_data
 {
+	mgf::Framework* framework = 0;
 	mgf::Window* mainWindow = 0;
 	mgf::Rectangle* playlistArea = 0;
 	mgf::Rectangle* controlArea = 0;

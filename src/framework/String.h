@@ -30,6 +30,11 @@
 #ifndef _MGF_STRING_H_
 #define _MGF_STRING_H_
 
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <cwchar>
+#include <vector>
 
 namespace mgf
 {
@@ -579,56 +584,63 @@ namespace mgf
 		String_base<wchar_t> to_utf16() const
 		{
 			String_base<wchar_t> output;
+			const char* old = m_data;
 
-			auto utf8_data = m_data;
-			while (*utf8_data)
-			{
-				unsigned char utf8_char = *utf8_data;
-				++utf8_data;
+			std::mbstate_t state = std::mbstate_t();
+			std::size_t len = 1 + std::mbsrtowcs(nullptr, &old, 0, &state);
+			std::vector<wchar_t> wstr(len);
+			std::mbsrtowcs(&wstr[0], &old, wstr.size(), &state);
+			output.append(&wstr[0]);
 
-				if (utf8_char >= 0 && utf8_char < 0x80) // one byte
-				{
-					output.append((wchar_t)utf8_char);
-				}
-				else if (utf8_char >= 0xC0 && utf8_char < 0xE0) // 2
-				{
-					unsigned char utf8_char2 = *utf8_data;
-					if (utf8_char2)
-					{
-						++utf8_data;
+			//auto utf8_data = m_data;
+			//while (*utf8_data)
+			//{
+			//	unsigned char utf8_char = *utf8_data;
+			//	++utf8_data;
 
-						wchar_t char16 = 0;
-						char16 = utf8_char;
-						char16 ^= 0xC0;
-						char16 <<= 6;
-						char16 |= (utf8_char2 ^ 0x80);
+			//	if (utf8_char >= 0 && utf8_char < 0x80) // one byte
+			//	{
+			//		output.append((wchar_t)utf8_char);
+			//	}
+			//	else if (utf8_char >= 0xC0 && utf8_char < 0xE0) // 2
+			//	{
+			//		unsigned char utf8_char2 = *utf8_data;
+			//		if (utf8_char2)
+			//		{
+			//			++utf8_data;
 
-						output.append(char16);
-					}
-				}
-				else if (utf8_char >= 0xE0 && utf8_char < 0xF0) // 3
-				{
-					unsigned char utf8_char2 = *utf8_data;
-					if (utf8_char2)
-					{
-						++utf8_data;
-						unsigned char utf8_char3 = *utf8_data;
-						if (utf8_char3)
-						{
-							++utf8_data;
+			//			wchar_t char16 = 0;
+			//			char16 = utf8_char;
+			//			char16 ^= 0xC0;
+			//			char16 <<= 6;
+			//			char16 |= (utf8_char2 ^ 0x80);
 
-							wchar_t char16 = 0;
-							char16 = utf8_char;
-							char16 ^= 0xE0;
-							char16 <<= 12;
-							char16 |= (utf8_char2 ^ 0x80) << 6;
-							char16 |= (utf8_char3 ^ 0x80);
+			//			output.append(char16);
+			//		}
+			//	}
+			//	else if (utf8_char >= 0xE0 && utf8_char < 0xF0) // 3
+			//	{
+			//		unsigned char utf8_char2 = *utf8_data;
+			//		if (utf8_char2)
+			//		{
+			//			++utf8_data;
+			//			unsigned char utf8_char3 = *utf8_data;
+			//			if (utf8_char3)
+			//			{
+			//				++utf8_data;
 
-							output.append(char16);
-						}
-					}
-				}
-			}
+			//				wchar_t char16 = 0;
+			//				char16 = utf8_char;
+			//				char16 ^= 0xE0;
+			//				char16 <<= 12;
+			//				char16 |= (utf8_char2 ^ 0x80) << 6;
+			//				char16 |= (utf8_char3 ^ 0x80);
+
+			//				output.append(char16);
+			//			}
+			//		}
+			//	}
+			//}
 			return output;
 		}
 

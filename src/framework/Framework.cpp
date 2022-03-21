@@ -60,6 +60,13 @@ Framework* mgf::InitFramework()
 
 Framework::Framework()
 {
+#ifdef MG_PLATFORM_WINDOWS
+	wchar_t wcharBuffer[0xfff];
+	GetCurrentDirectory(0xfff, wcharBuffer);
+	m_appDirectory = wcharBuffer;
+	m_appDirectory.flip_slash();
+	m_appDirectory += L"/";
+#endif
 }
 
 Framework::~Framework()
@@ -70,6 +77,10 @@ Framework::~Framework()
 #endif
 }
 
+StringW* Framework::GetAppDir()
+{
+	return &m_appDirectory;
+}
 
 bool Framework::Run()
 {
@@ -79,6 +90,7 @@ bool Framework::Run()
 		mgStartFrame(c->GetGUIContext());
 	}
 
+#ifdef MG_PLATFORM_WINDOWS
 	MSG msg;
 	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
 	{
@@ -86,6 +98,7 @@ bool Framework::Run()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+#endif
 
 	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
 	{

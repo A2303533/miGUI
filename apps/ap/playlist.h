@@ -11,6 +11,7 @@ wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c);
 void Playlist_BTN_newPL_onRelease(mgf::Element* e);
 
 class PlayList;
+class PlayListManager;
 
 struct PlaylistNode
 {
@@ -43,8 +44,10 @@ public:
 
 	mgf::StringW m_name;
 	mgf::StringW m_filePath;
+	mgf::StringW m_fileName;
 
 	std::vector<PlaylistNode*> m_nodes;
+	PlayListManager* m_mgr = 0;
 };
 
 
@@ -57,6 +60,8 @@ class PlayListManager : public mgf::BaseClass
 
 	mgf::StringW m_musicDir;
 	mgf::StringW m_playlistDir;
+
+	mgf::StringW m_orderFilePath;
 
 	PlayList* m_playPlaylist = 0;
 	PlayList* m_editPlaylist = 0;
@@ -71,6 +76,7 @@ public:
 	void AddNew();
 	
 	void LoadPlaylist(const wchar_t*);
+	void SaveOrderFile();
 };
 
 #endif // !AP_PL

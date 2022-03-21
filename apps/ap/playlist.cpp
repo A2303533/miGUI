@@ -1,5 +1,6 @@
 #include "framework/mgf.h"
 #include "framework/ListBox.h"
+#include "framework/TextBuffer.h"
 #include "ap.h"
 #include "playlist.h"
 
@@ -65,6 +66,7 @@ void PlayList::Save()
 
 		fclose(f);
 	}
+	this->m_mgr->SaveOrderFile();
 }
 
 void PlayList::RenameFile()
@@ -93,6 +95,7 @@ void PlayList::RenameFile()
 	std::filesystem::rename(m_filePath.data(), newFilePath.data());
 
 	m_filePath = newFilePath;
+	m_fileName = std::filesystem::path(newFilePath.data()).filename().c_str();
 	Save();
 }
 
@@ -144,10 +147,32 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 	if (!m_musicDir.size())
 		throw "Can't locate user music dir";
 
+	m_musicDir.flip_slash();
+
 	m_playlistDir = m_musicDir;
 	m_playlistDir += "/AP/";
 	if (!std::filesystem::exists(m_playlistDir.data()))
 		std::filesystem::create_directory(m_playlistDir.data());
+
+	m_orderFilePath = g_data.framework->GetAppDir()->data();
+	m_orderFilePath += L"ap.order";
+	if (std::filesystem::exists(m_orderFilePath.data()))
+	{
+		mgf::TextBuffer textBuf;
+		textBuf.FromFile(m_orderFilePath.data());
+		mgf::StringW wstr;
+		while (!textBuf.IsEnd())
+		{
+			textBuf.GetLine(&wstr);
+
+			mgf::StringW plPath = m_playlistDir;
+			plPath += wstr;
+			if (std::filesystem::exists(plPath.data()))
+			{
+				LoadPlaylist(plPath.c_str());
+			}
+		}
+	}
 
 	for (auto& entry : std::filesystem::directory_iterator(m_playlistDir.data()))
 	{
@@ -159,6 +184,8 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 				LoadPlaylist(path.c_str());
 		}
 	}
+
+	SaveOrderFile();
 }
 
 PlayListManager::~PlayListManager()
@@ -199,8 +226,17 @@ mgf::StringW PlayListManager::CheckPLName(mgf::StringW* str)
 
 void PlayListManager::LoadPlaylist(const wchar_t* pth)
 {
+	mgf::StringW strw = pth;
+	for (size_t i = 0; i < m_playlists.size(); ++i)
+	{
+		if (m_playlists[i]->m_filePath == strw)
+			return;
+	}
+
 	PlayList* newPL = new PlayList;
+	newPL->m_mgr = this;
 	newPL->m_filePath = pth;
+	newPL->m_fileName = std::filesystem::path(pth).filename().c_str();
 
 	std::filesystem::path p = pth;
 	std::filesystem::path fn = p.filename();
@@ -220,7 +256,7 @@ void PlayListManager::AddNew()
 	static uint32_t pl_number = 0;
 
 	PlayList* newPL = new PlayList;
-	
+	newPL->m_mgr = this;
 	newPL->m_name = L"Playlist";
 	newPL->m_name += pl_number++;
 
@@ -248,6 +284,7 @@ void PlayListManager::AddNew()
 	}
 
 	newPL->m_filePath = plFilePath.data();
+	newPL->m_fileName = std::filesystem::path(plFilePath.data()).filename().c_str();
 	m_playlists.emplace_back(newPL);	
 	m_playlistLBData.emplace_back(PlaylistListBoxData());
 
@@ -264,6 +301,23 @@ void PlayListManager::_updateGUIListbox()
 		m_playlistLBData[i].playlist = m_playlists[i];
 	}
 	g_data.listboxPlaylist->SetData(m_playlistLBData.data(), m_playlistLBData.size());
+}
+
+void PlayListManager::SaveOrderFile()
+{
+	mgf::StringA stra = m_orderFilePath.to_utf8();
+	FILE* f = fopen(stra.data(), "wb");
+	if (f)
+	{
+		uint16_t bom = 0xFEFF;
+		fwrite(&bom, 2, 1, f);
+		for (uint32_t i = 0; i < m_playlists.size(); ++i)
+		{
+			fwrite(m_playlists[i]->m_fileName.data(), 1, m_playlists[i]->m_fileName.size() * sizeof(wchar_t), f);
+			fputwc(L'\n', f);
+		}
+		fclose(f);
+	}
 }
 
 wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c)
@@ -331,4 +385,5 @@ int Playlist_LB_onSelect(mgf::ListBox* lb, uint8_t* item)
 	wprintf(L"%s\n", data->text);
 	return 1;
 }
+
 
