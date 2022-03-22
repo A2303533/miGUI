@@ -89,6 +89,7 @@ namespace mgf
 		virtual void SetRectTop(int v);
 		virtual void SetRectRight(int v);
 		virtual void SetRectBottom(int v);
+		virtual void SetPositionAndSize(int posX, int posY, int sizeX, int sizeY);
 
 		ElementCallback onMouseEnter = 0;
 		ElementCallback onMouseLeave = 0;

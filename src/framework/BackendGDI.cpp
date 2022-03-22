@@ -192,16 +192,6 @@ void BackendGDI::EndDraw()
 
 mgTexture* BackendGDI::CreateTexture(mgImage* img)
 {
-	/*BITMAP bitmap;
-	memset(&bitmap, 0, sizeof(BITMAP));
-	bitmap.bmWidth = img->width;
-	bitmap.bmHeight = img->height;
-	bitmap.bmBitsPixel = img->bits;
-	bitmap.bmWidthBytes = img->pitch;
-	bitmap.bmPlanes = 1;
-	bitmap.bmBits = img->data;
-
-	CreateStreamOnHGlobal();*/
 	if (img->type == mgImageType_unknown)
 		return 0;
 
@@ -212,20 +202,18 @@ mgTexture* BackendGDI::CreateTexture(mgImage* img)
 		pixelFormat = PixelFormat24bppRGB;
 		break;
 	case mgImageType_r8g8b8a8:
-		pixelFormat = PixelFormat32bppRGB;
-		break;
+	{
+		mgf::Image mgfImage(img);
+		mgfImage.Convert(mgImageType_a8r8g8b8);
+		pixelFormat = PixelFormat32bppARGB;
+		mgfImage.Drop();
+	}break;
 	case mgImageType_a8r8g8b8:
 		pixelFormat = PixelFormat32bppARGB;
 		break;
 	}
 
 	Gdiplus::Bitmap* myImage = new Gdiplus::Bitmap(img->width, img->height, img->pitch, pixelFormat, img->data);
-
-	Gdiplus::Rect rect;
-	rect.X = 0;
-	rect.Y = 0;
-	rect.Width = img->width;
-	rect.Height = img->height;
 
 	mgTexture* newT = new mgTexture;
 	newT->implementation = myImage;

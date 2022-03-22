@@ -34,7 +34,17 @@
 
 using namespace mgf;
 
+struct pixel4
+{
+	char c[4];
+};
+
 Image::Image()
+{
+}
+
+Image::Image(mgImage_s* ptr)
+	:m_image(ptr)
 {
 
 }
@@ -42,6 +52,11 @@ Image::Image()
 Image::~Image()
 {
 	Free();
+}
+
+void Image::Drop()
+{
+	m_image = 0;
 }
 
 void Image::Free()
@@ -120,3 +135,114 @@ uint32_t Image::GetDataSize()
 		return 0;
 	return m_image->dataSize;
 }
+
+
+
+void Image::Convert(uint32_t newType)
+{
+	if (m_image->type == newType)
+		return;
+
+	
+
+	switch (m_image->type)
+	{
+	case mgImageType_unknown:
+		break;
+	case mgImageType_r8g8b8:
+		switch (newType)
+		{
+		default:
+			printf("NOT IMPLEMENTED!\n");
+			break;
+		case mgImageType_unknown:
+		case mgImageType_r8g8b8:
+			break;
+		case mgImageType_a8r8g8b8:
+			_convert_r8g8b8_to_a8r8g8b8();
+			break;
+		case mgImageType_r8g8b8a8:
+			_convert_r8g8b8_to_r8g8b8a8();
+			break;
+		}
+		break;
+	case mgImageType_a8r8g8b8:
+		switch (newType)
+		{
+		default:
+			printf("NOT IMPLEMENTED!\n");
+			break;
+		case mgImageType_unknown:
+		case mgImageType_a8r8g8b8:
+			break;
+		case mgImageType_r8g8b8:
+			_convert_a8r8g8b8_to_r8g8b8();
+			break;
+		case mgImageType_r8g8b8a8:
+			_convert_a8r8g8b8_to_r8g8b8a8();
+			break;
+		}
+		break;
+	case mgImageType_r8g8b8a8:
+		switch (newType)
+		{
+		default:
+			printf("NOT IMPLEMENTED!\n");
+			break;
+		case mgImageType_unknown:
+		case mgImageType_r8g8b8a8:
+			break;
+		case mgImageType_r8g8b8:
+			_convert_r8g8b8a8_to_r8g8b8();
+			break;
+		case mgImageType_a8r8g8b8:
+			_convert_r8g8b8a8_to_a8r8g8b8();
+			break;
+		}
+		break;
+	default:
+		printf("NOT IMPLEMENTED!\n");
+		break;
+	}
+	m_image->type = newType;
+}
+
+void Image::_convert_r8g8b8_to_r8g8b8a8()
+{
+
+}
+
+void Image::_convert_r8g8b8_to_a8r8g8b8()
+{
+
+}
+
+void Image::_convert_r8g8b8a8_to_r8g8b8()
+{
+
+}
+
+void Image::_convert_r8g8b8a8_to_a8r8g8b8()
+{
+	pixel4* p = (pixel4*)m_image->data;
+	for (int i = 0, sz = m_image->width * m_image->height; i < sz; ++i)
+	{
+		pixel4 p2 = *p;
+		p->c[0] = p2.c[2];
+		p->c[1] = p2.c[1];
+		p->c[2] = p2.c[0];
+		p->c[3] = p2.c[3];
+		++p;
+	}
+}
+
+void Image::_convert_a8r8g8b8_to_r8g8b8()
+{
+
+}
+
+void Image::_convert_a8r8g8b8_to_r8g8b8a8()
+{
+
+}
+

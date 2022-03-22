@@ -63,12 +63,13 @@ Context::Context(
 	m_backend->SetActiveContext(this);
 	m_backend->InitWindow(m_window);
 	m_backend->UpdateBackbuffer();
-	m_backend->GetDefaultFont();
 
 	mgVideoDriverAPI* gpu = (mgVideoDriverAPI*)backend->GetVideoDriverAPI();
 	m_gui_context = mgCreateContext(gpu, m_input);
 	m_gui_context->getTextSize = m_backend->m_getTextSize;
-	
+
+	m_backend->GetDefaultFont();
+
 	mgInitDefaultIcons(m_gui_context, m_backend->GetDefaultIcons());
 
 	{

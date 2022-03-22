@@ -40,14 +40,30 @@ namespace mgf
 		friend Image* Image_png(const char* fn);
 
 		mgImage_s* m_image = 0;
+
+		void _convert_r8g8b8_to_r8g8b8a8();
+		void _convert_r8g8b8_to_a8r8g8b8();
+
+		void _convert_r8g8b8a8_to_r8g8b8();
+		void _convert_r8g8b8a8_to_a8r8g8b8();
+
+		void _convert_a8r8g8b8_to_r8g8b8();
+		void _convert_a8r8g8b8_to_r8g8b8a8();
 	public:
 		Image();
+		Image(mgImage_s*); //only pointer, not copy!
 		virtual ~Image();
+
+		//m_image = 0;
+		void Drop();
 
 		void Create(uint32_t x, uint32_t y, const mgColor&);
 		void Free();
 
 		void Fill(const mgColor&);
+
+		// mgImageType from mgImage.h
+		void Convert(uint32_t);
 
 		uint32_t GetPitch();
 		uint32_t GetWidth();

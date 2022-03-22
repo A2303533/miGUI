@@ -48,7 +48,7 @@ Image* mgf::Image_png(const char* fn)
 	int dataSize = 0;
 	unsigned char* data = 0;
 	
-	int type = mgImageType_a8r8g8b8;
+	int type = mgImageType_r8g8b8a8;
 	bits = 32;
 
 	std::vector<unsigned char> image;
@@ -64,7 +64,7 @@ Image* mgf::Image_png(const char* fn)
 	data = (unsigned char*)malloc(dataSize);
 	memcpy(data, image.data(), dataSize);
 
-	struct pixel
+	/*struct pixel
 	{
 		char c[4];
 	};
@@ -77,7 +77,7 @@ Image* mgf::Image_png(const char* fn)
 		p->c[2] = p2.c[0];
 		p->c[3] = p2.c[3];
 		++p;
-	}
+	}*/
 
 	img = new Image;
 	img->m_image = (mgImage_s*)calloc(1, sizeof(mgImage_s));

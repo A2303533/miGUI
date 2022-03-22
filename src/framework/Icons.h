@@ -49,7 +49,7 @@ namespace mgf
 		Icons(Backend*);
 		virtual ~Icons();
 
-		int Add(int left, int top, int right, int bottom);
+		int Add(int left, int top, int sizeX, int sizeY);
 	};
 }
 

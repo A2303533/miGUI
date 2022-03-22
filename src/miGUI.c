@@ -835,6 +835,7 @@ MG_API
 void MG_C_DECL
 mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy)
 {
+	sy++;
 	assert(ic);
 	assert(ic->iconNodesSize);
 	assert(id >= 0);

@@ -26,17 +26,18 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _MG_BCK_GDI_H_
-#define _MG_BCK_GDI_H_
+#ifndef _MG_BCK_OPENGL1_H_
+#define _MG_BCK_OPENGL1_H_
 
-#ifdef MGF_BACKEND_GDI
+#ifdef MGF_BACKEND_OPENGL
 
+#ifdef MG_PLATFORM_WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#include <objidl.h>
-#define GDIPVER 0x0110
-#include <gdiplus.h>
-//#pragma comment (lib,"Gdiplus.lib")
+#include <gl/GL.h>
+#include <gl/GLU.h>
+#pragma comment(lib, "OpenGL32.lib")
+#pragma comment(lib, "GLU32.lib")
 
 #ifdef DrawText
 #undef DrawText
@@ -53,13 +54,26 @@
 #ifdef LoadImage
 #undef LoadImage
 #endif
+#endif
 
 namespace mgf
 {
 	class SystemWindowImpl;
 	class Context;
+	
+	struct BackendOpenGLParams
+	{
+		bool withClearColorAndDepth = true; // set false to skip
+		bool withSwapBuffers = true; // set false to skip
+		bool withInit = true; // if false then add hglrc
 
-	class BackendGDI : public Backend
+#ifdef MG_PLATFORM_WINDOWS
+		HGLRC hglrc = 0;
+#endif
+	};
+
+	// Simple OpenGL without shaders
+	class BackendOpenGL : public Backend
 	{
 		friend class Context;
 
@@ -67,10 +81,7 @@ namespace mgf
 		mgf::Context* m_context = 0;
 
 		void* m_gpu = 0;
-		Gdiplus::GdiplusStartupInput m_gdiplusStartupInput = 0;
-		ULONG_PTR m_gdiplusToken = 0;
 
-		//Gdiplus::Bitmap* m_gdiimage_defaultIcons = 0;
 		mgTexture_s* m_defaultIcons = 0;
 		Font* m_defaultFont = 0;
 
@@ -79,11 +90,17 @@ namespace mgf
 		void _createBackbuffer(mgf::SystemWindowImpl* impl);
 
 		Image* blackImage = 0;
-		Gdiplus::Bitmap* blackBitmap = 0;
+		/*Gdiplus::Bitmap* blackBitmap = 0;*/
+		BackendOpenGLParams m_params;
 
+		mgVec4 m_drrect_tcoords;
+		mgColor* m_drrect_color1 = 0;
+		mgColor* m_drrect_color2 = 0;
+		mgRectf m_drrect_rect;
+		void _drawRectangle();
 	public:
-		BackendGDI();
-		virtual ~BackendGDI();
+		BackendOpenGL(BackendOpenGLParams);
+		virtual ~BackendOpenGL();
 		virtual void* GetVideoDriverAPI() override;
 
 		virtual void InitWindow(mgf::SystemWindow*) override;

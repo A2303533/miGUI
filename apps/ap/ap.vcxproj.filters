@@ -63,6 +63,9 @@
     <ClCompile Include="..\..\src\framework\TextBuffer.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">
@@ -87,6 +90,9 @@
       <Filter>migui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\framework\TextBuffer.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\BackendOpenGL.h">
       <Filter>migui</Filter>
     </ClInclude>
   </ItemGroup>

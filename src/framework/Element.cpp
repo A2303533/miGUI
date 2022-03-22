@@ -177,6 +177,11 @@ void Element::SetRect(int left, int top, int right, int bottom)
 	m_element->transformWorld = m_element->transformLocal;
 }
 
+void Element::SetPositionAndSize(int posX, int posY, int sizeX, int sizeY)
+{
+	SetRect(posX, posY, posX + sizeX, posY + sizeY);
+}
+
 void Element::SetRectLeft(int v)
 {
 	m_element->transformLocal.buildArea.left = v;

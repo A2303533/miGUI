@@ -1,5 +1,6 @@
 ﻿#include "framework/mgf.h"
 #include "framework/BackendGDI.h"
+#include "framework/BackendOpenGL.h"
 #include "framework/Window.h"
 #include "framework/Rectangle.h"
 #include "framework/Font.h"
@@ -324,7 +325,13 @@ void context_onDraw(mgf::Context* c, mgf::Backend* b)
 //	wprintf(L"%s\n", fi2->filename.data());
 //}
 
-int main()
+enum class backend_type
+{
+	Gdi,
+	OpenGLOld
+};
+
+int main(int argc, char* argv[])
 {
 	std::setlocale(LC_ALL, "en_US.utf8");
 	printf("locale: %s\n", setlocale(LC_ALL, NULL));
@@ -341,6 +348,23 @@ int main()
 		}
 		wprintf(L"%s\n", L"END");
 	}*/
+
+	backend_type backend = backend_type::Gdi;
+	if (argc)
+	{
+		for (int i = 0; i < argc; ++i)
+		{
+			if (strcmp(argv[i], "-b") == 0)
+			{
+				++i;
+				if (i < argc)
+				{
+					if (strcmp(argv[i], "ogl_old") == 0)
+						backend = backend_type::OpenGLOld;
+				}
+			}
+		}
+	}
 
 	mgf::Ptr<PlayListManager> playlistMgr = 0;
 
@@ -361,12 +385,27 @@ int main()
 		g_data.style.listItemBG2.setAsIntegerARGB(0xFFBFDDFF);
 		g_data.style.listItemHoverBG.setAsIntegerARGB(0xFFA8D2FF);
 
+
+		mgf::Backend* be = 0;
+		switch (backend)
+		{
+		case backend_type::Gdi:
+			be = new mgf::BackendGDI;
+			break;
+		case backend_type::OpenGLOld:
+		{
+			mgf::BackendOpenGLParams oglParams;
+			be = new mgf::BackendOpenGL(oglParams);
+		}break;
+		default:
+			break;
+		}
+
 		context = framework.m_data->CreateContext(
 			MGWS_OVERLAPPEDWINDOW,
 			mgPoint(MGCW_USEDEFAULT, 0),
 			mgPoint(MGCW_USEDEFAULT, 0),
-			new mgf::BackendGDI
-		);
+			be);
 
 		fontImpact = context.m_data->GetBackend()->CreateFont(L"Impact", 20, true, false);
 		popupFont = context.m_data->GetBackend()->CreateFont(L"Arial", 9, false, false);
@@ -408,15 +447,16 @@ int main()
 	//	text->SetColor(0xFF337722);
 		
 		g_data.buttonNewPlaylist = window.m_data->AddButton();
-		g_data.buttonNewPlaylist->SetRect(0, 5, 180, 20);
+		//g_data.buttonNewPlaylist->SetRect(0, 5, 180, 23);
+		g_data.buttonNewPlaylist->SetPositionAndSize(0, 5, 180, 18); //SetPositionAndSize is more comfortable
 		g_data.buttonNewPlaylist->SetDrawBG(false);
 		g_data.buttonNewPlaylist->onReleaseLMB = Playlist_BTN_newPL_onRelease;
 
 		icons = framework.m_data->CreateIcons("../data/ap/icons.png", context.m_data->GetBackend());
 		if (icons.m_data)
 		{
-			int iconID1 = icons.m_data->Add(0, 0, 180, 20);
-			int iconID2 = icons.m_data->Add(0, 19, 180, 20);
+			int iconID1 = icons.m_data->Add(0, 0, 180, 17);
+			int iconID2 = icons.m_data->Add(0, 19, 180, 17);
 			g_data.buttonNewPlaylist->SetIcons(icons.m_data, iconID1, iconID2, iconID1, iconID1);
 		}
 

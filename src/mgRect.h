@@ -56,6 +56,32 @@ typedef struct mgRect_s {
 
 } mgRect;
 
+typedef struct mgRectf_s {
+	float left;
+	float top;
+	float right;
+	float bottom;
+
+#if defined(__cplusplus)
+	mgRectf_s()
+		:
+		left(0.f),
+		top(0.f),
+		right(0.f),
+		bottom(0.f)
+	{}
+
+	mgRectf_s(float Left, float Top, float Right, float Bottom)
+		:
+		left(Left),
+		top(Top),
+		right(Right),
+		bottom(Bottom)
+	{}
+#endif
+
+} mgRectf;
+
 inline
 void mgRectSet(mgRect* r, int Left, int Top, int Right, int Bottom)
 {

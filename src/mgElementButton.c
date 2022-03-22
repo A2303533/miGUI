@@ -160,7 +160,7 @@ miGUI_onDraw_button(mgElement* e)
 			&e->transformWorld.buildArea, 
 			&e->window->context->whiteColor, 
 			&e->window->context->whiteColor,
-			impl->icons->texture, 0);
+			impl->icons->texture, &impl->icons->iconNodes[iconID].uv);
 	}
 
 	if (impl->text && impl->textLen)

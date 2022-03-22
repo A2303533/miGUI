@@ -33,4 +33,7 @@
 
 #define MGF_BACKEND_GDI
 
+// simple opengl
+#define MGF_BACKEND_OPENGL
+
 #endif

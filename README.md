@@ -19,6 +19,6 @@ See demos in build/ dir.
 
 # TODO
 
-* save\load dockpanel
+* scrollbar
 
 

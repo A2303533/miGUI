@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp" />
+    <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp" />
     <ClCompile Include="..\..\src\framework\Button.cpp" />
     <ClCompile Include="..\..\src\framework\Context.cpp" />
     <ClCompile Include="..\..\src\framework\Element.cpp" />
@@ -44,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\framework\BackendGDI.h" />
+    <ClInclude Include="..\..\src\framework\BackendOpenGL.h" />
     <ClInclude Include="..\..\src\framework\FontImpl.h" />
     <ClInclude Include="..\..\src\framework\SystemWindowImpl.h" />
     <ClInclude Include="..\..\src\framework\Table.h" />

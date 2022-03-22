@@ -142,6 +142,7 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 	image.height = textureSize;
 	image.dataSize = (image.width * 4) * image.height;
 	image.data = malloc(image.dataSize);
+	image.type = mgImageType_r8g8b8a8;
 
 	TextureInfo* textureInfoArray = 0;
 
@@ -250,9 +251,6 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			wchar_t currentChar = ch;
 			SIZE size;
 			ABC abc;
-
-			if (ch == L'.')
-				printf("a");
 
 			if (IsDBCSLeadByte((BYTE)ch))
 				continue;
@@ -385,6 +383,11 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			}
 		}
 
+		TEXTMETRICW tm;
+		GetTextMetrics(bmpdc, &tm);
+		newFont->maxSize.x = tm.tmMaxCharWidth;
+		newFont->maxSize.y = tm.tmHeight;
+
 		BITMAP b;
 		GetObject(bmp, sizeof(BITMAP), (LPSTR)&b);
 		WORD cClrBits = (WORD)(b.bmPlanes * b.bmBitsPixel);
@@ -434,7 +437,9 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 			mgSaveImageToFile(pathBuffer, &image);
 		}
 
+		uint8_t* savePtr = image.data;
 		((mgFontBitmap*)newFont->implementation)[i].gpuTexture = c->gpu->createTexture(&image);
+		image.data = savePtr;
 
 		LocalFree(pbmi);
 		GlobalFree(lpBits);
@@ -445,7 +450,8 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 	}
 
 end:
-	if (image.data) free(image.data);
+	image.data = 0;
+	//if (image.data) free(image.data);
 	if (textureInfoArray) free(textureInfoArray);
 	if (fontGlyphs && !newFont) free(fontGlyphs);
 	if (glyphset) free(glyphset);
