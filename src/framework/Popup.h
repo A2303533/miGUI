@@ -27,58 +27,34 @@
 */
 
 #pragma once
-#ifndef _MGF_CONTEXT_H_
-#define _MGF_CONTEXT_H_
+#ifndef _MGF_POPUP_H_
+#define _MGF_POPUP_H_
 
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
+#include "mgPopup.h"
 
 namespace mgf
 {
-	using ContextOnDraw = void(*)(Context*,Backend*);
-
-	class SystemWindowImpl;
-
-	class Context : public BaseClass
+	class Popup : public BaseClass
 	{
-		friend class Framework;
-		friend class SystemWindowImpl;
+		friend class Context;
 
-		SystemWindowImpl* m_window = 0;
-		Backend* m_backend = 0;
-		ContextOnDraw m_onDraw = 0;
-	public:
-		Context(int windowFlags,const mgPoint& windowPosition,const mgPoint& windowSize,Backend* backend);
-		virtual ~Context();
+		// I think it's possible to create one class for system popup and for migui popup
+		void* m_implementation = 0;
 
-		mgContext_s* m_gui_context = 0;
-		mgInputContext_s* m_input = 0;
-
-		mgContext_s* GetGUIContext();
-		mgf::SystemWindow* GetSystemWindow();
-		mgf::Backend* GetBackend();
-
-		void OnWindowSize();
-		
-		mgf::Window* CreateWindow();
-		/*
-		struct mgPopupItemInfo_s popupItems[] =
+		enum
 		{
-			{0, L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A", 1},
-			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-			{0, L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove", 1},
-			{0, L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide", 1},
-		};
-		*/
-		Popup* CreatePopup(Font*, mgPopupItemInfo_s* arr, int arrSize);
+			type_system,
+			type_migui
+		}
+		m_type = type_migui;
 
-		// Will draw after drawing all windows
-		void SetOnDraw(ContextOnDraw);
-		
-		void SetDefaultPopupFont(Font*);
-		
-		void DrawAll();
+		Context* m_context = 0;
+	public:
+		Popup(Context*);
+		virtual ~Popup();
+
+		void SetFont(Font*);
+		void Show(int x, int y);
 	};
 }
 

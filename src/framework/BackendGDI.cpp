@@ -249,6 +249,13 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	{
 	default:
 	{
+		if (reason == mgDrawRectangleReason_popupSeparator)
+		{
+			r.top += 2;
+			r.bottom -= 2;
+			r.left += 2;
+			r.right -= 2;
+		}
 		rgn = CreateRectRgn(
 			m_clipRect.left + m_window->m_borderSize.x, 
 			m_clipRect.top + m_window->m_borderSize.y,
@@ -256,6 +263,8 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			m_clipRect.bottom + m_window->m_borderSize.y);
 		SelectClipRgn(m_window->m_hdcMem, rgn);
 		FillRect(m_window->m_hdcMem, &r, brsh);
+
+		
 	}break;
 	case mgDrawRectangleReason_listItemBG1:
 	case mgDrawRectangleReason_listItemBG2:
@@ -332,6 +341,17 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 				m_clipRect.bottom + m_window->m_borderSize.y);
 			SelectClipRgn(m_window->m_hdcMem, rgn);
 		FillRect(m_window->m_hdcMem, &r, brsh);
+
+		if (reason == mgDrawRectangleReason_popupBG)
+		{
+			HPEN p = CreatePen(0, 3, 0xf4f4f4);
+			SelectObject(m_window->m_hdcMem, p);
+			MoveToEx(m_window->m_hdcMem, r.left, r.top, 0);
+			LineTo(m_window->m_hdcMem, r.right, r.top);
+			MoveToEx(m_window->m_hdcMem, r.left, r.top, 0);
+			LineTo(m_window->m_hdcMem, r.left, r.bottom);
+			DeleteObject(p);
+		}
 	}break;
 	case mgDrawRectangleReason_windowCloseButton:
 	case mgDrawRectangleReason_windowCollapseButton:

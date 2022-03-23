@@ -33,8 +33,8 @@
 #include "framework/SystemWindowImpl.h"
 #include "framework/Backend.h"
 #include "framework/Window.h"
-#include "framework/Font.h"
 #include "framework/FontImpl.h"
+#include "framework/Popup.h"
 
 #ifdef CreateFont
 #undef CreateFont
@@ -151,4 +151,14 @@ mgf::Backend* Context::GetBackend()
 void Context::SetDefaultPopupFont(Font* f)
 {
 	m_gui_context->defaultPopupFont = ((mgf::FontImpl*)f)->m_font;
+}
+
+Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize)
+{
+	FontImpl* fontImpl = (FontImpl*)f;
+
+	Popup* newPopup = new Popup(this);
+	newPopup->m_implementation = mgCreatePopup(arr, arrSize, fontImpl->m_font);
+
+	return newPopup;
 }

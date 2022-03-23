@@ -26,60 +26,48 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MGF_CONTEXT_H_
-#define _MGF_CONTEXT_H_
+#include "miGUI.h"
 
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
+#include "framework/mgf.h"
+#include "framework/Window.h"
+#include "framework/Font.h"
+#include "framework/FontImpl.h"
+#include "framework/Popup.h"
 
-namespace mgf
+using namespace mgf;
+
+Popup::Popup(Context* c)
+	:
+	m_context(c)
 {
-	using ContextOnDraw = void(*)(Context*,Backend*);
-
-	class SystemWindowImpl;
-
-	class Context : public BaseClass
-	{
-		friend class Framework;
-		friend class SystemWindowImpl;
-
-		SystemWindowImpl* m_window = 0;
-		Backend* m_backend = 0;
-		ContextOnDraw m_onDraw = 0;
-	public:
-		Context(int windowFlags,const mgPoint& windowPosition,const mgPoint& windowSize,Backend* backend);
-		virtual ~Context();
-
-		mgContext_s* m_gui_context = 0;
-		mgInputContext_s* m_input = 0;
-
-		mgContext_s* GetGUIContext();
-		mgf::SystemWindow* GetSystemWindow();
-		mgf::Backend* GetBackend();
-
-		void OnWindowSize();
-		
-		mgf::Window* CreateWindow();
-		/*
-		struct mgPopupItemInfo_s popupItems[] =
-		{
-			{0, L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A", 1},
-			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-			{0, L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove", 1},
-			{0, L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide", 1},
-		};
-		*/
-		Popup* CreatePopup(Font*, mgPopupItemInfo_s* arr, int arrSize);
-
-		// Will draw after drawing all windows
-		void SetOnDraw(ContextOnDraw);
-		
-		void SetDefaultPopupFont(Font*);
-		
-		void DrawAll();
-	};
 }
 
-#endif
+Popup::~Popup()
+{
+	if (m_type == type_migui)
+	{
+		mgPopup* popup = (mgPopup*)m_implementation;
+		mgDestroyPopup(popup);
+	}
+}
+
+void Popup::SetFont(Font* f)
+{
+	if (m_type == type_migui)
+	{
+		mgPopup* popup = (mgPopup*)m_implementation;
+		popup->font = ((FontImpl*)f)->m_font;
+	}
+}
+
+void Popup::Show(int x, int y)
+{
+	if (m_type == type_migui)
+	{
+		mgPopup* popup = (mgPopup*)m_implementation;
+		mgPoint pos;
+		pos.x = x;
+		pos.y = y;
+		mgShowPopup(m_context->m_gui_context, popup, &pos);
+	}
+}

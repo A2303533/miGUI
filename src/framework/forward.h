@@ -47,6 +47,7 @@ namespace mgf
 	class TextInput;
 	class ListBox;
 	class Table;
+	class Popup;
 }
 
 #endif

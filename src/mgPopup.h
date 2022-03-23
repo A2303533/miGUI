@@ -69,6 +69,7 @@ typedef struct mgPopup_s {
 	int itemHeight;
 	mgFont* font;
 
+	/*memory allocation will be in mgCreatePopup_f*/
 	struct mgPopupItem_s* items;
 	int itemsSize;
 

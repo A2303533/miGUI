@@ -30,6 +30,8 @@
 #ifndef _MGF_FONTIMPL_H_
 #define _MGF_FONTIMPL_H_
 
+#include "framework/Font.h"
+
 namespace mgf
 {
 	class FontImpl : public Font

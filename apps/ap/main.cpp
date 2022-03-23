@@ -11,6 +11,7 @@
 #include "framework/ListBox.h"
 #include "framework/Table.h"
 #include "framework/TextBuffer.h"
+#include "framework/Popup.h"
 
 #include "ap.h"
 #include "playlist.h"
@@ -562,6 +563,15 @@ int main(int argc, char* argv[])
 
 		g_data.listboxPlaylist->SetUserStyle(&g_data.style);
 
+		mgPopupItemInfo_s popupItems[] =
+		{
+			{0, L"Make first", 0, 0, mgPopupItemType_default, 0, L"Ctrl+A", 1},
+			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+			{0, L"Unpin", 0, 0, mgPopupItemType_default, 0, L"remove", 1},
+			{0, L"Close", 0, 0, mgPopupItemType_default, 0, L"hide", 1},
+		};
+		mgf::Popup* testPopup = context.m_data->CreatePopup(listboxFont.m_data, popupItems, 4);
+
 		// also rebuild all gui
 		context.m_data->GetSystemWindow()->OnSize();
 
@@ -571,6 +581,11 @@ int main(int argc, char* argv[])
 		{
 			if (sleep)
 				Sleep(1);
+
+			if (context.m_data->m_input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+			{
+				testPopup->Show(context.m_data->m_input->mousePosition.x, context.m_data->m_input->mousePosition.y);
+			}
 
 			framework.m_data->DrawAll();
 		}

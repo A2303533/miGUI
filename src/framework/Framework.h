@@ -60,6 +60,8 @@ namespace mgf
 
 		Icons* CreateIcons(const char* imageFile, Backend* backend);
 
+		
+
 		Image* LoadImage(const char* imageFile);
 
 		mgStyle_s GetNewStyle(int isLightTheme);

@@ -34,6 +34,8 @@
 #include "framework/Context.h"
 #include "framework/SystemWindowImpl.h"
 #include "framework/Icons.h"
+#include "framework/Popup.h"
+#include "framework/FontImpl.h"
 
 
 using namespace mgf;
@@ -190,5 +192,6 @@ Icons* Framework::CreateIcons(const char* imageFile, Backend* backend)
 	}
 	return icons;
 }
+
 
 

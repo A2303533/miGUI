@@ -32,6 +32,7 @@
     <ClCompile Include="..\..\src\framework\Image_png.cpp" />
     <ClCompile Include="..\..\src\framework\ListBox.cpp" />
     <ClCompile Include="..\..\src\framework\lodepng.cpp" />
+    <ClCompile Include="..\..\src\framework\Popup.cpp" />
     <ClCompile Include="..\..\src\framework\Rectangle.cpp" />
     <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp" />
     <ClCompile Include="..\..\src\framework\Table.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="..\..\src\framework\BackendGDI.h" />
     <ClInclude Include="..\..\src\framework\BackendOpenGL.h" />
     <ClInclude Include="..\..\src\framework\FontImpl.h" />
+    <ClInclude Include="..\..\src\framework\Popup.h" />
     <ClInclude Include="..\..\src\framework\SystemWindowImpl.h" />
     <ClInclude Include="..\..\src\framework\Table.h" />
     <ClInclude Include="..\..\src\framework\TextBuffer.h" />
