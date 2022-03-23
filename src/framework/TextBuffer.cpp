@@ -218,23 +218,29 @@ bool TextBuffer::GetToken(StringW* out,uint32_t flags)
 		case L' ':
 		{
 			if (flags & gettokenFlag_getSpace)
+			{
 				out->append(ch);
-			++m_curr;
-			return true;
+				++m_curr;
+				return true;
+			}
 		}break;
 		case L'\t':
 		{
 			if (flags & gettokenFlag_getTab)
+			{
 				out->append(ch);
-			++m_curr;
-			return true;
+				++m_curr;
+				return true;
+			}
 		}break;
 		case L'\n':
 		{
 			if (flags & gettokenFlag_getNewline)
+			{
 				out->append(ch);
-			++m_curr;
-			return true;
+				++m_curr;
+				return true;
+			}
 		}break;
 
 		case L'~':

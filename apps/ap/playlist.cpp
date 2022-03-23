@@ -372,6 +372,10 @@ void PlayListManager::SaveStateFile()
 	{
 		uint16_t bom = 0xFEFF;
 		fwrite(&bom, 2, 1, f);
+
+		fwrite(L";pl - playlist\n", 1, sizeof(wchar_t) * 15, f);
+		fwrite(L";pla - active (selected) playlist\n\n", 1, sizeof(wchar_t) * 35, f);
+
 		for (uint32_t i = 0; i < m_playlists.size(); ++i)
 		{
 			fwrite(L"pl:", 1, sizeof(wchar_t) * 3, f);
@@ -412,7 +416,7 @@ wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c)
 	return good ? c : 0;
 }
 
-int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, void* editItem)
+int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, void* item)
 {
 	/*
 	* i:
@@ -420,27 +424,17 @@ int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, 
 	*   2 - click somewhere
 	*   3 - Escape
 	*/
+	PlayList* pl = (PlayList*)item;
 
 	if (str)
 	{
-		/*wprintf(L"END: %s\n", str);*/
 		if (i == 1)
 		{
 			uint32_t len = wcslen(str);
-			//if (len < 30)
-			//{
-			//	PlaylistListBoxData* data = (PlaylistListBoxData*)editItem;
-			//	/* data->text points to not const wchar_t
-			//	*   so we can change text.
-			//	*/
-			//	swprintf((wchar_t*)data->text, L"%s", str);
-			//}
 			if (len)
 			{
-				//PlaylistListBoxData* data = (PlaylistListBoxData*)editItem;
-				//data->playlist->m_name = str;
-				//data->text = data->playlist->m_name.data();
-				//data->playlist->RenameFile();
+				pl->m_name = str;
+				pl->RenameFile();
 			}
 		}
 	}

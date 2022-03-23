@@ -275,6 +275,7 @@ miGUI_onDraw_list(mgElement* e)
 
 		impl->hoverItem = 0;
 		impl->hoverItemIndex = 0;
+		impl->hoverItemText = 0;
 		for (uint32_t i = 0; i < impl->numOfLines; ++i)
 		{
 			void* itemCurr = impl->items[index];
@@ -324,6 +325,9 @@ miGUI_onDraw_list(mgElement* e)
 			uint32_t strLen = 0;
 			if (impl->onDrawItem(e, itemCurr, index, &str, &strLen))
 			{
+				if(impl->hoverItem == itemCurr)
+					impl->hoverItemText = str;
+
 				int isItemSelected = 0;
 				if (impl->onIsItemSelected)
 					isItemSelected = impl->onIsItemSelected(e, itemCurr);
@@ -351,55 +355,6 @@ miGUI_onDraw_list(mgElement* e)
 			if (index >= impl->itemsSize)
 				break;
 		}
-		/*
-			const wchar_t* str = 0;
-			uint8_t* u8ptr_curr = u8ptr + (index * impl->dataTypeSizeOf);
-
-
-			if (impl->multiselect)
-			{
-				struct lbData2* dptr = (struct lbData2*)u8ptr_curr;
-				str = dptr->text;
-				if (dptr->flags & 0x1)
-				{
-					e->window->context->gpu->drawRectangle(mgDrawRectangleReason_listHoverItemBG,
-						impl,
-						&r,
-						&style->listItemSelectedBG,
-						&style->listItemSelectedBG, 0, 0);
-				}
-			}
-			else
-			{
-				struct lbData1* dptr = (struct lbData1*)u8ptr_curr;
-				str = dptr->text;
-
-				if (impl->isSelected && (impl->curSel == index))
-				{
-					e->window->context->gpu->drawRectangle(mgDrawRectangleReason_listHoverItemBG,
-						impl,
-						&r,
-						&style->listItemSelectedBG,
-						&style->listItemSelectedBG, 0, 0);
-				}
-			}
-
-			if(impl->hoverItem == u8ptr_curr)
-				impl->hoverItemText = str;
-
-			e->window->context->gpu->drawText(mgDrawTextReason_listbox, impl,
-				&pos,
-				str,
-				wcslen(str),
-				&style->listItemText,
-				impl->font);
-
-			pos.y = pos.y + impl->itemHeight;
-
-			++index;
-			if (index >= impl->arraySize)
-				break;
-		}*/
 	}
 }
 
