@@ -315,10 +315,10 @@ extern PFNMGCREATEBUTTONPROC mgCreateButton;
 * arr and arrSz - can be 0, set this later
 */
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, mgFont* f);
+MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** items, uint32_t itemsSize, mgFont* f);
 #define mgCreateListBox mgCreateListBox_f
 #else
-typedef mgElement* (*PFNMGCREATELISTBOXPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, mgFont* f);
+typedef mgElement* (*PFNMGCREATELISTBOXPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** items, uint32_t itemsSize, mgFont* f);
 extern PFNMGCREATELISTBOXPROC mgCreateListBox;
 #endif
 

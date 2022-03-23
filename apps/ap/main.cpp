@@ -488,17 +488,15 @@ int main(int argc, char* argv[])
 			{strings[8], 0, "string"},
 			{strings[9], 0, "string"},
 		};*/
-		g_data.listboxPlaylist = window.m_data->AddListBox(0, 0, sizeof(PlaylistListBoxData), listboxFont.m_data);
+		g_data.listboxPlaylist = window.m_data->AddListBox(listboxFont.m_data);
 		g_data.listboxPlaylist->SetRect(50, 200, 200, 300);
 		g_data.listboxPlaylist->SetItemHeight(listboxFont.m_data->GetMaxSize().y);
 		g_data.listboxPlaylist->SetDrawBG(false);
 		g_data.listboxPlaylist->CanEdit(true);
-		g_data.listboxPlaylist->SetSelectWithRMB(true);
 		g_data.listboxPlaylist->SetDrawItemBG(true);
 		g_data.listboxPlaylist->onTextInputCharEnter = Playlist_LB_onTextInputCharEnter;
 		g_data.listboxPlaylist->onTextInputEndEdit = Playlist_LB_onTextInputEndEdit;
 		g_data.listboxPlaylist->SetTextInputCharLimit(100);
-		g_data.listboxPlaylist->NoDeselect(true);
 		//g_data.listboxPlaylist->SetData(listboxData, 10);
 		
 		// TABLE DEMO

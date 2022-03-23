@@ -258,9 +258,9 @@ TextInput* Window::AddTextInput(Font* f)
 	return e;
 }
 
-ListBox* Window::AddListBox(void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font* f)
+ListBox* Window::AddListBox(Font* f)
 {
-	ListBox* e = new ListBox(this, arr, arrSz, dataTypeSizeOf, f);
+	ListBox* e = new ListBox(this, f);
 	m_elements.emplace_back(e);
 	return e;
 }

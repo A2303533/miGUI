@@ -39,21 +39,25 @@ using namespace mgf;
 extern Backend* g_backend;
 
 wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c);
-int LB_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, uint8_t* editItem);
-int LB_onSelect(struct mgElement_s* e, uint8_t* item);
+int LB_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, void* editItem);
+int LB_onIsItemSelected(struct mgElement_s* e, void* item);
+void LB_onItemClick(struct mgElement_s* e, void* item, uint32_t itemIndex, uint32_t mouseButton);
+int LB_onDrawItem(struct mgElement_s*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
 
-ListBox::ListBox(Window* w, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font* f)
+ListBox::ListBox(Window* w, Font* f)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 	
 	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
-	m_element = mgCreateListBox(w->m_window, &p, &p, arr, arrSz, dataTypeSizeOf, ((FontImpl*)f)->m_font);
+	m_element = mgCreateListBox(w->m_window, &p, &p, 0, 0, ((FontImpl*)f)->m_font);
 	m_element->userData = this;
 	m_elementList = (mgElementList*)m_element->implementation;
 	m_elementList->onTextInputCharEnter = LB_onTextInputCharEnter;
 	m_elementList->onTextInputEndEdit = LB_onEndEdit;
-	m_elementList->onSelect = LB_onSelect;
+	m_elementList->onIsItemSelected = LB_onIsItemSelected;
+	m_elementList->onItemClick = LB_onItemClick;
+	m_elementList->onDrawItem = LB_onDrawItem;
 	Element::PostInit();
 }
 
@@ -63,23 +67,15 @@ ListBox::~ListBox()
 		mgDestroyElement(m_element);
 }
 
-void ListBox::SetMultiselect(bool v)
+void ListBox::SetData(void** arr, uint32_t arrSz)
 {
-	m_elementList->multiselect = (int)v;
+	m_elementList->items = arr;
+	m_elementList->itemsSize = arrSz;
 }
 
-void ListBox::SetCurSel(uint32_t c)
+void** ListBox::GetData()
 {
-	m_elementList->curSel = c;
-}
-uint32_t ListBox::GetCurSel()
-{
-	return m_elementList->curSel;
-}
-
-uint32_t ListBox::GetArraySize()
-{
-	return m_elementList->arraySize;
+	return m_elementList->items;
 }
 
 void ListBox::SetFont(Font* f)
@@ -97,17 +93,6 @@ void ListBox::CanEdit(bool v)
 	m_elementList->editText = (int)v;
 }
 
-void ListBox::NoDeselect(bool v)
-{
-	m_elementList->noDeselect = (int)v;
-}
-
-void ListBox::SetData(void* arr, uint32_t arrSz)
-{
-	m_elementList->array = arr;
-	m_elementList->arraySize = arrSz;
-}
-
 wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c)
 {
 	ListBox* lb = (ListBox*)e->userData;
@@ -117,7 +102,7 @@ wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c)
 	return c;
 }
 
-int LB_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, uint8_t* editItem)
+int LB_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, void* editItem)
 {
 	ListBox* lb = (ListBox*)e->userData;
 
@@ -125,11 +110,6 @@ int LB_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, uint8_t* e
 		return lb->onTextInputEndEdit(lb, type, str, editItem);
 
 	return type;
-}
-
-void ListBox::SetSelectWithRMB(bool v)
-{
-	m_elementList->selectWithRMB = (int)v;
 }
 
 void ListBox::SetDrawItemBG(bool v)
@@ -144,12 +124,25 @@ void ListBox::SetTextInputCharLimit(uint32_t i)
 	ti->charLimit = i;
 }
 
-int LB_onSelect(struct mgElement_s* e, uint8_t* item)
+int LB_onIsItemSelected(struct mgElement_s* e, void* item)
 {
 	ListBox* lb = (ListBox*)e->userData;
+	if (lb->onIsItemSelected)
+		return lb->onIsItemSelected(lb, item);
+	return 0;
+}
 
-	if (lb->onSelect)
-		return lb->onSelect(lb, item);
+void LB_onItemClick(struct mgElement_s* e, void* item, uint32_t itemIndex, uint32_t mouseButton)
+{
+	ListBox* lb = (ListBox*)e->userData;
+	if (lb->onItemClick)
+		return lb->onItemClick(lb, item, itemIndex, mouseButton);
+}
 
-	return 1;
+int LB_onDrawItem(struct mgElement_s* e, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen)
+{
+	ListBox* lb = (ListBox*)e->userData;
+	if (lb->onDrawItem)
+		return lb->onDrawItem(lb, item, itemIndex, text, textlen);
+	return 0;
 }

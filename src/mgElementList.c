@@ -109,7 +109,7 @@ miGUI_onUpdateTransform_list(mgElement* e)
 		impl->numOfLines = (w / impl->itemHeight) + 4;
 	}
 
-	e->contentHeight = impl->arraySize * impl->itemHeight;
+	e->contentHeight = impl->itemsSize * impl->itemHeight;
 }
 
 void 
@@ -144,7 +144,7 @@ miGUI_onUpdate_list(mgElement* e)
 		impl->itemScrollValueWorld = impl->itemScrollValue;/*parent must be somewhere*/
 	}
 
-	if (impl->arraySize && (impl->arraySize > impl->numOfLines))
+	if (impl->itemsSize && (impl->itemsSize > impl->numOfLines))
 	{
 		mgPoint pos;
 		pos.x = e->transformWorld.buildArea.left;
@@ -156,7 +156,7 @@ miGUI_onUpdate_list(mgElement* e)
 		{
 			++impl->firstItemIndexForDraw;
 
-			uint32_t lastIndex = impl->arraySize - impl->numOfLines;
+			uint32_t lastIndex = impl->itemsSize - impl->numOfLines;
 			if (impl->firstItemIndexForDraw > lastIndex)
 			{
 				impl->firstItemIndexForDraw = lastIndex;
@@ -188,103 +188,16 @@ miGUI_onUpdate_list(mgElement* e)
 
 		if(!edit)
 		{
-			if (impl->multiselect)
-			{
-				struct lbData2* dptr = (struct lbData2*)impl->hoverItem;
+			int mouseBtn = 0;
+			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+				mouseBtn = 1;
+			else if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+				mouseBtn = 2;
+			else if (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
+				mouseBtn = 3;
 
-				if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-					issel = 1;
-
-				if (impl->selectWithRMB && !issel)
-				{
-					if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
-						issel = 1;
-				}
-
-				if (issel)
-				{
-					impl->clickedItems[impl->clickedItemsCurr] = impl->hoverItem;
-					++impl->clickedItemsCurr;
-					if (impl->clickedItemsCurr > 2)
-						impl->clickedItemsCurr = 0;
-
-					if (dptr->flags & 0x1)
-						dptr->flags ^= 0x1;
-					else
-					{
-						if (impl->onSelect)
-						{
-							if (impl->onSelect(e, impl->hoverItem))
-								dptr->flags |= 0x1;
-						}
-						else
-						{
-							dptr->flags |= 0x1;
-						}
-					}
-				}
-			}
-			else
-			{
-				if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-					issel = 1;
-
-				if (impl->selectWithRMB && !issel)
-				{
-					if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
-						issel = 1;
-				}
-
-				if (issel)
-				{
-					impl->clickedItems[impl->clickedItemsCurr] = impl->hoverItem;
-					++impl->clickedItemsCurr;
-					if (impl->clickedItemsCurr > 2)
-						impl->clickedItemsCurr = 0;
-
-					if (impl->isSelected)
-					{
-						uint32_t index = impl->hoverItem - (uint8_t*)impl->array;
-						index /= impl->dataTypeSizeOf;
-
-						if (index != impl->curSel)
-						{
-							if (impl->onSelect)
-							{
-								if (impl->onSelect(e, impl->hoverItem))
-									impl->curSel = index;
-							}
-							else
-							{
-								impl->curSel = index;
-							}
-						}
-						else if(!impl->noDeselect)
-						{
-							impl->isSelected = 0;
-							impl->curSel = 0;
-						}
-					}
-					else
-					{
-						if (impl->onSelect)
-						{
-							if (impl->onSelect(e, impl->hoverItem))
-							{
-								impl->isSelected = 1;
-								impl->curSel = impl->hoverItem - (uint8_t*)impl->array;
-								impl->curSel /= impl->dataTypeSizeOf;
-							}
-						}
-						else
-						{
-							impl->isSelected = 1;
-							impl->curSel = impl->hoverItem - (uint8_t*)impl->array;
-							impl->curSel /= impl->dataTypeSizeOf;
-						}
-					}
-				}
-			}
+			if (impl->onItemClick && mouseBtn)
+				impl->onItemClick(e, impl->hoverItem, impl->hoverItemIndex, mouseBtn);
 		}
 
 		if (edit)
@@ -312,7 +225,7 @@ miGUI_onUpdate_list(mgElement* e)
 			/*
 			* I need to select this item again...
 			*/
-			if (impl->multiselect)
+			/*if (impl->multiselect)
 			{
 				struct lbData2* dptr = (struct lbData2*)impl->hoverItem;
 				dptr->flags |= 0x1;
@@ -324,7 +237,7 @@ miGUI_onUpdate_list(mgElement* e)
 
 				impl->isSelected = 1;
 				impl->curSel = index;
-			}
+			}*/
 		}
 	}
 }
@@ -349,7 +262,7 @@ miGUI_onDraw_list(mgElement* e)
 			&style->listBG, 0, 0);
 	}
 
-	if (impl->arraySize && impl->font)
+	if (impl->itemsSize && impl->font)
 	{
 		uint32_t index = impl->firstItemIndexForDraw;
 		mgPoint pos;
@@ -357,24 +270,22 @@ miGUI_onDraw_list(mgElement* e)
 		pos.y = e->transformWorld.buildArea.top - (int)impl->itemScrollValueWorld;
 		pos.y = pos.y + (impl->itemHeight * index);
 
-		uint8_t* u8ptr = (uint8_t*)impl->array;
+		if (impl->onBeginGetUserElement)
+			impl->onBeginGetUserElement(e);
 
 		impl->hoverItem = 0;
+		impl->hoverItemIndex = 0;
 		for (uint32_t i = 0; i < impl->numOfLines; ++i)
 		{
-			const wchar_t* str = 0;
-			uint8_t* u8ptr_curr = u8ptr + (index * impl->dataTypeSizeOf);
-			
+			void* itemCurr = impl->items[index];
 			mgRect r;
 			r.left = pos.x;
 			r.top = pos.y;
 			r.right = e->transformWorld.clipArea.right;
 			r.bottom = r.top + impl->itemHeight;
-
 			mgRect rClip = r;
 			if (rClip.top < e->parent->transformWorld.clipArea.top)
 				rClip.top = e->parent->transformWorld.clipArea.top;
-
 			if (impl->drawItemBG)
 			{
 				mgColor* ibgc = &style->listItemBG2;
@@ -396,11 +307,9 @@ miGUI_onDraw_list(mgElement* e)
 					ibgc,
 					0, 0);
 			}
-
-
 			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverItem && !g_skipFrame)
 			{
-				impl->hoverItem = u8ptr_curr;
+				impl->hoverItem = itemCurr;
 				impl->hoverItemClipRect = rClip;
 				impl->hoverItemBuildRect = r;
 
@@ -410,6 +319,42 @@ miGUI_onDraw_list(mgElement* e)
 					&style->listItemHoverBG,
 					&style->listItemHoverBG, 0, 0);
 			}
+
+			wchar_t* str = 0;
+			uint32_t strLen = 0;
+			if (impl->onDrawItem(e, itemCurr, index, &str, &strLen))
+			{
+				int isItemSelected = 0;
+				if (impl->onIsItemSelected)
+					isItemSelected = impl->onIsItemSelected(e, itemCurr);
+
+				if (isItemSelected)
+				{
+					e->window->context->gpu->drawRectangle(mgDrawRectangleReason_listHoverItemBG,
+						impl,
+						&r,
+						&style->listItemSelectedBG,
+						&style->listItemSelectedBG, 0, 0);
+				}
+
+				e->window->context->gpu->drawText(mgDrawTextReason_listbox, impl,
+					&pos,
+					str,
+					wcslen(str),
+					&style->listItemText,
+					impl->font);
+			}
+
+			pos.y = pos.y + impl->itemHeight;
+
+			++index;
+			if (index >= impl->itemsSize)
+				break;
+		}
+		/*
+			const wchar_t* str = 0;
+			uint8_t* u8ptr_curr = u8ptr + (index * impl->dataTypeSizeOf);
+
 
 			if (impl->multiselect)
 			{
@@ -454,7 +399,7 @@ miGUI_onDraw_list(mgElement* e)
 			++index;
 			if (index >= impl->arraySize)
 				break;
-		}
+		}*/
 	}
 }
 
@@ -469,9 +414,8 @@ mgCreateListBox_f(
 	struct mgWindow_s* w, 
 	mgPoint* position, 
 	mgPoint* size, 
-	void* array, 
-	uint32_t arraySize, 
-	uint32_t dataTypeSizeOf,
+	void** items, 
+	uint32_t itemsSize,
 	mgFont* f)
 {
 	assert(w);
@@ -499,12 +443,8 @@ mgCreateListBox_f(
 
 	newElement->implementation = calloc(1, sizeof(mgElementList));
 	mgElementList* impl = (mgElementList*)newElement->implementation;
-	impl->array = array;
-	impl->dataTypeSizeOf = dataTypeSizeOf;
-	impl->arraySize = arraySize;
-	impl->isSelected = 0;
-	impl->multiselect = 0;
-	impl->curSel = 0;
+	impl->items = items;
+	impl->itemsSize = itemsSize;
 	impl->itemHeight = 12;
 	impl->font = f;
 	impl->useF2ForEdit = 1;

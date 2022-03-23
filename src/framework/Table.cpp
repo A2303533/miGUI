@@ -104,16 +104,6 @@ void Table::SetRect(int left, int top, int right, int bottom)
 	}
 }
 
-void Table::SetCurSel(uint32_t c)
-{
-	/*m_elementTable->curSel = c;*/
-}
-uint32_t Table::GetCurSel()
-{
-	/*return m_elementTable->curSel;*/
-	return 0;
-}
-
 void Table::SetScrollSpeed(float s)
 {
 	m_elementTable->scrollSpeed = s;
@@ -154,14 +144,9 @@ int Table_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, uint8_t
 	return type;
 }
 
-void Table::SetSelectWithRMB(bool v)
-{
-//	m_elementTable->selectWithRMB = (int)v;
-}
-
 void Table::SetDrawItemBG(bool v)
 {
-//	m_elementTable->drawItemBG = (int)v;
+	m_elementTable->drawItemBG = (int)v;
 }
 
 void Table::SetTextInputCharLimit(uint32_t i)

@@ -49,6 +49,7 @@ enum {
 	MG_TYPE_BUTTON,
 	MG_TYPE_TEXTINPUT,
 	MG_TYPE_LIST,
+	MG_TYPE_TABLE,
 };
 
 struct mgElement_s;

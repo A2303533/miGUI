@@ -89,15 +89,7 @@ namespace mgf
 		virtual ~Table();
 		virtual void SetRect(int left, int top, int right, int bottom) override;
 
-		void SetCurSel(uint32_t);
-		uint32_t GetCurSel();
-		
-		void SetSelectWithRMB(bool);
 		void SetDrawItemBG(bool);
-
-	//	uint32_t GetArraySize();
-		
-	//	mgTableRow_s* AddRow();
 
 		void SetFont(Font*);
 

@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -31,19 +31,12 @@
 #define _MG_ELEMENTLIST_H_
 
 typedef struct mgElementList_s {
-	uint32_t isSelected;
-	uint32_t curSel;
-	uint32_t multiselect;/*0*/
 	uint32_t editText;/*0*/
-	uint32_t selectWithRMB;/*0*/
 	uint32_t drawItemBG;/*0*/
 	uint32_t useF2ForEdit;/*1*/
-	uint32_t noDeselect;/*0, Some item will be always selected. 
-						Select item by yourself. 
-						Only for not multisilect.*/
 
-	void* array;
-	uint32_t arraySize;
+	void** items;
+	uint32_t itemsSize;
 
 	uint32_t firstItemIndexForDraw;/*internal*/
 	uint32_t numOfLines;/*internal*/
@@ -54,24 +47,41 @@ typedef struct mgElementList_s {
 	float itemScrollValueTarget;
 	float itemScrollValueWorld;
 
-	uint32_t dataTypeSizeOf;
-	uint8_t* hoverItem;
-	uint8_t* editItem;
+	void* hoverItem;
+	uint32_t hoverItemIndex;
+	void* editItem;
 
-	uint8_t* clickedItems[2];
+	void* clickedItems[2];
 	uint32_t clickedItemsCurr;
 
-	/*return 1 if need to select*/
-	int(*onSelect)(struct mgElement_s* e, uint8_t* item);
+	/*
+	* If you need selection
+	* return 1 if this item selected
+	*/
+	int(*onIsItemSelected)(struct mgElement_s* e, void* item);
+	/*
+	* select or deselect here
+	* mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
+	*/
+	void(*onItemClick)(struct mgElement_s* e, void* item, uint32_t itemIndex, uint32_t mouseButton);
+	/*
+	* Return 0 - no draw
+	*        1 - draw (you must set `text` and `textlen`)
+	*/
+	int(*onDrawItem)(struct mgElement_s*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
 	
 	wchar_t(*onTextInputCharEnter)(struct mgElement_s*, wchar_t);
-	int(*onTextInputEndEdit)(struct mgElement_s*, int, const wchar_t*, uint8_t* editItem);
+	int(*onTextInputEndEdit)(struct mgElement_s*, int, const wchar_t*, void* editItem);
 
 
 	struct mgElement_s* textInput;
 	mgRect hoverItemClipRect;
 	mgRect hoverItemBuildRect;
 	const wchar_t* hoverItemText;
+
+	int(*onGetUserElementNum)(struct mgElement_s*, void* item, uint32_t itemIndex);
+	struct mgElement_s* (*onGetUserElement)(struct mgElement_s*, uint32_t index, void* item, uint32_t itemIndex);
+	void (*onBeginGetUserElement)(struct mgElement_s*);
 } mgElementList;
 
 

@@ -45,8 +45,7 @@ typedef struct mgElementTable_s {
 
 	/*
 	* Return 0 - no draw
-	*        1 - this is wchar_t* (you must set `text` and `textlen`)
-	*        
+	*        1 - draw (you must set `text` and `textlen`)
 	*/
 	int(*onDrawRow)(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
 	
@@ -58,6 +57,7 @@ typedef struct mgElementTable_s {
 	*/
 	int(*onIsRowSelected)(struct mgElement_s*, void* row);
 	/*
+	* select or deselect here
 	* mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
 	*/
 	void(*onRowClick)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t mouseButton);

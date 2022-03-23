@@ -464,40 +464,6 @@ miGUI_onDraw_table(mgElement* e)
 					&style->tableRowHoverBG, 0, 0);
 			}
 
-/*
-
-			if (impl->multiselect)
-			{
-				struct lbData2* dptr = (struct lbData2*)u8ptr_curr;
-				str = dptr->text;
-				if (dptr->flags & 0x1)
-				{
-					e->window->context->gpu->drawRectangle(mgDrawRectangleReason_listHoverItemBG,
-						impl,
-						&r,
-						&style->listItemSelectedBG,
-						&style->listItemSelectedBG, 0, 0);
-				}
-			}
-			else
-			{
-				struct lbData1* dptr = (struct lbData1*)u8ptr_curr;
-				str = dptr->text;
-
-				if (impl->isSelected && (impl->curSel == index))
-				{
-					e->window->context->gpu->drawRectangle(mgDrawRectangleReason_listHoverItemBG,
-						impl,
-						&r,
-						&style->listItemSelectedBG,
-						&style->listItemSelectedBG, 0, 0);
-				}
-			}
-
-			if(impl->hoverRow == u8ptr_curr)
-				impl->hoverItemText = str;
-
-		*/
 			if (impl->onDrawRow)
 			{
 				mgPoint pos2 = pos;
@@ -649,7 +615,7 @@ mgCreateTable_f(struct mgWindow_s* w,
 	assert(size);
 
 	mgElement* newElement = calloc(1, sizeof(mgElement));
-	newElement->type = MG_TYPE_LIST;
+	newElement->type = MG_TYPE_TABLE;
 
 	newElement->transformLocal.buildArea.left = position->x;
 	newElement->transformLocal.buildArea.top = position->y;

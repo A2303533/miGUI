@@ -45,29 +45,20 @@ namespace mgf
 	{
 		mgElementList_s* m_elementList = 0;
 	public:
-		ListBox(Window* w, void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font*);
+		ListBox(Window* w, Font*);
 		virtual ~ListBox();
 
-		void SetMultiselect(bool);
-
-		// Only for NOT multiselect
-		void SetCurSel(uint32_t);
-		uint32_t GetCurSel();
-		
-		void SetSelectWithRMB(bool);
 		void SetDrawItemBG(bool);
-
-		uint32_t GetArraySize();
+		
+		void SetData(void** arr, uint32_t arrSz);
+		void** GetData();
 
 		void SetFont(Font*);
 		void SetItemHeight(uint32_t);
 		void CanEdit(bool);
-		void NoDeselect(bool);
 
 		// 0 - no limit;
 		void SetTextInputCharLimit(uint32_t);
-		
-		void SetData(void* arr, uint32_t arrSz);
 		
 		wchar_t(*onTextInputCharEnter)(ListBox*, wchar_t) = 0;
 		/*
@@ -78,10 +69,23 @@ namespace mgf
 		* str: new text
 		* editItem: first byte for edited item
 		*/
-		int(*onTextInputEndEdit)(ListBox*, int i, const wchar_t* str, uint8_t* editItem) = 0;
+		int(*onTextInputEndEdit)(ListBox*, int i, const wchar_t* str, void* editItem) = 0;
 
-		/*return 1 if need to select*/
-		int(*onSelect)(ListBox*, uint8_t* item);
+		/*
+		* If you need selection
+		* return 1 if this item selected
+		*/
+		int(*onIsItemSelected)(ListBox* e, void* item);
+		/*
+		* select or deselect here
+		* mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
+		*/
+		void(*onItemClick)(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton);
+		/*
+		* Return 0 - no draw
+		*        1 - draw (you must set `text` and `textlen`)
+		*/
+		int(*onDrawItem)(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
 	};
 }
 

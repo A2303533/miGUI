@@ -85,7 +85,7 @@ namespace mgf
 		*  flags:
 		*		0x1 - selected or not
 		*/
-		ListBox* AddListBox(void* arr, uint32_t arrSz, uint32_t dataTypeSizeOf, Font*);
+		ListBox* AddListBox(Font*);
 		
 		Table* AddTable(uint32_t colNum, Font*);
 

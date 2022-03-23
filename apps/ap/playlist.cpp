@@ -11,9 +11,11 @@
 
 extern AP_global_data g_data;
 
-int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, uint8_t* editItem);
+int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, void* editItem);
 wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c);
-int Playlist_LB_onSelect(mgf::ListBox* lb, uint8_t* item);
+int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item);
+void Playlist_LB_onItemClick(mgf::ListBox* lb, void* item, uint32_t itemIndex, uint32_t mouseButton);
+int Playlist_LB_onDrawItem(mgf::ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
 void Playlist_BTN_newPL_onRelease(mgf::Element* e);
 
 PlayList::PlayList()
@@ -103,7 +105,9 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 	:
 	m_listBox(lb)
 {
-	m_listBox->onSelect = Playlist_LB_onSelect;
+	m_listBox->onIsItemSelected = Playlist_LB_onIsItemSelected;
+	m_listBox->onItemClick = Playlist_LB_onItemClick;
+	m_listBox->onDrawItem = Playlist_LB_onDrawItem;
 
 	IKnownFolderManager* pManager;
 	HRESULT hr = CoCreateInstance(CLSID_KnownFolderManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pManager));
@@ -174,11 +178,13 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 				}
 				else
 				{
+					wstr.clear();
 					textBuf.SkipLine();
 				}
 			}
 			else
 			{
+				wstr.clear();
 				textBuf.SkipLine();
 			}
 
@@ -190,6 +196,45 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 				{
 					LoadPlaylist(plPath.c_str());
 				}
+			}
+		}
+
+		// read pla:
+		textBuf.ToBegin();
+		while (!textBuf.IsEnd())
+		{
+			textBuf.GetToken(&wstr, 0);
+			if (std::wcscmp(wstr.data(), L"pla") == 0)
+			{
+				textBuf.GetToken(&wstr, 0);
+				if (std::wcscmp(wstr.data(), L":") == 0)
+				{
+					textBuf.GetLine(&wstr);
+					wstr.trim_spaces();
+				}
+				else
+				{
+					wstr.clear();
+					textBuf.SkipLine();
+				}
+			}
+			else
+			{
+				wstr.clear();
+				textBuf.SkipLine();
+			}
+
+			if (wstr.size())
+			{
+				for (size_t i = 0, sz = m_playlists.size(); i < sz; ++i)
+				{
+					if (m_playlists[i]->m_fileName == wstr)
+					{
+						SelectPlaylist(m_playlists[i]);
+						break;
+					}
+				}
+				break;
 			}
 		}
 	}
@@ -208,6 +253,7 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 	printf("%u playlists\n", m_playlists.size());
 
 	SaveStateFile();
+	_updateGUIListbox();
 }
 
 PlayListManager::~PlayListManager()
@@ -268,7 +314,6 @@ void PlayListManager::LoadPlaylist(const wchar_t* pth)
 	newPL->m_name.pop_back();
 
 	m_playlists.emplace_back(newPL);
-	m_playlistLBData.emplace_back(PlaylistListBoxData());
 
 	_updateGUIListbox();
 }
@@ -307,22 +352,16 @@ void PlayListManager::AddNew()
 
 	newPL->m_filePath = plFilePath.data();
 	newPL->m_fileName = std::filesystem::path(plFilePath.data()).filename().c_str();
-	m_playlists.emplace_back(newPL);	
-	m_playlistLBData.emplace_back(PlaylistListBoxData());
+	m_playlists.emplace_back(newPL);
 
 	_updateGUIListbox();
-
+	
 	newPL->Save();
 }
 
 void PlayListManager::_updateGUIListbox()
 {
-	for (uint32_t i = 0; i < m_playlists.size(); ++i)
-	{
-		m_playlistLBData[i].text = m_playlists[i]->m_name.data();
-		m_playlistLBData[i].playlist = m_playlists[i];
-	}
-	g_data.listboxPlaylist->SetData(m_playlistLBData.data(), m_playlistLBData.size());
+	g_data.listboxPlaylist->SetData((void**)m_playlists.data(), m_playlists.size());
 }
 
 void PlayListManager::SaveStateFile()
@@ -339,6 +378,20 @@ void PlayListManager::SaveStateFile()
 			fwrite(m_playlists[i]->m_fileName.data(), 1, m_playlists[i]->m_fileName.size() * sizeof(wchar_t), f);
 			fputwc(L'\n', f);
 		}
+
+		if (m_playPlaylist)
+		{
+			fwrite(L"pla:", 1, sizeof(wchar_t) * 4, f);
+			fwrite(m_playPlaylist->m_fileName.data(), 1, m_playPlaylist->m_fileName.size() * sizeof(wchar_t), f);
+			fputwc(L'\n', f);
+		}
+		else if (m_editPlaylist)
+		{
+			fwrite(L"pla:", 1, sizeof(wchar_t) * 4, f);
+			fwrite(m_editPlaylist->m_fileName.data(), 1, m_editPlaylist->m_fileName.size() * sizeof(wchar_t), f);
+			fputwc(L'\n', f);
+		}
+
 		fclose(f);
 	}
 }
@@ -359,7 +412,7 @@ wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c)
 	return good ? c : 0;
 }
 
-int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, uint8_t* editItem)
+int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, void* editItem)
 {
 	/*
 	* i:
@@ -384,11 +437,10 @@ int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, 
 			//}
 			if (len)
 			{
-				PlaylistListBoxData* data = (PlaylistListBoxData*)editItem;
-				data->playlist->m_name = str;
-				data->text = data->playlist->m_name.data();
-				data->playlist->RenameFile();
-				/*std::filesystem::rename*/
+				//PlaylistListBoxData* data = (PlaylistListBoxData*)editItem;
+				//data->playlist->m_name = str;
+				//data->text = data->playlist->m_name.data();
+				//data->playlist->RenameFile();
 			}
 		}
 	}
@@ -402,11 +454,43 @@ void Playlist_BTN_newPL_onRelease(mgf::Element* e)
 		g_data.playlistMgr->AddNew();
 }
 
-int Playlist_LB_onSelect(mgf::ListBox* lb, uint8_t* item)
+int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item)
 {
-	PlaylistListBoxData* data = (PlaylistListBoxData*)item;
-	wprintf(L"%s\n", data->text);
+	PlayList* pl = (PlayList*)item;
+	return (int)pl->m_isSelected;
+}
+
+void Playlist_LB_onItemClick(mgf::ListBox* lb, void* item, uint32_t itemIndex, uint32_t mouseButton)
+{
+	if (mouseButton)
+	{
+		PlayList* pl = (PlayList*)item;
+		pl->m_mgr->SelectPlaylist(pl);
+	}
+}
+
+int Playlist_LB_onDrawItem(mgf::ListBox* lb, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen)
+{
+	PlayList* pl = (PlayList*)item;
+
+	*text = pl->m_name.data();
+	*textlen = pl->m_name.size();
+
 	return 1;
 }
 
+void PlayListManager::SetEditPlaylist(PlayList* p)
+{
+	m_editPlaylist = p;
+}
 
+void PlayListManager::SelectPlaylist(PlayList* pl)
+{
+	for (size_t i = 0, sz = m_playlists.size(); i < sz; ++i)
+	{
+		m_playlists[i]->m_isSelected = false;
+	}
+	pl->m_isSelected = true;
+	m_editPlaylist = pl;
+	SaveStateFile();
+}
