@@ -335,19 +335,23 @@ int main(int argc, char* argv[])
 {
 	std::setlocale(LC_ALL, "en_US.utf8");
 	printf("locale: %s\n", setlocale(LC_ALL, NULL));
-	/*{
-		mgf::TextBuffer textBuf;
-		std::setlocale(LC_ALL, "en_US.utf8");
-		textBuf.FromFile(L"E:\\новая папка\\月曜日\\New Текстовый документ OpenDocument.odt");
-		mgf::StringW wstr;
-		wprintf(L"%s\n", L"BEGIN");
-		while (!textBuf.IsEnd())
-		{
-			textBuf.GetLine(&wstr);
-			wprintf(L"%s\n", wstr.data());
-		}
-		wprintf(L"%s\n", L"END");
-	}*/
+	//{
+	//	mgf::TextBuffer textBuf;
+	//	std::setlocale(LC_ALL, "en_US.utf8");
+	//	textBuf.FromFile(L"E:\\новая папка\\月曜日\\New Текстовый документ OpenDocument.odt");
+	//	mgf::StringW wstr;
+	//	wprintf(L"%s\n", L"BEGIN");
+	//	while (!textBuf.IsEnd())
+	//	{
+	//		textBuf.GetLine(&wstr);
+	//		wprintf(L"%s\n", wstr.data());
+
+	//		//textBuf.GetToken(&wstr, 0);
+	//		//if(wstr.size())
+	//		//	wprintf(L"\'%s\' ", wstr.data());
+	//	}
+	//	wprintf(L"%s\n", L"END");
+	//}
 
 	backend_type backend = backend_type::Gdi;
 	if (argc)

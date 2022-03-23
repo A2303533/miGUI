@@ -32,6 +32,8 @@
 #include "framework/mgf.h"
 #include "framework/TextBuffer.h"
 
+#include <cwctype>
+
 using namespace mgf;
 
 TextBuffer::TextBuffer()
@@ -177,6 +179,153 @@ void TextBuffer::FromFile(const wchar_t* fn)
 	FromFile(stra.data());
 }
 
+bool TextBuffer::GetToken(StringW* out,uint32_t flags)
+{
+	out->clear();
+
+	if (m_curr >= m_end)
+	{
+		m_curr = m_end;
+		return false;
+	}
+
+	enum
+	{
+		mode_free,
+		mode_word,
+		mode_int,
+		mode_hex,
+		mode_science,
+		mode_float
+	}
+	mode = mode_free;
+
+	enum
+	{
+		symbol_alpha,
+		symbol_digit,
+		symbol_punct,
+	}
+	symbol = symbol_alpha;
+
+	while (m_curr < m_end)
+	{
+		wchar_t ch = *m_curr;
+		
+
+		switch (ch)
+		{
+		case L' ':
+		{
+			if (flags & gettokenFlag_getSpace)
+				out->append(ch);
+			++m_curr;
+			return true;
+		}break;
+		case L'\t':
+		{
+			if (flags & gettokenFlag_getTab)
+				out->append(ch);
+			++m_curr;
+			return true;
+		}break;
+		case L'\n':
+		{
+			if (flags & gettokenFlag_getNewline)
+				out->append(ch);
+			++m_curr;
+			return true;
+		}break;
+
+		case L'~':
+		case L'`':
+		case L'@':
+		case L'\"':
+		case L'\'':
+		case L'#':
+		case L'№':
+		case L'$':
+		case L'%':
+		case L'^':
+		case L':':
+		case L'?':
+		case L'&':
+		case L'*':
+		case L'(':
+		case L')':
+		case L'=':
+		case L'+':
+		case L'-':
+		case L';':
+		case L'{':
+		case L'}':
+		case L'[':
+		case L']':
+		case L'\\':
+		case L'/':
+		case L'|':
+		case L'<':
+		case L'>':
+		case L',':
+		case L'.':
+			symbol = symbol_punct;
+			break;
+		}
+
+		if (std::iswcntrl(ch))
+		{
+			++m_curr;
+			continue;
+		}
+
+		if (std::iswdigit(ch))
+			symbol = symbol_digit;
+
+		switch (mode)
+		{
+		case mode_free:
+		{
+			switch (symbol)
+			{
+			case symbol_alpha:
+				mode = mode_word;
+				out->append(ch);
+				break;
+			case symbol_digit:
+				mode = mode_int;
+				out->append(ch);
+				break;
+			case symbol_punct:
+				out->append(ch);
+				++m_curr;
+				return true;
+			default:
+				break;
+			}
+		}break;
+		case mode_word:
+		{
+			if (symbol == symbol_punct)
+				return true;
+			out->append(ch);
+		}break;
+		case mode_int:
+		{
+			if (symbol == symbol_punct || symbol == symbol_alpha)
+				return true;
+
+			out->append(ch);
+		}break;
+		default:
+			break;
+		}
+
+		++m_curr;
+	}
+
+	return true;
+}
+
 bool TextBuffer::GetLine(StringW* out)
 {
 	out->clear();
@@ -215,3 +364,23 @@ bool TextBuffer::IsEnd()
 	return m_curr == m_end;
 }
 
+void TextBuffer::ToBegin()
+{
+	m_curr = m_begin;
+}
+
+void TextBuffer::SkipLine()
+{
+	while (m_curr < m_end)
+	{
+		if (*m_curr == L'\r')
+			++m_curr;
+		if (*m_curr == L'\n')
+		{
+			++m_curr;
+			break;
+		}
+
+		++m_curr;
+	}
+}

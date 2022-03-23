@@ -53,12 +53,30 @@ namespace mgf
 		
 		bool GetLine(StringW* out);
 
+		// Will return:
+		// Words: abc1 _abc2 a_b3c
+		// Numbers: only positive like 123 
+		// other symbols
+		bool GetToken(StringW* out, uint32_t gettokenFlags);
+		enum
+		{
+			gettokenFlag_hexNumbers = 0x1,
+			gettokenFlag_scientificNumbers = 0x2,
+			gettokenFlag_getSpace = 0x4,
+			gettokenFlag_getTab = 0x8,
+			gettokenFlag_getNewline = 0x10,
+			gettokenFlag_getFloat = 0x20, // 1.23 -1.23
+		};
+
+
 		StringW m_buffer;
 		const wchar_t* m_begin = 0;
 		const wchar_t* m_end = 0;
 		const wchar_t* m_curr = 0;
 
 		bool IsEnd();
+		void ToBegin();
+		void SkipLine();
 	};
 }
 

@@ -61,7 +61,7 @@ class PlayListManager : public mgf::BaseClass
 	mgf::StringW m_musicDir;
 	mgf::StringW m_playlistDir;
 
-	mgf::StringW m_orderFilePath;
+	mgf::StringW m_stateFilePath;
 
 	PlayList* m_playPlaylist = 0;
 	PlayList* m_editPlaylist = 0;
@@ -76,7 +76,7 @@ public:
 	void AddNew();
 	
 	void LoadPlaylist(const wchar_t*);
-	void SaveOrderFile();
+	void SaveStateFile();
 };
 
 #endif // !AP_PL

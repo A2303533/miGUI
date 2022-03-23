@@ -35,7 +35,12 @@
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 
+#include "GL/wgl.h"
+
 #ifdef MGF_BACKEND_OPENGL
+
+PFNWGLGETEXTENSIONSSTRINGEXTPROC oldgl_wglGetExtensionsStringEXT = 0;
+PFNWGLSWAPINTERVALEXTPROC       oldgl_wglSwapIntervalEXT = 0;
 
 struct BackendOpenGL_texture
 {
@@ -207,7 +212,7 @@ mgTexture* BackendOpenGL::CreateTexture(mgImage* img)
 {
 	if (img->type == mgImageType_unknown)
 		return 0;
-
+	
 	int bytes = GL_RGBA8;
 	unsigned int pixelFormat = 0;
 	switch (img->type)
@@ -238,7 +243,7 @@ mgTexture* BackendOpenGL::CreateTexture(mgImage* img)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexImage2D(GL_TEXTURE_2D, 0, bytes, img->width, img->height, 0, pixelFormat, GL_UNSIGNED_BYTE, img->data);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	img->data = 0;
+	//img->data = 0;
 
 	return newT;
 }
@@ -473,6 +478,10 @@ void BackendOpenGL::SetActiveWindow(mgf::SystemWindow* w)
 
 		m_params.hglrc = wglCreateContext(dc);
 		wglMakeCurrent(dc, m_params.hglrc);
+
+		/*oldgl_wglGetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC)wglGetProcAddress("wglGetExtensionsStringEXT");
+		oldgl_wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+		oldgl_wglSwapIntervalEXT(1);*/
 
 		ReleaseDC(m_window->m_hWnd, dc);
 

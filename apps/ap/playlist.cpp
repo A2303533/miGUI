@@ -66,7 +66,7 @@ void PlayList::Save()
 
 		fclose(f);
 	}
-	this->m_mgr->SaveOrderFile();
+	this->m_mgr->SaveStateFile();
 }
 
 void PlayList::RenameFile()
@@ -154,22 +154,42 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 	if (!std::filesystem::exists(m_playlistDir.data()))
 		std::filesystem::create_directory(m_playlistDir.data());
 
-	m_orderFilePath = g_data.framework->GetAppDir()->data();
-	m_orderFilePath += L"ap.order";
-	if (std::filesystem::exists(m_orderFilePath.data()))
+	m_stateFilePath = g_data.framework->GetAppDir()->data();
+	m_stateFilePath += L"ap.state";
+	if (std::filesystem::exists(m_stateFilePath.data()))
 	{
 		mgf::TextBuffer textBuf;
-		textBuf.FromFile(m_orderFilePath.data());
+		textBuf.FromFile(m_stateFilePath.data());
 		mgf::StringW wstr;
 		while (!textBuf.IsEnd())
 		{
-			textBuf.GetLine(&wstr);
-
-			mgf::StringW plPath = m_playlistDir;
-			plPath += wstr;
-			if (std::filesystem::exists(plPath.data()))
+			textBuf.GetToken(&wstr, 0);
+			if (std::wcscmp(wstr.data(), L"pl") == 0)
 			{
-				LoadPlaylist(plPath.c_str());
+				textBuf.GetToken(&wstr, 0);
+				if (std::wcscmp(wstr.data(), L":") == 0)
+				{
+					textBuf.GetLine(&wstr);
+					wstr.trim_spaces();
+				}
+				else
+				{
+					textBuf.SkipLine();
+				}
+			}
+			else
+			{
+				textBuf.SkipLine();
+			}
+
+			if (wstr.size())
+			{
+				mgf::StringW plPath = m_playlistDir;
+				plPath += wstr;
+				if (std::filesystem::exists(plPath.data()))
+				{
+					LoadPlaylist(plPath.c_str());
+				}
 			}
 		}
 	}
@@ -185,7 +205,9 @@ PlayListManager::PlayListManager(mgf::ListBox* lb)
 		}
 	}
 
-	SaveOrderFile();
+	printf("%u playlists\n", m_playlists.size());
+
+	SaveStateFile();
 }
 
 PlayListManager::~PlayListManager()
@@ -303,9 +325,9 @@ void PlayListManager::_updateGUIListbox()
 	g_data.listboxPlaylist->SetData(m_playlistLBData.data(), m_playlistLBData.size());
 }
 
-void PlayListManager::SaveOrderFile()
+void PlayListManager::SaveStateFile()
 {
-	mgf::StringA stra = m_orderFilePath.to_utf8();
+	mgf::StringA stra = m_stateFilePath.to_utf8();
 	FILE* f = fopen(stra.data(), "wb");
 	if (f)
 	{
@@ -313,6 +335,7 @@ void PlayListManager::SaveOrderFile()
 		fwrite(&bom, 2, 1, f);
 		for (uint32_t i = 0; i < m_playlists.size(); ++i)
 		{
+			fwrite(L"pl:", 1, sizeof(wchar_t) * 3, f);
 			fwrite(m_playlists[i]->m_fileName.data(), 1, m_playlists[i]->m_fileName.size() * sizeof(wchar_t), f);
 			fputwc(L'\n', f);
 		}

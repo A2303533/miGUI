@@ -688,6 +688,53 @@ namespace mgf
 			m_size = new_size;
 			m_data[m_size] = 0;
 		}
+
+		void trim_spaces()
+		{
+			for (size_t i = 0, sz = m_size; i < sz; ++i)
+			{
+				if (m_data[m_size - 1] == (char_type)' '
+					|| m_data[m_size - 1] == (char_type)'\f'
+					|| m_data[m_size - 1] == (char_type)'\n'
+					|| m_data[m_size - 1] == (char_type)'\r'
+					|| m_data[m_size - 1] == (char_type)'\t'
+					|| m_data[m_size - 1] == (char_type)'\v')
+				{
+					pop_back();
+				}
+				else
+					break;
+			}
+			
+			if (m_data[0] == (char_type)' '
+				|| m_data[0] == (char_type)'\f'
+				|| m_data[0] == (char_type)'\n'
+				|| m_data[0] == (char_type)'\r'
+				|| m_data[0] == (char_type)'\t'
+				|| m_data[0] == (char_type)'\v')
+			{
+				int howMany = 0;
+				for (size_t i = 0, sz = m_size; i < sz; ++i)
+				{
+					if (m_data[i] == (char_type)' '
+						|| m_data[i] == (char_type)'\f'
+						|| m_data[i] == (char_type)'\n'
+						|| m_data[i] == (char_type)'\r'
+						|| m_data[i] == (char_type)'\t'
+						|| m_data[i] == (char_type)'\v')
+					{
+						++howMany;
+					}
+					else
+						break;
+				}
+
+				if (howMany == m_size)
+					clear();
+				else
+					erase(0, howMany-1);
+			}
+		}
 	};
 
 	typedef String_base<wchar_t> StringW;
