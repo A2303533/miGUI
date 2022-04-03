@@ -35,6 +35,10 @@ enum mgImageType {
 	mgImageType_r8g8b8,
 	mgImageType_r8g8b8a8,
 	mgImageType_a8r8g8b8,
+
+	mgImageType_bc1,
+	mgImageType_bc2,
+	mgImageType_bc3,
 };
 
 /* RGBA */
@@ -46,6 +50,7 @@ typedef struct mgImage_s {
 	uint32_t pitch;
 	uint8_t* data;
 	uint32_t type;
+	uint32_t fileSize;/*optional*/
 } mgImage;
 
 #endif

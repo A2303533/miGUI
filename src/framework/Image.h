@@ -70,6 +70,8 @@ namespace mgf
 		uint32_t GetHeight();
 		uint8_t* GetData();
 		uint32_t GetDataSize();
+
+		mgImage_s* GetMGImage();
 	};
 	
 	Image* Image_bmp(const char* fn);

@@ -101,6 +101,9 @@ namespace mgf
 
 		void** GetData();
 
+		// return array with size == num of cols
+		int* GetColSizes();
+
 		uint32_t GetRowHeight();
 		void SetRowHeight(uint32_t);
 

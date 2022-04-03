@@ -21,6 +21,15 @@ struct PlaylistNode
 	mgf::StringW m_audioFilePath;
 	uint32_t m_begin = 0;
 	uint32_t m_end = 0;
+
+	bool m_isPlaying = false;
+	bool m_isSelected = false;
+
+	mgf::StringW m_info_number;
+	mgf::StringW m_info_title;
+	mgf::StringW m_info_duration;
+
+	PlayList* m_playlist = 0;
 };
 
 class PlayList
@@ -39,14 +48,16 @@ public:
 	std::vector<PlaylistNode*> m_nodes;
 	PlayListManager* m_mgr = 0;
 
+	void Free();
+
 	bool m_isSelected = false;
 };
 
 
 class PlayListManager : public mgf::BaseClass
 {
-	mgf::ListBox* m_listBox = 0;
-	
+	mgf::Popup* m_listBoxPopup = 0;
+
 	std::vector<PlayList*> m_playlists;
 
 	mgf::StringW m_musicDir;
@@ -57,9 +68,12 @@ class PlayListManager : public mgf::BaseClass
 	PlayList* m_playPlaylist = 0; // active for playing
 	PlayList* m_editPlaylist = 0; // active for table
 
+	PlayList* m_playlistOnPopup = 0;
+
 	void _updateGUIListbox();
+	void _updateGUITable();
 public:
-	PlayListManager(mgf::ListBox*);
+	PlayListManager();
 	virtual ~PlayListManager();
 	
 	mgf::StringW CheckPLName(mgf::StringW*);
@@ -71,6 +85,20 @@ public:
 
 	void SetEditPlaylist(PlayList*);
 	void SelectPlaylist(PlayList*);
+	void ShowListboxPopup(PlayList*);
+
+	void PopupOpenPlaylist();
+	void PopupPlayPlaylist();
+	void PopupDeletePlaylist();
+	void PopupShowPlaylistInExplorer();
+	
+	void DeletePlaylist(PlayList*);
+
+	void AddTrackToEditPlaylist(const wchar_t*);
+	bool IsSupportedFormat(const wchar_t*);
+	void SaveEditPlaylist();
+	void StopPlaying();
+	void PlayTrack(PlaylistNode* nd);
 };
 
 #endif // !AP_PL

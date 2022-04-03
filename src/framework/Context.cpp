@@ -29,6 +29,7 @@
 #include "miGUI.h"
 
 #include "framework/mgf.h"
+#include "framework/Framework.h"
 #include "framework/Context.h"
 #include "framework/SystemWindowImpl.h"
 #include "framework/Backend.h"
@@ -46,13 +47,11 @@
 
 using namespace mgf;
 
-Context::Context(
-	int windowFlags,
-	const mgPoint& windowPosition,
-	const mgPoint& windowSize,
+Context::Context(mgf::SystemWindow* sysWnd, 
 	Backend* backend)
 {
-	m_window = new mgf::SystemWindowImpl(windowFlags, windowPosition, windowSize);
+	//m_window = new mgf::SystemWindowImpl(windowFlags, windowPosition, windowSize);
+	m_window = (SystemWindowImpl*)sysWnd;
 	m_window->m_context = this;
 	
 	m_input = new mgInputContext_s;
@@ -95,9 +94,6 @@ Context::~Context()
 
 	if (m_backend)
 		m_backend->Release();
-
-	if (m_window)
-		m_window->Release();
 }
 
 void Context::OnWindowSize()

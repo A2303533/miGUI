@@ -51,12 +51,12 @@ namespace mgf
 		
 		bool m_run = true;
 
-		Context* CreateContext(
+		SystemWindow* CreateWindow(
 			int windowFlags, /*WinAPI flags*/
 			const mgPoint& windowPosition,
-			const mgPoint& windowSize,
-			Backend* backend
-		);
+			const mgPoint& windowSize);
+
+		Context* CreateContext(mgf::SystemWindow*, Backend* backend);
 
 		Icons* CreateIcons(const char* imageFile, Backend* backend);
 
@@ -75,7 +75,8 @@ namespace mgf
 		StringW* GetAppDir();
 	};
 
-	Framework* InitFramework();
+	Framework* InitFramework(); // init or return
+	Framework* GetFramework();  // only return
 }
 
 #endif

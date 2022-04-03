@@ -30,6 +30,11 @@
 #ifndef _MG_DEFS_H_
 #define _MG_DEFS_H_
 
+#include <stddef.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <stdint.h>
+
 #if defined(WIN32)
 #define MG_PLATFORM_WINDOWS
 #define MG_C_DECL _cdecl
@@ -46,6 +51,9 @@
 #error Please write code for other OS
 #endif
 
+#ifdef _DEBUG
+#define MG_DEBUG
+#endif
 
 #define MG_MAKEFOURCC( ch0, ch1, ch2, ch3 )\
 	((unsigned int)(unsigned char)(ch0)|((unsigned int)(unsigned char)(ch1)<<8)|\

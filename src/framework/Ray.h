@@ -27,21 +27,47 @@
 */
 
 #pragma once
-#ifndef _MG_FRAMEWORK_CONFIG_H_
-#define _MG_FRAMEWORK_CONFIG_H_
+#ifndef __RAY_H_
+#define __RAY_H_
 
+#include "framework/Vec.h"
+#include "framework/Mat.h"
 
-#ifndef MGF_NO_BACKEND_GDI
-#define MGF_BACKEND_GDI
-#endif
+namespace mgf
+{
+	inline int max_dim(const v4f& v)
+	{
+		return (v.x > v.y) ? ((v.x > v.z)
+			? 0 : 2) : ((v.y > v.z) ? 1 : 2);
+	}
 
-// simple opengl
-#ifndef MGF_NO_BACKEND_OPENGL
-#define MGF_BACKEND_OPENGL
-#endif
+	//const float g_tMax = Infinity;
 
-#ifndef MGF_NO_BACKEND_D3D11
-#define MGF_BACKEND_D3D11
-#endif
+	class Ray
+	{
+	public:
+		Ray();
+		~Ray();
+
+		void createFrom2DCoords(const v2f& coord, const v4f& rc, const v2f& rc_sz, const Mat4& VPinv);
+		float distanceToLine(const v4f& lineP0, const v4f& lineP1);
+		void update();
+		void getIntersectionPoint(float t, v4f& ip);
+		bool planeIntersection(const v4f& planePoint, const v4f& planeNormal, float& T);
+
+		v4f m_origin;
+		v4f m_end;
+		v4f m_direction;
+		v4f m_invDir;
+
+		int32_t m_kz;
+		int32_t m_kx;
+		int32_t m_ky;
+
+		float m_Sx;
+		float m_Sy;
+		float m_Sz;
+	};
+}
 
 #endif

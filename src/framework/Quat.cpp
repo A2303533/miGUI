@@ -26,22 +26,11 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MG_FRAMEWORK_CONFIG_H_
-#define _MG_FRAMEWORK_CONFIG_H_
 
+#include "miGUI.h"
 
-#ifndef MGF_NO_BACKEND_GDI
-#define MGF_BACKEND_GDI
-#endif
+#include "framework/mgf.h"
+#include "framework/Quat.h"
 
-// simple opengl
-#ifndef MGF_NO_BACKEND_OPENGL
-#define MGF_BACKEND_OPENGL
-#endif
+using namespace mgf;
 
-#ifndef MGF_NO_BACKEND_D3D11
-#define MGF_BACKEND_D3D11
-#endif
-
-#endif

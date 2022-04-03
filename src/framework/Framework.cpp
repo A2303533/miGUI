@@ -37,6 +37,11 @@
 #include "framework/Popup.h"
 #include "framework/FontImpl.h"
 
+#ifdef MG_PLATFORM_WINDOWS
+#include <Windows.h>
+#include <Objbase.h>
+HRESULT g_CoInitializeResult = 0;
+#endif
 
 using namespace mgf;
 
@@ -60,6 +65,11 @@ Framework* mgf::InitFramework()
 	return g_mgf;
 }
 
+Framework* mgf::GetFramework()
+{
+	return g_mgf;
+}
+
 Framework::Framework()
 {
 #ifdef MG_PLATFORM_WINDOWS
@@ -68,11 +78,21 @@ Framework::Framework()
 	m_appDirectory = wcharBuffer;
 	m_appDirectory.flip_slash();
 	m_appDirectory += L"/";
+
+	g_CoInitializeResult = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	if (FAILED(g_CoInitializeResult))
+		throw "Unable to initialize COM";
 #endif
 }
 
 Framework::~Framework()
 {
+#ifdef MG_PLATFORM_WINDOWS
+	if(g_CoInitializeResult == S_OK
+		|| g_CoInitializeResult == S_FALSE)
+		CoUninitialize();
+#endif
+
 #ifndef MG_NO_DLL
 	if(g_migui_dll)
 		mgUnload(g_migui_dll);
@@ -124,14 +144,9 @@ void Framework::DrawAll()
 	}
 }
 
-Context* Framework::CreateContext(
-	int windowFlags,
-	const mgPoint& windowPosition,
-	const mgPoint& windowSize,
-	Backend* backend
-)
+Context* Framework::CreateContext(mgf::SystemWindow* sw, Backend* backend)
 {
-	Context* c = new Context(windowFlags, windowPosition, windowSize, backend);
+	Context* c = new Context(sw, backend);
 	m_contexts.push_back(c);
 	return c;
 }
@@ -194,4 +209,10 @@ Icons* Framework::CreateIcons(const char* imageFile, Backend* backend)
 }
 
 
-
+SystemWindow* Framework::CreateWindow(
+	int windowFlags, /*WinAPI flags*/
+	const mgPoint& windowPosition,
+	const mgPoint& windowSize)
+{
+	return new SystemWindowImpl(windowFlags, windowPosition, windowSize);
+}

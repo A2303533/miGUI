@@ -31,11 +31,6 @@
 #ifndef _MI_GUI_H_
 #define _MI_GUI_H_
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <stdint.h>
-
 struct mgContext_s;
 
 #include "mgDefs.h"

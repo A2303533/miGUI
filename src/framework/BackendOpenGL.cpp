@@ -29,6 +29,8 @@
 #include "miGUI.h"
 
 #include "framework/mgf.h"
+#ifdef MGF_BACKEND_OPENGL
+
 #include "framework/Context.h"
 #include "framework/SystemWindowImpl.h"
 #include "framework/BackendOpenGL.h"
@@ -37,7 +39,6 @@
 
 #include "GL/wgl.h"
 
-#ifdef MGF_BACKEND_OPENGL
 
 PFNWGLGETEXTENSIONSSTRINGEXTPROC oldgl_wglGetExtensionsStringEXT = 0;
 PFNWGLSWAPINTERVALEXTPROC       oldgl_wglSwapIntervalEXT = 0;
@@ -318,7 +319,32 @@ void BackendOpenGL::DrawRectangle(int reason, void* object, mgRect* rct, mgColor
 	case mgDrawRectangleReason_listItemBG2:
 		break;
 	default:
+		if (reason == mgDrawRectangleReason_popupSeparator)
+		{
+			m_drrect_rect.top += 2;
+			m_drrect_rect.bottom -= 2;
+			m_drrect_rect.left += 2;
+			m_drrect_rect.right -= 2;
+		}
+
 		_drawRectangle();
+
+		if (reason == mgDrawRectangleReason_popupBG)
+		{
+			mgColor c;
+			c.setAsIntegerRGB(0x666666);
+			glBegin(GL_LINES);
+			glColor4fv(&c.r);
+			glVertex3f(m_drrect_rect.left, m_drrect_rect.top + 1, 0.0f);
+			glVertex3f(m_drrect_rect.right, m_drrect_rect.top + 1, 0.0f);
+			glVertex3f(m_drrect_rect.left, m_drrect_rect.bottom, 0.0f);
+			glVertex3f(m_drrect_rect.right, m_drrect_rect.bottom, 0.0f);
+			glVertex3f(m_drrect_rect.left + 1, m_drrect_rect.top, 0.0f);
+			glVertex3f(m_drrect_rect.left + 1, m_drrect_rect.bottom, 0.0f);
+			glVertex3f(m_drrect_rect.right, m_drrect_rect.top, 0.0f);
+			glVertex3f(m_drrect_rect.right, m_drrect_rect.bottom, 0.0f);
+			glEnd();
+		}
 		break;
 	}
 	glScissor(0, 0, m_window->m_size.x, m_window->m_size.y);

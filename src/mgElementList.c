@@ -308,7 +308,8 @@ miGUI_onDraw_list(mgElement* e)
 					ibgc,
 					0, 0);
 			}
-			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverItem && !g_skipFrame)
+			if (mgPointInRect(&rClip, &ctx->input->mousePosition) && !impl->hoverItem && !g_skipFrame
+				&& !ctx->activePopup)
 			{
 				impl->hoverItem = itemCurr;
 				impl->hoverItemClipRect = rClip;

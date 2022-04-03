@@ -498,21 +498,29 @@ miGUI_onDraw_table(mgElement* e)
 					rctCol.right = 0;
 					rctCol.bottom = 0;
 
+					rctCol.left = pos2.x;
+					rctCol.top = pos2.y;
+					rctCol.right = rctCol.left + impl->colsSizes[i2];
+					rctCol.bottom = rctCol.top + impl->rowHeight;
+
+					rctColClip = rctCol;
+
+					if (rctColClip.top < e->transformWorld.clipArea.top)
+						rctColClip.top = e->transformWorld.clipArea.top;
+					if (rctColClip.bottom > e->transformWorld.clipArea.bottom)
+						rctColClip.bottom = e->transformWorld.clipArea.bottom;
+					e->window->context->gpu->setClipRect(&rctColClip);
+
+					e->window->context->gpu->drawRectangle(
+						mgDrawRectangleReason_tableCellBG,
+						impl,
+						&rctCol,
+						&style->tableCellBG,
+						&style->tableCellBG,
+						0, 0);
+
 					if (impl->onDrawRow(e, rowCurr, i2, &str, &strLen))
 					{
-						rctCol.left = pos2.x;
-						rctCol.top = pos2.y;
-						rctCol.right = rctCol.left + impl->colsSizes[i2];
-						rctCol.bottom = rctCol.top + impl->rowHeight;
-
-						rctColClip = rctCol;
-
-						if (rctColClip.top < e->transformWorld.clipArea.top)
-							rctColClip.top = e->transformWorld.clipArea.top;
-						if (rctColClip.bottom > e->transformWorld.clipArea.bottom)
-							rctColClip.bottom = e->transformWorld.clipArea.bottom;
-
-						e->window->context->gpu->setClipRect(&rctColClip);
 
 						if (impl->hoverRow == rowCurr)
 						{
@@ -521,22 +529,6 @@ miGUI_onDraw_table(mgElement* e)
 								impl->hoverColIndex = i2;
 								impl->hoverCellClipRect = rctColClip;
 							}
-						}
-
-						int drwBg = 0;
-						
-						if (str)
-							drwBg = 1;
-
-						if (drwBg)
-						{
-							e->window->context->gpu->drawRectangle(
-								mgDrawRectangleReason_tableCellBG,
-								impl,
-								&rctCol,
-								&style->tableCellBG,
-								&style->tableCellBG,
-								0, 0);
 						}
 
 						if (str)

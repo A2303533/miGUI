@@ -246,3 +246,7 @@ void Image::_convert_a8r8g8b8_to_r8g8b8a8()
 
 }
 
+mgImage_s* Image::GetMGImage()
+{
+	return m_image;
+}

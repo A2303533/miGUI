@@ -1,6 +1,9 @@
 #include "framework/mgf.h"
 #include "framework/ListBox.h"
+#include "framework/Table.h"
 #include "framework/TextBuffer.h"
+#include "framework/Popup.h"
+#include "framework/SystemWindow.h"
 #include "ap.h"
 #include "playlist.h"
 
@@ -17,6 +20,14 @@ int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item);
 void Playlist_LB_onItemClick(mgf::ListBox* lb, void* item, uint32_t itemIndex, uint32_t mouseButton);
 int Playlist_LB_onDrawItem(mgf::ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
 void Playlist_BTN_newPL_onRelease(mgf::Element* e);
+void Playlist_popupCb_open(int id, struct mgPopupItem_s*);
+void Playlist_popupCb_play(int id, struct mgPopupItem_s*);
+void Playlist_popupCb_delete(int id, struct mgPopupItem_s*);
+void Playlist_popupCb_showexpl(int id, struct mgPopupItem_s*);
+const wchar_t* Playlist_onColTitleText(mgf::Table*, uint32_t* textLen, uint32_t colIndex);
+int Playlist_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+void Playlist_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input);
+int Playlist_onIsRowSelected(mgf::Table* tb, void* row);
 
 PlayList::PlayList()
 {
@@ -25,10 +36,16 @@ PlayList::PlayList()
 
 PlayList::~PlayList()
 {
+	Free();
+}
+
+void PlayList::Free()
+{
 	for (uint32_t i = 0, sz = m_nodes.size(); i < sz; ++i)
 	{
 		delete m_nodes[i];
 	}
+	m_nodes.clear();
 }
 
 void PlayList::Save()
@@ -47,7 +64,7 @@ void PlayList::Save()
 
 		for (uint32_t i = 0, sz = m_nodes.size(); i < sz; ++i)
 		{
-			fwrite(L"s:", 2 * sizeof(wchar_t), 1, f);
+			fwrite(L"t:", 2 * sizeof(wchar_t), 1, f);
 			fwrite(m_nodes[i]->m_audioFilePath.data(), m_nodes[i]->m_audioFilePath.size() * sizeof(wchar_t), 1, f);
 			fwrite(L"\n", 1 * sizeof(wchar_t), 1, f);
 
@@ -101,13 +118,35 @@ void PlayList::RenameFile()
 	Save();
 }
 
-PlayListManager::PlayListManager(mgf::ListBox* lb)
-	:
-	m_listBox(lb)
+PlayListManager::PlayListManager()
 {
-	m_listBox->onIsItemSelected = Playlist_LB_onIsItemSelected;
-	m_listBox->onItemClick = Playlist_LB_onItemClick;
-	m_listBox->onDrawItem = Playlist_LB_onDrawItem;
+	g_data.listboxPlaylist->onIsItemSelected = Playlist_LB_onIsItemSelected;
+	g_data.listboxPlaylist->onItemClick = Playlist_LB_onItemClick;
+	g_data.listboxPlaylist->onDrawItem = Playlist_LB_onDrawItem;
+
+	g_data.tableTracklist->GetColSizes()[0] = 45;
+	g_data.tableTracklist->GetColSizes()[1] = 320;
+	g_data.tableTracklist->GetColSizes()[2] = 20;
+	g_data.tableTracklist->GetColSizes()[3] = 170;
+	g_data.tableTracklist->GetColSizes()[4] = 50;
+	g_data.tableTracklist->SetScrollSpeed(50.f);
+	g_data.tableTracklist->SetRowHeight(20);
+	g_data.tableTracklist->onColTitleText = Playlist_onColTitleText;
+	g_data.tableTracklist->onDrawRow = Playlist_onDrawRow;
+	g_data.tableTracklist->onRowClick = Playlist_onRowClick;
+	g_data.tableTracklist->onIsRowSelected = Playlist_onIsRowSelected;
+
+	mgPopupItemInfo_s listboxPopupItems[] =
+	{
+		{0, L"Open", 0, Playlist_popupCb_open, mgPopupItemType_default, 0, 0, 1},
+		{0, L"Play", 0, Playlist_popupCb_play, mgPopupItemType_default, 0, 0, 1},
+		{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+		{0, L"Delete", 0, Playlist_popupCb_delete, mgPopupItemType_default, 0, 0, 1},
+		{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+		{0, L"Show in explorer", 0, Playlist_popupCb_showexpl, mgPopupItemType_default, 0, 0, 1},
+	};
+	m_listBoxPopup = g_data.context->CreatePopup(g_data.popupFont, listboxPopupItems, 6);
+
 
 	IKnownFolderManager* pManager;
 	HRESULT hr = CoCreateInstance(CLSID_KnownFolderManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pManager));
@@ -341,19 +380,13 @@ void PlayListManager::AddNew()
 		newPL->m_name.pop_back();
 	}
 
-	mgf::StringA stra = plFilePath.to_utf8();
-	FILE* f = fopen(stra.data(), "wb");
-	if (f)
-	{
-		uint16_t bom = 0xFEFF;
-		fwrite(&bom, 2, 1, f);
-		fclose(f);
-	}
 
 	newPL->m_filePath = plFilePath.data();
 	newPL->m_fileName = std::filesystem::path(plFilePath.data()).filename().c_str();
 	m_playlists.emplace_back(newPL);
-
+	
+	newPL->Save();
+	SaveEditPlaylist();
 	_updateGUIListbox();
 	
 	newPL->Save();
@@ -362,6 +395,15 @@ void PlayListManager::AddNew()
 void PlayListManager::_updateGUIListbox()
 {
 	g_data.listboxPlaylist->SetData((void**)m_playlists.data(), m_playlists.size());
+}
+void PlayListManager::_updateGUITable()
+{
+	g_data.tableTracklist->SetData(0,0);
+	if (m_editPlaylist)
+	{
+		if(m_editPlaylist->m_nodes.size())
+			g_data.tableTracklist->SetData((void**)m_editPlaylist->m_nodes.data(), m_editPlaylist->m_nodes.size());
+	}
 }
 
 void PlayListManager::SaveStateFile()
@@ -456,10 +498,14 @@ int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item)
 
 void Playlist_LB_onItemClick(mgf::ListBox* lb, void* item, uint32_t itemIndex, uint32_t mouseButton)
 {
-	if (mouseButton)
+	PlayList* pl = (PlayList*)item;
+	if (mouseButton == 1)
 	{
-		PlayList* pl = (PlayList*)item;
 		pl->m_mgr->SelectPlaylist(pl);
+	}
+	else if (mouseButton == 2)
+	{
+		pl->m_mgr->ShowListboxPopup(pl);
 	}
 }
 
@@ -480,6 +526,18 @@ void PlayListManager::SetEditPlaylist(PlayList* p)
 
 void PlayListManager::SelectPlaylist(PlayList* pl)
 {
+	// if m_editPlaylist not current played playlist
+	//  then remove all nodes from m_editPlaylist
+	if (m_editPlaylist)
+	{
+		if (m_editPlaylist != m_playPlaylist)
+		{
+			m_editPlaylist->Free();
+			_updateGUITable();
+		}
+	}
+
+	// select new 
 	for (size_t i = 0, sz = m_playlists.size(); i < sz; ++i)
 	{
 		m_playlists[i]->m_isSelected = false;
@@ -487,4 +545,329 @@ void PlayListManager::SelectPlaylist(PlayList* pl)
 	pl->m_isSelected = true;
 	m_editPlaylist = pl;
 	SaveStateFile();
+
+	//read file if m_editPlaylist not current played playlist
+	if (m_editPlaylist)
+	{
+		if (m_editPlaylist != m_playPlaylist)
+		{
+			m_editPlaylist->Free();
+
+			if (std::filesystem::exists(m_editPlaylist->m_filePath.data()))
+			{
+				mgf::StringW wstr;
+				mgf::TextBuffer textBuf;
+				textBuf.FromFile(m_editPlaylist->m_filePath.data());
+				while (!textBuf.IsEnd())
+				{
+					textBuf.GetToken(&wstr, 0);
+					if (std::wcscmp(wstr.data(), L"t") == 0)
+					{
+						textBuf.GetToken(&wstr, 0);
+						if (std::wcscmp(wstr.data(), L":") == 0)
+						{
+							textBuf.GetLine(&wstr);
+							wstr.trim_spaces();
+						}
+						else
+						{
+							wstr.clear();
+							textBuf.SkipLine();
+						}
+					}
+					else
+					{
+						wstr.clear();
+						textBuf.SkipLine();
+					}
+
+					if (wstr.size())
+					{
+						//wprintf(L"ADD TRACK: %s\n", wstr.data());
+						if (std::filesystem::exists(wstr.data()))
+						{
+							PlaylistNode * node = new PlaylistNode;
+							node->m_playlist = m_editPlaylist;
+							node->m_audioFilePath = wstr.data();
+							m_editPlaylist->m_nodes.push_back(node);
+						}
+					}
+				}
+			}
+		}
+	}
+	_updateGUITable();
+}
+
+void PlayListManager::ShowListboxPopup(PlayList* pl)
+{
+	m_playlistOnPopup = pl;
+	m_listBoxPopup->Show(g_data.context->m_input->mousePosition.x, g_data.context->m_input->mousePosition.y);
+}
+
+void Playlist_popupCb_open(int id, struct mgPopupItem_s*)
+{
+	g_data.playlistMgr->PopupOpenPlaylist();
+}
+
+void Playlist_popupCb_play(int id, struct mgPopupItem_s*)
+{
+	g_data.playlistMgr->PopupPlayPlaylist();
+}
+
+void Playlist_popupCb_delete(int id, struct mgPopupItem_s*)
+{
+	g_data.playlistMgr->PopupDeletePlaylist();
+}
+
+void Playlist_popupCb_showexpl(int id, struct mgPopupItem_s*)
+{
+	g_data.playlistMgr->PopupShowPlaylistInExplorer();
+}
+
+void PlayListManager::PopupOpenPlaylist()
+{
+	if (!m_playlistOnPopup)
+		return;
+	this->SelectPlaylist(m_playlistOnPopup);
+	m_playlistOnPopup = 0;
+}
+
+void PlayListManager::PopupPlayPlaylist()
+{
+	if (!m_playlistOnPopup)
+		return;
+	this->SelectPlaylist(m_playlistOnPopup);
+	m_playlistOnPopup = 0;
+}
+
+void PlayListManager::PopupDeletePlaylist()
+{
+	if (!m_playlistOnPopup)
+		return;
+
+	int res = MessageBox((HWND)g_data.context->GetSystemWindow()->GetOSData().handle, 
+		L"Are you sure?", 
+		L"Delete playlist", 
+		MB_YESNO | MB_ICONQUESTION);
+	if (res == IDYES)
+	{
+		DeletePlaylist(m_playlistOnPopup);
+	}
+	m_playlistOnPopup = 0;
+}
+
+void PlayListManager::PopupShowPlaylistInExplorer()
+{
+	if (!m_playlistOnPopup)
+		return;
+	mgf::StringW fp = m_playlistOnPopup->m_filePath;
+	fp.flip_backslash();
+	mgf::StringW cmd;
+	cmd = L"/select,\"";
+	cmd += fp.data();
+	cmd += L"\"";
+	ShellExecute(0, L"runas", L"explorer.exe", cmd.data(), 0, SW_SHOWNORMAL);
+	m_playlistOnPopup = 0;
+}
+
+void PlayListManager::StopPlaying()
+{
+
+}
+
+void PlayListManager::DeletePlaylist(PlayList* pl)
+{
+	std::filesystem::remove(pl->m_filePath.data());
+	for (size_t i = 0, sz = m_playlists.size(); i < sz; ++i)
+	{
+		if (m_playlists[i] == pl)
+		{
+			m_playlists.erase(m_playlists.begin() + i);
+			break;
+		}
+	}
+
+	if (m_playPlaylist == pl)
+	{
+		StopPlaying();
+		m_playPlaylist = 0;
+	}
+
+	delete pl;
+
+	if (m_editPlaylist == pl)
+		m_editPlaylist = 0;
+
+	if(m_playPlaylist)
+		m_editPlaylist = m_playPlaylist;
+
+	_updateGUIListbox();
+	_updateGUITable();
+	SaveStateFile();
+}
+
+bool PlayListManager::IsSupportedFormat(const wchar_t* ext)
+{
+	if (std::wcscmp(ext, L".wav") == 0)
+		return true;
+	if (std::wcscmp(ext, L".mp3") == 0)
+		return true;
+	if (std::wcscmp(ext, L".flac") == 0)
+		return true;
+	if (std::wcscmp(ext, L".ogg") == 0)
+		return true;
+	if (std::wcscmp(ext, L".opus") == 0)
+		return true;
+
+	return false;
+}
+
+void PlayListManager::AddTrackToEditPlaylist(const wchar_t* fn)
+{
+	std::filesystem::path pth = fn;
+	if (!std::filesystem::exists(pth))
+		return;
+
+	std::filesystem::path ext = pth.extension(); //return like this .asd
+	if (!IsSupportedFormat(ext.c_str()))
+		return;
+
+	PlaylistNode* node = new PlaylistNode;
+	node->m_audioFilePath = fn;
+	node->m_playlist = m_editPlaylist;
+	m_editPlaylist->m_nodes.push_back(node);
+	SaveEditPlaylist();
+	_updateGUITable();
+}
+
+void PlayListManager::SaveEditPlaylist()
+{
+	if (!m_editPlaylist)
+		return;
+	m_editPlaylist->Save();
+}
+
+const wchar_t* Playlist_onColTitleText(mgf::Table*, uint32_t* textLen, uint32_t colIndex)
+{
+	switch (colIndex)
+	{
+	case 0:
+		*textLen = 7;
+		return L"Playing";
+	case 1:
+		*textLen = 4;
+		return L"File";
+	case 2:
+		*textLen = 1;
+		return L"#";
+	case 3:
+		*textLen = 5;
+		return L"Title";
+	case 4:
+		*textLen = 8;
+		return L"Duration";
+	}
+	return 0;
+}
+
+int Playlist_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
+{
+	if (row)
+	{
+		static mgf::StringW playingText = L"*";
+
+		PlaylistNode* nd = (PlaylistNode*)row;
+		static mgf::StringW textBuffer;
+		// col is where you want to show text for current row
+		switch (col)
+		{
+		case 0:
+		{
+			if (nd->m_isPlaying)
+			{
+				textBuffer.clear();
+				textBuffer += playingText.data();
+				*text = textBuffer.data();
+				*textlen = textBuffer.size();
+			}
+			else
+			{
+				*text = 0;
+				*textlen = 0;
+			}
+		}break;
+		case 1:
+			*text = nd->m_audioFilePath.data();
+			*textlen = nd->m_audioFilePath.size();
+			break;
+		case 2:
+			textBuffer.clear();
+			textBuffer += nd->m_info_number.data();
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		case 3:
+			textBuffer.clear();
+			textBuffer += nd->m_info_title.data();
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		case 4:
+			textBuffer.clear();
+			textBuffer += nd->m_info_duration.data();
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		}
+
+		return 1;
+	}
+	return 0;
+}
+
+void Playlist_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input)
+{
+	if (mouseButton != 1)
+		return;
+	
+	static PlaylistNode* oldNd = 0;
+
+	PlaylistNode* nd = (PlaylistNode*)row;
+
+	if (input->LMBClickCount == 2)
+	{
+		if (oldNd == nd)
+		{
+			g_data.playlistMgr->PlayTrack(nd);
+		}
+	}
+
+	for (size_t i = 0, sz = nd->m_playlist->m_nodes.size(); i < sz; ++i)
+	{
+		nd->m_playlist->m_nodes[i]->m_isSelected = false;
+	}
+	nd->m_isSelected = true;
+
+	oldNd = nd;
+}
+int Playlist_onIsRowSelected(mgf::Table* tb, void* row)
+{
+	PlaylistNode* nd = (PlaylistNode*)row;
+	return (int)nd->m_isSelected;
+}
+
+void PlayListManager::PlayTrack(PlaylistNode* nd)
+{
+	if (nd->m_playlist == m_playPlaylist)
+	{
+
+	}
+	else
+	{
+		StopPlaying();
+		m_playPlaylist = nd->m_playlist;
+
+
+	}
 }

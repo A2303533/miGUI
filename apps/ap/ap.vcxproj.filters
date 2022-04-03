@@ -69,6 +69,9 @@
     <ClCompile Include="..\..\src\framework\Popup.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\AudioEngine.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">
@@ -99,6 +102,9 @@
       <Filter>migui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\framework\Popup.h">
+      <Filter>migui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\framework\AudioEngine.h">
       <Filter>migui</Filter>
     </ClInclude>
   </ItemGroup>

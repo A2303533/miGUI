@@ -289,3 +289,7 @@ void Table_onBeginGetUserElement(struct mgElement_s* e)
 		tb->onBeginGetUserElement(tb);
 }
 
+int* Table::GetColSizes()
+{
+	return m_elementTable->colsSizes;
+}

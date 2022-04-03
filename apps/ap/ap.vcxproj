@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\framework\AudioEngine.cpp" />
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp" />
     <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp" />
     <ClCompile Include="..\..\src\framework\Button.cpp" />
@@ -45,6 +46,7 @@
     <ClCompile Include="playlist.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\framework\AudioEngine.h" />
     <ClInclude Include="..\..\src\framework\BackendGDI.h" />
     <ClInclude Include="..\..\src\framework\BackendOpenGL.h" />
     <ClInclude Include="..\..\src\framework\FontImpl.h" />

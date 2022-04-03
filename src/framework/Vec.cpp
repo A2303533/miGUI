@@ -26,22 +26,46 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MG_FRAMEWORK_CONFIG_H_
-#define _MG_FRAMEWORK_CONFIG_H_
 
+#include "miGUI.h"
 
-#ifndef MGF_NO_BACKEND_GDI
-#define MGF_BACKEND_GDI
-#endif
+#include "framework/mgf.h"
+#include "framework/Vec.h"
 
-// simple opengl
-#ifndef MGF_NO_BACKEND_OPENGL
-#define MGF_BACKEND_OPENGL
-#endif
+mgf::v4f operator*(const float& s, const mgf::v4f& v)
+{
+	return v * s; 
+}
 
-#ifndef MGF_NO_BACKEND_D3D11
-#define MGF_BACKEND_D3D11
-#endif
+// this->w = 1.f really need? or better this->w = 0.f ?
+mgf::v4f& mgf::v4f::operator=(const mgf::v3f& v)
+{
+	this->x = v.x;
+	this->y = v.y;
+	this->z = v.z;
+	this->w = 0.f;
+	return *this; 
+}
 
-#endif
+mgf::v4f::v4f(const mgf::v3f& v)
+	:
+	x(v.x), 
+	y(v.y), 
+	z(v.z), 
+	w(0.f) 
+{}
+
+void mgf::v3f::add(const mgf::v4f& v)
+{
+	this->x += v.x;
+	this->y += v.y;
+	this->z += v.z;
+}
+
+void mgf::v4f::cross2(const mgf::v4f& a, mgf::v3f& out) const
+{
+	out.x = (y * a.z) - (z * a.y);
+	out.y = (z * a.x) - (x * a.z);
+	out.z = (x * a.y) - (y * a.x);
+}
+

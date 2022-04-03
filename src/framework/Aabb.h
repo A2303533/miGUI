@@ -27,21 +27,60 @@
 */
 
 #pragma once
-#ifndef _MG_FRAMEWORK_CONFIG_H_
-#define _MG_FRAMEWORK_CONFIG_H_
+#ifndef __AABB_H_
+#define __AABB_H_
 
+#include "framework/Vec.h"
+#include "framework/Mat.h"
+#include "framework/Ray.h"
 
-#ifndef MGF_NO_BACKEND_GDI
-#define MGF_BACKEND_GDI
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
 #endif
 
-// simple opengl
-#ifndef MGF_NO_BACKEND_OPENGL
-#define MGF_BACKEND_OPENGL
-#endif
+namespace mgf
+{
 
-#ifndef MGF_NO_BACKEND_D3D11
-#define MGF_BACKEND_D3D11
-#endif
+
+// Oriented Bounding Box
+class Obb
+{
+public:
+	Obb() { }
+	v4f v1, v2, v3, v4, v5, v6, v7, v8;
+};
+// Axis-Aligned Bounding Box
+class Aabb
+{
+public:
+
+	Aabb();
+	Aabb(const v4f& min, const v4f& max);
+	~Aabb();
+
+	/*
+	Transforming Axis-Aligned Bounding Boxes
+	by Jim Arvo
+	from "Graphics Gems", Academic Press, 1990
+	*/
+	void transform(Aabb* original, Mat4* matrix, v4f* position);
+	void add(const v4f& point);
+	void add(const v3f& point);
+	void add(const Aabb& box);
+	bool rayTest(const Ray& r);
+	void center(v4f& v) const ;
+	float radius();
+	void extent(v4f& v);
+	bool isEmpty() const;
+	void reset();
+
+	v4f m_min;
+	v4f m_max;
+};
+
+}
 
 #endif

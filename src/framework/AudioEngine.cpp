@@ -26,59 +26,61 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MG_SYSWIND_IMPL_H_
-#define _MG_SYSWIND_IMPL_H_
+#include "mgf.h"
+
+#include "AudioEngine.h"
 
 #ifdef MG_PLATFORM_WINDOWS
-#include <Windows.h>
+#include <windows.h>
+#include <objbase.h>
+#include <mmdeviceapi.h>
+#include <audiopolicy.h>
 #endif
 
-namespace mgf
+struct AudioEngineImplementationData
 {
-	/*class FrameworkImpl;*/
-	class SystemWindowImpl : public SystemWindow
-	{
-	public:
-		SystemWindowImpl(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize);
-		virtual ~SystemWindowImpl();
-		
-		virtual const SystemWindowOSData& GetOSData() override;
-
-		virtual void SetTitle(const wchar_t*) override;
-		virtual void Show() override;
-		virtual void Hide() override;
-		virtual const mgPoint& GetSize() override;
-		virtual void UpdateBackbuffer() override;
-		virtual void SetOnClose(SystemWindowOnClose) override;
-		virtual void SetOnSize(SystemWindowOnSize) override;
-		virtual void SetOnDropFiles(SystemWindowOnDropFiles) override;
-
-		virtual void OnSize() override;
-		virtual bool IsVisible() override;
-
-		bool m_isVisible = false;
-
-#ifdef _WIN32
-		HWND m_hWnd = 0;
-		//HDC m_dc = 0;
-		wchar_t m_className[20];
-
-		/*double bufferring for GDI*/
-		HDC m_hdcMem = 0;
-		HBITMAP m_hbmMem = 0;
-		HBITMAP m_hbmOld = 0;
+#ifdef MG_PLATFORM_WINDOWS
+	IMMDevice* m_device = 0;
+	HANDLE      _ShutdownEvent = 0;
 #endif
-		SystemWindowOSData m_OSData;
+};
 
-		Context* m_context = 0;
-		mgPoint m_size;
-		mgPoint m_borderSize;
-		SystemWindowOnClose m_onClose = 0;
-		SystemWindowOnSize m_onSize = 0;
-		SystemWindowOnDropFiles m_onDropFiles = 0;
-	};
 
+mgf::AudioEngine::AudioEngine()
+{
+#ifdef MG_PLATFORM_WINDOWS
+	AudioEngineImplementationData* iData = new AudioEngineImplementationData;
+	m_implementationData = iData;
+
+	IMMDeviceEnumerator* deviceEnumerator = NULL;
+	IMMDeviceCollection* deviceCollection = NULL;
+
+	HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&deviceEnumerator));
+	if (FAILED(hr))
+		throw "AudioEngine: Unable to instantiate device enumerator";
+
+	ERole deviceRole = eMultimedia;
+	hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, deviceRole, &iData->m_device);
+	if (FAILED(hr))
+		throw "AudioEngine: Unable to get default device";
+	if (deviceCollection)
+		deviceCollection->Release();
+	if (deviceEnumerator)
+		deviceEnumerator->Release();
+
+	iData->_ShutdownEvent = CreateEventEx(NULL, NULL, 0, EVENT_MODIFY_STATE | SYNCHRONIZE);
+	if (iData->_ShutdownEvent == NULL)
+		throw "AudioEngine: Unable to create shutdown event";
+#endif
 }
 
+mgf::AudioEngine::~AudioEngine()
+{
+	AudioEngineImplementationData* iData = (AudioEngineImplementationData*)m_implementationData;
+
+#ifdef MG_PLATFORM_WINDOWS
+	if (iData->m_device)
+		iData->m_device->Release();
 #endif
+	delete ((AudioEngineImplementationData*)m_implementationData);
+}

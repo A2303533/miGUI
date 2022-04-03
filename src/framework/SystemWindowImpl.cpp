@@ -71,7 +71,7 @@ SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPositio
     RegisterClassExW(&wcex);
 
     m_hWnd = CreateWindowExW(
-        0, 
+        WS_EX_ACCEPTFILES,
         m_className, 
         L"mgf", 
         windowFlags,
@@ -170,6 +170,11 @@ void SystemWindowImpl::SetOnSize(SystemWindowOnSize c)
     m_onSize = c;
 }
 
+void SystemWindowImpl::SetOnDropFiles(SystemWindowOnDropFiles c)
+{
+    m_onDropFiles = c;
+}
+
 void SystemWindowImpl::OnSize()
 {
     RECT rc;
@@ -208,6 +213,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
+    case WM_DROPFILES:
+    {
+        if (pW->m_onDropFiles)
+        {
+            //printf("DROP FILES\n");
+            HDROP hDrop = (HDROP)wParam;
+            if (hDrop)
+            {
+                UINT num = DragQueryFileW(hDrop, 0xFFFFFFFF, 0, 0);
+                //printf("%u FILES\n", num);
+                
+                wchar_t* buf = new wchar_t[0xffff];
+                for (UINT i = 0; i < num; ++i)
+                {
+                    DragQueryFileW(hDrop, i, buf, 0xffff);
+                    buf[0xffff - 1] = 0;
+
+                    POINT pt;
+                    DragQueryPoint(hDrop, &pt);
+
+                    pW->m_onDropFiles(num, i, buf, pt.x, pt.y);
+                    //wprintf(L"FILE: %s\n", buf);
+                }
+                delete[] buf;
+
+                DragFinish(hDrop);
+            }
+        }
+
+        return 0;
+    }break;
     case WM_GETMINMAXINFO:
     {
         LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;

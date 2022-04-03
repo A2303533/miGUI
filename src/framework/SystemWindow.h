@@ -71,6 +71,7 @@ namespace mgf
 {
 	using SystemWindowOnClose = int(*)(SystemWindow*);
 	using SystemWindowOnSize = void(*)(SystemWindow*);
+	using SystemWindowOnDropFiles = void(*)(uint32_t num, uint32_t i, const wchar_t*, int x, int y);
 
 	//struct SystemWindowCreationInfo
 
@@ -94,6 +95,7 @@ namespace mgf
 
 		virtual void SetOnClose(SystemWindowOnClose) = 0;
 		virtual void SetOnSize(SystemWindowOnSize) = 0;
+		virtual void SetOnDropFiles(SystemWindowOnDropFiles) = 0;
 		virtual void OnSize() = 0;
 
 		virtual bool IsVisible() = 0;

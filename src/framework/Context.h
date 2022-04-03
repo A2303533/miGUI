@@ -40,6 +40,7 @@ namespace mgf
 
 	class SystemWindowImpl;
 
+	// Probably need to rename to GUIContext
 	class Context : public BaseClass
 	{
 		friend class Framework;
@@ -49,7 +50,7 @@ namespace mgf
 		Backend* m_backend = 0;
 		ContextOnDraw m_onDraw = 0;
 	public:
-		Context(int windowFlags,const mgPoint& windowPosition,const mgPoint& windowSize,Backend* backend);
+		Context(mgf::SystemWindow*, Backend* backend);
 		virtual ~Context();
 
 		mgContext_s* m_gui_context = 0;

@@ -12,6 +12,7 @@
 #include "framework/Table.h"
 #include "framework/TextBuffer.h"
 #include "framework/Popup.h"
+#include "framework/AudioEngine.h"
 
 #include "ap.h"
 #include "playlist.h"
@@ -53,6 +54,11 @@ void window_OnSize(mgf::SystemWindow* w)
 		g_data.listboxPlaylist->SetRect(5, 25, AP_PLAYLISTAREASIZE, sz.y - AP_CONTROLAREASIZE);
 	if (g_data.tableTracklist)
 		g_data.tableTracklist->SetRect(AP_PLAYLISTAREASIZE, 0, sz.x, sz.y - AP_CONTROLAREASIZE);
+}
+
+void window_onDropFiles(uint32_t num, uint32_t i, const wchar_t* fn, int x, int y)
+{
+	g_data.playlistMgr->AddTrackToEditPlaylist(fn);
 }
 
 void context_onDraw(mgf::Context* c, mgf::Backend* b)
@@ -329,13 +335,14 @@ void context_onDraw(mgf::Context* c, mgf::Backend* b)
 enum class backend_type
 {
 	Gdi,
-	OpenGLOld
+	OpenGLOld,
 };
 
 int main(int argc, char* argv[])
 {
 	std::setlocale(LC_ALL, "en_US.utf8");
 	printf("locale: %s\n", setlocale(LC_ALL, NULL));
+
 	//{
 	//	mgf::TextBuffer textBuf;
 	//	std::setlocale(LC_ALL, "en_US.utf8");
@@ -374,8 +381,9 @@ int main(int argc, char* argv[])
 	mgf::Ptr<PlayListManager> playlistMgr = 0;
 
 	mgf::Ptr<mgf::Framework> framework = 0;
+	mgf::Ptr<mgf::SystemWindow> mainWindow = 0;
 	mgf::Ptr<mgf::Context> context = 0;
-	mgf::Ptr<mgf::Window> window = 0;
+	mgf::Ptr<mgf::Window> guiWindow = 0;
 	mgf::Ptr<mgf::Font> fontImpact = 0;
 	mgf::Ptr<mgf::Font> popupFont = 0;
 	mgf::Ptr<mgf::Font> listboxFont = 0;
@@ -385,11 +393,17 @@ int main(int argc, char* argv[])
 		framework = mgf::InitFramework();
 		g_data.framework = framework.m_data;
 
+		mainWindow = framework.m_data->CreateWindow(
+			MGWS_OVERLAPPEDWINDOW,
+			mgPoint(MGCW_USEDEFAULT, 0),
+			mgPoint(MGCW_USEDEFAULT, 0));
+
 		g_data.style = framework.m_data->GetNewStyle(1);
 		g_data.style.listItemBG1.setAsIntegerARGB(0xFFBFDDFF);
 		g_data.style.listItemBG2.setAsIntegerARGB(0xFFBFDDFF);
 		g_data.style.listItemHoverBG.setAsIntegerARGB(0xFFA8D2FF);
 
+		mgf::AudioEngine* ae = new mgf::AudioEngine;
 
 		mgf::Backend* be = 0;
 		switch (backend)
@@ -406,52 +420,51 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		context = framework.m_data->CreateContext(
-			MGWS_OVERLAPPEDWINDOW,
-			mgPoint(MGCW_USEDEFAULT, 0),
-			mgPoint(MGCW_USEDEFAULT, 0),
-			be);
+		context = framework.m_data->CreateContext(mainWindow.m_data, be);
+		g_data.context = context.m_data;
 
 		fontImpact = context.m_data->GetBackend()->CreateFont(L"Impact", 20, true, false);
 		popupFont = context.m_data->GetBackend()->CreateFont(L"Arial", 9, false, false);
 		listboxFont = context.m_data->GetBackend()->CreateFont(L"Arial", 9, false, false);
 		context.m_data->SetDefaultPopupFont(popupFont.m_data);
 
+		g_data.popupFont = popupFont.m_data;
+
 		context.m_data->GetSystemWindow()->SetOnClose(window_OnClose);
 		context.m_data->GetSystemWindow()->SetOnSize(window_OnSize);
+		context.m_data->GetSystemWindow()->SetOnDropFiles(window_onDropFiles);		
 		context.m_data->GetSystemWindow()->Show();
 		context.m_data->SetOnDraw(context_onDraw);
-		
-
-		window = context.m_data->CreateWindow();
-		window.m_data->SetTitle(L"Window");
-		window.m_data->WithCloseButton(false);
-		window.m_data->WithCollapseButton(false);
-		window.m_data->WithTitlebar(false);
-		window.m_data->DrawBG(false);
-		window.m_data->CanMove(false);
-		window.m_data->CanResize(false);
-		window.m_data->CanToTop(false);
-		window.m_data->SetSize(
+	
+		guiWindow = context.m_data->CreateWindow();
+		guiWindow.m_data->SetTitle(L"Window");
+		guiWindow.m_data->WithCloseButton(false);
+		guiWindow.m_data->WithCollapseButton(false);
+		guiWindow.m_data->WithTitlebar(false);
+		guiWindow.m_data->DrawBG(false);
+		guiWindow.m_data->CanMove(false);
+		guiWindow.m_data->CanResize(false);
+		guiWindow.m_data->CanToTop(false);
+		guiWindow.m_data->SetSize(
 			context.m_data->GetSystemWindow()->GetSize().x, 
 			context.m_data->GetSystemWindow()->GetSize().y);
 		
 
-		g_data.mainWindow = window.m_data;
+		g_data.mainWindow = guiWindow.m_data;
 
-		g_data.playlistArea = window.m_data->AddRectangle();
+		g_data.playlistArea = guiWindow.m_data->AddRectangle();
 		g_data.playlistArea->SetColor(0xFF77ADFF);
 
-		g_data.controlArea = window.m_data->AddRectangle();
+		g_data.controlArea = guiWindow.m_data->AddRectangle();
 		g_data.controlArea->SetColor(0xFFBAC5C6);
 		
-		g_data.tracklistArea = window.m_data->AddRectangle();
+		g_data.tracklistArea = guiWindow.m_data->AddRectangle();
 		g_data.tracklistArea->SetColor(0xFFE1EEEF);
 
-	//	auto text = window.m_data->AddText(0,0, L"Hello world", fontImpact.m_data);
+	//	auto text = guiWindow.m_data->AddText(0,0, L"Hello world", fontImpact.m_data);
 	//	text->SetColor(0xFF337722);
 		
-		g_data.buttonNewPlaylist = window.m_data->AddButton();
+		g_data.buttonNewPlaylist = guiWindow.m_data->AddButton();
 		//g_data.buttonNewPlaylist->SetRect(0, 5, 180, 23);
 		g_data.buttonNewPlaylist->SetPositionAndSize(0, 5, 180, 18); //SetPositionAndSize is more comfortable
 		g_data.buttonNewPlaylist->SetDrawBG(false);
@@ -466,7 +479,7 @@ int main(int argc, char* argv[])
 		}
 
 		//auto window2 = context.m_data->CreateWindow();
-		/*auto textInput = window.m_data->AddTextInput(fontImpact.m_data);
+		/*auto textInput = guiWindow.m_data->AddTextInput(fontImpact.m_data);
 		textInput->SetRect(50, 200, 500, 250);
 		textInput->SetText(L"Hello world");*/
 
@@ -489,7 +502,7 @@ int main(int argc, char* argv[])
 			{strings[8], 0, "string"},
 			{strings[9], 0, "string"},
 		};*/
-		g_data.listboxPlaylist = window.m_data->AddListBox(listboxFont.m_data);
+		g_data.listboxPlaylist = guiWindow.m_data->AddListBox(listboxFont.m_data);
 		g_data.listboxPlaylist->SetRect(50, 200, 200, 300);
 		g_data.listboxPlaylist->SetItemHeight(listboxFont.m_data->GetMaxSize().y);
 		g_data.listboxPlaylist->SetDrawBG(false);
@@ -530,7 +543,7 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
-		g_data.tableTracklist = window.m_data->AddTable(5, listboxFont.m_data);
+		g_data.tableTracklist = guiWindow.m_data->AddTable(5, listboxFont.m_data);
 		g_data.tableTracklist->SetScrollSpeed(50.f);
 		g_data.tableTracklist->SetRowHeight(20);
 		g_data.tableTracklist->SetData((void**)arrFileInfo, lst.size());
@@ -548,7 +561,7 @@ int main(int argc, char* argv[])
 		g_data.tableTracklist->onBeginGetUserElement = testTable_onBeginGetUserElement;
 		for (int i = 0; i < testTable_buttonsSize; ++i)
 		{
-			g_data.tableTracklist_testButton[i] = window.m_data->AddButton();
+			g_data.tableTracklist_testButton[i] = guiWindow.m_data->AddButton();
 			g_data.tableTracklist_testButton[i]->SetVisible(false);
 			g_data.tableTracklist_testButton[i]->SetRect(20, 2, 90, 15);
 			g_data.tableTracklist_testButton[i]->SetText(L"TEST");
@@ -557,20 +570,22 @@ int main(int argc, char* argv[])
 		}
 		printf("LIST SIZE: %u\n", lst.size());*/
 		/*for (auto ln : lst){delete ln;}*/
+		g_data.tableTracklist = guiWindow.m_data->AddTable(5, listboxFont.m_data);// initialization in PlayListManager
+		
 
-		playlistMgr = new PlayListManager(g_data.listboxPlaylist);
+		playlistMgr = new PlayListManager();
 		g_data.playlistMgr = playlistMgr.m_data;
 
 		g_data.listboxPlaylist->SetUserStyle(&g_data.style);
 
-		mgPopupItemInfo_s popupItems[] =
+		/*mgPopupItemInfo_s popupItems[] =
 		{
 			{0, L"Make first", 0, 0, mgPopupItemType_default, 0, L"Ctrl+A", 1},
 			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
 			{0, L"Unpin", 0, 0, mgPopupItemType_default, 0, L"remove", 1},
 			{0, L"Close", 0, 0, mgPopupItemType_default, 0, L"hide", 1},
 		};
-		mgf::Popup* testPopup = context.m_data->CreatePopup(listboxFont.m_data, popupItems, 4);
+		mgf::Popup* testPopup = context.m_data->CreatePopup(listboxFont.m_data, popupItems, 4);*/
 
 		// also rebuild all gui
 		context.m_data->GetSystemWindow()->OnSize();
@@ -582,10 +597,10 @@ int main(int argc, char* argv[])
 			if (sleep)
 				Sleep(1);
 
-			if (context.m_data->m_input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+			/*if (context.m_data->m_input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
 			{
 				testPopup->Show(context.m_data->m_input->mousePosition.x, context.m_data->m_input->mousePosition.y);
-			}
+			}*/
 
 			framework.m_data->DrawAll();
 		}

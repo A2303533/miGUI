@@ -27,21 +27,19 @@
 */
 
 #pragma once
-#ifndef _MG_FRAMEWORK_CONFIG_H_
-#define _MG_FRAMEWORK_CONFIG_H_
+#ifndef _MGF_AUDIOENGINE_H_
+#define _MGF_AUDIOENGINE_H_
 
+namespace mgf
+{
+	class AudioEngine : public BaseClass
+	{
+		void* m_implementationData = 0;
+	public:
+		AudioEngine();
+		virtual ~AudioEngine();
 
-#ifndef MGF_NO_BACKEND_GDI
-#define MGF_BACKEND_GDI
-#endif
-
-// simple opengl
-#ifndef MGF_NO_BACKEND_OPENGL
-#define MGF_BACKEND_OPENGL
-#endif
-
-#ifndef MGF_NO_BACKEND_D3D11
-#define MGF_BACKEND_D3D11
-#endif
+	};
+}
 
 #endif

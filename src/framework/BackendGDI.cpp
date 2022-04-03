@@ -29,6 +29,8 @@
 #include "miGUI.h"
 
 #include "framework/mgf.h"
+#ifdef MGF_BACKEND_GDI
+
 #include "framework/Context.h"
 #include "framework/SystemWindowImpl.h"
 #include "framework/BackendGDI.h"
@@ -564,4 +566,5 @@ Font* BackendGDI::GetDefaultFont()
 	return m_defaultFont;
 }
 
+#endif
 #endif
