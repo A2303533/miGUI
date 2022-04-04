@@ -36,6 +36,7 @@
 #include "framework/TextInput.h"
 #include "framework/ListBox.h"
 #include "framework/Table.h"
+#include "framework/FontImpl.h"
 
 using namespace mgf;
 
@@ -52,10 +53,16 @@ Window::~Window()
 	}
 }
 
-void Window::SetTitle(const wchar_t* t)
+void Window::SetTitle(const wchar_t* t, Font* optionalFont)
 {
 	m_title.assign(t);
+	if (optionalFont)
+	{
+		FontImpl* f = (FontImpl*)optionalFont;
+		m_window->titlebarFont = f->m_font;
+	}
 	mgSetWindowTitle(m_window, m_title.data());
+
 }
 
 void Window::Show()

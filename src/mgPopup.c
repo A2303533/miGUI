@@ -232,10 +232,11 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 			{
 				mgIconGroup* iconGroup = c->defaultIconGroup;
 				int iconID = iconGroup->popupNext;
-				c->currentIcon.left =  iconGroup->icons->iconNodes[iconID].lt.x;
+				/*c->currentIcon.left =  iconGroup->icons->iconNodes[iconID].lt.x;
 				c->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
 				c->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
-				c->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
+				c->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;*/
+				c->currentIcon = &iconGroup->icons->iconNodes[iconID];
 
 				mgColor wh;
 				mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);

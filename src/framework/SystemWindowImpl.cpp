@@ -102,6 +102,8 @@ SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPositio
     device.hwndTarget = 0;
     RegisterRawInputDevices(&device, 1, sizeof device);
 #endif
+
+    OnSize();
 }
 
 SystemWindowImpl::~SystemWindowImpl()
@@ -157,7 +159,8 @@ const mgPoint& SystemWindowImpl::GetSize()
 
 void SystemWindowImpl::UpdateBackbuffer()
 {
-    m_context->m_backend->UpdateBackbuffer();
+    if(m_context)
+        m_context->m_backend->UpdateBackbuffer();
 }
 
 void SystemWindowImpl::SetOnClose(SystemWindowOnClose c)
@@ -185,7 +188,18 @@ void SystemWindowImpl::OnSize()
         m_onSize(this);
 
     UpdateBackbuffer();
-    m_context->OnWindowSize();
+    if(m_context)
+        m_context->OnWindowSize();
+}
+
+void SystemWindowImpl::SetUserData(void* d)
+{
+    m_userData = d;
+}
+
+void* SystemWindowImpl::GetUserData()
+{
+    return m_userData;
 }
 
 bool SystemWindowImpl::IsVisible()

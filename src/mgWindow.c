@@ -270,10 +270,11 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->collapseButtonRect.right = w->collapseButtonRect.left + sz.x;
 					w->collapseButtonRect.bottom = w->collapseButtonRect.top + sz.y;
 
-					w->context->currentIcon.left = iconGroup->icons->iconNodes[iconID].lt.x;
+					/*w->context->currentIcon.left = iconGroup->icons->iconNodes[iconID].lt.x;
 					w->context->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
 					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
-					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
+					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;*/
+					w->context->currentIcon = &iconGroup->icons->iconNodes[iconID];
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCollapseButton, w,
 						&w->collapseButtonRect, &w->context->whiteColor, &w->context->whiteColor, 
 						iconGroup->icons->texture, 0);
@@ -326,10 +327,11 @@ mgDrawWindow(struct mgWindow_s* w)
 					if (w->flagsInternal & mgWindowFlag_internal_isCloseButton)
 						iconID = iconGroup->windowCloseButtonPress;
 
-					w->context->currentIcon.left = iconGroup->icons->iconNodes[iconID].lt.x;
+					/*w->context->currentIcon.left = iconGroup->icons->iconNodes[iconID].lt.x;
 					w->context->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
 					w->context->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
-					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;
+					w->context->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;*/
+					w->context->currentIcon = &iconGroup->icons->iconNodes[iconID];
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowCloseButton, w,
 						&w->closeButtonRect, &wh, &wh, 
 						iconGroup->icons->texture, 0);

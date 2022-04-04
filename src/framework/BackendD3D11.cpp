@@ -277,7 +277,7 @@ bool BackendD3D11::_createShader()
 		"    PSOut output;\n"
 		"    float4 textureColor = tex2d_1.Sample(tex2D_sampler_1, input.uv);\n"
 		"    output.color = float4(input.color.xyz, 1.f) * textureColor;\n"
-		"    output.color.w = input.color.w * textureColor.w;\n"
+		"    output.color.w = textureColor.w;\n"
 		"    return output;\n"
 		"}\n";
 	if (!D3D11_createShaders("vs_4_0", "ps_4_0", text, text, "VSMain", "PSMain", &this->m_vShader, &this->m_pShader, &this->m_vLayout))
@@ -436,8 +436,6 @@ void BackendD3D11::BeginDraw()
 	
 	m_params.m_d3d11DevCon->OMGetDepthStencilState(&m_oldDepthStencilState, &m_oldDepthStencilRef);
 	m_params.m_d3d11DevCon->OMSetDepthStencilState(m_depthStencilStateDisabled, 0);
-	/*m_depthOld ? m_params.m_d3d11DevCon->OMSetDepthStencilState(m_depthStencilStateEnabled, 0)
-		: m_params.m_d3d11DevCon->OMSetDepthStencilState(m_depthStencilStateDisabled, 0);*/
 
 	m_params.m_d3d11DevCon->RSGetState(&m_oldRasterizerState);
 	m_params.m_d3d11DevCon->RSSetState(m_RasterizerSolidNoBackFaceCulling);
@@ -550,13 +548,13 @@ void BackendD3D11::DestroyTexture(mgTexture* t)
 
 void BackendD3D11::_drawRectangle()
 {
-	m_cbVertex_impl.m_Corners.x = m_drrect_rect.left;
+	/*m_cbVertex_impl.m_Corners.x = m_drrect_rect.left;
 	m_cbVertex_impl.m_Corners.y = m_drrect_rect.top;
 	m_cbVertex_impl.m_Corners.z = m_drrect_rect.right;
-	m_cbVertex_impl.m_Corners.w = m_drrect_rect.bottom;
-	m_cbVertex_impl.m_Color1 = *m_drrect_color1;
-	m_cbVertex_impl.m_Color2 = *m_drrect_color2;
-	m_cbVertex_impl.m_UVs = m_drrect_tcoords;
+	m_cbVertex_impl.m_Corners.w = m_drrect_rect.bottom;*/
+	//m_cbVertex_impl.m_Color1 = *m_drrect_color1;
+	//m_cbVertex_impl.m_Color2 = *m_drrect_color2;
+	//m_cbVertex_impl.m_UVs = m_drrect_tcoords;
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		D3D11_BUFFER_DESC d;
@@ -573,30 +571,44 @@ void BackendD3D11::_drawRectangle()
 void BackendD3D11::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* color1, mgColor* color2,
 	mgTexture* texture, mgVec4* UVRegion)
 {
-	m_drrect_color1 = color1;
-	m_drrect_color2 = color2;
+	m_cbVertex_impl.m_Color1 = *color1;
+	m_cbVertex_impl.m_Color2 = *color2;
 
-	m_drrect_rect.left = (float)(rct->left);
+	/*m_drrect_rect.left = (float)(rct->left);
 	m_drrect_rect.top = (float)(rct->top);
 	m_drrect_rect.right = (float)(rct->right);
-	m_drrect_rect.bottom = (float)(rct->bottom);
+	m_drrect_rect.bottom = (float)(rct->bottom);*/
+	m_cbVertex_impl.m_Corners.x = (float)(rct->left);
+	m_cbVertex_impl.m_Corners.y = (float)(rct->top);
+	m_cbVertex_impl.m_Corners.z = (float)(rct->right);
+	m_cbVertex_impl.m_Corners.w = (float)(rct->bottom);
 
-	m_drrect_tcoords.x = 0.f;
+	/*m_drrect_tcoords.x = 0.f;
 	m_drrect_tcoords.y = 0.f;
 	m_drrect_tcoords.z = 1.f;
-	m_drrect_tcoords.w = 1.f;
+	m_drrect_tcoords.w = 1.f;*/
+	m_cbVertex_impl.m_UVs.x = 0.f;
+	m_cbVertex_impl.m_UVs.y = 0.f;
+	m_cbVertex_impl.m_UVs.z = 1.f;
+	m_cbVertex_impl.m_UVs.w = 1.f;
 
 	m_activeTexture = (BackendD3D11_texture*)m_whiteTexture->implementation;
 
 	if (texture)
 	{
 		BackendD3D11_texture* timpl = (BackendD3D11_texture*)texture->implementation;
-		//glBindTexture(GL_TEXTURE_2D, timpl->textureID);
 
 		m_activeTexture = timpl;
 
 		if (UVRegion)
-			m_drrect_tcoords = *UVRegion;
+		{
+			//m_drrect_tcoords = *UVRegion;
+			m_cbVertex_impl.m_UVs = *UVRegion;
+		}
+		else
+		{
+			m_cbVertex_impl.m_UVs = m_context->m_gui_context->currentIcon->uv;
+		}
 	}
 
 	m_params.m_d3d11DevCon->PSSetShaderResources(0, 1, &m_activeTexture->m_textureResView);
@@ -644,6 +656,9 @@ void BackendD3D11::DrawRectangle(int reason, void* object, mgRect* rct, mgColor*
 void BackendD3D11::DrawText(int reason, void* object, mgPoint* position, const wchar_t* text, int textLen,
 	mgColor* color, mgFont* font)
 {
+	m_cbVertex_impl.m_Color1 = *color;
+	m_cbVertex_impl.m_Color2 = *color;
+
 	mgPoint _position = *position;
 	for (int i = 0; i < textLen; ++i)
 	{
@@ -661,14 +676,16 @@ void BackendD3D11::DrawText(int reason, void* object, mgPoint* position, const w
 
 			BackendD3D11_texture* texture = (BackendD3D11_texture*)((mgFontBitmap*)font->implementation)[glyph->textureSlot].gpuTexture->implementation;
 
-			m_drrect_rect.left = corners.x;
+			/*m_drrect_rect.left = corners.x;
 			m_drrect_rect.top = corners.y;
 			m_drrect_rect.right = corners.z;
-			m_drrect_rect.bottom = corners.w;
+			m_drrect_rect.bottom = corners.w;*/
+			m_cbVertex_impl.m_Corners = corners;
 
 			m_params.m_d3d11DevCon->PSSetShaderResources(0, 1, &texture->m_textureResView);
 			m_params.m_d3d11DevCon->PSSetSamplers(0, 1, &texture->m_samplerState);
-
+			//m_drrect_tcoords = glyph->UV;
+			m_cbVertex_impl.m_UVs = glyph->UV;
 			_drawRectangle();
 
 			_position.x += glyph->width + glyph->overhang + font->characterSpacing;
@@ -717,7 +734,7 @@ void BackendD3D11::InitWindow(mgf::SystemWindow* w)
 {
 	if (m_window->m_hdcMem)
 		return;
-	_createBackbuffer(m_window);
+//	_createBackbuffer(m_window);
 }
 
 void BackendD3D11::SetActiveWindow(mgf::SystemWindow* w)
@@ -743,7 +760,7 @@ void BackendD3D11::UpdateBackbuffer()
 	m_cbVertex_impl.m_ProjMtx.m_data[1] = mgf::v4f(0.0f, 2.0f / -m_window->m_size.y, 0.0f, 0.0f);
 	m_cbVertex_impl.m_ProjMtx.m_data[2] = mgf::v4f(0.0f, 0.0f, 0.5f, 0.0f);
 	m_cbVertex_impl.m_ProjMtx.m_data[3] = mgf::v4f(-1.f, 1.f, 0.5f, 1.0f);
-	_createBackbuffer(m_window);
+	//_createBackbuffer(m_window);
 }
 
 void BackendD3D11::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)

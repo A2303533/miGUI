@@ -629,7 +629,8 @@ typedef struct mgContext_s {
 	struct mgDockPanel_s* dockPanel;
 
 	mgColor whiteColor;
-	mgRect currentIcon;
+	//mgRect currentIcon;
+	mgIconsNode* currentIcon;
 
 	mgStyle styleLight;
 	mgStyle styleDark;

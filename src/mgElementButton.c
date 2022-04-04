@@ -151,10 +151,11 @@ miGUI_onDraw_button(mgElement* e)
 		if (!e->drawBG)
 			e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 
-		e->window->context->currentIcon.left = impl->icons->iconNodes[iconID].lt.x;
+		/*e->window->context->currentIcon.left = impl->icons->iconNodes[iconID].lt.x;
 		e->window->context->currentIcon.top = impl->icons->iconNodes[iconID].lt.y;
 		e->window->context->currentIcon.right = impl->icons->iconNodes[iconID].sz.x;
-		e->window->context->currentIcon.bottom = impl->icons->iconNodes[iconID].sz.y;
+		e->window->context->currentIcon.bottom = impl->icons->iconNodes[iconID].sz.y;*/
+		e->window->context->currentIcon = &impl->icons->iconNodes[iconID];
 		e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonIcon,
 			e->window,
 			&e->transformWorld.buildArea, 

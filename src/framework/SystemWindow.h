@@ -86,6 +86,9 @@ namespace mgf
 
 		virtual const SystemWindowOSData& GetOSData() = 0;
 
+		virtual void SetUserData(void*) = 0;
+		virtual void* GetUserData() = 0;
+		
 		virtual void SetTitle(const wchar_t*) = 0;
 		virtual void Show() = 0;
 		virtual void Hide() = 0;

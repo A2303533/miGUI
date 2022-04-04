@@ -45,6 +45,10 @@ namespace mgf
 		
 		virtual const SystemWindowOSData& GetOSData() override;
 
+		void* m_userData = 0;
+		virtual void SetUserData(void*) override;
+		virtual void* GetUserData() override;
+
 		virtual void SetTitle(const wchar_t*) override;
 		virtual void Show() override;
 		virtual void Hide() override;

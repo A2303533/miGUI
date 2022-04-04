@@ -54,7 +54,7 @@ namespace mgf
 		Window();
 		virtual ~Window();
 
-		void SetTitle(const wchar_t* t);
+		void SetTitle(const wchar_t* t, Font* optionalFont);
 		void Show();
 		void Hide();
 		void WithCloseButton(bool);

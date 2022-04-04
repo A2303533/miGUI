@@ -164,10 +164,10 @@ void gui_drawRectangle(
             gdirct.Width = rct->right - rct->left;
             gdirct.Height = rct->bottom - rct->top;
             graphics.DrawImage(myimg, gdirct,
-                g_gui_context->currentIcon.left, 
-                g_gui_context->currentIcon.top, 
-                g_gui_context->currentIcon.right, 
-                g_gui_context->currentIcon.bottom, 
+                g_gui_context->currentIcon->lt.x, 
+                g_gui_context->currentIcon->lt.y, 
+                g_gui_context->currentIcon->rb.x, 
+                g_gui_context->currentIcon->rb.y, 
                 Gdiplus::UnitPixel);
         }
         return;
