@@ -89,6 +89,7 @@ void UpdateBackBuffer() {
 void gui_beginDraw()
 {
     hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+    hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
     RECT r;
     r.left = 0;
     r.top = 0;
@@ -96,12 +97,25 @@ void gui_beginDraw()
     r.bottom =  g_windowRect.bottom - g_windowRect.top;
     FillRect(hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
 
+
     UINT dpi = GetDpiForWindow(g_hwnd);
     int padding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
     borderSize.x = GetSystemMetricsForDpi(SM_CXFRAME, dpi) + padding;
     borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
 }
+struct stacktrace {
+    char* exe;  /* Name of executable file */
+    char* maps; /* Process memory map for this snapshot */
 
+    size_t frames_size;
+    size_t frames_len;
+    struct stacktrace_frame* frames;
+
+    size_t files_len;
+    struct file_map* files;
+
+    unsigned skip;
+};
 void gui_endDraw()
 {
     /*Gdiplus::Graphics graphics(hdcMem);
@@ -163,11 +177,12 @@ void gui_drawRectangle(
             gdirct.Y = rct->top + borderSize.y;
             gdirct.Width = rct->right - rct->left;
             gdirct.Height = rct->bottom - rct->top;
-            graphics.DrawImage(myimg, gdirct,
+            graphics.DrawImage(myimg, 
+                gdirct,
                 g_gui_context->currentIcon->lt.x, 
                 g_gui_context->currentIcon->lt.y, 
-                g_gui_context->currentIcon->rb.x, 
-                g_gui_context->currentIcon->rb.y, 
+                g_gui_context->currentIcon->sz.x, 
+                g_gui_context->currentIcon->sz.y, 
                 Gdiplus::UnitPixel);
         }
         return;

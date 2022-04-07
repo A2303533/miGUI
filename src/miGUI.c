@@ -34,7 +34,6 @@
 
 void mgInitDefaultCursors(mgContext* c);
 void mgDestroyDefaultCursors(mgContext* c);
-void mgDrawWindow(struct mgWindow_s* w);
 void mgUpdateWindow(struct mgWindow_s* w);
 void mgDrawDockPanel(struct mgContext_s* c);
 void mgDockPanelOnSize(struct mgContext_s* c);
@@ -174,7 +173,7 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->tableColTitleColBG, 0xB2D2FF);
 	mgColorSetAsIntegerRGB(&s->tableColTitleColHover, 0xEFF6FF);
 	mgColorSetAsIntegerRGB(&s->tableColTitleColActive, 0xB2D2FF);
-
+	mgColorSetAsIntegerRGB(&s->windowMenuText, 0x0);
 }
 
 MG_API 
@@ -689,7 +688,7 @@ mgDraw_f(mgContext* c)
 				goto skip;
 
 			if (cw->flagsInternal & mgWindowFlag_internal_visible)
-				mgDrawWindow(cw);
+				mgDrawWindow_f(cw);
 
 		skip:;
 			if (cw == lw)

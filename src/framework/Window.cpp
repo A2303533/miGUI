@@ -279,3 +279,85 @@ Table* Window::AddTable(uint32_t colNum, Font* f)
 	return e;
 }
 
+void Window::UseMenu(bool v, Font* f)
+{
+	m_menuFont = f;
+
+	if (m_menu)
+		m_menu->font = ((FontImpl*)f)->m_font;
+
+	if (v)
+		m_window->menu = m_menu;
+	else
+		m_window->menu = 0;
+}
+
+void Window::RebuildMenu()
+{
+	bool isUse = m_window->menu != nullptr;
+	
+
+	if (m_menu)
+		mgDestroyMenu(m_menu);
+	
+	mgMenuItemInfo* mii = new mgMenuItemInfo[m_menuItems.size()];
+
+	for (uint32_t i = 0; i < m_menuItems.size(); ++i)
+	{
+		mii[i].popup = 0;
+		mii[i].text = m_menuItems[i].m_title.c_str();
+	}
+
+	m_menu = mgCreateMenu(m_window->context, mii, m_menuItems.size(), ((FontImpl*)m_menuFont)->m_font);
+
+	delete[] mii;
+
+	UseMenu(true, m_menuFont);
+}
+
+void Window::DeleteMenu()
+{
+	UseMenu(false, m_menuFont);
+	if (m_menu)
+		mgDestroyMenu(m_menu);
+	m_menu = 0;
+	m_menuItems.clear();
+}
+
+void Window::BeginMenu(const wchar_t* title)
+{
+	m_menu_currItem.m_title = title;
+}
+
+void Window::EndMenu()
+{
+	m_menuItems.push_back(m_menu_currItem);
+}
+
+void Window::Draw()
+{
+	mgDrawWindow(m_window);
+}
+
+void Window::SetUserStyle(mgStyle_s* s)
+{
+	m_window->userStyle = s;
+}
+
+void Window::NoMenuBG(bool v)
+{
+	if (v)
+	{
+		m_window->flags |= mgWindowFlag_noMenuBG;
+	}
+	else
+	{
+		if (m_window->flags & mgWindowFlag_noMenuBG)
+			m_window->flags ^= mgWindowFlag_noMenuBG;
+	}
+}
+
+mgRect* Window::GetMenuRect()
+{
+	return &m_window->menuRect;
+}

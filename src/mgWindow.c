@@ -31,6 +31,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <Windows.h>
@@ -208,8 +209,10 @@ mgBringWindowToTop_f(struct mgWindow_s* w)
 	}
 }
 
+MG_API
 void
-mgDrawWindow(struct mgWindow_s* w)
+MG_C_DECL
+mgDrawWindow_f(struct mgWindow_s* w)
 {
 	assert(w);
 	mgIconGroup* iconGroup = w->context->defaultIconGroup;
@@ -362,11 +365,14 @@ mgDrawWindow(struct mgWindow_s* w)
 		if (w->menu)
 		{
 			w->context->gpu->setClipRect(&w->menuRect);
-			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuBG, w,
-				&w->menuRect,
-				&style->windowMenuBG,
-				&style->windowMenuBG,
-				0, 0);
+
+			if((w->flags & mgWindowFlag_noMenuBG) == 0)
+				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuBG, w,
+					&w->menuRect,
+					&style->windowMenuBG,
+					&style->windowMenuBG,
+					0, 0);
+
 			mgPoint pt;
 			for (int i = 0; i < w->menu->itemsSize; ++i)
 			{
@@ -397,7 +403,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					&pt,
 					w->menu->items[i].info.text,
 					w->menu->items[i].textLen,
-					&style->windowTitlebarText,
+					&style->windowMenuText,
 					w->menu->font);
 			}
 		}

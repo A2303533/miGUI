@@ -372,8 +372,8 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			auto status = graphics.DrawImage((Gdiplus::Bitmap*)texture->implementation, gdirct,
 				m_context->m_gui_context->currentIcon->lt.x,
 				m_context->m_gui_context->currentIcon->lt.y,
-				m_context->m_gui_context->currentIcon->rb.x,
-				m_context->m_gui_context->currentIcon->rb.y,
+				m_context->m_gui_context->currentIcon->sz.x,
+				m_context->m_gui_context->currentIcon->sz.y,
 				Gdiplus::UnitPixel);
 		}
 	}break;

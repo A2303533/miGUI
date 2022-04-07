@@ -80,6 +80,9 @@ namespace mgf
 		void SetDefaultPopupFont(Font*);
 		
 		void DrawAll();
+		void DrawBegin();
+		void Draw();
+		void DrawEnd();
 	};
 }
 

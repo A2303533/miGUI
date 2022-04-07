@@ -72,6 +72,8 @@ namespace mgf
 	using SystemWindowOnClose = int(*)(SystemWindow*);
 	using SystemWindowOnSize = void(*)(SystemWindow*);
 	using SystemWindowOnDropFiles = void(*)(uint32_t num, uint32_t i, const wchar_t*, int x, int y);
+	using SystemWindowOnActivate = void(*)(SystemWindow*);
+	using SystemWindowOnDeactivate = void(*)(SystemWindow*);
 
 	//struct SystemWindowCreationInfo
 
@@ -102,6 +104,13 @@ namespace mgf
 		virtual void OnSize() = 0;
 
 		virtual bool IsVisible() = 0;
+		virtual bool IsActive() = 0;
+
+		// test
+		virtual void UseCustomTitleBar(bool, void(*onDrawTitlebar)(SystemWindow*)) = 0;
+		virtual uint32_t GetCustomTitleBarSize() = 0;
+		virtual void SetCustomTitleBarSize(uint32_t) = 0;
+		virtual void SetOnHTCaption(bool(*)(SystemWindow*)) = 0;
 	};
 }
 

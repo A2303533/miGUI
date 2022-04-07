@@ -587,6 +587,13 @@ typedef void (*PFNMGTEXTINPUTACTIVATEPROC)(struct mgContext_s*, struct mgElement
 extern PFNMGTEXTINPUTACTIVATEPROC mgTextInputActivate;
 #endif
 
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgDrawWindow_f(struct mgWindow_s* w);
+#define mgDrawWindow mgDrawWindow_f
+#else
+typedef void (*PFNMGDRAWWINDOWPROC)(struct mgWindow_s*);
+extern PFNMGDRAWWINDOWPROC mgDrawWindow;
+#endif
 
 #if defined(__cplusplus)
 }

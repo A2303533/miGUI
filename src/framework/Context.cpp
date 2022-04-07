@@ -112,6 +112,26 @@ Window* Context::CreateWindow()
 	return newWindow;
 }
 
+void Context::DrawBegin()
+{
+	m_gui_context->gpu->beginDraw();
+}
+
+void Context::Draw()
+{
+	mgDraw(m_gui_context);
+	if (m_onDraw)
+		m_onDraw(this, this->m_backend);
+
+	if (m_window->m_isCustomTitlebar && m_window->m_onDrawTitlebar)
+		m_window->m_onDrawTitlebar(m_window);
+}
+
+void Context::DrawEnd()
+{
+	m_gui_context->gpu->endDraw();
+}
+
 void Context::DrawAll()
 {
 	if (!m_gui_context)
@@ -121,6 +141,10 @@ void Context::DrawAll()
 	mgDraw(m_gui_context);
 	if (m_onDraw)
 		m_onDraw(this, this->m_backend);
+
+	if (m_window->m_isCustomTitlebar && m_window->m_onDrawTitlebar)
+		m_window->m_onDrawTitlebar(m_window);
+
 	m_gui_context->gpu->endDraw();
 }
 

@@ -42,6 +42,7 @@ enum mgWindowFlag
 	mgWindowFlag_canResize = 0x20,  /*default*/
 	mgWindowFlag_canDock = 0x40,
 	mgWindowFlag_noToTop = 0x80,
+	mgWindowFlag_noMenuBG = 0x100,
 
 	mgWindowFlag_internal_scrollMode = 0x1000000,
 	mgWindowFlag_internal_canScroll = 0x2000000,

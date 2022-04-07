@@ -437,7 +437,7 @@ int main(int argc, char* argv[])
 		context.m_data->SetOnDraw(context_onDraw);
 	
 		guiWindow = context.m_data->CreateWindow();
-		guiWindow.m_data->SetTitle(L"Window");
+		guiWindow.m_data->SetTitle(L"Window", 0);
 		guiWindow.m_data->WithCloseButton(false);
 		guiWindow.m_data->WithCollapseButton(false);
 		guiWindow.m_data->WithTitlebar(false);

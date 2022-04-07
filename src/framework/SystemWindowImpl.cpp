@@ -94,6 +94,9 @@ SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPositio
     int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
     m_borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
     m_borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
+    
+    if(m_isCustomTitlebar)
+        m_borderSize.y = 0;
 
     RAWINPUTDEVICE device;
     device.usUsagePage = 0x01;
@@ -184,6 +187,17 @@ void SystemWindowImpl::OnSize()
     GetClientRect(m_hWnd, &rc);
     m_size.x = rc.right - rc.left;
     m_size.y = rc.bottom - rc.top;
+
+    m_clientRect.left = 0;
+    m_clientRect.top = 0;
+    m_clientRect.right = m_size.x;
+    m_clientRect.bottom = m_size.y;
+
+    m_customTitlebarHitRect.left = 0;
+    m_customTitlebarHitRect.top = 0;
+    m_customTitlebarHitRect.right = m_size.x;
+    m_customTitlebarHitRect.bottom = m_customTitlebarHitRect.top + m_customTitlebarSize;
+
     if (m_onSize)
         m_onSize(this);
 
@@ -207,9 +221,54 @@ bool SystemWindowImpl::IsVisible()
     return m_isVisible;
 }
 
+bool SystemWindowImpl::IsActive()
+{
+    return GetFocus() == m_hWnd;
+}
+
+void SystemWindowImpl::UseCustomTitleBar(bool v, void(*onDrawTitlebar)(mgf::SystemWindow*))
+{
+    m_onDrawTitlebar = onDrawTitlebar;
+    m_isCustomTitlebar = v;
+    _update();
+}
+
+void SystemWindowImpl::_update()
+{
 #ifdef MG_PLATFORM_WINDOWS
+    RECT size_rect;
+    GetWindowRect(m_hWnd, &size_rect);
+    SetWindowPos(
+        m_hWnd, NULL,
+        size_rect.left, size_rect.top,
+        size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
+        SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
+    );
+#endif
+}
+
+uint32_t SystemWindowImpl::GetCustomTitleBarSize()
+{
+    return m_customTitlebarSize;
+}
+
+void SystemWindowImpl::SetCustomTitleBarSize(uint32_t v)
+{
+    m_customTitlebarSize = v;
+}
+
+void SystemWindowImpl::SetOnHTCaption(bool(*cb)(SystemWindow*))
+{
+    m_onHTCaption = cb;
+}
+
+#ifdef MG_PLATFORM_WINDOWS
+
+// Cutom titlebar: https://github.com/grassator/win32-window-custom-titlebar
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+
+    int wmId = LOWORD(wParam);
     SystemWindowImpl* pW = 0;
     if (message == WM_NCCREATE)
     {
@@ -227,6 +286,201 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
+    case WM_NCMOUSEMOVE:
+    case WM_MOUSEMOVE:
+      //  printf("%i\n", HIWORD(lParam));
+        break;
+    case WM_CREATE: {
+        RECT size_rect;
+        GetWindowRect(hWnd, &size_rect);
+        SetWindowPos(
+            hWnd, NULL,
+            size_rect.left, size_rect.top,
+            size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
+            SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
+        );
+        break;
+    }
+    case WM_NCCALCSIZE: {
+        if (!wParam) 
+            return DefWindowProc(hWnd, message, wParam, lParam);
+
+        if (pW)
+        {
+            if (pW->m_isCustomTitlebar)
+            {
+                int frame_x = GetSystemMetrics(SM_CXFRAME);
+                int frame_y = GetSystemMetrics(SM_CYFRAME);
+                int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
+
+                NCCALCSIZE_PARAMS* params = (NCCALCSIZE_PARAMS*)lParam;
+                RECT* requested_client_rect = params->rgrc;
+
+                requested_client_rect->right -= frame_x + padding;
+                requested_client_rect->left += frame_x + padding;
+                requested_client_rect->bottom -= frame_y + padding;
+
+                WINDOWPLACEMENT placement = { 0 };
+                placement.length = sizeof(WINDOWPLACEMENT);
+                if (GetWindowPlacement(hWnd, &placement)) {
+                    if (placement.showCmd == SW_SHOWMAXIMIZED) {
+                        requested_client_rect->top += padding;
+                    }
+                }
+
+
+
+                pW->m_borderSize.y = 0;
+                //   pW->m_context->m_input->mousePosition.y = cursorPoint.y;
+            }
+            else
+            {
+                return DefWindowProc(hWnd, message, wParam, lParam);
+            }
+        }
+        else
+        {
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+
+        return 0;
+    }break;
+    case WM_NCHITTEST: {
+       // return DefWindowProc(hWnd, message, wParam, lParam);
+        if (pW)
+        {
+            if (pW->m_isCustomTitlebar)
+            {
+                WINDOWPLACEMENT placement = { 0 };
+                placement.length = sizeof(WINDOWPLACEMENT);
+                bool isMaximized = false;
+                if (GetWindowPlacement(hWnd, &placement)) {
+                    isMaximized = placement.showCmd == SW_SHOWMAXIMIZED;
+                }
+
+                int frame_y = GetSystemMetrics(SM_CYFRAME);
+                int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
+                POINT cursor_point = { 0 };
+                cursor_point.x = LOWORD(lParam);
+                cursor_point.y = HIWORD(lParam);
+                ScreenToClient(hWnd, &cursor_point);
+                
+                if (isMaximized)
+                {
+                    if (cursor_point.y < pW->m_customTitlebarHitRect.bottom
+                        && cursor_point.y >= pW->m_customTitlebarHitRect.top
+                        && cursor_point.x < pW->m_customTitlebarHitRect.right
+                        && cursor_point.x >= pW->m_customTitlebarHitRect.left)
+                    {
+                        return HTCAPTION;
+                    }
+
+                    return DefWindowProc(hWnd, message, wParam, lParam);
+                }
+                else
+                {
+                    LRESULT hit = DefWindowProc(hWnd, message, wParam, lParam);
+                    switch (hit) {
+                    case HTNOWHERE:
+                    case HTRIGHT:
+                    case HTLEFT:
+                    case HTTOPLEFT:
+                    case HTTOP:
+                    case HTTOPRIGHT:
+                    case HTBOTTOMRIGHT:
+                    case HTBOTTOM:
+                    case HTBOTTOMLEFT: {
+                        return hit;
+                    }
+                    }
+
+                    if (cursor_point.y > 0 && cursor_point.y < frame_y)
+                        return HTTOP;
+
+                    if (cursor_point.y < pW->m_customTitlebarHitRect.bottom
+                        && cursor_point.y >= pW->m_customTitlebarHitRect.top
+                        && cursor_point.x < pW->m_customTitlebarHitRect.right
+                        && cursor_point.x >= pW->m_customTitlebarHitRect.left)
+                    {
+                        if (pW->m_onHTCaption)
+                        {
+                            if(pW->m_onHTCaption(pW))
+                                return HTCAPTION;
+                            else
+                                return 0;
+                        }
+                        else
+                        {
+                            return HTCAPTION;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return DefWindowProc(hWnd, message, wParam, lParam);
+            }
+        }
+        else
+        {
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+
+        return HTCLIENT;
+    }break;
+
+    case WM_CAPTURECHANGED:
+    case WM_NCLBUTTONDBLCLK:
+    case WM_NCLBUTTONDOWN:
+    case WM_NCLBUTTONUP:
+    case WM_NCMBUTTONDBLCLK:
+    case WM_NCMBUTTONDOWN:
+    case WM_NCMBUTTONUP:
+    case WM_NCRBUTTONDBLCLK:
+    case WM_NCRBUTTONDOWN:
+    case WM_NCRBUTTONUP:
+    case WM_NCMOUSEHOVER:
+    case WM_NCMOUSELEAVE:
+    {
+        //break;
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+
+    case WM_ACTIVATE:
+    {
+        switch (wmId)
+        {
+        case WA_ACTIVE:
+        case WA_CLICKACTIVE:
+        {
+            if (pW)
+            {
+                if (pW->m_onActivate)
+                {
+                    pW->m_onActivate(pW);
+                    if(pW->m_context)
+                        pW->m_context->DrawAll();
+                }
+            }
+
+          //  RECT title_bar_rect = win32_titlebar_rect(hWnd);
+        //    InvalidateRect(hWnd, &title_bar_rect, FALSE);
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }break;
+        case WA_INACTIVE:
+            if (pW)
+            {
+                if (pW->m_onDeactivate)
+                {
+                    pW->m_onDeactivate(pW);
+                    if (pW->m_context)
+                        pW->m_context->DrawAll();
+                }
+            }
+            break;
+        }
+        break;
+    }
     case WM_DROPFILES:
     {
         if (pW->m_onDropFiles)
@@ -298,11 +552,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
 
     case WM_ERASEBKGND:
-    case WM_ACTIVATE:
     case WM_PAINT:
     {
         if (pW)
-            pW->m_context->DrawAll();
+        {
+            if (pW->m_context)
+            {
+                //pW->m_context->DrawAll();
+                pW->m_context->DrawBegin();
+                pW->m_context->Draw();
+
+                /*if (pW->m_isCustomTitlebar && pW->m_onDrawTitlebar)
+                {
+                    pW->m_onDrawTitlebar(pW);
+                }*/
+                pW->m_context->DrawEnd();
+            }
+        }
         /*draw_gui();*/
         //if (pW)
         //{
@@ -323,117 +589,122 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }break;
     case WM_INPUT:
     {
-        HRAWINPUT hRawInput = (HRAWINPUT)lParam;
-        UINT dataSize;
-        GetRawInputData(hRawInput, RID_INPUT, NULL, &dataSize, sizeof(RAWINPUTHEADER));
-
-        if (dataSize == 0 || dataSize > 0xff)
-            break;
-
-        void* dataBuf = &g_rawInputData[0];
-        GetRawInputData(hRawInput, RID_INPUT, dataBuf, &dataSize, sizeof(RAWINPUTHEADER));
-
-        const RAWINPUT* raw = (const RAWINPUT*)dataBuf;
-        if (raw->header.dwType == RIM_TYPEMOUSE)
+        if (pW->m_context)
         {
-            HANDLE deviceHandle = raw->header.hDevice;
 
-            const RAWMOUSE& mouseData = raw->data.mouse;
+            HRAWINPUT hRawInput = (HRAWINPUT)lParam;
+            UINT dataSize;
+            GetRawInputData(hRawInput, RID_INPUT, NULL, &dataSize, sizeof(RAWINPUTHEADER));
 
-            USHORT flags = mouseData.usButtonFlags;
-            short wheelDelta = (short)mouseData.usButtonData;
-            LONG x = mouseData.lLastX, y = mouseData.lLastY;
+            if (dataSize == 0 || dataSize > 0xff)
+                break;
 
-            /*wprintf(
-                L"Mouse: Device=0x%08X, Flags=%04x, WheelDelta=%d, X=%d, Y=%d\n",
-                deviceHandle, flags, wheelDelta, x, y);*/
+            void* dataBuf = &g_rawInputData[0];
+            GetRawInputData(hRawInput, RID_INPUT, dataBuf, &dataSize, sizeof(RAWINPUTHEADER));
 
-            if (wheelDelta)
-                pW->m_context->m_input->mouseWheelDelta = (float)wheelDelta / (float)WHEEL_DELTA;
-
-            POINT cursorPoint;
-            GetCursorPos(&cursorPoint);
-            ScreenToClient(hWnd, &cursorPoint);
-            pW->m_context->m_input->mousePosition.x = cursorPoint.x;
-            pW->m_context->m_input->mousePosition.y = cursorPoint.y;
-
-            if (flags)
+            const RAWINPUT* raw = (const RAWINPUT*)dataBuf;
+            if (raw->header.dwType == RIM_TYPEMOUSE)
             {
-                if ((flags & 0x1) == 0x1)
+                HANDLE deviceHandle = raw->header.hDevice;
+
+                const RAWMOUSE& mouseData = raw->data.mouse;
+
+                USHORT flags = mouseData.usButtonFlags;
+                short wheelDelta = (short)mouseData.usButtonData;
+                LONG x = mouseData.lLastX, y = mouseData.lLastY;
+
+                /*wprintf(
+                    L"Mouse: Device=0x%08X, Flags=%04x, WheelDelta=%d, X=%d, Y=%d\n",
+                    deviceHandle, flags, wheelDelta, x, y);*/
+
+                if (wheelDelta)
+                    pW->m_context->m_input->mouseWheelDelta = (float)wheelDelta / (float)WHEEL_DELTA;
+
+                POINT cursorPoint;
+                GetCursorPos(&cursorPoint);
+                ScreenToClient(hWnd, &cursorPoint);
+                pW->m_context->m_input->mousePosition.x = cursorPoint.x;
+                pW->m_context->m_input->mousePosition.y = cursorPoint.y;
+                // printf("%i %i\n", cursorPoint.x, cursorPoint.y);
+
+                if (flags)
                 {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_LMBDOWN;
-                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_LMBHOLD;
+                    if ((flags & 0x1) == 0x1)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_LMBDOWN;
+                        pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_LMBHOLD;
+                    }
+
+                    if ((flags & 0x2) == 0x2)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_LMBUP;
+                        if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_LMBHOLD) == MG_MBFL_LMBHOLD)
+                            pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_LMBHOLD;
+                    }
+
+                    if ((flags & 0x4) == 0x4)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_RMBDOWN;
+                        pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_RMBHOLD;
+                    }
+                    if ((flags & 0x8) == 0x8)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_RMBUP;
+                        if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_RMBHOLD) == MG_MBFL_RMBHOLD)
+                            pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_RMBHOLD;
+                    }
+
+                    if ((flags & 0x10) == 0x10)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_MMBDOWN;
+                        pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_MMBHOLD;
+                    }
+                    if ((flags & 0x20) == 0x20)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_MMBUP;
+                        if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_MMBHOLD) == MG_MBFL_MMBHOLD)
+                            pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_MMBHOLD;
+                    }
+
+                    if ((flags & 0x100) == 0x100)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X1MBDOWN;
+                        pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_X1MBHOLD;
+                    }
+                    if ((flags & 0x200) == 0x200)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X1MBUP;
+                        if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_X1MBHOLD) == MG_MBFL_X1MBHOLD)
+                            pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_X1MBHOLD;
+                    }
+
+                    if ((flags & 0x40) == 0x40)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X2MBDOWN;
+                        pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_X2MBHOLD;
+                    }
+                    if ((flags & 0x80) == 0x80)
+                    {
+                        pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X2MBUP;
+                        if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_X2MBHOLD) == MG_MBFL_X2MBHOLD)
+                            pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_X2MBHOLD;
+                    }
+
                 }
 
-                if ((flags & 0x2) == 0x2)
+                /*if (pW->m_context->m_gui_context)
                 {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_LMBUP;
-                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_LMBHOLD) == MG_MBFL_LMBHOLD)
-                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_LMBHOLD;
-                }
-
-                if ((flags & 0x4) == 0x4)
-                {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_RMBDOWN;
-                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_RMBHOLD;
-                }
-                if ((flags & 0x8) == 0x8)
-                {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_RMBUP;
-                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_RMBHOLD) == MG_MBFL_RMBHOLD)
-                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_RMBHOLD;
-                }
-
-                if ((flags & 0x10) == 0x10)
-                {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_MMBDOWN;
-                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_MMBHOLD;
-                }
-                if ((flags & 0x20) == 0x20)
-                {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_MMBUP;
-                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_MMBHOLD) == MG_MBFL_MMBHOLD)
-                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_MMBHOLD;
-                }
-
-                if ((flags & 0x100) == 0x100)
-                {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X1MBDOWN;
-                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_X1MBHOLD;
-                }
-                if ((flags & 0x200) == 0x200)
-                {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X1MBUP;
-                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_X1MBHOLD) == MG_MBFL_X1MBHOLD)
-                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_X1MBHOLD;
-                }
-
-                if ((flags & 0x40) == 0x40)
-                {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X2MBDOWN;
-                    pW->m_context->m_input->mouseButtonFlags2 |= MG_MBFL_X2MBHOLD;
-                }
-                if ((flags & 0x80) == 0x80)
-                {
-                    pW->m_context->m_input->mouseButtonFlags1 |= MG_MBFL_X2MBUP;
-                    if ((pW->m_context->m_input->mouseButtonFlags2 & MG_MBFL_X2MBHOLD) == MG_MBFL_X2MBHOLD)
-                        pW->m_context->m_input->mouseButtonFlags2 ^= MG_MBFL_X2MBHOLD;
-                }
-
+                    pW->m_context->m_gui_context->gpu->beginDraw();
+                    mgDraw(pW->m_context->m_gui_context);
+                    pW->m_context->m_gui_context->gpu->endDraw();
+                }*/
             }
-
-            /*if (pW->m_context->m_gui_context)
-            {
-                pW->m_context->m_gui_context->gpu->beginDraw();
-                mgDraw(pW->m_context->m_gui_context);
-                pW->m_context->m_gui_context->gpu->endDraw();
-            }*/
+            //if (pW->m_context->m_gui_context)
+            //{
+            //    mgUpdate(pW->m_context->m_gui_context);
+            //    //printf("u");
+            //}
         }
-        //if (pW->m_context->m_gui_context)
-        //{
-        //    mgUpdate(pW->m_context->m_gui_context);
-        //    //printf("u");
-        //}
     }break;
    case WM_CLOSE:
        if (pW)
@@ -459,39 +730,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
        }
        return 0;
     case WM_SETCURSOR: {
-        auto id = LOWORD(lParam);
-        switch (id)
+        if (pW->m_context)
         {
-        default:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_Arrow], mgCursorType_Arrow);
-            return TRUE;
-        case HTLEFT:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeWE], mgCursorType_SizeWE);
-            return TRUE;
-        case HTRIGHT:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeWE], mgCursorType_SizeWE);
-            return TRUE;
-        case HTTOP:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNS], mgCursorType_SizeNS);
-            return TRUE;
-        case HTBOTTOM:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNS], mgCursorType_SizeNS);
-            return TRUE;
-        case HTTOPLEFT:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNWSE], mgCursorType_SizeNWSE);
-            return TRUE;
-        case HTBOTTOMRIGHT:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNWSE], mgCursorType_SizeNWSE);
-            return TRUE;
-        case HTBOTTOMLEFT:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNESW], mgCursorType_SizeNESW);
-            return TRUE;
-        case HTTOPRIGHT:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNESW], mgCursorType_SizeNESW);
-            return TRUE;
-        case HTHELP:
-            mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_Help], mgCursorType_Help);
-            return TRUE;
+            auto id = LOWORD(lParam);
+            switch (id)
+            {
+            default:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+                return TRUE;
+            case HTLEFT:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeWE], mgCursorType_SizeWE);
+                return TRUE;
+            case HTRIGHT:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeWE], mgCursorType_SizeWE);
+                return TRUE;
+            case HTTOP:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNS], mgCursorType_SizeNS);
+                return TRUE;
+            case HTBOTTOM:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNS], mgCursorType_SizeNS);
+                return TRUE;
+            case HTTOPLEFT:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNWSE], mgCursorType_SizeNWSE);
+                return TRUE;
+            case HTBOTTOMRIGHT:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNWSE], mgCursorType_SizeNWSE);
+                return TRUE;
+            case HTBOTTOMLEFT:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNESW], mgCursorType_SizeNESW);
+                return TRUE;
+            case HTTOPRIGHT:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_SizeNESW], mgCursorType_SizeNESW);
+                return TRUE;
+            case HTHELP:
+                mgSetCursor(pW->m_context->m_gui_context, pW->m_context->m_gui_context->currentCursors[mgCursorType_Help], mgCursorType_Help);
+                return TRUE;
+            }
         }
     }break;
     case WM_SYSKEYDOWN:
@@ -499,6 +773,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_KEYDOWN:
     case WM_KEYUP:
     {
+        if (!pW->m_context)
+            break;
+
         bool isPress = true;
 
         unsigned char key = (unsigned char)wParam;

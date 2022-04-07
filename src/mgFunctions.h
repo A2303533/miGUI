@@ -68,5 +68,6 @@ struct mgPopup_s* mgGetDefaultPopupTextInput(mgContext* c);
 MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w,mgPoint* position,mgPoint* size,void** items,uint32_t itemsSize,mgFont* f);
 MG_API void MG_C_DECL mgTextInputActivate_f(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
 MG_API void MG_C_DECL mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text);
+MG_API void MG_C_DECL mgDrawWindow_f(struct mgWindow_s* w);
 
 #endif

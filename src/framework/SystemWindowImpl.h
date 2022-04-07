@@ -39,6 +39,7 @@ namespace mgf
 	/*class FrameworkImpl;*/
 	class SystemWindowImpl : public SystemWindow
 	{
+		void _update();
 	public:
 		SystemWindowImpl(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize);
 		virtual ~SystemWindowImpl();
@@ -60,6 +61,13 @@ namespace mgf
 
 		virtual void OnSize() override;
 		virtual bool IsVisible() override;
+		virtual bool IsActive() override;
+
+		virtual void UseCustomTitleBar(bool, void(*onDrawTitlebar)(SystemWindow*)) override;
+		virtual uint32_t GetCustomTitleBarSize() override;
+		virtual void SetCustomTitleBarSize(uint32_t) override;
+		virtual void SetOnHTCaption(bool(*)(SystemWindow*)) override;
+
 
 		bool m_isVisible = false;
 
@@ -76,11 +84,21 @@ namespace mgf
 		SystemWindowOSData m_OSData;
 
 		Context* m_context = 0;
+		mgRect m_clientRect;
 		mgPoint m_size;
 		mgPoint m_borderSize;
 		SystemWindowOnClose m_onClose = 0;
 		SystemWindowOnSize m_onSize = 0;
 		SystemWindowOnDropFiles m_onDropFiles = 0;
+		SystemWindowOnActivate m_onActivate = 0;
+		SystemWindowOnDeactivate m_onDeactivate = 0;
+
+		bool m_isCustomTitlebar = false;
+		mgRect m_customTitlebarHitRect;
+		uint32_t m_customTitlebarSize = 20;
+
+		void(*m_onDrawTitlebar)(SystemWindow*) = 0;
+		bool(*m_onHTCaption)(SystemWindow*) = 0; // lmb and move
 	};
 
 }

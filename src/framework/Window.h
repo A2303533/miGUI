@@ -50,6 +50,15 @@ namespace mgf
 		mgWindow_s* m_window = 0;
 		std::basic_string<wchar_t> m_title;
 		std::vector<Element*> m_elements;
+
+		mgMenu_s* m_menu = 0;
+		struct _menuItem
+		{
+			StringW m_title;
+		};
+		std::vector<_menuItem> m_menuItems;
+		_menuItem m_menu_currItem;
+		Font* m_menuFont = 0;
 	public:
 		Window();
 		virtual ~Window();
@@ -67,10 +76,19 @@ namespace mgf
 		void CanDock(bool);
 		void CanResize(bool);
 		void CanToTop(bool);
+		void NoMenuBG(bool);
 		void SetID(int);
 		int GetID();
 		void SetUserData(void*);
 		void* GetUserData();
+
+		mgRect* GetMenuRect();
+
+		void UseMenu(bool, Font*);
+		void RebuildMenu();
+		void DeleteMenu();
+		void BeginMenu(const wchar_t* title);
+		void EndMenu();
 		
 		void DeleteElement(Element*);
 		Rectangle* AddRectangle();
@@ -90,7 +108,9 @@ namespace mgf
 		Table* AddTable(uint32_t colNum, Font*);
 
 		void UpdateRect();
+		void Draw();
 
+		void SetUserStyle(mgStyle_s*);
 	};
 }
 
