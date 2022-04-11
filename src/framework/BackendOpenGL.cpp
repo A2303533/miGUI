@@ -32,7 +32,7 @@
 #ifdef MGF_BACKEND_OPENGL
 
 #include "framework/Context.h"
-#include "framework/SystemWindowImpl.h"
+#include "framework/SystemWindow.h"
 #include "framework/BackendOpenGL.h"
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
@@ -461,7 +461,7 @@ mgRect BackendOpenGL::SetClipRect(mgRect* r)
 }
 
 
-void BackendOpenGL::_createBackbuffer(mgf::SystemWindowImpl* impl)
+void BackendOpenGL::_createBackbuffer(mgf::SystemWindow* impl)
 {
 }
 
@@ -474,7 +474,7 @@ void BackendOpenGL::InitWindow(mgf::SystemWindow* w)
 
 void BackendOpenGL::SetActiveWindow(mgf::SystemWindow* w)
 {
-	m_window = (mgf::SystemWindowImpl*)w;
+	m_window = w;
 
 	if (m_params.withInit && !m_params.hglrc)
 	{

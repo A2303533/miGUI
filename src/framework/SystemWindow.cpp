@@ -28,14 +28,14 @@
 
 #include "miGUI.h"
 
-#include "framework/mgf.h"
-#include "framework/Framework.h"
-#include "framework/SystemWindowImpl.h"
+#include "mgf.h"
 #include "framework/Context.h"
-
-#include <wchar.h>
+#include "framework/Backend.h"
+#include "framework/SystemWindow.h"
 
 using namespace mgf;
+
+extern Framework* g_mgf;
 
 #ifdef MG_PLATFORM_WINDOWS
 HRAWINPUT g_rawInputData[0xff];
@@ -45,10 +45,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 #endif
 
-extern Framework* g_mgf;
-
-
-SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize)
+SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize)
 {
 #ifdef MG_PLATFORM_WINDOWS
     WNDCLASSEXW wcex;
@@ -64,7 +61,7 @@ SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPositio
     wcex.lpszMenuName = 0;
 
     static int windowCount = 0;
-    wsprintf(m_className, L"w%i", windowCount);
+    wsprintf(m_className, L"w%i", windowCount++);
 
     wcex.lpszClassName = m_className;
     wcex.hIconSm = 0;// LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -72,19 +69,19 @@ SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPositio
 
     m_hWnd = CreateWindowExW(
         WS_EX_ACCEPTFILES,
-        m_className, 
-        L"mgf", 
+        m_className,
+        L"mgf",
         windowFlags,
         windowPosition.x,
         windowPosition.y,
         windowSize.x,
         windowSize.y,
-        0, 
-        0, 
-        wcex.hInstance, 
+        0,
+        0,
+        wcex.hInstance,
         this
     );
-    
+
     m_OSData.handle = m_hWnd;
 
     KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
@@ -94,9 +91,6 @@ SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPositio
     int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
     m_borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
     m_borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
-    
-    if(m_isCustomTitlebar)
-        m_borderSize.y = 0;
 
     RAWINPUTDEVICE device;
     device.usUsagePage = 0x01;
@@ -109,7 +103,7 @@ SystemWindowImpl::SystemWindowImpl(int windowFlags, const mgPoint& windowPositio
     OnSize();
 }
 
-SystemWindowImpl::~SystemWindowImpl()
+SystemWindow::~SystemWindow()
 {
 #ifdef MG_PLATFORM_WINDOWS
     if (m_hWnd)
@@ -129,59 +123,53 @@ SystemWindowImpl::~SystemWindowImpl()
 #endif
 }
 
-const SystemWindowOSData& SystemWindowImpl::GetOSData()
+SystemWindowOSData* SystemWindow::GetOSData()
 {
-    return m_OSData;
+	return &m_OSData;
 }
 
-void SystemWindowImpl::Show()
+void SystemWindow::SetUserData(void* ud)
 {
-#ifdef MG_PLATFORM_WINDOWS
-    ShowWindow(m_hWnd, SW_SHOW);
-#endif
+	m_userData = ud;
 }
 
-void SystemWindowImpl::Hide()
+void* SystemWindow::GetUserData()
 {
-#ifdef MG_PLATFORM_WINDOWS
-    ShowWindow(m_hWnd, SW_HIDE);
-#endif
+	return m_userData;
 }
 
-void SystemWindowImpl::SetTitle(const wchar_t* t)
+void SystemWindow::SetTitle(const wchar_t* t)
 {
 #ifdef MG_PLATFORM_WINDOWS
     SetWindowTextW(m_hWnd, t);
 #endif
 }
 
-const mgPoint& SystemWindowImpl::GetSize()
+void SystemWindow::SetVisible(bool v)
+{
+    m_isVisible = v;
+#ifdef MG_PLATFORM_WINDOWS
+    ShowWindow(m_hWnd, v ? SW_SHOW : SW_HIDE);
+#endif
+}
+
+bool SystemWindow::IsVisible()
+{
+    return m_isVisible;
+}
+
+const mgPoint& SystemWindow::GetSize()
 {
     return m_size;
 }
 
-void SystemWindowImpl::UpdateBackbuffer()
+void SystemWindow::UpdateBackbuffer()
 {
-    if(m_context)
+    if (m_context)
         m_context->m_backend->UpdateBackbuffer();
 }
 
-void SystemWindowImpl::SetOnClose(SystemWindowOnClose c)
-{
-    m_onClose = c;
-}
-
-void SystemWindowImpl::SetOnSize(SystemWindowOnSize c)
-{
-    m_onSize = c;
-}
-
-void SystemWindowImpl::SetOnDropFiles(SystemWindowOnDropFiles c)
-{
-    m_onDropFiles = c;
-}
-
-void SystemWindowImpl::OnSize()
+void SystemWindow::OnSize()
 {
     RECT rc;
     GetClientRect(m_hWnd, &rc);
@@ -198,42 +186,86 @@ void SystemWindowImpl::OnSize()
     m_customTitlebarHitRect.right = m_size.x;
     m_customTitlebarHitRect.bottom = m_customTitlebarHitRect.top + m_customTitlebarSize;
 
-    if (m_onSize)
-        m_onSize(this);
-
     UpdateBackbuffer();
-    if(m_context)
+    if (m_context)
         m_context->OnWindowSize();
 }
 
-void SystemWindowImpl::SetUserData(void* d)
+bool SystemWindow::IsUseCustomTitleBar()
 {
-    m_userData = d;
+    return m_isCustomTitlebar;
 }
 
-void* SystemWindowImpl::GetUserData()
+void SystemWindow::SetUseCustomTitleBar(bool v)
 {
-    return m_userData;
-}
-
-bool SystemWindowImpl::IsVisible()
-{
-    return m_isVisible;
-}
-
-bool SystemWindowImpl::IsActive()
-{
-    return GetFocus() == m_hWnd;
-}
-
-void SystemWindowImpl::UseCustomTitleBar(bool v, void(*onDrawTitlebar)(mgf::SystemWindow*))
-{
-    m_onDrawTitlebar = onDrawTitlebar;
     m_isCustomTitlebar = v;
-    _update();
 }
 
-void SystemWindowImpl::_update()
+mgRect* SystemWindow::GetCustomTitleBarHitRect()
+{
+    return &m_customTitlebarHitRect;
+}
+
+bool SystemWindow::OnHTCaption()
+{
+    return true;
+}
+
+void SystemWindow::OnActivate()
+{
+    if (m_context)
+        m_context->DrawAll();
+}
+
+void SystemWindow::OnDeactivate()
+{
+    if (m_context)
+        m_context->DrawAll();
+}
+
+void SystemWindow::OnMaximize() 
+{
+    m_isVisible = true;
+}
+void SystemWindow::OnMinimize() 
+{
+    m_isVisible = false;
+}
+void SystemWindow::OnRestore() 
+{
+    m_isVisible = true;
+}
+
+uint32_t SystemWindow::GetCustomTitleBarSize()
+{
+    return m_customTitlebarSize;
+}
+
+void SystemWindow::SetCustomTitleBarSize(uint32_t s)
+{
+    m_customTitlebarSize = s;
+}
+
+void SystemWindow::OnDrawCustomTitleBar()
+{
+}
+
+void SystemWindow::OnDraw()
+{
+    if (m_context)
+    {
+        m_context->DrawBegin();
+        m_context->Draw();
+        m_context->DrawEnd();
+    }
+}
+
+bool SystemWindow::OnClose()
+{
+    return true;
+}
+
+void SystemWindow::Rebuild()
 {
 #ifdef MG_PLATFORM_WINDOWS
     RECT size_rect;
@@ -247,32 +279,22 @@ void SystemWindowImpl::_update()
 #endif
 }
 
-uint32_t SystemWindowImpl::GetCustomTitleBarSize()
-{
-    return m_customTitlebarSize;
-}
-
-void SystemWindowImpl::SetCustomTitleBarSize(uint32_t v)
-{
-    m_customTitlebarSize = v;
-}
-
-void SystemWindowImpl::SetOnHTCaption(bool(*cb)(SystemWindow*))
-{
-    m_onHTCaption = cb;
-}
-
 #ifdef MG_PLATFORM_WINDOWS
+void SystemWindow::OnNCCalcSize()
+{
+    m_borderSize.y = 0;
+    m_borderSize.x = 0;
+}
 
 // Cutom titlebar: https://github.com/grassator/win32-window-custom-titlebar
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
     int wmId = LOWORD(wParam);
-    SystemWindowImpl* pW = 0;
+    SystemWindow* pW = 0;
     if (message == WM_NCCREATE)
     {
-        pW = static_cast<SystemWindowImpl*>(reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams);
+        pW = static_cast<SystemWindow*>(reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams);
         SetLastError(0);
         if (!SetWindowLongPtr(hWnd, -21, reinterpret_cast<LONG_PTR>(pW)))
         {
@@ -282,56 +304,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     else
-        pW = reinterpret_cast<SystemWindowImpl*>(GetWindowLongPtr(hWnd, -21));
+        pW = reinterpret_cast<SystemWindow*>(GetWindowLongPtr(hWnd, -21));
 
     switch (message)
     {
     case WM_NCMOUSEMOVE:
     case WM_MOUSEMOVE:
-      //  printf("%i\n", HIWORD(lParam));
+        //  printf("%i\n", HIWORD(lParam));
         break;
     case WM_CREATE: {
-        RECT size_rect;
-        GetWindowRect(hWnd, &size_rect);
-        SetWindowPos(
-            hWnd, NULL,
-            size_rect.left, size_rect.top,
-            size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
-            SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
-        );
+        pW->Rebuild();
         break;
     }
     case WM_NCCALCSIZE: {
-        if (!wParam) 
+        if (!wParam)
             return DefWindowProc(hWnd, message, wParam, lParam);
 
         if (pW)
         {
-            if (pW->m_isCustomTitlebar)
+            if (pW->IsUseCustomTitleBar())
             {
-                int frame_x = GetSystemMetrics(SM_CXFRAME);
-                int frame_y = GetSystemMetrics(SM_CYFRAME);
-                int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
-
-                NCCALCSIZE_PARAMS* params = (NCCALCSIZE_PARAMS*)lParam;
-                RECT* requested_client_rect = params->rgrc;
-
-                requested_client_rect->right -= frame_x + padding;
-                requested_client_rect->left += frame_x + padding;
-                requested_client_rect->bottom -= frame_y + padding;
-
-                WINDOWPLACEMENT placement = { 0 };
-                placement.length = sizeof(WINDOWPLACEMENT);
-                if (GetWindowPlacement(hWnd, &placement)) {
-                    if (placement.showCmd == SW_SHOWMAXIMIZED) {
-                        requested_client_rect->top += padding;
-                    }
-                }
-
-
-
-                pW->m_borderSize.y = 0;
-                //   pW->m_context->m_input->mousePosition.y = cursorPoint.y;
+                pW->OnNCCalcSize();
+                return 0;
             }
             else
             {
@@ -346,10 +340,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return 0;
     }break;
     case WM_NCHITTEST: {
-       // return DefWindowProc(hWnd, message, wParam, lParam);
+        // return DefWindowProc(hWnd, message, wParam, lParam);
         if (pW)
         {
-            if (pW->m_isCustomTitlebar)
+            if (pW->IsUseCustomTitleBar())
             {
                 WINDOWPLACEMENT placement = { 0 };
                 placement.length = sizeof(WINDOWPLACEMENT);
@@ -359,18 +353,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
 
                 int frame_y = GetSystemMetrics(SM_CYFRAME);
+                int frame_x = GetSystemMetrics(SM_CXFRAME);
                 int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
                 POINT cursor_point = { 0 };
                 cursor_point.x = LOWORD(lParam);
                 cursor_point.y = HIWORD(lParam);
                 ScreenToClient(hWnd, &cursor_point);
-                
+
                 if (isMaximized)
                 {
-                    if (cursor_point.y < pW->m_customTitlebarHitRect.bottom
-                        && cursor_point.y >= pW->m_customTitlebarHitRect.top
-                        && cursor_point.x < pW->m_customTitlebarHitRect.right
-                        && cursor_point.x >= pW->m_customTitlebarHitRect.left)
+                    if (cursor_point.y < pW->GetCustomTitleBarHitRect()->bottom
+                        && cursor_point.y >= pW->GetCustomTitleBarHitRect()->top
+                        && cursor_point.x < pW->GetCustomTitleBarHitRect()->right
+                        && cursor_point.x >= pW->GetCustomTitleBarHitRect()->left)
                     {
                         return HTCAPTION;
                     }
@@ -394,25 +389,51 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     }
                     }
 
-                    if (cursor_point.y > 0 && cursor_point.y < frame_y)
-                        return HTTOP;
+                    uint32_t ht = 0;
 
-                    if (cursor_point.y < pW->m_customTitlebarHitRect.bottom
-                        && cursor_point.y >= pW->m_customTitlebarHitRect.top
-                        && cursor_point.x < pW->m_customTitlebarHitRect.right
-                        && cursor_point.x >= pW->m_customTitlebarHitRect.left)
+                    if (cursor_point.y > 0 && cursor_point.y < frame_y)
+                        ht |= 0x1;
+
+                    if (cursor_point.y < pW->GetSize().y
+                        && cursor_point.y >(pW->GetSize().y - frame_y))
+                        ht |= 0x2;
+
+                    if (cursor_point.x > 0 && cursor_point.x < frame_x)
+                        ht |= 0x4;
+
+                    if (cursor_point.x < pW->GetSize().x
+                        && cursor_point.x >(pW->GetSize().x - frame_x))
+                        ht |= 0x8;
+
+                    switch (ht)
                     {
-                        if (pW->m_onHTCaption)
-                        {
-                            if(pW->m_onHTCaption(pW))
-                                return HTCAPTION;
-                            else
-                                return 0;
-                        }
-                        else
-                        {
+                    case 1:
+                        return HTTOP;
+                    case 2:
+                        return HTBOTTOM;
+                    case 4:
+                        return HTLEFT;
+                    case 8:
+                        return HTRIGHT;
+                    case 5:
+                        return HTTOPLEFT;
+                    case 9:
+                        return HTTOPRIGHT;
+                    case 6:
+                        return HTBOTTOMLEFT;
+                    case 10:
+                        return HTBOTTOMRIGHT;
+                    }
+
+                    if (cursor_point.y < pW->GetCustomTitleBarHitRect()->bottom
+                        && cursor_point.y >= pW->GetCustomTitleBarHitRect()->top
+                        && cursor_point.x < pW->GetCustomTitleBarHitRect()->right
+                        && cursor_point.x >= pW->GetCustomTitleBarHitRect()->left)
+                    {
+                        if (pW->OnHTCaption())
                             return HTCAPTION;
-                        }
+                        else
+                            return 0;
                     }
                 }
             }
@@ -454,69 +475,55 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WA_CLICKACTIVE:
         {
             if (pW)
-            {
-                if (pW->m_onActivate)
-                {
-                    pW->m_onActivate(pW);
-                    if(pW->m_context)
-                        pW->m_context->DrawAll();
-                }
-            }
+                pW->OnActivate();
 
-          //  RECT title_bar_rect = win32_titlebar_rect(hWnd);
-        //    InvalidateRect(hWnd, &title_bar_rect, FALSE);
+            //  RECT title_bar_rect = win32_titlebar_rect(hWnd);
+          //    InvalidateRect(hWnd, &title_bar_rect, FALSE);
             return DefWindowProc(hWnd, message, wParam, lParam);
         }break;
         case WA_INACTIVE:
             if (pW)
-            {
-                if (pW->m_onDeactivate)
-                {
-                    pW->m_onDeactivate(pW);
-                    if (pW->m_context)
-                        pW->m_context->DrawAll();
-                }
-            }
+                pW->OnDeactivate();
             break;
         }
         break;
     }
-    case WM_DROPFILES:
-    {
-        if (pW->m_onDropFiles)
-        {
-            //printf("DROP FILES\n");
-            HDROP hDrop = (HDROP)wParam;
-            if (hDrop)
-            {
-                UINT num = DragQueryFileW(hDrop, 0xFFFFFFFF, 0, 0);
-                //printf("%u FILES\n", num);
-                
-                wchar_t* buf = new wchar_t[0xffff];
-                for (UINT i = 0; i < num; ++i)
-                {
-                    DragQueryFileW(hDrop, i, buf, 0xffff);
-                    buf[0xffff - 1] = 0;
+    //case WM_DROPFILES:
+    //{
+    //    if (pW->m_onDropFiles)
+    //    {
+    //        //printf("DROP FILES\n");
+    //        HDROP hDrop = (HDROP)wParam;
+    //        if (hDrop)
+    //        {
+    //            UINT num = DragQueryFileW(hDrop, 0xFFFFFFFF, 0, 0);
+    //            //printf("%u FILES\n", num);
 
-                    POINT pt;
-                    DragQueryPoint(hDrop, &pt);
+    //            wchar_t* buf = new wchar_t[0xffff];
+    //            for (UINT i = 0; i < num; ++i)
+    //            {
+    //                DragQueryFileW(hDrop, i, buf, 0xffff);
+    //                buf[0xffff - 1] = 0;
 
-                    pW->m_onDropFiles(num, i, buf, pt.x, pt.y);
-                    //wprintf(L"FILE: %s\n", buf);
-                }
-                delete[] buf;
+    //                POINT pt;
+    //                DragQueryPoint(hDrop, &pt);
 
-                DragFinish(hDrop);
-            }
-        }
+    //                pW->m_onDropFiles(num, i, buf, pt.x, pt.y);
+    //                //wprintf(L"FILE: %s\n", buf);
+    //            }
+    //            delete[] buf;
 
-        return 0;
-    }break;
+    //            DragFinish(hDrop);
+    //        }
+    //    }
+
+    //    return 0;
+    //}break;
     case WM_GETMINMAXINFO:
     {
         LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
-        lpMMI->ptMinTrackSize.x = 800;
-        lpMMI->ptMinTrackSize.y = 600;
+        lpMMI->ptMinTrackSize.x = 300;
+        lpMMI->ptMinTrackSize.y = 200;
     }
     break;
     case WM_SIZE:
@@ -528,11 +535,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wmId)
             {
             case SIZE_MINIMIZED:
-                pW->m_isVisible = false;
+                pW->OnMinimize();
                 break;
             case SIZE_RESTORED:
+                pW->OnRestore();
+                break;
             case SIZE_MAXIMIZED:
-                pW->m_isVisible = true;
+                pW->OnMaximize();
                 break;
             }
         }
@@ -555,37 +564,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
     {
         if (pW)
-        {
-            if (pW->m_context)
-            {
-                //pW->m_context->DrawAll();
-                pW->m_context->DrawBegin();
-                pW->m_context->Draw();
-
-                /*if (pW->m_isCustomTitlebar && pW->m_onDrawTitlebar)
-                {
-                    pW->m_onDrawTitlebar(pW);
-                }*/
-                pW->m_context->DrawEnd();
-            }
-        }
-        /*draw_gui();*/
-        //if (pW)
-        //{
-        //    PAINTSTRUCT ps;
-        //    HDC hdc = BeginPaint(hWnd, &ps);
-        //    ////// TODO: Add any drawing code that uses hdc here...
-        //    //pW->m_context->
-
-        //    if (pW->m_context->m_gui_context)
-        //    {
-        //        pW->m_context->m_gui_context->gpu->beginDraw();
-        //        mgDraw(pW->m_context->m_gui_context);
-        //        pW->m_context->m_gui_context->gpu->endDraw();
-        //    }
-
-        //    EndPaint(hWnd, &ps);
-        //}
+            pW->OnDraw();
     }break;
     case WM_INPUT:
     {
@@ -706,29 +685,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //}
         }
     }break;
-   case WM_CLOSE:
-       if (pW)
-       {
-           if (pW->m_onClose)
-           {
-               if (pW->m_onClose(pW))
-               {
-                   g_mgf->m_run = false;
-                   PostQuitMessage(0);
-               }
-           }
-           else
-           {
-               g_mgf->m_run = false;
-               PostQuitMessage(0);
-           }
-       }
-       else
-       {
-           g_mgf->m_run = false;
-           PostQuitMessage(0);
-       }
-       return 0;
+    case WM_CLOSE:
+        if (pW)
+        {
+            if (pW->OnClose())
+            {
+                g_mgf->m_run = false;
+                PostQuitMessage(0);
+            }
+        }
+        else
+        {
+            g_mgf->m_run = false;
+            PostQuitMessage(0);
+        }
+        return 0;
+
+        // I don't know how to work with this in right way
     case WM_SETCURSOR: {
         if (pW->m_context)
         {

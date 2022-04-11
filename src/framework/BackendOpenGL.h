@@ -58,7 +58,7 @@
 
 namespace mgf
 {
-	class SystemWindowImpl;
+	class SystemWindow;
 	class Context;
 	
 	struct BackendOpenGLParams
@@ -77,7 +77,7 @@ namespace mgf
 	{
 		friend class Context;
 
-		mgf::SystemWindowImpl* m_window = 0;
+		mgf::SystemWindow* m_window = 0;
 		mgf::Context* m_context = 0;
 
 		void* m_gpu = 0;
@@ -87,7 +87,7 @@ namespace mgf
 
 		mgRect m_clipRect;
 
-		void _createBackbuffer(mgf::SystemWindowImpl* impl);
+		void _createBackbuffer(mgf::SystemWindow* impl);
 
 		Image* blackImage = 0;
 		/*Gdiplus::Bitmap* blackBitmap = 0;*/

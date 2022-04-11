@@ -30,6 +30,10 @@
 #ifndef _MGF_BCK_H_
 #define _MGF_BCK_H_
 
+#ifdef MG_PLATFORM_WINDOWS
+#include "framework/OS/UndefWindows.h"
+#endif
+
 namespace mgf
 {
 	class Backend : public BaseClass

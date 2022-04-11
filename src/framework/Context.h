@@ -30,23 +30,23 @@
 #ifndef _MGF_CONTEXT_H_
 #define _MGF_CONTEXT_H_
 
-#ifdef CreateWindow
-#undef CreateWindow
+#ifdef MG_PLATFORM_WINDOWS
+#include "framework/OS/UndefWindows.h"
 #endif
 
 namespace mgf
 {
 	using ContextOnDraw = void(*)(Context*,Backend*);
 
-	class SystemWindowImpl;
+	class SystemWindow;
 
 	// Probably need to rename to GUIContext
 	class Context : public BaseClass
 	{
 		friend class Framework;
-		friend class SystemWindowImpl;
+		friend class SystemWindow;
 
-		SystemWindowImpl* m_window = 0;
+		SystemWindow* m_window = 0;
 		Backend* m_backend = 0;
 		ContextOnDraw m_onDraw = 0;
 	public:

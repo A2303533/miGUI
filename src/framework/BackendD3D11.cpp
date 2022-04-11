@@ -34,7 +34,7 @@
 #include <d3dcompiler.h>
 
 #include "framework/Context.h"
-#include "framework/SystemWindowImpl.h"
+#include "framework/SystemWindow.h"
 #include "framework/BackendD3D11.h"
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
@@ -726,7 +726,7 @@ mgRect BackendD3D11::SetClipRect(mgRect* r)
 }
 
 
-void BackendD3D11::_createBackbuffer(mgf::SystemWindowImpl* impl)
+void BackendD3D11::_createBackbuffer(mgf::SystemWindow* impl)
 {
 }
 
@@ -739,7 +739,7 @@ void BackendD3D11::InitWindow(mgf::SystemWindow* w)
 
 void BackendD3D11::SetActiveWindow(mgf::SystemWindow* w)
 {
-	m_window = (mgf::SystemWindowImpl*)w;
+	m_window = w;
 }
 
 void BackendD3D11::SetActiveContext(mgf::Context* c)

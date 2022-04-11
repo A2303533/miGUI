@@ -30,6 +30,11 @@
 #ifndef _MG_SYSWIND_H_
 #define _MG_SYSWIND_H_
 
+#ifdef MG_PLATFORM_WINDOWS
+#include <Windows.h>
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+#endif
+
 /*Just like WINAPI*/
 #define MGWS_OVERLAPPED       0x00000000L
 #define MGWS_POPUP            0x80000000L
@@ -69,14 +74,6 @@
 
 namespace mgf
 {
-	using SystemWindowOnClose = int(*)(SystemWindow*);
-	using SystemWindowOnSize = void(*)(SystemWindow*);
-	using SystemWindowOnDropFiles = void(*)(uint32_t num, uint32_t i, const wchar_t*, int x, int y);
-	using SystemWindowOnActivate = void(*)(SystemWindow*);
-	using SystemWindowOnDeactivate = void(*)(SystemWindow*);
-
-	//struct SystemWindowCreationInfo
-
 	struct SystemWindowOSData
 	{
 		void* handle = 0;
@@ -84,33 +81,86 @@ namespace mgf
 
 	class SystemWindow : public BaseClass
 	{
+		friend class BackendD3D11;
+		friend class BackendGDI;
+		friend class BackendOpenGL;
+		friend class Context;
+		friend class Framework;
+
+#ifdef MG_PLATFORM_WINDOWS
+		HWND m_hWnd = 0;
+		//HDC m_dc = 0;
+		wchar_t m_className[20];
+
+		/*double bufferring for GDI*/
+		HDC m_hdcMem = 0;
+		HBITMAP m_hbmMem = 0;
+		HBITMAP m_hbmOld = 0;
+#endif
+		SystemWindowOSData m_OSData;
+
+		void* m_userData = 0;
+
+		bool m_isVisible = false;
+
+		mgRect m_clientRect;
+		mgPoint m_size;
+		mgPoint m_borderSize;
+
+		bool m_isCustomTitlebar = false;
+		mgRect m_customTitlebarHitRect;
+		uint32_t m_customTitlebarSize = 20;
 	public:
+		SystemWindow(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize);
+		virtual ~SystemWindow();
 
-		virtual const SystemWindowOSData& GetOSData() = 0;
+		SystemWindowOSData* GetOSData();
 
-		virtual void SetUserData(void*) = 0;
-		virtual void* GetUserData() = 0;
+		void SetUserData(void*);
+		void* GetUserData();
+		const mgPoint& GetSize();
 		
-		virtual void SetTitle(const wchar_t*) = 0;
-		virtual void Show() = 0;
-		virtual void Hide() = 0;
-		virtual const mgPoint& GetSize() = 0;
+		virtual void SetTitle(const wchar_t*);
+		virtual void SetVisible(bool);
+		virtual bool IsVisible();
 
-		virtual void UpdateBackbuffer() = 0;
 
-		virtual void SetOnClose(SystemWindowOnClose) = 0;
-		virtual void SetOnSize(SystemWindowOnSize) = 0;
-		virtual void SetOnDropFiles(SystemWindowOnDropFiles) = 0;
-		virtual void OnSize() = 0;
+		virtual void UpdateBackbuffer();
 
-		virtual bool IsVisible() = 0;
-		virtual bool IsActive() = 0;
+		// it's for update back buffer and other thigs.
+		virtual void OnSize();
+		
+		virtual void OnDraw();
 
-		// test
-		virtual void UseCustomTitleBar(bool, void(*onDrawTitlebar)(SystemWindow*)) = 0;
-		virtual uint32_t GetCustomTitleBarSize() = 0;
-		virtual void SetCustomTitleBarSize(uint32_t) = 0;
-		virtual void SetOnHTCaption(bool(*)(SystemWindow*)) = 0;
+		bool IsUseCustomTitleBar();
+		void SetUseCustomTitleBar(bool);
+		mgRect* GetCustomTitleBarHitRect();
+#ifdef MG_PLATFORM_WINDOWS
+		void OnNCCalcSize();
+#endif
+		virtual void OnDrawCustomTitleBar();
+		// return true if need to move window when click on titlebar.
+		// cursor is already in m_customTitlebarHitRect.
+		// You can return false if there is some GUI controls...
+		virtual bool OnHTCaption();
+		
+		uint32_t GetCustomTitleBarSize();
+		void SetCustomTitleBarSize(uint32_t);
+		
+		virtual void OnActivate();
+		virtual void OnDeactivate();
+
+		virtual void OnMaximize();
+		virtual void OnMinimize();
+		virtual void OnRestore();
+
+		// return true close application
+		virtual bool OnClose();
+		
+		// call this after SetUseCustomTitleBar
+		virtual void Rebuild();
+
+		Context* m_context = 0;
 	};
 }
 

@@ -31,40 +31,24 @@
 
 #ifdef MGF_BACKEND_GDI
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
 #include <objidl.h>
 #define GDIPVER 0x0110
 #include <gdiplus.h>
 #pragma comment (lib,"Gdiplus.lib")
 #pragma comment (lib,"Msimg32.lib")
 
-#ifdef DrawText
-#undef DrawText
-#endif
-
-#ifdef CreateFont
-#undef CreateFont
-#endif
-
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
-
-#ifdef LoadImage
-#undef LoadImage
-#endif
+#include "framework/OS/UndefWindows.h"
 
 namespace mgf
 {
-	class SystemWindowImpl;
+	class SystemWindow;
 	class Context;
 
 	class BackendGDI : public Backend
 	{
 		friend class Context;
 
-		mgf::SystemWindowImpl* m_window = 0;
+		mgf::SystemWindow* m_window = 0;
 		mgf::Context* m_context = 0;
 
 		void* m_gpu = 0;
@@ -77,7 +61,7 @@ namespace mgf
 
 		mgRect m_clipRect;
 
-		void _createBackbuffer(mgf::SystemWindowImpl* impl);
+		void _createBackbuffer(mgf::SystemWindow* impl);
 
 		Image* blackImage = 0;
 		Gdiplus::Bitmap* blackBitmap = 0;

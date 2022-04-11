@@ -37,27 +37,11 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <d3d11.h>
-
-#ifdef DrawText
-#undef DrawText
-#endif
-
-#ifdef CreateFont
-#undef CreateFont
-#endif
-
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
-
-#ifdef LoadImage
-#undef LoadImage
-#endif
 #endif
 
 namespace mgf
 {
-	class SystemWindowImpl;
+	class SystemWindow;
 	class Context;
 	
 	struct BackendD3D11Params
@@ -85,7 +69,7 @@ namespace mgf
 	{
 		friend class Context;
 
-		mgf::SystemWindowImpl* m_window = 0;
+		mgf::SystemWindow* m_window = 0;
 		mgf::Context* m_context = 0;
 
 		void* m_gpu = 0;
@@ -95,7 +79,7 @@ namespace mgf
 
 		mgRect m_clipRect;
 
-		void _createBackbuffer(mgf::SystemWindowImpl* impl);
+		void _createBackbuffer(mgf::SystemWindow* impl);
 
 		//Image* blackImage = 0; //for shadows
 		BackendD3D11Params m_params;

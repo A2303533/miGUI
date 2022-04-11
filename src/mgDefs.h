@@ -59,4 +59,11 @@
 	((unsigned int)(unsigned char)(ch0)|((unsigned int)(unsigned char)(ch1)<<8)|\
 	((unsigned int)(unsigned char)(ch2)<<16)|((unsigned int)(unsigned char)(ch3)<<24))
 
+#ifdef MG_PLATFORM_WINDOWS
+#if defined _WIN64 || defined __x86_64__
+#define MG_BIT_64
+#endif
+#else
+#endif
+
 #endif

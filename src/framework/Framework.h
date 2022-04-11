@@ -51,11 +51,6 @@ namespace mgf
 		
 		bool m_run = true;
 
-		SystemWindow* CreateWindow(
-			int windowFlags, /*WinAPI flags*/
-			const mgPoint& windowPosition,
-			const mgPoint& windowSize);
-
 		Context* CreateContext(mgf::SystemWindow*, Backend* backend);
 
 		Icons* CreateIcons(const char* imageFile, Backend* backend);

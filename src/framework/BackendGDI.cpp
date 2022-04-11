@@ -32,12 +32,17 @@
 #ifdef MGF_BACKEND_GDI
 
 #include "framework/Context.h"
-#include "framework/SystemWindowImpl.h"
+#include "framework/SystemWindow.h"
 #include "framework/BackendGDI.h"
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 
 #ifdef MG_PLATFORM_WINDOWS
+
+#include <Windows.h>
+#define GDIPVER 0x0110
+#include <gdiplus.h>
+#include "framework/OS/UndefWindows.h"
 
 using namespace mgf;
 
@@ -459,7 +464,7 @@ mgRect BackendGDI::SetClipRect(mgRect* r)
 }
 
 
-void BackendGDI::_createBackbuffer(mgf::SystemWindowImpl* impl)
+void BackendGDI::_createBackbuffer(mgf::SystemWindow* impl)
 {
 	HDC dc = GetWindowDC(impl->m_hWnd);
 	impl->m_hdcMem = CreateCompatibleDC(dc);
@@ -480,7 +485,7 @@ void BackendGDI::InitWindow(mgf::SystemWindow* w)
 
 void BackendGDI::SetActiveWindow(mgf::SystemWindow* w)
 {
-	m_window = (mgf::SystemWindowImpl*)w;
+	m_window = w;
 }
 
 void BackendGDI::SetActiveContext(mgf::Context* c)

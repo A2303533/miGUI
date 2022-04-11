@@ -31,19 +31,11 @@
 #include "framework/mgf.h"
 #include "framework/Framework.h"
 #include "framework/Context.h"
-#include "framework/SystemWindowImpl.h"
+#include "framework/SystemWindow.h"
 #include "framework/Backend.h"
 #include "framework/Window.h"
 #include "framework/FontImpl.h"
 #include "framework/Popup.h"
-
-#ifdef CreateFont
-#undef CreateFont
-#endif
-
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
 
 using namespace mgf;
 
@@ -51,7 +43,7 @@ Context::Context(mgf::SystemWindow* sysWnd,
 	Backend* backend)
 {
 	//m_window = new mgf::SystemWindowImpl(windowFlags, windowPosition, windowSize);
-	m_window = (SystemWindowImpl*)sysWnd;
+	m_window = (SystemWindow*)sysWnd;
 	m_window->m_context = this;
 	
 	m_input = new mgInputContext_s;
@@ -123,8 +115,8 @@ void Context::Draw()
 	if (m_onDraw)
 		m_onDraw(this, this->m_backend);
 
-	if (m_window->m_isCustomTitlebar && m_window->m_onDrawTitlebar)
-		m_window->m_onDrawTitlebar(m_window);
+	if (m_window->m_isCustomTitlebar)
+		m_window->OnDrawCustomTitleBar();
 }
 
 void Context::DrawEnd()
@@ -142,8 +134,8 @@ void Context::DrawAll()
 	if (m_onDraw)
 		m_onDraw(this, this->m_backend);
 
-	if (m_window->m_isCustomTitlebar && m_window->m_onDrawTitlebar)
-		m_window->m_onDrawTitlebar(m_window);
+	if (m_window->m_isCustomTitlebar)
+		m_window->OnDrawCustomTitleBar();
 
 	m_gui_context->gpu->endDraw();
 }

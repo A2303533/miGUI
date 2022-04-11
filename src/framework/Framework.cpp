@@ -32,7 +32,7 @@
 #include "framework/mgf.h"
 #include "framework/Framework.h"
 #include "framework/Context.h"
-#include "framework/SystemWindowImpl.h"
+#include "framework/SystemWindow.h"
 #include "framework/Icons.h"
 #include "framework/Popup.h"
 #include "framework/FontImpl.h"
@@ -209,10 +209,3 @@ Icons* Framework::CreateIcons(const char* imageFile, Backend* backend)
 }
 
 
-SystemWindow* Framework::CreateWindow(
-	int windowFlags, /*WinAPI flags*/
-	const mgPoint& windowPosition,
-	const mgPoint& windowSize)
-{
-	return new SystemWindowImpl(windowFlags, windowPosition, windowSize);
-}

@@ -27,29 +27,21 @@
 */
 
 #pragma once
-#ifndef _MGF_FORWARD_H_
-#define _MGF_FORWARD_H_
+#ifndef __OS_WINDOWS_H_
+#define __OS_WINDOWS_H_
 
-namespace mgf
-{
-	class BackendD3D11;
-	class Backend;
-	class Window;
-	class Button;
-	class Rectangle;
-	class Text;
-	class DockPanel;
-	class SystemWindow;
-	class Font;
-	class Context;
-	class Element;
-	class Rectangle;
-	class Icons;
-	class Image;
-	class TextInput;
-	class ListBox;
-	class Table;
-	class Popup;
-}
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
+
+#ifdef CreateFont
+#undef CreateFont
+#endif
+
+#ifdef DrawText
+#undef DrawText
+#endif
+
+
 
 #endif

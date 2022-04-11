@@ -236,7 +236,7 @@ void Window::DeleteElement(Element* e)
 	delete e;
 }
 
-Rectangle* Window::AddRectangle()
+mgf::Rectangle* Window::AddRectangle()
 {
 	Rectangle* e = new Rectangle(this);
 	m_elements.emplace_back(e);
