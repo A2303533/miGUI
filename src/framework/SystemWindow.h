@@ -106,6 +106,7 @@ namespace mgf
 		mgRect m_clientRect;
 		mgPoint m_size;
 		mgPoint m_borderSize;
+		mgPoint m_sizeMinimum;
 
 		bool m_isCustomTitlebar = false;
 		mgRect m_customTitlebarHitRect;
@@ -124,6 +125,7 @@ namespace mgf
 		virtual void SetVisible(bool);
 		virtual bool IsVisible();
 
+		mgPoint* GetSizeMinimum();
 
 		virtual void UpdateBackbuffer();
 

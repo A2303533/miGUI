@@ -200,6 +200,8 @@ miGUI_onUpdate_rectangle(mgElement* e)
 
 	if (e->cursorInRect)
 	{
+		e->window->context->cursorInElement = 1;
+
 		if (!e->elementState & 0x1)
 		{
 			if (e->onMouseEnter)

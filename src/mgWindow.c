@@ -389,6 +389,7 @@ mgDrawWindow_f(struct mgWindow_s* w)
 			{
 				if (w->menu->activeItem == &w->menu->items[i])
 				{
+					w->context->cursorInElement = 1;
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuActiveItemBG, w,
 						&w->menu->activeItem->rect,
 						&style->windowMenuActiveItemBG,
@@ -397,6 +398,8 @@ mgDrawWindow_f(struct mgWindow_s* w)
 				}
 				else if (w->menu->hoverItem == &w->menu->items[i])
 				{
+					w->context->cursorInElement = 1;
+
 					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuHoverItemBG, w,
 						&w->menu->hoverItem->rect,
 						&style->windowMenuHoverItemBG,

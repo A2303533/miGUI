@@ -100,6 +100,9 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     RegisterRawInputDevices(&device, 1, sizeof device);
 #endif
 
+    m_sizeMinimum.x = 0;
+    m_sizeMinimum.y = 0;
+
     OnSize();
 }
 
@@ -268,6 +271,11 @@ bool SystemWindow::OnClose()
     return true;
 }
 
+mgPoint* SystemWindow::GetSizeMinimum()
+{
+    return &m_sizeMinimum;
+}
+
 void SystemWindow::Rebuild()
 {
 #ifdef MG_PLATFORM_WINDOWS
@@ -393,19 +401,52 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     }
 
                     uint32_t ht = 0;
+                    const mgPoint& wsz = pW->GetSize();
+
+                    if ((cursor_point.x >= 0) && (cursor_point.x <= 5))
+                    {
+                        if ((cursor_point.y >= 0) && (cursor_point.y <= 5))
+                        {
+                            return HTTOPLEFT;
+                        }
+                    }
+
+                    if ((cursor_point.x >= 0) && (cursor_point.x <= 5))
+                    {
+                        if ((cursor_point.y >= wsz.y - 5) && (cursor_point.y <= wsz.y))
+                        {
+                            return HTBOTTOMLEFT;
+                        }
+                    }
+
+                    if ((cursor_point.x >= wsz.x - 5) && (cursor_point.x <= wsz.x))
+                    {
+                        if ((cursor_point.y >= 0) && (cursor_point.y <= 5))
+                        {
+                            return HTTOPRIGHT;
+                        }
+                    }
+
+                    if ((cursor_point.x >= wsz.x - 5) && (cursor_point.x <= wsz.x))
+                    {
+                        if ((cursor_point.y >= wsz.y - 5) && (cursor_point.y <= wsz.y))
+                        {
+                            return HTBOTTOMRIGHT;
+                        }
+                    }
 
                     if (cursor_point.y > 0 && cursor_point.y < frame_y)
                         ht |= 0x1;
 
-                    if (cursor_point.y < pW->GetSize().y
-                        && cursor_point.y >(pW->GetSize().y - frame_y))
+                    if (cursor_point.y < wsz.y
+                        && cursor_point.y >(wsz.y - frame_y))
                         ht |= 0x2;
 
                     if (cursor_point.x > 0 && cursor_point.x < frame_x)
                         ht |= 0x4;
 
-                    if (cursor_point.x < pW->GetSize().x
-                        && cursor_point.x >(pW->GetSize().x - frame_x))
+                    if (cursor_point.x < wsz.x
+                        && cursor_point.x >(wsz.x - frame_x))
                         ht |= 0x8;
 
                     switch (ht)
@@ -524,9 +565,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     //}break;
     case WM_GETMINMAXINFO:
     {
-        LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
-        lpMMI->ptMinTrackSize.x = 300;
-        lpMMI->ptMinTrackSize.y = 200;
+        if (pW)
+        {
+            LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+            lpMMI->ptMinTrackSize.x = pW->GetSizeMinimum()->x;
+            lpMMI->ptMinTrackSize.y = pW->GetSizeMinimum()->y;
+        }
     }
     break;
     case WM_SIZE:

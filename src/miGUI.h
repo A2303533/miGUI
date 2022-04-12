@@ -586,6 +586,8 @@ typedef struct mgContext_s {
 
 	mgFont* defaultPopupFont;
 	int cursorInPopup;
+	
+	int cursorInElement; // 1 if cursor above element like button, menu item, but not in popup or window
 
 	mgIconGroup* defaultIconGroup;
 	

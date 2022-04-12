@@ -384,6 +384,7 @@ mgUpdate_f(mgContext* c)
 	assert(c);
 
 	c->tooltipText = 0;
+	c->cursorInElement = 0;
 
 	unsigned int ctrl_shift_alt = 0;
 	if (mgIsKeyHold(c->input, MG_KEY_LALT) || mgIsKeyHold(c->input, MG_KEY_RALT))
