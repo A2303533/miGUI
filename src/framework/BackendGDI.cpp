@@ -45,6 +45,8 @@
 #include <gdiplus.h>
 #include "framework/OS/UndefWindows.h"
 
+#include <filesystem>
+
 using namespace mgf;
 
 extern mgf::Backend* g_backend;
@@ -528,6 +530,30 @@ void BackendGDI::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 	sz->y = s.cy;
 }
 
+Font* BackendGDI::CreateFontPrivate(const wchar_t* file, int size, bool bold, bool italic, const wchar_t* name)
+{
+	FontImpl* newFont = 0;
+
+	StringW strw = file;
+	StringA stra = strw.to_utf8();
+
+	std::filesystem::path filePath = file;
+	if (std::filesystem::exists(filePath))
+	{
+		if (std::filesystem::is_regular_file(filePath))
+		{
+			int result = AddFontResourceExW(file, FR_PRIVATE, 0);
+			if (result)
+			{
+				newFont = (FontImpl*)CreateFont(name, size, bold, italic);
+				newFont->m_private = file;
+			}
+		}
+	}
+
+	return newFont;
+}
+
 Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool italic)
 {
 	FontImpl* newFont = new FontImpl;
@@ -568,6 +594,12 @@ void BackendGDI::DestroyFont(Font* f)
 	if (!f)
 		return;
 	FontImpl* fi = (FontImpl*)f;
+
+	if (fi->m_private.size())
+	{
+		RemoveFontResourceExW(fi->m_private.data(), FR_PRIVATE, 0);
+	}
+
 	if (fi->m_font)
 	{
 		if (fi->m_font->implementation)

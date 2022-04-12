@@ -364,3 +364,9 @@ mgRect* Window::GetMenuRect()
 {
 	return &m_window->menuRect;
 }
+
+const mgRect& Window::GetRect()
+{
+	return m_window->rect;
+}
+

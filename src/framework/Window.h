@@ -88,6 +88,7 @@ namespace mgf
 		void* GetUserData();
 
 		mgRect* GetMenuRect();
+		const mgRect& GetRect();
 
 		void UseMenu(bool, Font*);
 		void RebuildMenu();

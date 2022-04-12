@@ -56,8 +56,6 @@ lerp(float v0, float v1, float t)
 	return (1.f - t) * v0 + t * v1;
 }
 
-
-
 void
 mgWindowUpdateContentHeight(mgWindow* w, mgElement* e)
 {
@@ -130,7 +128,6 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	newWindow->rect.top = newWindow->position.y;
 	newWindow->rect.right = newWindow->rect.left + newWindow->size.x;
 	newWindow->rect.bottom = newWindow->rect.top + newWindow->size.y;
-
 
 	newWindow->rootElement = calloc(1, sizeof(mgElement));
 	newWindow->rootElement->window = newWindow;
@@ -442,7 +439,8 @@ mgWindowRebuildMenu(struct mgWindow_s* w)
 			w->menuRect.top += w->titlebarHeight;
 	}
 
-	w->menuRect.right = r.right;
+	//w->menuRect.right = r.right;
+	w->menuRect.right = 0;
 
 	int X = w->menuRect.left + w->menu->indent;
 	int Y = w->menuRect.top;
@@ -461,7 +459,8 @@ mgWindowRebuildMenu(struct mgWindow_s* w)
 
 		X += w->menu->items[i].width + w->menu->textIndent;
 		
-		if (X > w->menuRect.right)
+		//if (X > w->menuRect.right)
+		if (X > r.right)
 		{
 			Y += w->menu->height+1;
 			X = w->menuRect.left;
@@ -479,11 +478,15 @@ mgWindowRebuildMenu(struct mgWindow_s* w)
 			X += w->menu->items[i].width + w->menu->textIndent;
 		}
 
+		if (X > w->menuRect.right)
+			w->menuRect.right = X;
+
 		itemRect.right += w->menu->textIndent + w->menu->textIndent;
 		X += w->menu->textIndent + 1;
 
 		w->menu->items[i].rect = itemRect;
 	}
+	
 
 	w->menuRect.bottom = w->menuRect.top + w->menu->currentHeight;
 }
@@ -1075,10 +1078,8 @@ mgUpdateWindow(struct mgWindow_s* w)
 			w->scrollbarElementRect.top += (int)v2;
 			w->scrollbarElementRect.bottom += (int)v2;
 		}
-
 		w->rootElement->scrollValue = lerp(w->rootElement->scrollValue, w->rootElement->scrollValueTarget, 0.1f);
 	}
-
 
 	if (w->menu && !w->context->popupUnderCursor 
 		&& !g_dockpanel_splitterModeElement
@@ -1147,7 +1148,6 @@ mgUpdateWindow(struct mgWindow_s* w)
 			}
 		}
 	}
-	
 
 	w->cursorInfoOld = w->cursorInfo;
 }

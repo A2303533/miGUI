@@ -36,6 +36,7 @@ namespace mgf
 	{
 	public:
 		virtual mgPoint GetMaxSize() = 0;
+		virtual mgFont_s* GetMGFont() = 0;
 	};
 }
 
