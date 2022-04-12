@@ -158,6 +158,13 @@ mgStyle_s Framework::GetNewStyle(int isLightTheme)
 	return style;
 }
 
+Image* Framework::LoadImage(const wchar_t* imageFile)
+{
+	StringW strw = imageFile;
+	StringA stra = strw.to_utf8();
+	return LoadImage(stra.data());
+}
+
 Image* Framework::LoadImage(const char* imageFile)
 {
 	assert(imageFile);
@@ -190,6 +197,13 @@ Image* Framework::LoadImage(const char* imageFile)
 		pch = strtok(0, " .");
 	}
 	return 0;
+}
+
+Icons* Framework::CreateIcons(const wchar_t* imageFile, Backend* backend)
+{
+	StringW strw = imageFile;
+	StringA stra = strw.to_utf8();
+	return CreateIcons(stra.data(), backend);
 }
 
 Icons* Framework::CreateIcons(const char* imageFile, Backend* backend)

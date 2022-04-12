@@ -94,6 +94,7 @@ namespace mgf
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) override;
 		virtual void DestroyFont(Font*) override;
 		virtual Font* GetDefaultFont() override;
+		virtual void SetIcon(mgf::Icons*, int id) override;
 	};
 
 }

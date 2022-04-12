@@ -36,6 +36,7 @@
 #include "framework/BackendGDI.h"
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
+#include "framework/Icons.h"
 
 #ifdef MG_PLATFORM_WINDOWS
 
@@ -219,20 +220,32 @@ mgTexture* BackendGDI::CreateTexture(mgImage* img)
 		pixelFormat = PixelFormat32bppARGB;
 		break;
 	}
-
-	Gdiplus::Bitmap* myImage = new Gdiplus::Bitmap(img->width, img->height, img->pitch, pixelFormat, img->data);
-
+	
 	mgTexture* newT = new mgTexture;
+	newT->sourceCopy = new mgImage;
+	*newT->sourceCopy = *img;
+	newT->sourceCopy->data = (uint8_t*)malloc(img->dataSize);
+	memcpy(newT->sourceCopy->data, img->data, img->dataSize);
+
+	Gdiplus::Bitmap* myImage = new Gdiplus::Bitmap(newT->sourceCopy->width, newT->sourceCopy->height, newT->sourceCopy->pitch, pixelFormat, newT->sourceCopy->data);
+
 	newT->implementation = myImage;
-	newT->sourceCopy = img;
-	img->data = 0;
+	
+	//img->data = 0; // WHY? probably somewhere img will be deleted. GDI need to know data so I save it.
+	               // probably need to remove this code.
+	// solution probably this: create a copy of img
 
 	return newT;
 }
 
 void BackendGDI::DestroyTexture(mgTexture* t)
 {
-	delete ((Gdiplus::Bitmap*)t->implementation);
+	if(t->implementation)
+		delete ((Gdiplus::Bitmap*)t->implementation);
+
+	if (t->sourceCopy)
+		delete t->sourceCopy;
+
 	delete t;
 }
 
@@ -569,6 +582,11 @@ Font* BackendGDI::GetDefaultFont()
 		m_defaultFont = this->CreateFont(L"Arial", 10, 1, 0);
 
 	return m_defaultFont;
+}
+
+void BackendGDI::SetIcon(mgf::Icons* ic, int id)
+{
+	m_context->m_gui_context->currentIcon = &ic->GetMGIcons()->iconNodes[id];
 }
 
 #endif

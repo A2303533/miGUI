@@ -51,6 +51,9 @@ Window::~Window()
 	{
 		delete(elements[i]);
 	}
+
+	if(m_window)
+		mgDestroyWindow(m_window);
 }
 
 void Window::SetTitle(const wchar_t* t, Font* optionalFont)
@@ -62,20 +65,20 @@ void Window::SetTitle(const wchar_t* t, Font* optionalFont)
 		m_window->titlebarFont = f->m_font;
 	}
 	mgSetWindowTitle(m_window, m_title.data());
-
 }
 
-void Window::Show()
+void Window::SetVisible(bool v)
 {
-	mgShowWindow(m_window, 1);
+	m_isVisible = v;
+	mgShowWindow(m_window, v ? 1 : 0);
 }
 
-void Window::Hide()
+bool Window::IsVisible()
 {
-	mgShowWindow(m_window, 0);
+	return m_isVisible;
 }
 
-void Window::WithCloseButton(bool v)
+void Window::SetWithCloseButton(bool v)
 {
 	if (v)
 	{
@@ -88,7 +91,7 @@ void Window::WithCloseButton(bool v)
 	}
 }
 
-void Window::WithCollapseButton(bool v)
+void Window::SetWithCollapseButton(bool v)
 {
 	if (v)
 	{
@@ -101,7 +104,7 @@ void Window::WithCollapseButton(bool v)
 	}
 }
 
-void Window::WithTitlebar(bool v)
+void Window::SetWithTitlebar(bool v)
 {
 	if (v)
 	{
@@ -114,7 +117,7 @@ void Window::WithTitlebar(bool v)
 	}
 }
 
-void Window::CanMove(bool v)
+void Window::SetCanMove(bool v)
 {
 	if (v)
 	{
@@ -149,7 +152,7 @@ void Window::SetPosition(int x, int y)
 	UpdateRect();
 }
 
-void Window::DrawBG(bool v)
+void Window::SetDrawBG(bool v)
 {
 	if (v)
 	{
@@ -162,7 +165,7 @@ void Window::DrawBG(bool v)
 	}
 }
 
-void Window::CanDock(bool v)
+void Window::SetCanDock(bool v)
 {
 	if (v)
 	{
@@ -175,7 +178,7 @@ void Window::CanDock(bool v)
 	}
 }
 
-void Window::CanResize(bool v)
+void Window::SetCanResize(bool v)
 {
 	if (v)
 	{
@@ -188,7 +191,7 @@ void Window::CanResize(bool v)
 	}
 }
 
-void Window::CanToTop(bool v)
+void Window::SetCanToTop(bool v)
 {
 	if (v)
 	{
@@ -221,63 +224,63 @@ void* Window::GetUserData()
 	return m_window->userData;
 }
 
-void Window::DeleteElement(Element* e)
-{
-	assert(e);
-	auto elements = m_elements.data();
-	for (size_t i = 0, sz = m_elements.size(); i < sz; ++i)
-	{
-		if (elements[i] != e)
-			continue;
-
-		m_elements.erase(m_elements.begin() + i);
-		break;
-	}
-	delete e;
-}
-
-mgf::Rectangle* Window::AddRectangle()
-{
-	Rectangle* e = new Rectangle(this);
-	m_elements.emplace_back(e);
-	return e;
-}
-
-Text* Window::AddText(int x, int y, const wchar_t* text, Font* f)
-{
-	Text* e = new Text(this, text, f);
-	m_elements.emplace_back(e);
-	e->SetPosition(x, y);
-	return e;
-}
-
-Button* Window::AddButton()
-{
-	Button* e = new Button(this);
-	m_elements.emplace_back(e);
-	return e;
-}
-
-TextInput* Window::AddTextInput(Font* f)
-{
-	TextInput* e = new TextInput(this, f);
-	m_elements.emplace_back(e);
-	return e;
-}
-
-ListBox* Window::AddListBox(Font* f)
-{
-	ListBox* e = new ListBox(this, f);
-	m_elements.emplace_back(e);
-	return e;
-}
-
-Table* Window::AddTable(uint32_t colNum, Font* f)
-{
-	Table* e = new Table(this, colNum, f);
-	m_elements.emplace_back(e);
-	return e;
-}
+//void Window::DeleteElement(Element* e)
+//{
+//	assert(e);
+//	auto elements = m_elements.data();
+//	for (size_t i = 0, sz = m_elements.size(); i < sz; ++i)
+//	{
+//		if (elements[i] != e)
+//			continue;
+//
+//		m_elements.erase(m_elements.begin() + i);
+//		break;
+//	}
+//	delete e;
+//}
+//
+//mgf::Rectangle* Window::AddRectangle()
+//{
+//	Rectangle* e = new Rectangle(this);
+//	m_elements.emplace_back(e);
+//	return e;
+//}
+//
+//Text* Window::AddText(int x, int y, const wchar_t* text, Font* f)
+//{
+//	Text* e = new Text(this, text, f);
+//	m_elements.emplace_back(e);
+//	e->SetPosition(x, y);
+//	return e;
+//}
+//
+//Button* Window::AddButton()
+//{
+//	Button* e = new Button(this);
+//	m_elements.emplace_back(e);
+//	return e;
+//}
+//
+//TextInput* Window::AddTextInput(Font* f)
+//{
+//	TextInput* e = new TextInput(this, f);
+//	m_elements.emplace_back(e);
+//	return e;
+//}
+//
+//ListBox* Window::AddListBox(Font* f)
+//{
+//	ListBox* e = new ListBox(this, f);
+//	m_elements.emplace_back(e);
+//	return e;
+//}
+//
+//Table* Window::AddTable(uint32_t colNum, Font* f)
+//{
+//	Table* e = new Table(this, colNum, f);
+//	m_elements.emplace_back(e);
+//	return e;
+//}
 
 void Window::UseMenu(bool v, Font* f)
 {
@@ -344,7 +347,7 @@ void Window::SetUserStyle(mgStyle_s* s)
 	m_window->userStyle = s;
 }
 
-void Window::NoMenuBG(bool v)
+void Window::SetNoMenuBG(bool v)
 {
 	if (v)
 	{

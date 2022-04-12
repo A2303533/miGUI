@@ -54,10 +54,10 @@ namespace mgf
 		Context* CreateContext(mgf::SystemWindow*, Backend* backend);
 
 		Icons* CreateIcons(const char* imageFile, Backend* backend);
-
-		
+		Icons* CreateIcons(const wchar_t* imageFile, Backend* backend);
 
 		Image* LoadImage(const char* imageFile);
+		Image* LoadImage(const wchar_t* imageFile);
 
 		mgStyle_s GetNewStyle(int isLightTheme);
 		/*

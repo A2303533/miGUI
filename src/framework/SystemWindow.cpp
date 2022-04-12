@@ -105,19 +105,17 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
 
 SystemWindow::~SystemWindow()
 {
+    m_context = 0;
 #ifdef MG_PLATFORM_WINDOWS
     if (m_hWnd)
     {
-        if (m_hWnd)
-        {
-            if (m_hdcMem)
-                DeleteDC(m_hdcMem);
-            if (m_hbmMem)
-                DeleteObject(m_hbmMem);
+        if (m_hdcMem)
+            DeleteDC(m_hdcMem);
+        if (m_hbmMem)
+            DeleteObject(m_hbmMem);
 
-            //ReleaseDC(m_hWnd, m_dc);
-            DestroyWindow(m_hWnd);
-        }
+        //ReleaseDC(m_hWnd, m_dc);
+        DestroyWindow(m_hWnd);
         UnregisterClass(m_className, GetModuleHandle(0));
     }
 #endif
@@ -258,6 +256,11 @@ void SystemWindow::OnDraw()
         m_context->Draw();
         m_context->DrawEnd();
     }
+}
+
+void SystemWindow::OnMove()
+{
+
 }
 
 bool SystemWindow::OnClose()
@@ -565,6 +568,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         if (pW)
             pW->OnDraw();
+    }break;
+    case WM_MOVE:
+    {
+        if (pW)
+            pW->OnMove();
     }break;
     case WM_INPUT:
     {

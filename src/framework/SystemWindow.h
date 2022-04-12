@@ -131,6 +131,7 @@ namespace mgf
 		virtual void OnSize();
 		
 		virtual void OnDraw();
+		virtual void OnMove();
 
 		bool IsUseCustomTitleBar();
 		void SetUseCustomTitleBar(bool);

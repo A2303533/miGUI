@@ -50,6 +50,9 @@ namespace mgf
 		virtual ~Icons();
 
 		int Add(int left, int top, int sizeX, int sizeY);
+
+		mgTexture* GetMGTexture() { return m_texture; }
+		mgIcons_s* GetMGIcons() { return m_icons; }
 	};
 }
 

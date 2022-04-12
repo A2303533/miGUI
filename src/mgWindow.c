@@ -171,6 +171,17 @@ mgDestroyWindow_f(struct mgWindow_s* w)
 	if (w->rootElement)
 		mgDestroyElement_f(w->rootElement);
 
+	mgContext* ctx = w->context;
+	
+	w->left->right = w->right;
+	w->right->left = w->left;
+
+	if (ctx->firstWindow == w)
+		ctx->firstWindow = w->right;
+
+	if (ctx->firstWindow == w)
+		ctx->firstWindow = 0;
+
 	free(w);
 }
 

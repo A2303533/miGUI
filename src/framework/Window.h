@@ -59,24 +59,29 @@ namespace mgf
 		std::vector<_menuItem> m_menuItems;
 		_menuItem m_menu_currItem;
 		Font* m_menuFont = 0;
+
+		bool m_isVisible = true;
 	public:
 		Window();
 		virtual ~Window();
 
 		void SetTitle(const wchar_t* t, Font* optionalFont);
-		void Show();
-		void Hide();
-		void WithCloseButton(bool);
-		void WithCollapseButton(bool);
-		void WithTitlebar(bool);
-		void CanMove(bool);
+		
+		void SetVisible(bool);
+		bool IsVisible();
+
+		void SetWithCloseButton(bool);
+		void SetWithCollapseButton(bool);
+		void SetWithTitlebar(bool);
+		void SetCanMove(bool);
 		void SetSize(int x, int y);
 		void SetPosition(int x, int y);
-		void DrawBG(bool);
-		void CanDock(bool);
-		void CanResize(bool);
-		void CanToTop(bool);
-		void NoMenuBG(bool);
+		void SetDrawBG(bool);
+		void SetCanDock(bool);
+		void SetCanResize(bool);
+		void SetCanToTop(bool);
+		void SetNoMenuBG(bool);
+
 		void SetID(int);
 		int GetID();
 		void SetUserData(void*);
@@ -90,11 +95,11 @@ namespace mgf
 		void BeginMenu(const wchar_t* title);
 		void EndMenu();
 		
-		void DeleteElement(Element*);
+		/*void DeleteElement(Element*);
 		Rectangle* AddRectangle();
 		Text* AddText(int x, int y, const wchar_t* text, Font*);
 		Button* AddButton();
-		TextInput* AddTextInput(Font*);
+		TextInput* AddTextInput(Font*);*/
 
 		/*
 		* arr - user data type.
@@ -103,9 +108,8 @@ namespace mgf
 		*  flags:
 		*		0x1 - selected or not
 		*/
-		ListBox* AddListBox(Font*);
-		
-		Table* AddTable(uint32_t colNum, Font*);
+		/*ListBox* AddListBox(Font*);
+		Table* AddTable(uint32_t colNum, Font*);*/
 
 		void UpdateRect();
 		void Draw();
