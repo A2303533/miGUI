@@ -47,18 +47,50 @@ namespace mgf
 		friend class ListBox;
 		friend class Table;
 
+	protected:
 		mgWindow_s* m_window = 0;
 		std::basic_string<wchar_t> m_title;
 		std::vector<Element*> m_elements;
 
 		mgMenu_s* m_menu = 0;
-		struct _menuItem
+		/*struct _menuItem
 		{
 			StringW m_title;
 		};
 		std::vector<_menuItem> m_menuItems;
-		_menuItem m_menu_currItem;
+		_menuItem m_menu_currItem;*/
 		Font* m_menuFont = 0;
+
+		struct _menuPopupItemInfo
+		{
+			StringW title;
+			uint32_t id = 0;
+			StringW shortcut_text;
+			bool enabled = true;
+			Icons* icon = 0;
+			uint32_t icon_index = 0;
+
+			mgPopup_s* popup = 0;
+		};
+		/*std::vector<_menuPopupItemInfo> m_menuPopupItems[5];
+		int m_menuPopupItemsIndices[5];
+		int m_menuPopupItemsCurr = 0;*/
+		struct _menuTreeNode
+		{
+			_menuTreeNode* children;
+			_menuTreeNode* siblings;
+			_menuTreeNode* parent;
+
+			_menuPopupItemInfo itemInfo;
+		};
+		struct _menuTree
+		{
+			_menuTreeNode* m_root = 0;
+		}
+		m_menuTree;
+		_menuTreeNode* m_menuNodeCurr = 0;
+		_menuTreeNode* _menu_getLastSibling(_menuTreeNode*, int* num);
+		std::vector<_menuTreeNode*> m_menuNodes; // for easy delete
 
 		bool m_isVisible = true;
 	public:
@@ -94,6 +126,11 @@ namespace mgf
 		void RebuildMenu();
 		void DeleteMenu();
 		void BeginMenu(const wchar_t* title);
+
+		// for separator use 0 for title
+		void AddMenuItem(const wchar_t* title, uint32_t id, const wchar_t* shortcut_text = 0, bool enabled = true, Icons* icon = 0, uint32_t icon_index = 0);
+		void BeginSubMenu(const wchar_t* title, bool enabled = true, Icons* icon = 0, uint32_t icon_index = 0);
+		void EndSubMenu();
 		void EndMenu();
 		
 		/*void DeleteElement(Element*);

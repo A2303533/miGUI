@@ -297,26 +297,38 @@ void Window::UseMenu(bool v, Font* f)
 
 void Window::RebuildMenu()
 {
-	bool isUse = m_window->menu != nullptr;
-	
-
 	if (m_menu)
 		mgDestroyMenu(m_menu);
 	
-	mgMenuItemInfo* mii = new mgMenuItemInfo[m_menuItems.size()];
+	if (!m_menuTree.m_root)
+		return;
 
-	for (uint32_t i = 0; i < m_menuItems.size(); ++i)
+	int num = 0;
+	auto lastSib = _menu_getLastSibling(m_menuTree.m_root, &num);
+
+	mgMenuItemInfo* mii = new mgMenuItemInfo[num];
+	int index = 0;
+
+	auto currSib = m_menuTree.m_root;
+	while(true)
 	{
-		mii[i].popup = 0;
-		mii[i].text = m_menuItems[i].m_title.c_str();
+		mii[index].popup = 0;
+		mii[index].text = currSib->itemInfo.title.c_str();
+		++index;
+
+		if (currSib == lastSib)
+			break;
+		
+		currSib = currSib->siblings;
 	}
 
-	m_menu = mgCreateMenu(m_window->context, mii, m_menuItems.size(), ((FontImpl*)m_menuFont)->m_font);
+	m_menu = mgCreateMenu(m_window->context, mii, num, ((FontImpl*)m_menuFont)->m_font);
 
 	delete[] mii;
 
 	UseMenu(true, m_menuFont);
 }
+
 
 void Window::DeleteMenu()
 {
@@ -324,17 +336,135 @@ void Window::DeleteMenu()
 	if (m_menu)
 		mgDestroyMenu(m_menu);
 	m_menu = 0;
-	m_menuItems.clear();
+	for (size_t i = 0; i < m_menuNodes.size(); ++i)
+	{
+		delete m_menuNodes[i];
+	}
+	m_menuNodes.clear();
+}
+
+Window::_menuTreeNode* Window::_menu_getLastSibling(_menuTreeNode* node, int* num)
+{
+	*num = 1;
+
+	if (node->siblings)
+	{
+		_menuTreeNode* sib = node->siblings;
+	bgn:;
+		*num += 1;
+		if (sib == node)
+			return node;
+
+		if (!sib->siblings)
+			return sib;
+
+		sib = sib->siblings;
+		goto bgn;
+	}
+	return node;
 }
 
 void Window::BeginMenu(const wchar_t* title)
 {
-	m_menu_currItem.m_title = title;
+	if (!m_menuTree.m_root)
+	{
+		m_menuTree.m_root = new _menuTreeNode;
+		
+		m_menuTree.m_root->children = 0;
+		m_menuTree.m_root->siblings = 0;
+		m_menuTree.m_root->parent = 0;
+
+		m_menuTree.m_root->itemInfo.title = title;
+		m_menuNodeCurr = m_menuTree.m_root;
+	}
+	else
+	{
+		_menuTreeNode* nn = new _menuTreeNode;
+		nn->itemInfo.title = title;
+
+		nn->children = 0;
+		nn->siblings = 0;
+		nn->parent = 0;
+
+		int num = 0;
+		auto lastSib = _menu_getLastSibling(m_menuTree.m_root, &num);
+
+		lastSib->siblings = nn;
+
+		m_menuNodeCurr = nn;
+	}
+	m_menuNodes.push_back(m_menuNodeCurr);
+
+//	m_menu_currItem.m_title = title;
+	
+	/*for (int i = 0; i < 5; ++i)
+	{
+		m_menuPopupItems[i].clear();
+		m_menuPopupItemsIndices[i] = 0;
+	}
+	m_menuPopupItemsCurr = 0;*/
+}
+
+void Window::BeginSubMenu(
+	const wchar_t* title, 
+	bool enabled, 
+	Icons* icon,
+	uint32_t icon_index)
+{
+	/*_menuPopupItemInfo info;
+	info.enabled = enabled;
+	info.icon = icon;
+	info.icon_index = icon_index;
+	info.title = title;
+	m_menuPopupItems[m_menuPopupItemsCurr].push_back(info);
+
+	m_menuPopupItemsIndices[m_menuPopupItemsCurr] = m_menuPopupItems[m_menuPopupItemsCurr].size();
+	m_menuPopupItemsCurr++;*/
+}
+
+void Window::EndSubMenu()
+{
+	/*if (m_menuPopupItems[m_menuPopupItemsCurr].size())
+	{
+		mgPopupItemInfo_s* ii = new mgPopupItemInfo_s[m_menuPopupItems[m_menuPopupItemsCurr].size()];
+		for (size_t i = 0; i < m_menuPopupItems[m_menuPopupItemsCurr].size(); ++i)
+		{
+			ii[i].callback = 0;
+			ii[i].id = m_menuPopupItems[m_menuPopupItemsCurr].at(i).id;
+			ii[i].isChecked = 0;
+			ii[i].isEnabled = (int)m_menuPopupItems[m_menuPopupItemsCurr].at(i).enabled;
+			ii[i]. = m_menuPopupItems[m_menuPopupItemsCurr].at(i).id;
+			ii[i].id = m_menuPopupItems[m_menuPopupItemsCurr].at(i).id;
+			ii[i].id = m_menuPopupItems[m_menuPopupItemsCurr].at(i).id;
+		}
+
+		mgPopup* newPopup = mgCreatePopup(ii, m_menuPopupItems[m_menuPopupItemsCurr].size(), m_menuFont->GetMGFont());
+
+		delete[] ii;
+	}*/
+}
+
+void Window::AddMenuItem(
+	const wchar_t* title, 
+	uint32_t id,
+	const wchar_t* shortcut_text, 
+	bool enabled, 
+	Icons* icon, 
+	uint32_t icon_index)
+{
+	_menuPopupItemInfo info;
+	info.enabled = enabled;
+	info.icon = icon;
+	info.icon_index = icon_index;
+	info.id = id;
+	info.shortcut_text = shortcut_text;
+	info.title = title;
+	//m_menuPopupItems[m_menuPopupItemsCurr].push_back(info);
 }
 
 void Window::EndMenu()
 {
-	m_menuItems.push_back(m_menu_currItem);
+	//m_menuItems.push_back(m_menu_currItem);
 }
 
 void Window::Draw()
