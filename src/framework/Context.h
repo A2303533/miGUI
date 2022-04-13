@@ -83,6 +83,22 @@ namespace mgf
 		void DrawBegin();
 		void Draw();
 		void DrawEnd();
+
+		bool PointInRect(mgRect*, int x, int y);
+		bool PointInRect(mgRect*);
+
+		// only first click
+		bool IsLMBDown();
+		bool IsRMBDown();
+		bool IsMMBDown();
+		bool IsX1MBDown();
+		bool IsX2MBDown();
+
+		bool IsLMBUp();
+		bool IsRMBUp();
+		bool IsMMBUp();
+		bool IsX1MBUp();
+		bool IsX2MBUp();
 	};
 }
 

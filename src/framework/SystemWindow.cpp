@@ -87,7 +87,7 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
     KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
 
-    UINT dpi = GetDpiForWindow(m_hWnd);
+   // UINT dpi = GetDpiForWindow(m_hWnd);
     int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
     m_borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
     m_borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
@@ -276,6 +276,27 @@ mgPoint* SystemWindow::GetSizeMinimum()
     return &m_sizeMinimum;
 }
 
+void SystemWindow::Maximize()
+{
+#ifdef MG_PLATFORM_WINDOWS
+    ShowWindow(m_hWnd, SW_MAXIMIZE);
+#endif
+}
+
+void SystemWindow::Minimize()
+{
+#ifdef MG_PLATFORM_WINDOWS
+    ShowWindow(m_hWnd, SW_MINIMIZE);
+#endif
+}
+
+void SystemWindow::Restore()
+{
+#ifdef MG_PLATFORM_WINDOWS
+    ShowWindow(m_hWnd, SW_RESTORE);
+#endif
+}
+
 void SystemWindow::Rebuild()
 {
 #ifdef MG_PLATFORM_WINDOWS
@@ -378,7 +399,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         && cursor_point.x < pW->GetCustomTitleBarHitRect()->right
                         && cursor_point.x >= pW->GetCustomTitleBarHitRect()->left)
                     {
-                        return HTCAPTION;
+                        if (pW->OnHTCaption())
+                            return HTCAPTION;
+                        else
+                            return 0;
                     }
 
                     return DefWindowProc(hWnd, message, wParam, lParam);

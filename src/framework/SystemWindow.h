@@ -157,6 +157,10 @@ namespace mgf
 		virtual void OnMinimize();
 		virtual void OnRestore();
 
+		virtual void Maximize();
+		virtual void Minimize();
+		virtual void Restore();
+
 		// return true close application
 		virtual bool OnClose();
 		

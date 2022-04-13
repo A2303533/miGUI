@@ -52,7 +52,7 @@ int Icons::Add(int left, int top, int sizeX, int sizeY)
 	int id = (int)m_rects.size();
 
 	mgRect r;
-	mgRectSet(&r, left, top, sizeX, sizeY);
+	mgRectSet(&r, left, top, sizeX - 1, sizeY - 1);
 	m_rects.push_back(r);
 
 	if (m_icons)

@@ -174,3 +174,66 @@ Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize)
 
 	return newPopup;
 }
+
+bool Context::PointInRect(mgRect* r, int x, int y)
+{
+	return (x >= r->left) && (x <= r->right) && (y >= r->top) && (y <= r->bottom);
+}
+
+bool Context::PointInRect(mgRect* r)
+{
+	return (m_input->mousePosition.x >= r->left) 
+		&& (m_input->mousePosition.x <= r->right)
+		&& (m_input->mousePosition.y >= r->top) 
+		&& (m_input->mousePosition.y <= r->bottom);
+}
+
+bool Context::IsLMBDown()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_LMBDOWN) == MG_MBFL_LMBDOWN;
+}
+
+bool Context::IsRMBDown()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_RMBDOWN) == MG_MBFL_RMBDOWN;
+}
+
+bool Context::IsMMBDown()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_MMBDOWN) == MG_MBFL_MMBDOWN;
+}
+
+bool Context::IsX1MBDown()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_X1MBDOWN) == MG_MBFL_X1MBDOWN;
+}
+
+bool Context::IsX2MBDown()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_X2MBDOWN) == MG_MBFL_X2MBDOWN;
+}
+
+bool Context::IsLMBUp()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_LMBUP) == MG_MBFL_LMBUP;
+}
+
+bool Context::IsRMBUp()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_RMBUP) == MG_MBFL_RMBUP;
+}
+
+bool Context::IsMMBUp()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_MMBUP) == MG_MBFL_MMBUP;
+}
+
+bool Context::IsX1MBUp()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_X1MBUP) == MG_MBFL_X1MBUP;
+}
+
+bool Context::IsX2MBUp()
+{
+	return (m_input->mouseButtonFlags1 & MG_MBFL_X2MBUP) == MG_MBFL_X2MBUP;
+}
