@@ -76,6 +76,7 @@ PFNMGCREATELISTBOXPROC mgCreateListBox;
 PFNMGTEXTINPUTACTIVATEPROC mgTextInputActivate;
 PFNMGCREATETABLEPROC mgCreateTable;
 PFNMGDRAWWINDOWPROC mgDrawWindow;
+PFNMGDRAWPOPUPPROC mgDrawPopup;
 
 void* 
 mgGetProc(MG_LIB_HANDLE lib, const char* proc)
@@ -149,6 +150,7 @@ mgLoad()
 	mgTextInputActivate = mgGetProc(lib, "mgTextInputActivate_f");
 	mgCreateTable = mgGetProc(lib, "mgCreateTable_f");
 	mgDrawWindow = mgGetProc(lib, "mgDrawWindow_f");
+	mgDrawPopup = mgGetProc(lib, "mgDrawPopup_f");
 
 	return lib;
 }

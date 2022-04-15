@@ -34,6 +34,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 
 namespace mgf
 {
@@ -77,9 +78,9 @@ namespace mgf
 		int m_menuPopupItemsCurr = 0;*/
 		struct _menuTreeNode
 		{
-			_menuTreeNode* children;
-			_menuTreeNode* siblings;
-			_menuTreeNode* parent;
+			_menuTreeNode* children = 0;
+			_menuTreeNode* siblings = 0;
+			_menuTreeNode* parent = 0;
 
 			_menuPopupItemInfo itemInfo;
 		};
@@ -89,8 +90,12 @@ namespace mgf
 		}
 		m_menuTree;
 		_menuTreeNode* m_menuNodeCurr = 0;
+		std::stack<_menuTreeNode*> m_menuNodeCurrPrev;
+
 		_menuTreeNode* _menu_getLastSibling(_menuTreeNode*, int* num);
 		std::vector<_menuTreeNode*> m_menuNodes; // for easy delete
+		mgPopup_s* _menu_rebuild_createPopup(_menuTreeNode*);
+		void _menu_addMenuItem(bool isSub, const wchar_t* title, uint32_t id, const wchar_t* shortcut_text, bool enabled, Icons* icon, uint32_t icon_index);
 
 		bool m_isVisible = true;
 	public:
@@ -132,7 +137,12 @@ namespace mgf
 		void BeginSubMenu(const wchar_t* title, bool enabled = true, Icons* icon = 0, uint32_t icon_index = 0);
 		void EndSubMenu();
 		void EndMenu();
-		
+
+		// Size of menu item, like  [   File   ][   Edit   ]
+		void SetMenuTextIndent(int val); 
+		// this like  [     File ][     Edit ]
+		void SetMenuTextOffset(int x, int y);
+
 		/*void DeleteElement(Element*);
 		Rectangle* AddRectangle();
 		Text* AddText(int x, int y, const wchar_t* text, Font*);

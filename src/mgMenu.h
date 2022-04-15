@@ -54,10 +54,12 @@ typedef struct mgMenu_s {
 	int height;
 	int currentHeight;
 
-	/*indent from left side*/
+	/*indent from left side. for logo for expamle*/
 	int indent;
-
+	
 	int textIndent;
+	
+	mgPoint textOffset;
 
 	mgMenuItem* activeItem;
 	mgMenuItem* hoverItem;

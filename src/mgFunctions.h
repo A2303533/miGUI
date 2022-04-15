@@ -69,5 +69,6 @@ MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w,mgPoint* posi
 MG_API void MG_C_DECL mgTextInputActivate_f(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
 MG_API void MG_C_DECL mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text);
 MG_API void MG_C_DECL mgDrawWindow_f(struct mgWindow_s* w);
+MG_API void MG_C_DECL mgDrawPopup_f(struct mgContext_s* c, mgPopup* p);
 
 #endif

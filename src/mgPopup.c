@@ -50,6 +50,8 @@ mgPopupFixPosition(struct mgContext_s* c, mgPopup* p)
 
 	if (p->parent)
 	{
+		mgRect oldRect = p->rect;
+
 		if ((p->rect.left < p->parent->rect.right)
 			&& (p->rect.left > p->parent->rect.left))
 		{
@@ -57,6 +59,17 @@ mgPopupFixPosition(struct mgContext_s* c, mgPopup* p)
 			v += p->rect.right - p->rect.left;
 			p->rect.left -= v;
 			p->rect.right -= v;
+
+			/*if rect outside of the window from left border*/
+			/*move to old rect and move little bit to the left*/
+			if (p->rect.left < 0)
+			{
+				p->rect = oldRect;
+				
+				int v = p->rect.right - c->windowSize.x;
+				p->rect.left -= v;
+				p->rect.right -= v;
+			}
 		}
 	}
 }
@@ -154,8 +167,9 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 	}
 }
 
-void
-mgDrawPopup(struct mgContext_s* c, mgPopup* p)
+MG_API
+void MG_C_DECL
+mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 {
 	c->gpu->setClipRect(&p->rect);
 	c->gpu->drawRectangle(mgDrawRectangleReason_popupBG, 
@@ -336,6 +350,7 @@ _mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 				if (p->nodeUnderCursor->info.callback)
 					p->nodeUnderCursor->info.callback(p->nodeUnderCursor->info.id, p->nodeUnderCursor);
 				mgShowPopup_f(c, 0, 0);
+				c->cursorInPopup = 0;
 
 				if (c->activeMenu)
 				{

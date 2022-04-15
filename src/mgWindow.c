@@ -407,8 +407,8 @@ mgDrawWindow_f(struct mgWindow_s* w)
 				if (!w->menu->items[i].info.text)
 					continue;
 
-				pt.x = w->menu->items[i].rect.left + w->menu->textIndent;
-				pt.y = w->menu->items[i].rect.top;
+				pt.x = w->menu->items[i].rect.left + w->menu->textIndent + w->menu->textOffset.x;
+				pt.y = w->menu->items[i].rect.top + w->menu->textOffset.y;
 
 				w->context->gpu->drawText(mgDrawTextReason_windowMenu, w,
 					&pt,
@@ -487,7 +487,7 @@ mgWindowRebuildMenu(struct mgWindow_s* w)
 		w->menu->items[i].rect = itemRect;
 	}
 	
-
+	w->menuRect.right += w->menu->textIndent;
 	w->menuRect.bottom = w->menuRect.top + w->menu->currentHeight;
 }
 

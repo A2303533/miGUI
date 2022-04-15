@@ -116,7 +116,12 @@ void Context::Draw()
 		m_onDraw(this, this->m_backend);
 
 	if (m_window->m_isCustomTitlebar)
+	{
 		m_window->OnDrawCustomTitleBar();
+
+		if (m_gui_context->activePopup)
+			mgDrawPopup(m_gui_context, m_gui_context->activePopup);
+	}
 }
 
 void Context::DrawEnd()
@@ -135,7 +140,11 @@ void Context::DrawAll()
 		m_onDraw(this, this->m_backend);
 
 	if (m_window->m_isCustomTitlebar)
+	{
 		m_window->OnDrawCustomTitleBar();
+		if (m_gui_context->activePopup)
+			mgDrawPopup(m_gui_context, m_gui_context->activePopup);
+	}
 
 	m_gui_context->gpu->endDraw();
 }

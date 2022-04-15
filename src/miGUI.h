@@ -530,6 +530,14 @@ typedef void (*PFNMGDRAWWINDOWPROC)(struct mgWindow_s*);
 extern PFNMGDRAWWINDOWPROC mgDrawWindow;
 #endif
 
+#ifdef MG_NO_DLL
+MG_API void MG_C_DECL mgDrawPopup_f(struct mgContext_s* c, mgPopup* p);
+#define mgDrawPopup mgDrawPopup_f
+#else
+typedef void (*PFNMGDRAWPOPUPPROC)(struct mgContext_s* c, mgPopup* p);
+extern PFNMGDRAWPOPUPPROC mgDrawPopup;
+#endif
+
 #if defined(__cplusplus)
 }
 #endif

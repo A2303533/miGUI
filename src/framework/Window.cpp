@@ -282,6 +282,21 @@ void* Window::GetUserData()
 //	return e;
 //}
 
+void Window::SetMenuTextOffset(int x, int y)
+{
+	if (m_menu)
+	{
+		m_menu->textOffset.x = x;
+		m_menu->textOffset.y = y;
+	}
+}
+
+void Window::SetMenuTextIndent(int val)
+{
+	if (m_menu)
+		m_menu->textIndent = val;
+}
+
 void Window::UseMenu(bool v, Font* f)
 {
 	m_menuFont = f;
@@ -293,6 +308,51 @@ void Window::UseMenu(bool v, Font* f)
 		m_window->menu = m_menu;
 	else
 		m_window->menu = 0;
+}
+
+void Window_menuCallback(int id, struct mgPopupItem_s*)
+{
+
+}
+
+mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
+{
+	std::vector<mgPopupItemInfo_s> popupItems;
+
+	auto curr = firstNode;
+	while (true)
+	{
+		mgPopupItemInfo_s info;
+		memset(&info, 0, sizeof(mgPopupItemInfo_s));
+
+		if (curr->children)
+		{
+			// another popup
+			info.subMenu = _menu_rebuild_createPopup(curr->children);
+		}
+
+		info.callback = Window_menuCallback;
+		info.id = curr->itemInfo.id;
+		info.isChecked = 0;
+		info.isEnabled = 1;
+		info.shortcutText = curr->itemInfo.shortcut_text.data();
+		info.text = curr->itemInfo.title.size() ? curr->itemInfo.title.data() : 0;
+		info.type = info.text ? mgPopupItemType_default : mgPopupItemType_separator;
+
+		popupItems.push_back(info);
+
+		curr = curr->siblings;
+		if (!curr)
+			break;
+	}
+
+	mgPopup* newPopup = 0;
+	if (popupItems.size())
+	{
+		newPopup = mgCreatePopup(popupItems.data(), popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
+	}
+
+	return newPopup;
 }
 
 void Window::RebuildMenu()
@@ -313,6 +373,15 @@ void Window::RebuildMenu()
 	while(true)
 	{
 		mii[index].popup = 0;
+
+		if (currSib->children) // if node has children then crete new popup
+		{
+			mii[index].popup = _menu_rebuild_createPopup(currSib->children);
+
+			//mii[index].popup = mgCreatePopup(popupItems.data(), popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
+
+		}
+
 		mii[index].text = currSib->itemInfo.title.c_str();
 		++index;
 
@@ -366,87 +435,26 @@ Window::_menuTreeNode* Window::_menu_getLastSibling(_menuTreeNode* node, int* nu
 
 void Window::BeginMenu(const wchar_t* title)
 {
+	_menuTreeNode* newNode = new _menuTreeNode;
+	newNode->itemInfo.title = title;
 	if (!m_menuTree.m_root)
 	{
-		m_menuTree.m_root = new _menuTreeNode;
-		
-		m_menuTree.m_root->children = 0;
-		m_menuTree.m_root->siblings = 0;
-		m_menuTree.m_root->parent = 0;
-
-		m_menuTree.m_root->itemInfo.title = title;
-		m_menuNodeCurr = m_menuTree.m_root;
+		m_menuTree.m_root = newNode;
 	}
 	else
 	{
-		_menuTreeNode* nn = new _menuTreeNode;
-		nn->itemInfo.title = title;
-
-		nn->children = 0;
-		nn->siblings = 0;
-		nn->parent = 0;
-
 		int num = 0;
 		auto lastSib = _menu_getLastSibling(m_menuTree.m_root, &num);
-
-		lastSib->siblings = nn;
-
-		m_menuNodeCurr = nn;
+		lastSib->siblings = newNode;
 	}
+	m_menuNodeCurr = newNode;
 	m_menuNodes.push_back(m_menuNodeCurr);
-
-//	m_menu_currItem.m_title = title;
-	
-	/*for (int i = 0; i < 5; ++i)
-	{
-		m_menuPopupItems[i].clear();
-		m_menuPopupItemsIndices[i] = 0;
-	}
-	m_menuPopupItemsCurr = 0;*/
 }
 
-void Window::BeginSubMenu(
+void Window::_menu_addMenuItem(
+	bool isSub, 
 	const wchar_t* title, 
-	bool enabled, 
-	Icons* icon,
-	uint32_t icon_index)
-{
-	/*_menuPopupItemInfo info;
-	info.enabled = enabled;
-	info.icon = icon;
-	info.icon_index = icon_index;
-	info.title = title;
-	m_menuPopupItems[m_menuPopupItemsCurr].push_back(info);
-
-	m_menuPopupItemsIndices[m_menuPopupItemsCurr] = m_menuPopupItems[m_menuPopupItemsCurr].size();
-	m_menuPopupItemsCurr++;*/
-}
-
-void Window::EndSubMenu()
-{
-	/*if (m_menuPopupItems[m_menuPopupItemsCurr].size())
-	{
-		mgPopupItemInfo_s* ii = new mgPopupItemInfo_s[m_menuPopupItems[m_menuPopupItemsCurr].size()];
-		for (size_t i = 0; i < m_menuPopupItems[m_menuPopupItemsCurr].size(); ++i)
-		{
-			ii[i].callback = 0;
-			ii[i].id = m_menuPopupItems[m_menuPopupItemsCurr].at(i).id;
-			ii[i].isChecked = 0;
-			ii[i].isEnabled = (int)m_menuPopupItems[m_menuPopupItemsCurr].at(i).enabled;
-			ii[i]. = m_menuPopupItems[m_menuPopupItemsCurr].at(i).id;
-			ii[i].id = m_menuPopupItems[m_menuPopupItemsCurr].at(i).id;
-			ii[i].id = m_menuPopupItems[m_menuPopupItemsCurr].at(i).id;
-		}
-
-		mgPopup* newPopup = mgCreatePopup(ii, m_menuPopupItems[m_menuPopupItemsCurr].size(), m_menuFont->GetMGFont());
-
-		delete[] ii;
-	}*/
-}
-
-void Window::AddMenuItem(
-	const wchar_t* title, 
-	uint32_t id,
+	uint32_t id, 
 	const wchar_t* shortcut_text, 
 	bool enabled, 
 	Icons* icon, 
@@ -459,7 +467,54 @@ void Window::AddMenuItem(
 	info.id = id;
 	info.shortcut_text = shortcut_text;
 	info.title = title;
-	//m_menuPopupItems[m_menuPopupItemsCurr].push_back(info);
+
+	_menuTreeNode* newNode = new _menuTreeNode;
+	newNode->itemInfo = info;
+
+	if (!m_menuNodeCurr->children)
+	{
+		m_menuNodeCurr->children = newNode;
+	}
+	else
+	{
+		int num = 0;
+		auto lastSib = _menu_getLastSibling(m_menuNodeCurr->children, &num);
+		lastSib->siblings = newNode;
+	}
+
+	if (isSub)
+	{
+		m_menuNodeCurrPrev.push(m_menuNodeCurr);
+		m_menuNodeCurr = newNode;
+	}
+
+	m_menuNodes.push_back(newNode);
+}
+
+void Window::BeginSubMenu(
+	const wchar_t* title, 
+	bool enabled, 
+	Icons* icon,
+	uint32_t icon_index)
+{	
+	_menu_addMenuItem(true, title, 0, 0, enabled, icon, icon_index);
+}
+
+void Window::EndSubMenu()
+{
+	m_menuNodeCurr = m_menuNodeCurrPrev.top();
+	m_menuNodeCurrPrev.pop();
+}
+
+void Window::AddMenuItem(
+	const wchar_t* title, 
+	uint32_t id,
+	const wchar_t* shortcut_text, 
+	bool enabled, 
+	Icons* icon, 
+	uint32_t icon_index)
+{
+	_menu_addMenuItem(false, title, id, shortcut_text, enabled, icon, icon_index);
 }
 
 void Window::EndMenu()

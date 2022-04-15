@@ -38,7 +38,7 @@ void mgUpdateWindow(struct mgWindow_s* w);
 void mgDrawDockPanel(struct mgContext_s* c);
 void mgDockPanelOnSize(struct mgContext_s* c);
 void mgDockPanelUpdate(struct mgContext_s* c);
-void mgDrawPopup(struct mgContext_s* c, mgPopup* p);
+void mgDrawPopup_f(struct mgContext_s* c, mgPopup* p);
 void mgUpdatePopup(struct mgContext_s* c, mgPopup* p);
 void mgDockPanelClear(struct mgContext_s* c);
 
