@@ -49,6 +49,7 @@ mgCreateMenu_f(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, mgFo
 	for (int i = 0; i < itemsSize; ++i)
 	{
 		newMenu->items[i].info = items[i];
+		newMenu->items[i].isEnabled = 1;
 
 		if (newMenu->items[i].info.text)
 		{

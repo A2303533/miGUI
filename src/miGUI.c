@@ -174,6 +174,7 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->tableColTitleColHover, 0xEFF6FF);
 	mgColorSetAsIntegerRGB(&s->tableColTitleColActive, 0xB2D2FF);
 	mgColorSetAsIntegerRGB(&s->windowMenuText, 0x0);
+	mgColorSetAsIntegerRGB(&s->windowMenuTextDisabled, 0x343434);
 }
 
 MG_API 
@@ -699,7 +700,9 @@ mgDraw_f(mgContext* c)
 	}
 
 	if (c->activePopup)
-		mgDrawPopup(c, c->activePopup);
+	{
+		mgDrawPopup_f(c, c->activePopup);
+	}
 
 	if(!c->tooltipText)
 		drawTooltip = 0;

@@ -130,13 +130,19 @@ namespace mgf
 		void UseMenu(bool, Font*);
 		void RebuildMenu();
 		void DeleteMenu();
-		void BeginMenu(const wchar_t* title);
+		void BeginMenu(const wchar_t* title, uint32_t id = 0);
 
 		// for separator use 0 for title
-		void AddMenuItem(const wchar_t* title, uint32_t id, const wchar_t* shortcut_text = 0, bool enabled = true, Icons* icon = 0, uint32_t icon_index = 0);
-		void BeginSubMenu(const wchar_t* title, bool enabled = true, Icons* icon = 0, uint32_t icon_index = 0);
+		// for Enabled/Disabled use OnIsMenuItemEnabled
+		void AddMenuItem(const wchar_t* title, uint32_t id, const wchar_t* shortcut_text = 0, Icons* icon = 0, uint32_t icon_index = 0);
+		void BeginSubMenu(const wchar_t* title, uint32_t id, bool enabled = true, Icons* icon = 0, uint32_t icon_index = 0);
 		void EndSubMenu();
 		void EndMenu();
+
+		virtual void OnMenuCommand(int id);
+		// return true for enable, false for disable
+		virtual bool OnIsMenuItemEnabled(int id, bool prev);  // like New Open Save
+		virtual bool OnIsMenuEnabled(int id, bool prev);     // like File Edit View
 
 		// Size of menu item, like  [   File   ][   Edit   ]
 		void SetMenuTextIndent(int val); 

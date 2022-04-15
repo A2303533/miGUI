@@ -69,6 +69,8 @@ typedef struct mgPopup_s {
 	int itemHeight;
 	mgFont* font;
 
+	mgStyle* userStyle;
+
 	/*memory allocation will be in mgCreatePopup_f*/
 	struct mgPopupItem_s* items;
 	int itemsSize;
@@ -88,6 +90,8 @@ typedef struct mgPopup_s {
 	struct mgPopup_s* parent;/*internal*/
 
 	void(*onShow)(struct mgContext_s*, struct mgPopup_s*);
+
+	int(*onIsItemEnabled)(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s*);
 } mgPopup;
 
 #endif

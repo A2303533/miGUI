@@ -33,6 +33,7 @@
 typedef struct mgMenuItemInfo_s {
 	const wchar_t* text;
 	mgPopup* popup;
+	int id;
 } mgMenuItemInfo;
 
 typedef struct mgMenuItem_s {
@@ -40,6 +41,8 @@ typedef struct mgMenuItem_s {
 	int textLen;
 	int width;
 	mgRect rect;
+	int isEnabled;
+	void* userData;
 } mgMenuItem;
 
 /*
@@ -63,6 +66,10 @@ typedef struct mgMenu_s {
 
 	mgMenuItem* activeItem;
 	mgMenuItem* hoverItem;
+
+	mgStyle* userStyle;
+
+	int(*onIsItemEnabled)(struct mgMenuItem_s*);
 } mgMenu;
 
 #endif

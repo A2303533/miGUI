@@ -42,6 +42,7 @@ typedef struct mgStyle_s {
 	mgColor windowMenuHoverItemBG;
 	mgColor windowMenuActiveItemBG;
 	mgColor windowMenuText;
+	mgColor windowMenuTextDisabled;
 
 	mgColor tooltipBG;
 	mgColor tooltipText;

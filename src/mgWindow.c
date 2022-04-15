@@ -384,28 +384,42 @@ mgDrawWindow_f(struct mgWindow_s* w)
 			mgPoint pt;
 			for (int i = 0; i < w->menu->itemsSize; ++i)
 			{
-				if (w->menu->activeItem == &w->menu->items[i])
+				if (w->menu->onIsItemEnabled)
 				{
-					w->context->cursorInElement = 1;
-					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuActiveItemBG, w,
-						&w->menu->activeItem->rect,
-						&style->windowMenuActiveItemBG,
-						&style->windowMenuActiveItemBG,
-						0, 0);
-				}
-				else if (w->menu->hoverItem == &w->menu->items[i])
-				{
-					w->context->cursorInElement = 1;
-
-					w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuHoverItemBG, w,
-						&w->menu->hoverItem->rect,
-						&style->windowMenuHoverItemBG,
-						&style->windowMenuHoverItemBG,
-						0, 0);
+					w->menu->items[i].isEnabled = w->menu->onIsItemEnabled(&w->menu->items[i]);
 				}
 
-				if (!w->menu->items[i].info.text)
-					continue;
+				if (w->menu->hoverItem == &w->menu->items[i])
+					w->context->cursorInElement = 1;
+
+				mgColor* color = &style->windowMenuText;
+				if (w->menu->items[i].isEnabled)
+				{
+					if (w->menu->activeItem == &w->menu->items[i])
+					{
+						w->context->cursorInElement = 1;
+						w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuActiveItemBG, w,
+							&w->menu->activeItem->rect,
+							&style->windowMenuActiveItemBG,
+							&style->windowMenuActiveItemBG,
+							0, 0);
+					}
+					else if (w->menu->hoverItem == &w->menu->items[i])
+					{
+						w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuHoverItemBG, w,
+							&w->menu->hoverItem->rect,
+							&style->windowMenuHoverItemBG,
+							&style->windowMenuHoverItemBG,
+							0, 0);
+					}
+
+					if (!w->menu->items[i].info.text)
+						continue;
+				}
+				else
+				{
+					color = &style->windowMenuTextDisabled;
+				}
 
 				pt.x = w->menu->items[i].rect.left + w->menu->textIndent + w->menu->textOffset.x;
 				pt.y = w->menu->items[i].rect.top + w->menu->textOffset.y;
@@ -414,7 +428,7 @@ mgDrawWindow_f(struct mgWindow_s* w)
 					&pt,
 					w->menu->items[i].info.text,
 					w->menu->items[i].textLen,
-					&style->windowMenuText,
+					color,
 					w->menu->font);
 			}
 		}
@@ -1094,6 +1108,9 @@ mgUpdateWindow(struct mgWindow_s* w)
 			{
 				for (int i = 0; i < w->menu->itemsSize; ++i)
 				{
+					if (!w->menu->items[i].isEnabled)
+						continue;
+
 					if (mgPointInRect(&w->menu->items[i].rect, &w->context->input->mousePosition))
 					{
 						if (&w->menu->items[i] != w->menu->activeItem)
@@ -1104,8 +1121,9 @@ mgUpdateWindow(struct mgWindow_s* w)
 							if (w->menu->activeItem->info.popup)
 							{
 								mgPoint pt;
-								pt.x = w->menu->activeItem->rect.left;
+								pt.x = w->menu->activeItem->rect.left - w->menu->textIndent;
 								pt.y = w->menu->activeItem->rect.bottom - 5;
+								w->menu->activeItem->info.popup->userStyle = w->userStyle;
 								mgShowPopup_f(w->context, w->menu->activeItem->info.popup, &pt);
 							}
 							break;
@@ -1129,6 +1147,9 @@ mgUpdateWindow(struct mgWindow_s* w)
 					if (mgPointInRect(&w->menu->items[i].rect, &w->context->input->mousePosition))
 					{
 						w->menu->hoverItem = &w->menu->items[i];
+						if (!w->menu->items[i].isEnabled)
+							break;
+
 						if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 						{
 							w->menu->activeItem = &w->menu->items[i];
@@ -1137,8 +1158,9 @@ mgUpdateWindow(struct mgWindow_s* w)
 							{
 
 								mgPoint pt;
-								pt.x = w->menu->activeItem->rect.left;
+								pt.x = w->menu->activeItem->rect.left - w->menu->textIndent;
 								pt.y = w->menu->activeItem->rect.bottom - 5;
+								w->menu->activeItem->info.popup->userStyle = w->userStyle;
 								mgShowPopup_f(w->context, w->menu->activeItem->info.popup, &pt);
 							}
 						}

@@ -171,12 +171,14 @@ MG_API
 void MG_C_DECL
 mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 {
+	mgStyle* style = p->userStyle ? p->userStyle : c->activeStyle;
+	
 	c->gpu->setClipRect(&p->rect);
 	c->gpu->drawRectangle(mgDrawRectangleReason_popupBG, 
 		p,
 		&p->rect,
-		&c->activeStyle->popupBG,
-		&c->activeStyle->popupBG,
+		&style->popupBG,
+		&style->popupBG,
 		0, 0);
 
 	mgPoint pt;
@@ -195,26 +197,31 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 			c->gpu->drawRectangle(mgDrawRectangleReason_popupSeparator,
 				p,
 				&r,
-				&c->activeStyle->popupSeparator,
-				&c->activeStyle->popupSeparator,
+				&style->popupSeparator,
+				&style->popupSeparator,
 				0, 0);
 			pt.y += 5;
 		}
 		else
 		{
+			if (p->onIsItemEnabled)
+			{
+				p->items[i].info.isEnabled = p->onIsItemEnabled(c, p, &p->items[i]);
+			}
+
 			if (&p->items[i] == p->nodeUnderCursor)
 			{
 				c->gpu->drawRectangle(mgDrawRectangleReason_popupHoverElement,
 					p,
 					&p->nodeUnderCursorRect,
-					&c->activeStyle->popupHoverElementBG,
-					&c->activeStyle->popupHoverElementBG,
+					&style->popupHoverElementBG,
+					&style->popupHoverElementBG,
 					0, 0);
 			}
 
-			mgColor* textColor = &c->activeStyle->popupText;
+			mgColor* textColor = &style->popupText;
 			if(!p->items[i].info.isEnabled)
-				textColor = &c->activeStyle->popupTextDisabled;
+				textColor = &style->popupTextDisabled;
 
 			c->gpu->drawText(mgDrawTextReason_popup, 
 				p,
@@ -229,9 +236,9 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 				pt2 = pt;
 				pt2.x += p->items[i].indentForShortcutText;
 
-				textColor = &c->activeStyle->popupTextShortcut;
+				textColor = &style->popupTextShortcut;
 				if (!p->items[i].info.isEnabled)
-					textColor = &c->activeStyle->popupTextShortcutDisabled;
+					textColor = &style->popupTextShortcutDisabled;
 
 				c->gpu->drawText(mgDrawTextReason_popupShortcut, 
 					p,
@@ -284,7 +291,10 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 		if (p->items[i].info.subMenu)
 		{
 			if (p->items[i].info.subMenu->subVisible)
+			{
+				p->items[i].info.subMenu->userStyle = p->userStyle;
 				mgDrawPopup(c, p->items[i].info.subMenu);
+			}
 		}
 	}
 }

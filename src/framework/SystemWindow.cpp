@@ -172,6 +172,10 @@ void SystemWindow::UpdateBackbuffer()
 
 void SystemWindow::OnSize()
 {
+    // fix, always lmbdown
+    if(m_context)
+        m_context->m_input->mouseButtonFlags1 = 0;
+
     RECT rc;
     GetClientRect(m_hWnd, &rc);
     m_size.x = rc.right - rc.left;
