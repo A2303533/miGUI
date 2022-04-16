@@ -55,6 +55,8 @@ typedef struct mgIconGroup_s {
 	int windowExpandButton;
 	
 	int popupNext;
+	int popupCheck;
+	int popupCheckRadio;
 
 } mgIconGroup;
 

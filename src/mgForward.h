@@ -98,6 +98,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_popupHoverElement,
 	mgDrawRectangleReason_popupSeparator,
 	mgDrawRectangleReason_popupNextIcon,
+	mgDrawRectangleReason_popupCheckIcon,
 	mgDrawRectangleReason_textInputBG,
 	mgDrawRectangleReason_textInputCursor,
 	mgDrawRectangleReason_textInputSelectionBG,

@@ -35,7 +35,7 @@
 #include <assert.h>
 #include <stdint.h>
 
-#if defined(WIN32)
+#if defined(WIN32) | defined(_WIN64)
 #define MG_PLATFORM_WINDOWS
 #define MG_C_DECL _cdecl
 #ifdef MG_DLL

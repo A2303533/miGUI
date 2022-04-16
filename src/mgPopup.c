@@ -253,14 +253,7 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 			{
 				mgIconGroup* iconGroup = c->defaultIconGroup;
 				int iconID = iconGroup->popupNext;
-				/*c->currentIcon.left =  iconGroup->icons->iconNodes[iconID].lt.x;
-				c->currentIcon.top = iconGroup->icons->iconNodes[iconID].lt.y;
-				c->currentIcon.right = iconGroup->icons->iconNodes[iconID].sz.x;
-				c->currentIcon.bottom = iconGroup->icons->iconNodes[iconID].sz.y;*/
 				c->currentIcon = &iconGroup->icons->iconNodes[iconID];
-
-				mgColor wh;
-				mgColorSet(&wh, 1.f, 1.f, 1.f, 1.f);
 
 				mgRect r;
 				r.left = p->rect.right - iconGroup->icons->iconNodes[iconID].sz.x;
@@ -279,7 +272,41 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 
 				c->gpu->drawRectangle(mgDrawRectangleReason_popupNextIcon,
 					p,
-					&r, &wh, &wh, iconGroup->icons->texture, 0);
+					&r, 
+					&style->popupIconNext,
+					&style->popupIconNext,
+					iconGroup->icons->texture, 0);
+			}
+			else
+			{
+				int isRadio = 0;
+				if (p->onIsItemRadio)
+					isRadio = p->onIsItemRadio(c, p, &p->items[i]);
+
+				if(p->onIsItemChecked)
+					p->items[i].info.isChecked = p->onIsItemChecked(c, p, &p->items[i]);
+
+				if (p->items[i].info.isChecked)
+				{
+					mgIconGroup* iconGroup = c->defaultIconGroup;
+					
+					int iconID = isRadio == 1 ? iconGroup->popupCheckRadio : iconGroup->popupCheck;
+
+					c->currentIcon = &iconGroup->icons->iconNodes[iconID];
+
+					mgRect r;
+					r.left = p->rect.left + p->indent.x;
+					r.right = r.left + iconGroup->icons->iconNodes[iconID].sz.x;
+					r.top = pt.y;
+					r.bottom = r.top + iconGroup->icons->iconNodes[iconID].sz.y;
+
+					c->gpu->drawRectangle(mgDrawRectangleReason_popupCheckIcon,
+						p,
+						&r, 
+						&style->popupIconCheck, 
+						&style->popupIconCheck,
+						iconGroup->icons->texture, 0);
+				}
 			}
 
 			pt.y += p->itemHeight;

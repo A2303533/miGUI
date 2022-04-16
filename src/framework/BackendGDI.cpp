@@ -50,6 +50,8 @@
 using namespace mgf;
 
 extern mgf::Backend* g_backend;
+extern Framework* g_mgf;
+
 
 void BackendGDI_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 {
@@ -166,8 +168,16 @@ mgTexture_s* BackendGDI::GetDefaultIcons()
 	if (m_defaultIcons)
 		return m_defaultIcons;
 
-	m_defaultIcons = new mgTexture_s;
-	m_defaultIcons->implementation = new Gdiplus::Bitmap(L"../data/icons.png");
+	//m_defaultIcons = new mgTexture_s;
+	//m_defaultIcons->implementation = new Gdiplus::Bitmap(L"../data/icons.png");
+	Image* image = g_mgf->LoadImage("../data/icons.png");
+
+	if (image)
+	{
+		m_defaultIcons = this->CreateTexture(image->GetMGImage());
+		image->Release();
+	}
+
 	return m_defaultIcons;
 }
 
@@ -379,6 +389,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	case mgDrawRectangleReason_windowCollapseButton:
 	case mgDrawRectangleReason_buttonIcon:
 	case mgDrawRectangleReason_popupNextIcon:
+	case mgDrawRectangleReason_popupCheckIcon:
 	{
 		if (texture)
 		{
@@ -389,12 +400,39 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			gdirct.Height = rct->bottom - rct->top;
 			
 			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
-			auto status = graphics.DrawImage((Gdiplus::Bitmap*)texture->implementation, gdirct,
-				m_context->m_gui_context->currentIcon->lt.x,
-				m_context->m_gui_context->currentIcon->lt.y,
-				m_context->m_gui_context->currentIcon->sz.x,
-				m_context->m_gui_context->currentIcon->sz.y,
-				Gdiplus::UnitPixel);
+
+			{
+				Gdiplus::Bitmap* bmp = (Gdiplus::Bitmap*)texture->implementation;
+				
+				Gdiplus::Rect clrct;
+				clrct.X = 0;
+				clrct.Y = 0;
+				clrct.Width = bmp->GetWidth();
+				clrct.Height = bmp->GetHeight();
+
+				Gdiplus::Bitmap* bitmapCopy = ((Gdiplus::Bitmap*)texture->implementation)->Clone(clrct, bmp->GetPixelFormat());
+				
+				Gdiplus::ImageAttributes  imageAttributes;
+				Gdiplus::ColorMatrix colorMatrix = {
+				   2.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+				   0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+				   0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+				   0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+				   color1->r, color1->g, color1->b, 0.0f, 1.0f };
+				imageAttributes.SetColorMatrix(
+					&colorMatrix,
+					Gdiplus::ColorMatrixFlagsDefault,
+					Gdiplus::ColorAdjustTypeBitmap);
+
+				auto status = graphics.DrawImage(bitmapCopy, gdirct,
+					m_context->m_gui_context->currentIcon->lt.x,
+					m_context->m_gui_context->currentIcon->lt.y,
+					m_context->m_gui_context->currentIcon->sz.x,
+					m_context->m_gui_context->currentIcon->sz.y,
+					Gdiplus::UnitPixel, &imageAttributes);
+
+				delete bitmapCopy;
+			}
 		}
 	}break;
 	case mgDrawRectangleReason_windowTitlebar:

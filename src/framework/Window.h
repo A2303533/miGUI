@@ -143,6 +143,12 @@ namespace mgf
 		// return true for enable, false for disable
 		virtual bool OnIsMenuItemEnabled(int id, bool prev);  // like New Open Save
 		virtual bool OnIsMenuEnabled(int id, bool prev);     // like File Edit View
+		virtual bool OnIsMenuChecked(int id, bool prev);
+
+		// just to know what icon need to draw. 
+		// You need to use OnIsMenuChecked.
+		virtual bool OnIsMenuAsRadio(int id); 
+		                                                
 
 		// Size of menu item, like  [   File   ][   Edit   ]
 		void SetMenuTextIndent(int val); 

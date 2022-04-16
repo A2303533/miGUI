@@ -324,6 +324,20 @@ int Window_onIsItemEnabled(struct mgContext_s*, struct mgPopup_s*, struct mgPopu
 }
 bool Window::OnIsMenuItemEnabled(int id, bool prev) { return prev; }
 
+int Window_onIsItemChecked(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s* pi)
+{
+	Window* window = (Window*)pi->userData;
+	return window->OnIsMenuChecked(pi->info.id, pi->info.isChecked);
+}
+bool Window::OnIsMenuChecked(int id, bool prev) { return prev; }
+
+int Window_onIsItemRadio(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s* pi)
+{
+	Window* window = (Window*)pi->userData;
+	return window->OnIsMenuAsRadio(pi->info.id);
+}
+bool Window::OnIsMenuAsRadio(int id) { return false; }
+
 mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 {
 	std::vector<mgPopupItemInfo_s> popupItems;
@@ -361,6 +375,8 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 	{
 		newPopup = mgCreatePopup(popupItems.data(), popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
 		newPopup->onIsItemEnabled = Window_onIsItemEnabled;
+		newPopup->onIsItemChecked = Window_onIsItemChecked;
+		newPopup->onIsItemRadio = Window_onIsItemRadio;
 		for (int i = 0; i < newPopup->itemsSize; ++i)
 		{
 			newPopup->items[i].userData = this;

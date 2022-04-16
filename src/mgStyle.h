@@ -62,6 +62,8 @@ typedef struct mgStyle_s {
 	mgColor popupTextShortcutDisabled;
 	mgColor popupHoverElementBG;
 	mgColor popupSeparator;
+	mgColor popupIconCheck;
+	mgColor popupIconNext;
 
 	mgColor button1;
 	mgColor button2;

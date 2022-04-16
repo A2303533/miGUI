@@ -175,6 +175,9 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->tableColTitleColActive, 0xB2D2FF);
 	mgColorSetAsIntegerRGB(&s->windowMenuText, 0x0);
 	mgColorSetAsIntegerRGB(&s->windowMenuTextDisabled, 0x343434);
+	mgColorSetAsIntegerRGB(&s->popupIconCheck, 0xFFFFFF);
+	mgColorSetAsIntegerRGB(&s->popupIconNext, 0xFF0000);
+	
 }
 
 MG_API 
@@ -281,7 +284,7 @@ mgInitDefaultIcons_f(struct mgContext_s* c, mgTexture* t)
 		return 0;
 
 	c->defaultIconGroup = calloc(1, sizeof(mgIconGroup));
-	c->defaultIconGroup->icons = mgCreateIcons_f(t, 512, 512, 6);
+	c->defaultIconGroup->icons = mgCreateIcons_f(t, 512, 512, 8);
 	
 	c->defaultIconGroup->windowCloseButton = 0;
 	mgSetIcon_f(c->defaultIconGroup->icons, 0, 15, 2, 11, 11); //close wnd
@@ -300,6 +303,12 @@ mgInitDefaultIcons_f(struct mgContext_s* c, mgTexture* t)
 
 	c->defaultIconGroup->popupNext = 5;
 	mgSetIcon_f(c->defaultIconGroup->icons, 5, 64, 2, 11, 11); // popup next
+
+	c->defaultIconGroup->popupCheck = 6;
+	mgSetIcon_f(c->defaultIconGroup->icons, 6, 78, 0, 12, 13);
+
+	c->defaultIconGroup->popupCheckRadio = 7;
+	mgSetIcon_f(c->defaultIconGroup->icons, 7, 90, 0, 12, 13);
 	
 	return 1;
 }

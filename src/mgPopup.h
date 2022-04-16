@@ -92,6 +92,11 @@ typedef struct mgPopup_s {
 	void(*onShow)(struct mgContext_s*, struct mgPopup_s*);
 
 	int(*onIsItemEnabled)(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s*);
+	int(*onIsItemChecked)(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s*);
+
+	/* just to know what icon need to draw.*/
+	/* do check/uncheck in onIsItemChecked*/
+	int(*onIsItemRadio)(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s*);
 } mgPopup;
 
 #endif

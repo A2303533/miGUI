@@ -75,6 +75,12 @@ Context::Context(mgf::SystemWindow* sysWnd,
 
 Context::~Context()
 {
+	/*if (m_window)
+	{
+		SetWindowLongPtrA(m_window->m_hWnd, GWLP_USERDATA, 0);
+		m_window->m_context = 0;
+	}*/
+
 	if (m_gui_context)
 	{
 		mgDestroyContext(m_gui_context);
@@ -83,9 +89,6 @@ Context::~Context()
 
 	if (m_input)
 		delete m_input;
-
-	if (m_backend)
-		m_backend->Release();
 }
 
 void Context::OnWindowSize()
