@@ -95,7 +95,7 @@ namespace mgf
 		_menuTreeNode* _menu_getLastSibling(_menuTreeNode*, int* num);
 		std::vector<_menuTreeNode*> m_menuNodes; // for easy delete
 		mgPopup_s* _menu_rebuild_createPopup(_menuTreeNode*);
-		void _menu_addMenuItem(bool isSub, const wchar_t* title, uint32_t id, const wchar_t* shortcut_text, bool enabled, Icons* icon, uint32_t icon_index);
+		void _menu_addMenuItem(bool isSub, const wchar_t* title, uint32_t id, const wchar_t* shortcut_text, bool enabled);
 
 		bool m_isVisible = true;
 	public:
@@ -134,8 +134,8 @@ namespace mgf
 
 		// for separator use 0 for title
 		// for Enabled/Disabled use OnIsMenuItemEnabled
-		void AddMenuItem(const wchar_t* title, uint32_t id, const wchar_t* shortcut_text = 0, Icons* icon = 0, uint32_t icon_index = 0);
-		void BeginSubMenu(const wchar_t* title, uint32_t id, bool enabled = true, Icons* icon = 0, uint32_t icon_index = 0);
+		void AddMenuItem(const wchar_t* title, uint32_t id, const wchar_t* shortcut_text = 0);
+		void BeginSubMenu(const wchar_t* title, uint32_t id, bool enabled = true);
 		void EndSubMenu();
 		void EndMenu();
 
@@ -148,7 +148,10 @@ namespace mgf
 		// just to know what icon need to draw. 
 		// You need to use OnIsMenuChecked.
 		virtual bool OnIsMenuAsRadio(int id); 
-		                                                
+
+		/*return 1 if need to draw icon*/
+		/*you must set icons and iconID*/
+		virtual bool OnIcon(int id, Icons** icons, int* iconID, mgColor* color);
 
 		// Size of menu item, like  [   File   ][   Edit   ]
 		void SetMenuTextIndent(int val); 

@@ -37,6 +37,7 @@
 #include "framework/ListBox.h"
 #include "framework/Table.h"
 #include "framework/FontImpl.h"
+#include "framework/Icons.h"
 
 using namespace mgf;
 
@@ -338,6 +339,25 @@ int Window_onIsItemRadio(struct mgContext_s*, struct mgPopup_s*, struct mgPopupI
 }
 bool Window::OnIsMenuAsRadio(int id) { return false; }
 
+int Window_onIcon(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s* pi,
+	struct mgIcons_s** icons, int* iconID, mgColor* color)
+{
+	Window* window = (Window*)pi->userData;
+
+	mgf::Icons* mgf_icons = 0;
+
+	int result = (int)window->OnIcon(pi->info.id, &mgf_icons, iconID, color);
+
+	if (mgf_icons)
+	{
+		*icons = mgf_icons->GetMGIcons();
+	}
+
+	return result;
+}
+bool Window::OnIcon(int id, Icons** icons, int* iconID, mgColor* color) { return false; }
+
+
 mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 {
 	std::vector<mgPopupItemInfo_s> popupItems;
@@ -377,6 +397,7 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 		newPopup->onIsItemEnabled = Window_onIsItemEnabled;
 		newPopup->onIsItemChecked = Window_onIsItemChecked;
 		newPopup->onIsItemRadio = Window_onIsItemRadio;
+		newPopup->onIcon = Window_onIcon;
 		for (int i = 0; i < newPopup->itemsSize; ++i)
 		{
 			newPopup->items[i].userData = this;
@@ -499,14 +520,12 @@ void Window::_menu_addMenuItem(
 	const wchar_t* title, 
 	uint32_t id, 
 	const wchar_t* shortcut_text, 
-	bool enabled, 
-	Icons* icon, 
-	uint32_t icon_index)
+	bool enabled)
 {
 	_menuPopupItemInfo info;
 	info.enabled = enabled;
-	info.icon = icon;
-	info.icon_index = icon_index;
+	info.icon = 0;
+	info.icon_index = 0;
 	info.id = id;
 	info.shortcut_text = shortcut_text;
 	info.title = title;
@@ -537,11 +556,9 @@ void Window::_menu_addMenuItem(
 void Window::BeginSubMenu(
 	const wchar_t* title, 
 	uint32_t id,
-	bool enabled, 
-	Icons* icon,
-	uint32_t icon_index)
+	bool enabled)
 {	
-	_menu_addMenuItem(true, title, id, 0, enabled, icon, icon_index);
+	_menu_addMenuItem(true, title, id, 0, enabled);
 }
 
 void Window::EndSubMenu()
@@ -553,11 +570,9 @@ void Window::EndSubMenu()
 void Window::AddMenuItem(
 	const wchar_t* title, 
 	uint32_t id,
-	const wchar_t* shortcut_text, 
-	Icons* icon, 
-	uint32_t icon_index)
+	const wchar_t* shortcut_text)
 {
-	_menu_addMenuItem(false, title, id, shortcut_text, true, icon, icon_index);
+	_menu_addMenuItem(false, title, id, shortcut_text, true);
 }
 
 void Window::EndMenu()

@@ -289,23 +289,42 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 				if (p->items[i].info.isChecked)
 				{
 					mgIconGroup* iconGroup = c->defaultIconGroup;
-					
+					mgIcons* icons = iconGroup->icons;
+
+					mgColor iconColor = style->popupIconCheck;
+
 					int iconID = isRadio == 1 ? iconGroup->popupCheckRadio : iconGroup->popupCheck;
 
-					c->currentIcon = &iconGroup->icons->iconNodes[iconID];
+					if (p->onIcon)
+					{
+						struct mgIcons_s* user_icons = 0;
+						int user_iconID = 0;
+						mgColor user_iconColor;
+						if (p->onIcon(c, p, &p->items[i], &user_icons, &user_iconID, &user_iconColor))
+						{
+							if (user_icons)
+							{
+								icons = user_icons;
+								iconID = user_iconID;
+								iconColor = user_iconColor;
+							}
+						}
+					}
+					
+					c->currentIcon = &icons->iconNodes[iconID];
 
 					mgRect r;
 					r.left = p->rect.left + p->indent.x;
-					r.right = r.left + iconGroup->icons->iconNodes[iconID].sz.x;
+					r.right = r.left + icons->iconNodes[iconID].sz.x;
 					r.top = pt.y;
-					r.bottom = r.top + iconGroup->icons->iconNodes[iconID].sz.y;
+					r.bottom = r.top + icons->iconNodes[iconID].sz.y;
 
 					c->gpu->drawRectangle(mgDrawRectangleReason_popupCheckIcon,
 						p,
 						&r, 
-						&style->popupIconCheck, 
-						&style->popupIconCheck,
-						iconGroup->icons->texture, 0);
+						&iconColor,
+						&iconColor,
+						icons->texture, 0);
 				}
 			}
 
