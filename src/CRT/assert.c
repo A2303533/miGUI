@@ -3,8 +3,7 @@
 #include "assert.h"
 
 #ifdef __CRT_WIN32
-//#include <Windows.h>
-__declspec(dllimport) int __stdcall MessageBoxA( void*, const char*, const char*, unsigned int);
+#include "WinAPI.h"
 #endif
 
 #ifdef __CRT_PURE

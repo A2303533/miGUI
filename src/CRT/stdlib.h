@@ -7,15 +7,13 @@
 /*ISO/IEC 9899:TC3, N1256*/
 
 /*7.20:2*/
-#ifdef __CRT_WIN32
-#ifndef _WIN64
-typedef unsigned int size_t;
-#endif
-#else
-typedef unsigned int size_t;
-#endif /*__CRT_WIN32*/
+#include "size_t.h"
+
 #ifndef __cplusplus /*keyword for C++*/
+#ifndef __CRT_WCHAR_T_DEFINED
+#define __CRT_WCHAR_T_DEFINED
 typedef unsigned short wchar_t;
+#endif
 #endif
 
 #ifdef __CRT_PURE
@@ -35,7 +33,6 @@ typedef struct {
 } lldiv_t;
 #endif /*__CRT_PURE*/
 
-/*all internal prototypes*/
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -47,19 +44,8 @@ size_t _C_DECL __CRT_mb_cur_max();
 #endif
 
 /*7.20:3*/
-#ifdef __cplusplus
-#if (__cplusplus > 199711L) /*MSVS compiler option: /Zc:__cplusplus*/
+#include "NULL.h"
 
-#ifndef NULL
-#define NULL nullptr
-#endif
-
-#else
-#define NULL 0
-#endif
-#else
-#define NULL ((void *)0)
-#endif
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
@@ -97,11 +83,6 @@ extern "C" {
 	/*7.20.2.2*/
 	void _C_DECL srand(unsigned int seed);
 	
-#ifdef __CRT_PURE
-	/*7.20.4.3*/
-	void _C_DECL exit(int status);
-#endif /*__CRT_PURE*/
-
 	/*7.20.3.1*/
 	void* _C_DECL calloc(size_t nmemb, size_t size);
 	
@@ -113,6 +94,21 @@ extern "C" {
 
 	/*7.20.3.4*/
 	void* _C_DECL realloc(void* ptr, size_t size);
+
+#ifdef __CRT_WITH_ABORT
+	/*7.20.4.1*/
+	void _C_DECL abort(void);
+#endif //__CRT_WITH_ABORT
+
+	// 7.20.4.2
+	int _C_DECL atexit(void(*func)(void));
+
+#ifdef __CRT_PURE
+	/*7.20.4.3*/
+	void _C_DECL exit(int status);
+#endif /*__CRT_PURE*/
+	
+	void _C_DECL _Exit(int status);
 
 #ifdef __cplusplus
 }

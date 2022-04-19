@@ -16,30 +16,30 @@ setlocale(int category, const char* locale)
 		{
 		default:
 		case LC_ALL:
-			__crt.locale.decimal_point = ".";
-			__crt.locale.thousands_sep = "";
-			__crt.locale.grouping = "";
-			__crt.locale.mon_decimal_point = "";
-			__crt.locale.mon_thousands_sep = "";
-			__crt.locale.mon_grouping = "";
-			__crt.locale.positive_sign = "";
-			__crt.locale.negative_sign = "";
-			__crt.locale.currency_symbol = "";
-			__crt.locale.frac_digits = CHAR_MAX;
-			__crt.locale.p_cs_precedes = CHAR_MAX;
-			__crt.locale.n_cs_precedes = CHAR_MAX;
-			__crt.locale.p_sep_by_space = CHAR_MAX;
-			__crt.locale.n_sep_by_space = CHAR_MAX;
-			__crt.locale.p_sign_posn = CHAR_MAX;
-			__crt.locale.n_sign_posn = CHAR_MAX;
-			__crt.locale.int_curr_symbol = "";
-			__crt.locale.int_frac_digits = CHAR_MAX;
-			__crt.locale.int_p_cs_precedes = CHAR_MAX;
-			__crt.locale.int_n_cs_precedes = CHAR_MAX;
-			__crt.locale.int_p_sign_posn = CHAR_MAX;
-			__crt.locale.int_n_sign_posn = CHAR_MAX;
-			__crt.locale.int_p_sign_posn = CHAR_MAX;
-			__crt.locale.int_n_sign_posn = CHAR_MAX;
+			__crt._->locale.decimal_point = ".";
+			__crt._->locale.thousands_sep = "";
+			__crt._->locale.grouping = "";
+			__crt._->locale.mon_decimal_point = "";
+			__crt._->locale.mon_thousands_sep = "";
+			__crt._->locale.mon_grouping = "";
+			__crt._->locale.positive_sign = "";
+			__crt._->locale.negative_sign = "";
+			__crt._->locale.currency_symbol = "";
+			__crt._->locale.frac_digits = CHAR_MAX;
+			__crt._->locale.p_cs_precedes = CHAR_MAX;
+			__crt._->locale.n_cs_precedes = CHAR_MAX;
+			__crt._->locale.p_sep_by_space = CHAR_MAX;
+			__crt._->locale.n_sep_by_space = CHAR_MAX;
+			__crt._->locale.p_sign_posn = CHAR_MAX;
+			__crt._->locale.n_sign_posn = CHAR_MAX;
+			__crt._->locale.int_curr_symbol = "";
+			__crt._->locale.int_frac_digits = CHAR_MAX;
+			__crt._->locale.int_p_cs_precedes = CHAR_MAX;
+			__crt._->locale.int_n_cs_precedes = CHAR_MAX;
+			__crt._->locale.int_p_sign_posn = CHAR_MAX;
+			__crt._->locale.int_n_sign_posn = CHAR_MAX;
+			__crt._->locale.int_p_sign_posn = CHAR_MAX;
+			__crt._->locale.int_n_sign_posn = CHAR_MAX;
 			break;
 		}
 	}
@@ -50,7 +50,7 @@ lconv*
 _C_DECL 
 localeconv(void)
 {
-	return &__crt.locale;
+	return &__crt._->locale;
 }
 
 

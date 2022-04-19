@@ -2,7 +2,8 @@
 #include "assert.h"
 #include "string.h"
 
-void* 
+#ifdef __CRT_WITH_MEMCPY
+void*
 _C_DECL 
 memcpy(void* s1, const void* s2, size_t n)
 {
@@ -19,7 +20,9 @@ memcpy(void* s1, const void* s2, size_t n)
 
 	return s1;
 }
+#endif //__CRT_WITH_MEMCPY
 
+#ifdef __CRT_WITH_STRCMP
 int 
 _C_DECL 
 strcmp(const char* s1, const char* s2)
@@ -50,7 +53,9 @@ strcmp(const char* s1, const char* s2)
 
 	return result;
 }
+#endif
 
+#ifdef __CRT_WITH_MEMSET
 void* 
 _C_DECL 
 memset(void* s, int c, size_t n)
@@ -66,5 +71,5 @@ memset(void* s, int c, size_t n)
 
 	return s;
 }
-
+#endif
 

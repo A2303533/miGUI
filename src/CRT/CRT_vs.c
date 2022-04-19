@@ -3,8 +3,8 @@
 #include "stdlib.h"
 #include "string.h"
 
-//#include <Windows.h>
-__declspec(dllimport) void* __stdcall GetProcessHeap(void);
+#include "WinAPI.h"
+
 
 #ifdef __CRT_PURE
 #else
@@ -82,58 +82,47 @@ _purecall()
 
 void
 _C_DECL
-__CRT_on_dtors()
+__CRT_on_atexitProcs()
 {
-	if (__crt.dtors && __crt.dtorsSize)
+	if (__crt._->atexitProcs && __crt._->atexitProcsSize)
 	{
-		for (unsigned int i = __crt.dtorsSize - 1; ; )
+		for (unsigned int i = __crt._->atexitProcsSize - 1; ; )
 		{
-			_PVFV dtor = __crt.dtors[i];
-			dtor();
+			_PVFV fnc = __crt._->atexitProcs[i];
+			fnc();
 			if (!i)
 				break;
 			--i;
 		}
 
-		free(__crt.dtors);
+		free(__crt._->atexitProcs);
 	}
 }
 
 void
-__grow_dtors()
+__grow_atexitProcs()
 {
 	const int addSize = 100;
-	_PVFV* newDtors = malloc(__crt.dtorsAllocated + addSize * sizeof(_PVFV));
+	_PVFV* newProcs = malloc(__crt._->atexitProcsAllocated + addSize * sizeof(_PVFV));
 
-	if (__crt.dtorsAllocated && __crt.dtors)
+	if (__crt._->atexitProcsAllocated && __crt._->atexitProcs)
 	{
-		memcpy(newDtors, __crt.dtors, __crt.dtorsAllocated);
-		free(__crt.dtors);
+		memcpy(newProcs, __crt._->atexitProcs, __crt._->atexitProcsAllocated);
+		free(__crt._->atexitProcs);
 	}
-	__crt.dtors = newDtors;
-	__crt.dtorsAllocated = __crt.dtorsAllocated + addSize;
+	__crt._->atexitProcs = newProcs;
+	__crt._->atexitProcsAllocated = __crt._->atexitProcsAllocated + addSize;
 }
 
 void
-__add_dtor(_PVFV dtor)
+__add_atexitProcs(_PVFV fnc)
 {
-	unsigned int newSize = __crt.dtorsSize + 1;
-	if (newSize > __crt.dtorsAllocated)
-		__grow_dtors();
+	unsigned int newSize = __crt._->atexitProcsSize + 1;
+	if (newSize > __crt._->atexitProcsAllocated)
+		__grow_atexitProcs();
 
-	__crt.dtors[__crt.dtorsSize] = dtor;
-	__crt.dtorsSize = newSize;
-}
-
-/*move to stdlib*/
-int
-_cdecl
-atexit(_PVFV dtor)
-{
-	if (dtor)
-		__add_dtor(dtor);
-	//	dtor();
-	return 0;
+	__crt._->atexitProcs[__crt._->atexitProcsSize] = fnc;
+	__crt._->atexitProcsSize = newSize;
 }
 
 double 
@@ -189,12 +178,23 @@ __CRT_init()
 
 	memset(&__crt, 0, sizeof(__CRT_main_struct));
 	__crt.processHeap = GetProcessHeap();
+
+	__crt._ = calloc(1, sizeof(__CRT_main_struct_i));
+	memcpy(__crt._->tmpnamInternalBuf, "TMP000000000", 13);
+
 	setlocale(LC_ALL, "C");
 	srand(1);
 
 #ifdef __CRT_PURE
-	__grow_dtors();
+	__grow_atexitProcs();
 #endif
+
+	signal(SIGABRT, SIG_DFL);
+	signal(SIGFPE, SIG_DFL);
+	signal(SIGILL, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
+	signal(SIGSEGV, SIG_DFL);
+	signal(SIGTERM, SIG_DFL);
 
 	__crt_ready = 1;
 	
@@ -203,7 +203,6 @@ __CRT_init()
 	_global_init_v(__xc_a, __xc_z);
 #endif
 }
-
 
 void 
 _C_DECL 

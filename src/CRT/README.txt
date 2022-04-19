@@ -1,0 +1,1 @@
+If you use this code, you must accept all legal things that described in files, and do what right owners want.

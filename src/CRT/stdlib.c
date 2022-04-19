@@ -39,29 +39,21 @@
 extern int errno;
 
 #ifdef __CRT_WIN32
-//#include <Windows.h>
-#define HEAP_ZERO_MEMORY                0x00000008      
-__declspec(dllimport) __declspec(allocator) void* __stdcall HeapAlloc(void*, unsigned int, size_t);
-__declspec(dllimport) int __stdcall HeapFree(void*, unsigned int, void*);
-__declspec(dllimport) __declspec(allocator) void* __stdcall HeapReAlloc(void*,unsigned int, void*,size_t);
-__declspec(dllimport) void* __stdcall GetCurrentProcess(void);
-__declspec(dllimport) int __stdcall TerminateProcess(void*,unsigned int);
-
+#include "WinAPI.h"
 #endif
 
 extern __CRT_main_struct __crt;
 
-
 #ifdef __CRT_PURE
 
-void _C_DECL __CRT_on_dtors();
+void _C_DECL __CRT_on_atexitProcs();
 
 size_t
 _C_DECL
 __CRT_mb_cur_max()
 {
 	/* `never greater than MB_LEN_MAX` */
-	return 1;
+	return MB_CUR_MAX;
 }
 #endif
 
@@ -719,15 +711,15 @@ int
 _C_DECL 
 rand(void)
 {
-	__crt.rand_seed = __crt.rand_seed * 1103515245 + 12345;
-	return (unsigned int)(__crt.rand_seed / 65536) % 32768;
+	__crt._->rand_seed = __crt._->rand_seed * 1103515245 + 12345;
+	return (unsigned int)(__crt._->rand_seed / 65536) % 32768;
 }
 
 void 
 _C_DECL 
 srand(unsigned int seed)
 {
-	__crt.rand_seed = seed;
+	__crt._->rand_seed = seed;
 }
 
 void* 
@@ -775,6 +767,50 @@ realloc(void* ptr, size_t size)
 	return mem;
 }
 
+#ifdef __CRT_WITH_ABORT
+void 
+_C_DECL 
+abort(void)
+{
+	exit(EXIT_FAILURE);
+}
+#endif
+
+int
+_cdecl
+atexit(void(*func)(void))
+{
+	if (func)
+		__add_atexitProcs(func);
+	// The atexit function returns zero if the registration succeeds, nonzero if it fails.
+	return 0;
+}
+
+void 
+_C_DECL 
+_Exit(int status)
+{
+	/*The _Exit function causes normal program termination to occur and control to be
+returned to the host environment. No functions registered by the atexit function or
+signal handlers registered by the signal function are called. The status returned to the
+host environment is determined in the same way as for the exit function (7.20.4.3).
+Whether open streams with unwritten buffered data are flushed, open streams are closed,
+or temporary files are removed is implementation-defined.*/
+	__CRT_freeAll();
+
+#ifdef __CRT_WIN32
+	TerminateProcess(GetCurrentProcess(), status);
+#endif
+}
+
+// 
+void
+_C_DECL
+__CRT_freeAll()
+{
+	free(__crt._);
+}
+
 #ifdef __CRT_PURE
 void 
 _C_DECL 
@@ -785,10 +821,11 @@ their registration,262) except that a function is called after any previously re
 functions that had already been called at the time it was registered. If, during the call to
 any such function, a call to the longjmp function is made that would terminate the call
 to the registered function, the behavior is undefined*/
-	__CRT_on_dtors();
+	__CRT_on_atexitProcs();
 
 	/*Next, all open streams with unwritten buffered data are flushed, all open streams are
 closed, and all files created by the tmpfile function are removed.*/
+	__CRT_freeAll();
 
 #ifdef __CRT_WIN32
 	TerminateProcess(GetCurrentProcess(), status);
