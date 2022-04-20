@@ -4,7 +4,6 @@
 
 #include "CRT.h"
 
-#ifdef __CRT_PURE
 
 /*ISO/IEC 9899:TC3, N1256*/
 
@@ -25,8 +24,5 @@ extern "C" {
 #else
 #define assert(exp) if((exp) == 0){__assert(#exp, __FILE__, __FUNCTION__, __LINE__);}
 #endif
-#else/*__CRT_PURE*/
-#include <assert.h>
-#endif /*__CRT_PURE*/
 
 #endif

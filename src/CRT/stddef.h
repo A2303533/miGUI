@@ -25,18 +25,7 @@ extern "C" {
 #endif
 
 		// 7.17:3
-#ifndef NULL
-#ifdef __cplusplus
-#if (__cplusplus > 199711L) // MSVS compiler option: /Zc:__cplusplus
-#define NULL nullptr
-
-#else
-#define NULL 0
-#endif
-#else
-#define NULL ((void *)0)
-#endif
-#endif
+#include "NULL.h"
 
 		// 7.17:3
 #ifndef offsetof

@@ -6,7 +6,6 @@
 #include "WinAPI.h"
 #endif
 
-#ifdef __CRT_PURE
 
 void 
 _C_DECL 
@@ -23,4 +22,3 @@ __assert(
 	exit(EXIT_FAILURE);
 }
 
-#endif /*__CRT_PURE*/

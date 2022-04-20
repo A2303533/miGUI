@@ -73,3 +73,28 @@ memset(void* s, int c, size_t n)
 }
 #endif
 
+size_t 
+_C_DECL 
+strlen(const char* s)
+{
+#if 1
+	if (!s)
+		return 0;
+	const char* b = s;
+
+	while (*s)
+		++s;
+	return (size_t)(s - b);
+#else
+	size_t l = 0;
+	if (s)
+	{
+		while (*s)
+		{
+			++s;
+			++l;
+		}
+	}
+	return l;
+#endif
+}

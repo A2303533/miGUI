@@ -2,23 +2,15 @@
 
 #include "stdlib.h"
 #include "string.h"
+#include "pool.h"
 
 #include "WinAPI.h"
 
 
-#ifdef __CRT_PURE
-#else
-#ifdef _NDEBUG
-#else
-#endif /*_NDEBUG*/
-#endif
-
-// /NODEFAULTLIB 
-
-#ifdef __CRT_PURE
-
 __CRT_main_struct __crt;
 int __crt_ready = 0;
+
+void __grow_atexitProcs();
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,31 +91,7 @@ __CRT_on_atexitProcs()
 	}
 }
 
-void
-__grow_atexitProcs()
-{
-	const int addSize = 100;
-	_PVFV* newProcs = malloc(__crt._->atexitProcsAllocated + addSize * sizeof(_PVFV));
 
-	if (__crt._->atexitProcsAllocated && __crt._->atexitProcs)
-	{
-		memcpy(newProcs, __crt._->atexitProcs, __crt._->atexitProcsAllocated);
-		free(__crt._->atexitProcs);
-	}
-	__crt._->atexitProcs = newProcs;
-	__crt._->atexitProcsAllocated = __crt._->atexitProcsAllocated + addSize;
-}
-
-void
-__add_atexitProcs(_PVFV fnc)
-{
-	unsigned int newSize = __crt._->atexitProcsSize + 1;
-	if (newSize > __crt._->atexitProcsAllocated)
-		__grow_atexitProcs();
-
-	__crt._->atexitProcs[__crt._->atexitProcsSize] = fnc;
-	__crt._->atexitProcsSize = newSize;
-}
 
 double 
 _except1(int flags, int opcode, double arg, double res, unsigned int* cw)
@@ -165,16 +133,13 @@ _global_init_v(_PVFV* a, _PVFV* b)
 	}
 	return 1;
 }
-#endif
 
 void 
 _C_DECL 
 __CRT_init()
 {
-#ifdef __CRT_PURE
 	if (__crt_ready)
 		exit(EXIT_FAILURE);
-#endif
 
 	memset(&__crt, 0, sizeof(__CRT_main_struct));
 	__crt.processHeap = GetProcessHeap();
@@ -182,12 +147,15 @@ __CRT_init()
 	__crt._ = calloc(1, sizeof(__CRT_main_struct_i));
 	memcpy(__crt._->tmpnamInternalBuf, "TMP000000000", 13);
 
+	__crt._->fopenModeUnion.i = 0;
+
+	poolInitialize(&__crt._->fopenMaxPool, sizeof(FILE), FOPEN_MAX);
+	poolInitialize(&__crt._->tmpMaxPool, sizeof(FILE), TMP_MAX);
+
 	setlocale(LC_ALL, "C");
 	srand(1);
 
-#ifdef __CRT_PURE
 	__grow_atexitProcs();
-#endif
 
 	signal(SIGABRT, SIG_DFL);
 	signal(SIGFPE, SIG_DFL);
@@ -198,22 +166,18 @@ __CRT_init()
 
 	__crt_ready = 1;
 	
-#ifdef __CRT_PURE
 	_global_init_i(__xi_a, __xi_z);
 	_global_init_v(__xc_a, __xc_z);
-#endif
 }
 
 void 
 _C_DECL 
 __CRT_shutdown()
 {
-#ifdef __CRT_PURE
 	if (!__crt_ready)
 		exit(EXIT_FAILURE);
 
 	__crt_ready = 0;
 	
 	exit(EXIT_SUCCESS);
-#endif
 }

@@ -11,13 +11,14 @@
 
 #ifndef _FILE_DEFINED
 typedef struct {
+    void* handle;
+    char* tmpfn;
+
+    // I DON't know for what this:
     unsigned char* buf;
     unsigned int fpi;
     unsigned int erri;
     unsigned int eofi;
-
-    // 0x1 - is tmp, delete after fclose
-    unsigned int flags;
 } FILE;
 #define _FILE_DEFINED
 #endif
@@ -85,6 +86,19 @@ extern "C" {
     
     // 7.19.5.1
     int _C_DECL fclose(FILE* stream);
+
+    // 7.19.5.2
+    int _C_DECL fflush(FILE* stream);
+
+    // 7.19.5.3
+    FILE* _C_DECL fopen(const char* filename, const char* mode);
+
+#define __CRT_FOPEN_READ 0x1
+#define __CRT_FOPEN_WRITE 0x2
+#define __CRT_FOPEN_UPDATE 0x4
+#define __CRT_FOPEN_APPEND 0x8
+#define __CRT_FOPEN_TMP 0x10
+    FILE* _C_DECL _CRT_fopen(const char*, const char*, int FILEFlags);
 
 #ifdef __cplusplus
 }

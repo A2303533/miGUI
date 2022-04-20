@@ -16,7 +16,6 @@ typedef unsigned short wchar_t;
 #endif
 #endif
 
-#ifdef __CRT_PURE
 typedef struct {
 	int quot;
 	int rem;
@@ -31,7 +30,6 @@ typedef struct {
 	long long quot;
 	long long rem;
 } lldiv_t;
-#endif /*__CRT_PURE*/
 
 #ifdef __cplusplus
 extern "C"{
@@ -95,20 +93,22 @@ extern "C" {
 	/*7.20.3.4*/
 	void* _C_DECL realloc(void* ptr, size_t size);
 
+
 #ifdef __CRT_WITH_ABORT
 	/*7.20.4.1*/
 	void _C_DECL abort(void);
 #endif //__CRT_WITH_ABORT
 
+
 	// 7.20.4.2
 	int _C_DECL atexit(void(*func)(void));
 
-#ifdef __CRT_PURE
 	/*7.20.4.3*/
 	void _C_DECL exit(int status);
-#endif /*__CRT_PURE*/
 	
 	void _C_DECL _Exit(int status);
+
+
 
 #ifdef __cplusplus
 }

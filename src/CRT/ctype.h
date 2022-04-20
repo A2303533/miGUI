@@ -4,8 +4,6 @@
 
 #include "CRT.h"
 
-//#ifdef __CRT_PURE
-
 /*ISO/IEC 9899:TC3, N1256*/
 
 #ifdef __cplusplus

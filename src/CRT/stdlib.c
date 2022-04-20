@@ -30,11 +30,14 @@
 
 #include "CRT.h"
 #include "stdlib.h"
+
 #include "locale.h"
 
 #include "assert.h"
 #include "errno.h"
 #include "ctype.h"
+#include "string.h"
+#include "pool.h"
 
 extern int errno;
 
@@ -43,8 +46,6 @@ extern int errno;
 #endif
 
 extern __CRT_main_struct __crt;
-
-#ifdef __CRT_PURE
 
 void _C_DECL __CRT_on_atexitProcs();
 
@@ -55,7 +56,6 @@ __CRT_mb_cur_max()
 	/* `never greater than MB_LEN_MAX` */
 	return MB_CUR_MAX;
 }
-#endif
 
 #ifndef ULONG_MAX
 #define	ULONG_MAX	((unsigned long)(~0L))		/* 0xFFFFFFFF */
@@ -759,7 +759,7 @@ realloc(void* ptr, size_t size)
 {
 	void* mem = NULL;
 #ifdef __CRT_WIN32
-	mem = HeapReAlloc(__crt.processHeap, 0, ptr, size);
+	mem = HeapReAlloc(__crt.processHeap, HEAP_ZERO_MEMORY, ptr, size);
 #endif
 	if (!mem)
 		return ptr;
@@ -776,6 +776,64 @@ abort(void)
 }
 #endif
 
+void
+__grow_atexitProcs()
+{
+	const int addSize = 100;
+	_PVFV* newProcs = malloc(__crt._->atexitProcsAllocated + addSize * sizeof(_PVFV));
+
+	if (__crt._->atexitProcsAllocated && __crt._->atexitProcs)
+	{
+		memcpy(newProcs, __crt._->atexitProcs, __crt._->atexitProcsAllocated);
+		free(__crt._->atexitProcs);
+	}
+	__crt._->atexitProcs = newProcs;
+	__crt._->atexitProcsAllocated = __crt._->atexitProcsAllocated + addSize;
+}
+
+void
+__add_atexitProcs(_PVFV fnc)
+{
+	unsigned int newSize = __crt._->atexitProcsSize + 1;
+	if (newSize > __crt._->atexitProcsAllocated)
+		__grow_atexitProcs();
+
+	__crt._->atexitProcs[__crt._->atexitProcsSize] = fnc;
+	__crt._->atexitProcsSize = newSize;
+}
+
+// 
+void
+_C_DECL
+__CRT_freeAll()
+{
+	if (__crt._->fopenMaxPool.blocks)
+	{
+		FILE* f = (FILE*)(__crt._->fopenMaxPool.blocks[0]);
+		for (int i = 0; i < FOPEN_MAX; ++i)
+		{
+			if(f->handle)
+				fclose(f);
+			++f;
+		}
+	}
+	poolFreePool(&__crt._->fopenMaxPool);
+
+	if (__crt._->tmpMaxPool.blocks)
+	{
+		FILE* f = (FILE*)(__crt._->tmpMaxPool.blocks[0]);
+		for (int i = 0; i < TMP_MAX; ++i)
+		{
+			if (f->handle)
+				fclose(f);
+			++f;
+		}
+	}
+	poolFreePool(&__crt._->tmpMaxPool);
+	free(__crt._);
+}
+
+
 int
 _cdecl
 atexit(void(*func)(void))
@@ -786,7 +844,7 @@ atexit(void(*func)(void))
 	return 0;
 }
 
-void 
+void
 _C_DECL 
 _Exit(int status)
 {
@@ -803,15 +861,7 @@ or temporary files are removed is implementation-defined.*/
 #endif
 }
 
-// 
-void
-_C_DECL
-__CRT_freeAll()
-{
-	free(__crt._);
-}
 
-#ifdef __CRT_PURE
 void 
 _C_DECL 
 exit(int status)
@@ -832,4 +882,3 @@ closed, and all files created by the tmpfile function are removed.*/
 #endif
 }
 
-#endif /*__CRT_PURE*/

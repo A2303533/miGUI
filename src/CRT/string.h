@@ -10,7 +10,7 @@ extern "C" {
 
 #ifdef __CRT_WITH_MEMCPY
 	/*7.21.2.1*/
-	void* _C_DECL memcpy(void* s1, const void* s2, size_t n);
+	void* _C_DECL memcpy(void* dst, const void* src, size_t n);
 #endif //__CRT_WITH_MEMCPY
 
 #ifdef __CRT_WITH_STRCMP
@@ -22,6 +22,9 @@ extern "C" {
 	/*7.21.6.1*/
 	void* _C_DECL memset(void* s, int c, size_t n);
 #endif //__CRT_WITH_MEMSET
+
+	/*7.21.6.3*/
+	size_t _C_DECL strlen(const char* s);
 
 
 #ifdef __cplusplus

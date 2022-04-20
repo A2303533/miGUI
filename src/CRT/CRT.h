@@ -3,7 +3,6 @@
 #define __CRT__
 
 // without default lib and exceptions
-#define __CRT_PURE 
 
 // MSVS has own functions if enable optimization
 // error C2169: 'memcpy': intrinsic function, cannot be defined 
@@ -11,13 +10,12 @@
 //          If enable intrinsic exe file will be larger.
 // error C2169 - if /O2 and other optimizations
 // error C2268 - if /O1
-// so if you want to you Visual Studio optimizations  you need to comment this defines
+// so if you want to use Visual Studio optimizations  you need to comment this defines
 #define __CRT_WITH_MEMSET // error C2169, C2268
 #define __CRT_WITH_MEMCPY   // error C2169
 #define __CRT_WITH_STRCMP   // error C2169
 //#define __CRT_WITH_ABORT    // error C2381
 
-#ifdef __CRT_PURE
 /*you need to disable exceptions in project parameters*/
 #pragma comment(linker, "/NODEFAULTLIB")
 /*need to use libcmt.lib;libvcruntime.lib;*/
@@ -25,13 +23,9 @@
 
 #pragma comment(linker, "/ENTRY:\"__CRT_main\"")
 
-/*#pragma comment(lib, "libcmt.lib")
-#pragma comment(lib, "libvcruntime.lib")
-#pragma comment(lib, "libucrt.lib")*/
 
 typedef void (*_PVFV)(void);
 typedef int (*_PIFV)(void);
-#endif
 
 #if defined(_WIN32)
 #define __CRT_WIN32
@@ -44,6 +38,7 @@ typedef int (*_PIFV)(void);
 #include "signal.h"
 #include "stdbool.h"
 #include "stdio.h"
+#include "pool.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -64,6 +59,16 @@ extern "C"
 		__crt_signal_handler_t currSignalHandlers[6];
 
 		FILE *_stdin, *_stdout, *_stderr;
+		//FILE* fopenMax[FOPEN_MAX]; //minimum number of files that the implementation guarantees can be open simultaneously
+		//FILE* tmpMax[TMP_MAX]; //for tmpfile
+		pool fopenMaxPool;
+		pool tmpMaxPool;
+		union
+		{
+			unsigned int i;
+			char chars[4];
+		}
+		fopenModeUnion;
 
 		char tmpnamInternalBuf[L_tmpnam+1];
 
