@@ -59,10 +59,7 @@ extern "C"
 		__crt_signal_handler_t currSignalHandlers[6];
 
 		FILE *_stdin, *_stdout, *_stderr;
-		//FILE* fopenMax[FOPEN_MAX]; //minimum number of files that the implementation guarantees can be open simultaneously
-		//FILE* tmpMax[TMP_MAX]; //for tmpfile
-		pool fopenMaxPool;
-		pool tmpMaxPool;
+
 		union
 		{
 			unsigned int i;

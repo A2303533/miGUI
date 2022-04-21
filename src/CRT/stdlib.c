@@ -807,29 +807,6 @@ void
 _C_DECL
 __CRT_freeAll()
 {
-	if (__crt._->fopenMaxPool.blocks)
-	{
-		FILE* f = (FILE*)(__crt._->fopenMaxPool.blocks[0]);
-		for (int i = 0; i < FOPEN_MAX; ++i)
-		{
-			if(f->handle)
-				fclose(f);
-			++f;
-		}
-	}
-	poolFreePool(&__crt._->fopenMaxPool);
-
-	if (__crt._->tmpMaxPool.blocks)
-	{
-		FILE* f = (FILE*)(__crt._->tmpMaxPool.blocks[0]);
-		for (int i = 0; i < TMP_MAX; ++i)
-		{
-			if (f->handle)
-				fclose(f);
-			++f;
-		}
-	}
-	poolFreePool(&__crt._->tmpMaxPool);
 	free(__crt._);
 }
 

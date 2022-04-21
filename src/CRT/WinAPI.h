@@ -23,6 +23,12 @@ extern "C" {
 		unsigned int dwFlagsAndAttributes, void* hTemplateFile);
 	__declspec(dllimport) int __stdcall CloseHandle(void* hObject);
 	__declspec(dllimport) int __stdcall FlushFileBuffers(void* hFile);
+	__declspec(dllimport) int __stdcall AllocConsole(void);
+	__declspec(dllimport) int __stdcall AttachConsole(unsigned int dwProcessId);
+	__declspec(dllimport) void* __stdcall GetStdHandle(unsigned int nStdHandle);
+	__declspec(dllimport) int __stdcall WriteFile(void* hFile,const char* lpBuffer,
+		unsigned int nNumberOfBytesToWrite,unsigned int* lpNumberOfBytesWritten,
+		void* lpOverlapped);
 
 #define INVALID_FILE_SIZE ((unsigned int)0xFFFFFFFF)
 #define INVALID_SET_FILE_POINTER ((unsigned int)-1)

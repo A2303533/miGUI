@@ -13,6 +13,8 @@
 typedef struct {
     void* handle;
     char* tmpfn;
+    unsigned int flags;
+    unsigned long long pos;
 
     // I DON't know for what this:
     unsigned char* buf;
@@ -51,13 +53,17 @@ typedef long long fpos_t;
 
 #define TMP_MAX 32767
 
-#define stdin __crt._stdin
-#define stdout __crt._stdout
-#define stderr __crt._stderr
+#define stdin __CRT_stdin()
+#define stdout __CRT_stdout()
+#define stderr __CRT_stderr()
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    FILE* _C_DECL __CRT_stdin();
+    FILE* _C_DECL __CRT_stdout();
+    FILE* _C_DECL __CRT_stderr();
 
     // 7.19.4.1
     int _C_DECL remove(const char* filename);
@@ -95,10 +101,24 @@ extern "C" {
 
 #define __CRT_FOPEN_READ 0x1
 #define __CRT_FOPEN_WRITE 0x2
-#define __CRT_FOPEN_UPDATE 0x4
-#define __CRT_FOPEN_APPEND 0x8
-#define __CRT_FOPEN_TMP 0x10
-    FILE* _C_DECL _CRT_fopen(const char*, const char*, int FILEFlags);
+
+#define __CRT_FOPEN_APPEND 0x4
+#define __CRT_FOPEN_TMP 0x8
+
+#define __CRT_FOPEN_CREATION_OPENEXST 0x10    // read
+#define __CRT_FOPEN_CREATION_CREATEOPEN 0x20 // append
+#define __CRT_FOPEN_CREATION_CREATENEW 0x40  // write
+
+#define __CRT_FOPEN_SHAREMODE_READ 0x80
+#define __CRT_FOPEN_SHAREMODE_WRITE 0x100
+#define __CRT_FOPEN_ISDEVICE 0x200
+    FILE* _C_DECL _CRT_openFile(const char* fn, unsigned int fl);
+
+    // 7.19.5.4
+    FILE* _C_DECL freopen(const char* filename, const char* mode, FILE* stream);
+
+    // 7.19.8.2
+    size_t _C_DECL fwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream);
 
 #ifdef __cplusplus
 }

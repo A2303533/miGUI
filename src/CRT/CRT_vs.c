@@ -142,15 +142,22 @@ __CRT_init()
 		exit(EXIT_FAILURE);
 
 	memset(&__crt, 0, sizeof(__CRT_main_struct));
-	__crt.processHeap = GetProcessHeap();
+	__crt.processHeap = GetProcessHeap(); // CRT_vs.c - for Visual Studio
 
 	__crt._ = calloc(1, sizeof(__CRT_main_struct_i));
 	memcpy(__crt._->tmpnamInternalBuf, "TMP000000000", 13);
 
 	__crt._->fopenModeUnion.i = 0;
 
-	poolInitialize(&__crt._->fopenMaxPool, sizeof(FILE), FOPEN_MAX);
-	poolInitialize(&__crt._->tmpMaxPool, sizeof(FILE), TMP_MAX);
+	if (!GetStdHandle(((unsigned int)-11)))
+		AttachConsole((unsigned int)-1);
+
+	__crt._->_stdin = fopen("CONIN$", "rb");
+	__crt._->_stdout = fopen("CONOUT$", "wb");
+	__crt._->_stderr = fopen("CONOUT$", "wb");
+	/*__crt._->_stdin = GetStdHandle(((unsigned int)-10));
+	__crt._->_stdout = GetStdHandle(((unsigned int)-11));
+	__crt._->_stderr = GetStdHandle(((unsigned int)-12));*/
 
 	setlocale(LC_ALL, "C");
 	srand(1);
@@ -176,6 +183,10 @@ __CRT_shutdown()
 {
 	if (!__crt_ready)
 		exit(EXIT_FAILURE);
+
+	if (__crt._->_stdin) fclose(__crt._->_stdin);
+	if (__crt._->_stdout) fclose(__crt._->_stdout);
+	if (__crt._->_stderr) fclose(__crt._->_stderr);
 
 	__crt_ready = 0;
 	
