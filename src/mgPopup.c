@@ -339,7 +339,7 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 			if (p->items[i].info.subMenu->subVisible)
 			{
 				p->items[i].info.subMenu->userStyle = p->userStyle;
-				mgDrawPopup(c, p->items[i].info.subMenu);
+				mgDrawPopup_f(c, p->items[i].info.subMenu);
 			}
 		}
 	}

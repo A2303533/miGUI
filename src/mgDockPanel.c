@@ -62,7 +62,6 @@ struct mgDockPanelElement_s* g_dockpanel_splitterModeElement = 0;
 struct mgDockPanelWindow_s* g_dockpanel_splitterModePanel = 0;
 mgDockPanelWindow* g_pnlWnd_onPopup = 0;
 
-void mgDrawWindow(struct mgWindow_s* w);
 void mgUpdateWindow(struct mgWindow_s* w);
 void mgUpdateElement(mgElement* e);
 
@@ -584,7 +583,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 			c->gpu->drawText(0, &p, t, wcslen(t), &c->activeStyle->windowTitlebarTextColor, c->dockPanel->arrayWindows[i]->activeWindow->titlebarFont);*/
 
 			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->windowRect);
-			mgDrawWindow(c->dockPanel->arrayWindows[i]->activeWindow);			
+			mgDrawWindow_f(c->dockPanel->arrayWindows[i]->activeWindow);			
 		}
 
 		for (int i = 0; i < c->dockPanel->elementsSize; ++i)

@@ -646,7 +646,7 @@ void PlayListManager::PopupDeletePlaylist()
 	if (!m_playlistOnPopup)
 		return;
 
-	int res = MessageBox((HWND)g_data.context->GetSystemWindow()->GetOSData().handle, 
+	int res = MessageBox((HWND)g_data.context->GetSystemWindow()->GetOSData()->handle, 
 		L"Are you sure?", 
 		L"Delete playlist", 
 		MB_YESNO | MB_ICONQUESTION);

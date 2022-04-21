@@ -5,9 +5,6 @@
     <ClCompile Include="..\..\src\framework\Framework.cpp">
       <Filter>migui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\SystemWindowImpl.cpp">
-      <Filter>migui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp">
       <Filter>migui</Filter>
     </ClCompile>
@@ -72,6 +69,9 @@
     <ClCompile Include="..\..\src\framework\AudioEngine.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\SystemWindow.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">
@@ -79,9 +79,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\framework\SystemWindowImpl.h">
-      <Filter>migui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\framework\BackendGDI.h">
       <Filter>migui</Filter>
     </ClInclude>
