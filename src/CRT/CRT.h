@@ -20,6 +20,7 @@
 #pragma comment(linker, "/NODEFAULTLIB")
 /*need to use libcmt.lib;libvcruntime.lib;*/
 /*use LinkTimeCodeGeneration*/
+// No (/OPT:NOREF)
 
 #pragma comment(linker, "/ENTRY:\"__CRT_main\"")
 
@@ -54,7 +55,7 @@ extern "C"
 		unsigned int atexitProcsAllocated;
 		unsigned int rand_seed;
 
-		lconv locale;
+		struct lconv locale;
 
 		__crt_signal_handler_t currSignalHandlers[6];
 

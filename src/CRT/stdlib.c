@@ -37,7 +37,7 @@
 #include "errno.h"
 #include "ctype.h"
 #include "string.h"
-#include "pool.h"
+#include "math.h"
 
 extern int errno;
 
@@ -54,7 +54,7 @@ _C_DECL
 __CRT_mb_cur_max()
 {
 	/* `never greater than MB_LEN_MAX` */
-	return MB_CUR_MAX;
+	return 1;
 }
 
 #ifndef ULONG_MAX
@@ -127,6 +127,10 @@ const int __stdlib_string_to_int_table_hex[6] =
 {
 	10, 11, 12, 13, 14, 15
 };
+const char __stdlib_int_to_hex_table[16] =
+{
+	'0', '1', '2', '3','4','5','6','7','8','9','a','b','c','d','e','f',
+};
 
 const char*
 __string_skip_spaces(const char* str)
@@ -156,7 +160,7 @@ strtod(const char* nptr, char** endptr)
 	int flags = 0; /* 1(-) 2(hex) 3(e) 4(e-)*/
 
 	const char* str_ptr = __string_skip_spaces(nptr);
-	const lconv* lc = localeconv();
+	const struct lconv* lc = localeconv();
 	char decimal_point = *lc->decimal_point;
 
 	/*with - or not*/
@@ -335,7 +339,7 @@ strtof(const char* nptr, char** endptr)
 {
 	assert(nptr);
 
-	const lconv* lc = localeconv();
+	const struct lconv* lc = localeconv();
 	char decimal_point = *lc->decimal_point;
 
 	float result = 0.0;
@@ -859,3 +863,278 @@ closed, and all files created by the tmpfile function are removed.*/
 #endif
 }
 
+uint32_t
+_C_DECL
+__CRT_dectooct(uint32_t dec)
+{
+	uint32_t oct = 0;
+	if (dec)
+	{
+		uint32_t m = 0;
+		uint32_t m2 = 0;
+		while (1)
+		{
+			uint32_t rem = dec % 8;
+			dec /= 8;
+
+			m2 = m * 10;
+			if (!m2)
+				oct += rem;
+			else
+				oct += rem * m2;
+			if (!m)
+				m = 1;
+			else
+				m *= 10;
+
+			if (!dec)
+				break;
+		}
+	}
+	return oct;
+}
+
+uint64_t
+_C_DECL
+__CRT_dectooctll(uint64_t dec)
+{
+	uint64_t oct = 0;
+	if (dec)
+	{
+		uint64_t m = 0;
+		uint64_t m2 = 0;
+		while (1)
+		{
+			uint64_t rem = dec % 8;
+			dec /= 8;
+
+			m2 = m * 10;
+			if (!m2)
+				oct += rem;
+			else
+				oct += rem * m2;
+			if (!m)
+				m = 1;
+			else
+				m *= 10;
+
+			if (!dec)
+				break;
+		}
+	}
+	return oct;
+}
+
+// lower case
+// size of `buf` must be enough for 'ffffffffffffffff' so buf[16]
+char __CRT_itoa_internalBuffer[30]; // need to fix itoa(123) = "321"
+void
+_C_DECL
+__CRT_dectohex(uint64_t dec, char* buf, int* sz)
+{
+	if (dec)
+	{
+		double decInDouble = (double)dec;
+		int bufInd = 0;
+		while (1)
+		{
+			decInDouble /= 16.0;
+
+			double ipart = 0.0;
+			int i = (int)(modf(decInDouble, &ipart) * 16.0);//(dec % 16) * 16;
+			dec /= 16; // for exit from loop
+
+			__CRT_itoa_internalBuffer[bufInd++] = __stdlib_int_to_hex_table[i];
+
+			if (!dec)
+				break;
+		}
+		*sz = bufInd;
+		if (bufInd)
+		{
+			for (int i = 0; i < bufInd; ++i)
+			{
+				buf[i] = __CRT_itoa_internalBuffer[bufInd - i - 1];
+			}
+			buf[bufInd] = 0;
+		}
+	}
+	else
+	{
+		buf[0] = '0';
+		buf[1] = 0;
+	}
+}
+
+// mode: 
+//  0 - normal,  decimal
+//  1 - hex 7fa
+//  2 - hex 7FA
+//  3 - octal 610
+char __CRT_itoa_buffer[31]; // for vsnprintf
+void 
+_C_DECL 
+__CRT_itoa(int val, char* buf, size_t bufSz, int mode)
+{
+	__CRT_lltoa(val, buf, bufSz, mode);
+}
+
+void 
+_C_DECL 
+__CRT_uitoa(uint32_t val, /*not const*/ char* buf, size_t bufSz, int mode)
+{
+	__CRT_ulltoa(val, buf, bufSz, mode);
+}
+
+void 
+_C_DECL 
+__CRT_lltoa(long long val, /*not const*/ char* buf, size_t bufSz, int mode)
+{
+	if (val)
+	{
+		long long val2 = val;
+
+		switch (mode)
+		{
+		case 0:
+		case 3:
+		default:
+		{
+			if (mode == 3)
+				val2 = __CRT_dectooctll(val);
+			int bufferIndex = 0;
+			while (1)
+			{
+				long long mod = val2 % 10;
+				if (mod < 0) mod *= -1;
+				__CRT_itoa_internalBuffer[bufferIndex++] = (char)mod;
+				val2 = val2 / 10;
+
+				if (!val2)
+					break;
+			}
+			if (bufferIndex)
+			{
+				int dstBufInd = 0;
+				if (val < 0)
+					buf[dstBufInd++] = '-';
+
+				for (int i = 0; i < bufferIndex; ++i)
+				{
+					buf[dstBufInd++] = __CRT_itoa_internalBuffer[bufferIndex - i - 1] + '0';
+					if (dstBufInd == bufSz)
+						break;
+				}
+				buf[dstBufInd] = 0;
+			}
+		}break;
+		case 1:
+		case 2:
+		{
+			int bsz = 0;
+			char hexbuf[10];
+			__CRT_dectohex(val, hexbuf, &bsz);
+			if (bsz)
+			{
+				for (int i = 0; i < bsz; ++i)
+				{
+					buf[i] = hexbuf[i];
+					buf[i + 1] = 0;
+				}
+			}
+
+			if (mode == 2)
+			{
+				for (size_t i2 = 0; i2 < bufSz; ++i2)
+				{
+					if (islower(buf[i2]))
+						buf[i2] = toupper(buf[i2]);
+
+					if (!buf[i2])
+						break;
+				}
+			}
+		}break;
+		}
+	}
+	else
+	{
+		buf[0] = '0';
+		buf[1] = 0;
+	}
+}
+
+void 
+_C_DECL 
+__CRT_ulltoa(uint64_t val, /*not const*/ char* buf, size_t bufSz, int mode)
+{
+	if (val)
+	{
+		uint64_t val2 = val;
+
+		switch (mode)
+		{
+		case 0:
+		case 3:
+		default:
+		{
+			if (mode == 3)
+				val2 = __CRT_dectooctll(val);
+			int bufferIndex = 0;
+			while (1)
+			{
+				unsigned long long mod = val2 % 10;
+				__CRT_itoa_internalBuffer[bufferIndex++] = (char)mod;
+
+				val2 = val2 / 10;
+
+				if (!val2)
+					break;
+			}
+			if (bufferIndex)
+			{
+				int dstBufInd = 0;
+				for (int i = 0; i < bufferIndex; ++i)
+				{
+					buf[dstBufInd++] = __CRT_itoa_internalBuffer[bufferIndex - i - 1] + '0';
+					if (dstBufInd == bufSz)
+						break;
+				}
+				buf[dstBufInd] = 0;
+			}
+		}
+		break;
+		case 1:
+		case 2:
+		{
+			int bsz = 0;
+			char hexbuf[10];
+			__CRT_dectohex(val, hexbuf, &bsz);
+			if (bsz)
+			{
+				for (int i = 0; i < bsz; ++i)
+				{
+					buf[i] = hexbuf[i];
+					buf[i + 1] = 0;
+				}
+			}
+			if (mode == 2)
+			{
+				for (size_t i2 = 0; i2 < bufSz; ++i2)
+				{
+					if (islower(buf[i2]))
+						buf[i2] = toupper(buf[i2]);
+
+					if (!buf[i2])
+						break;
+				}
+			}
+		}break;
+		}
+	}
+	else
+	{
+		buf[0] = '0';
+		buf[1] = 0;
+	}
+}

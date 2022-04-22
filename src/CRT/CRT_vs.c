@@ -149,8 +149,8 @@ __CRT_init()
 
 	__crt._->fopenModeUnion.i = 0;
 
-	if (!GetStdHandle(((unsigned int)-11)))
-		AttachConsole((unsigned int)-1);
+	//if (!GetStdHandle(((unsigned int)-11))) // not work in XP
+	AttachConsole((unsigned int)-1);
 
 	__crt._->_stdin = fopen("CONIN$", "rb");
 	__crt._->_stdout = fopen("CONOUT$", "wb");

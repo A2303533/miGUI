@@ -3,6 +3,7 @@
 #define __STDLIB__
 
 #include "CRT.h"
+#include "stdint.h"
 
 /*ISO/IEC 9899:TC3, N1256*/
 
@@ -108,7 +109,15 @@ extern "C" {
 	
 	void _C_DECL _Exit(int status);
 
-
+	// mode: 
+	//  0 - normal,  decimal
+	//  1 - hex 7fa
+	//  2 - hex 7FA
+	//  3 - octal 610
+	void _C_DECL __CRT_itoa(int val, /*not const*/ char* buf, size_t bufSz, int mode);
+	void _C_DECL __CRT_uitoa(uint32_t val, /*not const*/ char* buf, size_t bufSz, int mode);
+	void _C_DECL __CRT_lltoa(long long val, /*not const*/ char* buf, size_t bufSz, int mode);
+	void _C_DECL __CRT_ulltoa(uint64_t val, /*not const*/ char* buf, size_t bufSz, int mode);
 
 #ifdef __cplusplus
 }

@@ -46,7 +46,7 @@ setlocale(int category, const char* locale)
 	return "C";
 }
 
-lconv* 
+struct lconv* 
 _C_DECL 
 localeconv(void)
 {

@@ -7,7 +7,8 @@
 //ISO/IEC 9899:TC3, N1256
 
 /*7.11:2*/
-typedef struct {
+struct lconv
+{
 	char* decimal_point;     // "."
 	char* thousands_sep;     // ""
 	char* grouping;          // ""
@@ -32,7 +33,7 @@ typedef struct {
 	char int_n_sep_by_space; // CHAR_MAX
 	char int_p_sign_posn;    // CHAR_MAX
 	char int_n_sign_posn;    // CHAR_MAX
-} lconv;
+};
 
 /*7.11:3*/
 #define LC_ALL 0
@@ -50,7 +51,7 @@ extern "C" {
 	char* _C_DECL setlocale(int category, const char* locale);
 
 	/*7.11.2.1*/
-	lconv* _C_DECL localeconv(void);
+	struct lconv* _C_DECL localeconv(void);
 
 #ifdef __cplusplus
 }

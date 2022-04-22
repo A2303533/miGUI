@@ -3,12 +3,15 @@
 #include "string.h"
 #include "ctype.h"
 #include "errno.h"
+#include "stdarg.h"
+
 
 #ifdef __CRT_WIN32
 #include "WinAPI.h"
 #endif
 
 extern __CRT_main_struct __crt;
+extern char __CRT_itoa_buffer[31];
 
 FILE* 
 _C_DECL 
@@ -407,3 +410,334 @@ fwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream)
 	stream->pos += written;
 	return written;
 }
+
+int 
+_C_DECL 
+setvbuf(FILE* stream, char* buf, int mode, size_t size)
+{
+	return -1; //not supported;
+}
+
+int
+_C_DECL
+__CRT_vsnprintf(
+	char* __restrict s, 
+	size_t n, 
+	const char* __restrict format, 
+	va_list ap,
+	FILE* stream, 
+	int(*onFull)(FILE*, const char*, size_t) // return 1 for end
+)
+{
+	size_t format_len = strlen(format);
+
+	int state = 0; // 1 = %
+	int buffer_current_size = 0;
+	int result = 0;
+	
+	const char* arg_constChar = 0;
+
+	for (size_t i = 0; i < format_len; ++i)
+	{
+		switch (format[i])
+		{
+		case '%':
+			if (state == 1)
+				goto _default;
+			if (!state)
+				state = 1;
+			break;
+		case 'd':
+		case 'i':
+		{
+			if (!state)
+				goto _default;
+			int arg = va_arg(ap, int);
+			__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
+			arg_constChar = __CRT_itoa_buffer;
+			if (arg_constChar)
+				goto putStr;
+		}break;
+		case 'x':
+		case 'X':
+		case 'o':
+		case 'u':
+		{
+			if (!state)
+				goto _default;
+			unsigned int arg = va_arg(ap, unsigned int);
+
+			int md = 0;
+			switch (format[i])
+			{
+			case 'o':
+				md = 3;
+				break;
+			case 'x':
+				md = 1;
+				break;
+			case 'X':
+				md = 2;
+				break;
+			default:
+				break;
+			}
+			__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
+
+			arg_constChar = __CRT_itoa_buffer;
+			if (arg_constChar)
+				goto putStr;
+		}break;
+		case 'f':
+		{
+			if (!state)
+				goto _default;
+			double arg = va_arg(ap, double);
+
+			int md = 0;
+			switch (format[i])
+			{
+			case 'o':
+				md = 3;
+				break;
+			case 'x':
+				md = 1;
+				break;
+			case 'X':
+				md = 2;
+				break;
+			default:
+				break;
+			}/*
+			__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
+
+			arg_constChar = __CRT_itoa_buffer;
+			if (arg_constChar)
+				goto putStr;*/
+		}break;
+		case 's':
+		{
+			if (!state)
+				goto _default;
+			arg_constChar = va_arg(ap, const char*);
+			if (arg_constChar)
+				goto putStr;
+		}break;
+		case 'c':
+		{
+			if (!state)
+				goto _default;
+			char c = va_arg(ap, char);
+			__CRT_itoa_buffer[0] = c;
+			__CRT_itoa_buffer[1] = 0;
+			arg_constChar = __CRT_itoa_buffer;
+			goto putStr;
+		}break;
+		default:
+		_default:;
+			state = 0;
+			s[buffer_current_size++] = format[i];
+			s[buffer_current_size] = 0;
+			break;
+		}
+		if(arg_constChar)
+		{
+		putStr:;
+			size_t argLen = strlen(arg_constChar);
+			if (argLen)
+			{
+				for (size_t i2 = 0; i2 < argLen; ++i2)
+				{
+					s[buffer_current_size++] = arg_constChar[i2];
+					s[buffer_current_size] = 0;
+					if (buffer_current_size == n) // or n-1 ?
+					{
+						result += buffer_current_size;
+						if (onFull)
+						{
+							if (onFull(stream, s, n))
+							{
+								return result;
+							}
+							buffer_current_size = 0;
+						}
+					}
+				}
+			}
+			arg_constChar = 0;
+		}
+
+		if (buffer_current_size == n) // or n-1 ?
+		{
+			result += buffer_current_size;
+			if (onFull)
+			{
+				if (onFull(stream, s, n))
+				{
+					return result;
+				}
+				buffer_current_size = 0;
+			}
+		}
+	}
+	return result ? result : -1;
+}
+
+int
+_C_DECL
+vsnprintf(char* __restrict s, size_t n, const char* __restrict format, va_list arg)
+{
+	int written_num = -1;
+	if (s && n && format)
+	{
+		size_t format_len = strlen(format);
+		if (format_len)
+			written_num = __CRT_vsnprintf(s, n, format, arg, NULL, NULL);
+	}
+	return written_num;
+}
+
+
+int
+_C_DECL
+snprintf(char* __restrict str, size_t n, char const* __restrict fmt, ...)
+{
+	int r = -1;
+	if (str && n && fmt)
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		r = __CRT_vsnprintf(str, n, fmt, ap, NULL, NULL);
+		va_end(ap);
+	}
+	return r;
+}
+
+
+char __CRT_vfprintf_buffer[200];
+int __CRT_vfprintf_buffer_onFull(
+	FILE* stream, 
+	const char* buf, size_t sz)
+{
+	fwrite(buf, 1, sz, stream); // __CRT_vsnprintf must have `n` parameter < 200
+	__CRT_vfprintf_buffer[0] = 0;
+	return 0;
+}
+int
+_C_DECL
+__CRT_vfprintf(FILE* stream, const char* __restrict format, va_list vl)
+{
+	__CRT_vfprintf_buffer[199] = 0;
+	int written_num = -1;
+	if (format)
+	{
+		size_t format_len = strlen(format);
+		if (format_len)
+		{
+			__CRT_vsnprintf(__CRT_vfprintf_buffer, 150, format, vl, stream, __CRT_vfprintf_buffer_onFull);
+			if (__CRT_vfprintf_buffer[0])
+			{
+				fwrite(__CRT_vfprintf_buffer, 1, strlen(__CRT_vfprintf_buffer), stream);
+				__CRT_vfprintf_buffer[0] = 0;
+			}
+		}
+		else
+			stream->erri = EDOM;
+	}
+	else
+		stream->erri = EDOM;
+	return written_num;
+}
+
+int 
+_C_DECL 
+fprintf(FILE* stream, const char* format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	int r = __CRT_vfprintf(stream, format, ap);
+	va_end(ap);
+	return r;
+}
+
+int 
+_C_DECL 
+fscanf(FILE* stream, const char* format, ...)
+{
+
+}
+
+int 
+_C_DECL 
+printf(const char* format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	int r = __CRT_vfprintf(__crt._->_stdout, format, ap);
+	va_end(ap);
+	return r;
+}
+
+int 
+_C_DECL 
+scanf(const char* format, ...)
+{
+
+}
+
+int 
+_C_DECL 
+sprintf(char* s, const char* format, ...)
+{
+
+}
+
+int 
+_C_DECL 
+sscanf(char* s, const char* format, ...)
+{
+
+}
+
+int 
+_C_DECL 
+vfprintf(FILE* stream, const char* format, va_list vl)
+{
+	return __CRT_vfprintf(stream, format, vl);
+}
+
+int 
+_C_DECL 
+vfscanf(FILE* stream, const char* format, va_list arg)
+{
+
+}
+
+int 
+_C_DECL 
+vprintf(const char* format, va_list arg)
+{
+	return __CRT_vfprintf(__crt._->_stdout, format, arg);
+}
+
+int 
+_C_DECL 
+vscanf(const char* format, va_list arg)
+{
+
+}
+
+int 
+_C_DECL 
+vsprintf(const char* s, const char* format, va_list arg)
+{
+
+}
+
+int 
+_C_DECL 
+vsscanf(const char* s, const char* format, va_list arg)
+{
+
+}
+

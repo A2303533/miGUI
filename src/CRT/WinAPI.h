@@ -29,6 +29,7 @@ extern "C" {
 	__declspec(dllimport) int __stdcall WriteFile(void* hFile,const char* lpBuffer,
 		unsigned int nNumberOfBytesToWrite,unsigned int* lpNumberOfBytesWritten,
 		void* lpOverlapped);
+	__declspec(dllimport) int __stdcall SetStdHandle(unsigned int  nStdHandle, void* hHandle);
 
 #define INVALID_FILE_SIZE ((unsigned int)0xFFFFFFFF)
 #define INVALID_SET_FILE_POINTER ((unsigned int)-1)
