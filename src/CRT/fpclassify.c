@@ -78,27 +78,5 @@ int
 _C_DECL
 __CRT_fpclassifyl(long double e)
 {
-	union IEEEl2bits u;
-
-	u.e = e;
-	if (u.bits.exp == 0) {
-		if ((u.bits.manl | u.bits.manh) == 0)
-			return (FP_ZERO);
-		return (FP_SUBNORMAL);
-	}
-	mask_nbit_l(u);		/* Mask normalization bit if applicable. */
-#if LDBL_MANT_DIG == 53
-	if (u.bits.exp == 2047) {
-		if ((u.bits.manl | u.bits.manh) == 0)
-			return (FP_INFINITE);
-		return (FP_NAN);
-	}
-#else
-	if (u.bits.exp == 32767) {
-		if ((u.bits.manl | u.bits.manh) == 0)
-			return (FP_INFINITE);
-		return (FP_NAN);
-	}
-#endif
-	return (FP_NORMAL);
+	return __CRT_fpclassifyd((double)e);
 }

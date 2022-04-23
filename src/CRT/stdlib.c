@@ -923,6 +923,8 @@ __CRT_ulltoa(uint64_t val, /*not const*/ char* buf, size_t bufSz, int mode)
 	}
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 // `buf` is a __CRT_dtoa_buffer if it called by __CRT_vsnprintf
 // I can use __CRT_itoa_buffer here for i1 and i2
 // mode:
@@ -980,7 +982,10 @@ __CRT_dtoa(double val, char* buf, size_t bufSz, int mode)
 
 	int isMinus = 0;
 	if (val < 0.0)
+	{
 		isMinus = 1;
+		val *= -1.0; // now we need positive number
+	}
 
 
 	int bufInd = 0;
@@ -989,6 +994,8 @@ __CRT_dtoa(double val, char* buf, size_t bufSz, int mode)
 		buf[bufInd++] = '-';
 		buf[bufInd] = 0;
 	}
+
+	
 
 	double ipart = 0.0;
 	double in = modf(val, &ipart);
@@ -1076,6 +1083,7 @@ __CRT_dtoa(double val, char* buf, size_t bufSz, int mode)
 	}
 	buf[bufInd] = 0;
 }
+#pragma warning(pop)
 
 void 
 _C_DECL 

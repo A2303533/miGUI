@@ -28,33 +28,34 @@
  * $FreeBSD$
  */
 
+#include "CRT.h"
 #include "math.h"
 
 #include "fpmath.h"
 
 int
 _C_DECL
-__CRT_isinf(double d)
+__CRT_isnormal(double d)
 {
 	union IEEEd2bits u;
 
 	u.d = d;
-	return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
+	return (u.bits.exp != 0 && u.bits.exp != 2047);
 }
 
 int
 _C_DECL
-__CRT_isinff(float f)
+__CRT_isnormalf(float f)
 {
 	union IEEEf2bits u;
 
 	u.f = f;
-	return (u.bits.exp == 255 && u.bits.man == 0);
+	return (u.bits.exp != 0 && u.bits.exp != 255);
 }
 
 int
 _C_DECL
-__CRT_isinfl(long double e)
+__CRT_isnormall(long double e)
 {
-	return __CRT_isinf((double)e);
+	return __CRT_isnormal((double)e);
 }

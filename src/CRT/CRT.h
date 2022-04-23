@@ -35,6 +35,12 @@ typedef int (*_PIFV)(void);
 #define _C_DECL
 #endif
 
+#ifdef _WIN64
+#define __CRT_ARCH_AMD64
+#else
+#define __CRT_ARCH_x86
+#endif
+
 #include "locale.h"
 #include "signal.h"
 #include "stdbool.h"
@@ -69,7 +75,6 @@ extern "C"
 		fopenModeUnion;
 
 		char tmpnamInternalBuf[L_tmpnam+1];
-
 
 	} __CRT_main_struct_i;
 

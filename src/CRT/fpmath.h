@@ -83,22 +83,23 @@ union IEEEd2bits {
 	} bits;
 };
 
-// I changed
-//    unsigned long -> unsigned long long
-union IEEEl2bits {
-	long double	e;
-	struct {
-		unsigned long long	manl : 64;
-		unsigned long long	manh : 48;
-		unsigned int	exp : 15;
-		unsigned int	sign : 1;
-	} bits;
-	struct {
-		unsigned long long	manl : 64;
-		unsigned long long	manh : 48;
-		unsigned int	expsign : 16;
-	} xbits;
-};
+
+// all long double must be a double
+
+//union IEEEl2bits {
+//	long double	e;
+//	struct {
+//		unsigned long	manl : 64;
+//		unsigned long	manh : 48;
+//		unsigned int	exp : 15;
+//		unsigned int	sign : 1;
+//	} bits;
+//	struct {
+//		unsigned long long	manl : 64;
+//		unsigned long long	manh : 48;
+//		unsigned int	expsign : 16;
+//	} xbits;
+//};
 
 // Platform depend
 // i386, amd64

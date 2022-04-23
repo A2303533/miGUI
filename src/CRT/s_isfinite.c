@@ -56,8 +56,5 @@ int
 _C_DECL
 __CRT_isfinitel(long double e)
 {
-	union IEEEl2bits u;
-
-	u.e = e;
-	return (u.bits.exp != 32767);
+	return __CRT_isfinite((double)e);
 }

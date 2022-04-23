@@ -1,7 +1,7 @@
 /*-
  * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
  *
- * Copyright (c) 2004 David Schultz <das@FreeBSD.ORG>
+ * Copyright (c) 2003 Mike Barcroft <mike@FreeBSD.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,27 +34,31 @@
 
 int
 _C_DECL
-__CRT_isinf(double d)
+__CRT_signbit(double d)
 {
 	union IEEEd2bits u;
 
 	u.d = d;
-	return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
+	return (u.bits.sign);
 }
 
 int
 _C_DECL
-__CRT_isinff(float f)
+__CRT_signbitf(float f)
 {
 	union IEEEf2bits u;
 
 	u.f = f;
-	return (u.bits.exp == 255 && u.bits.man == 0);
+	return (u.bits.sign);
 }
 
 int
 _C_DECL
-__CRT_isinfl(long double e)
+__CRT_signbitl(long double e)
 {
-	return __CRT_isinf((double)e);
+	/*union IEEEl2bits u;
+
+	u.e = e;
+	return (u.bits.sign);*/
+	return __CRT_signbit((double)e);
 }

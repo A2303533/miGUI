@@ -44,3 +44,5 @@ data/fonts
 bin32/dock.data
 apps/ap/Debug
 apps/ap/Release
+build/CRT_test/Debug
+build/CRT_test/Release

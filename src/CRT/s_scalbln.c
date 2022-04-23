@@ -24,37 +24,30 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * $FreeBSD$
  */
 
 #include "math.h"
 
-#include "fpmath.h"
+#define	NMAX	65536
+#define	NMIN	-65536
 
-int
+double
 _C_DECL
-__CRT_isinf(double d)
+__CRT_scalbln(double x, long n)
 {
-	union IEEEd2bits u;
-
-	u.d = d;
-	return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
+	return (__CRT_scalbn(x, (n > NMAX) ? NMAX : (n < NMIN) ? NMIN : (int)n));
 }
 
-int
+float
 _C_DECL
-__CRT_isinff(float f)
+__CRT_scalblnf(float x, long n)
 {
-	union IEEEf2bits u;
-
-	u.f = f;
-	return (u.bits.exp == 255 && u.bits.man == 0);
+	return (__CRT_scalbnf(x, (n > NMAX) ? NMAX : (n < NMIN) ? NMIN : (int)n));
 }
 
-int
+long double
 _C_DECL
-__CRT_isinfl(long double e)
+__CRT_scalblnl(long double x, long n)
 {
-	return __CRT_isinf((double)e);
+	return (__CRT_scalbnl(x, (n > NMAX) ? NMAX : (n < NMIN) ? NMIN : (int)n));
 }
