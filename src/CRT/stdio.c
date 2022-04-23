@@ -12,6 +12,7 @@
 
 extern __CRT_main_struct __crt;
 extern char __CRT_itoa_buffer[31];
+extern char __CRT_dtoa_buffer[31];
 
 FILE* 
 _C_DECL 
@@ -488,13 +489,36 @@ __CRT_vsnprintf(
 			if (arg_constChar)
 				goto putStr;
 		}break;
+		case 'F':
 		case 'f':
+		case 'E':
+		case 'e':
 		{
 			if (!state)
 				goto _default;
 			double arg = va_arg(ap, double);
-
+			
 			int md = 0;
+			switch (format[i])
+			{
+			case 'F':
+				md = 1;
+				break;
+			case 'f':
+				break;
+			case 'E':
+				md = 3;
+				break;
+			case 'e':
+				md = 2;
+				break;
+			}
+
+			__CRT_dtoa(arg, __CRT_dtoa_buffer, 30, md);
+			arg_constChar = __CRT_dtoa_buffer;
+			if (arg_constChar)
+				goto putStr;
+			/*
 			switch (format[i])
 			{
 			case 'o':
@@ -508,7 +532,7 @@ __CRT_vsnprintf(
 				break;
 			default:
 				break;
-			}/*
+			}
 			__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
 
 			arg_constChar = __CRT_itoa_buffer;

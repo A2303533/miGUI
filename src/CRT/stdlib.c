@@ -1,33 +1,3 @@
-/*- `strtol`, `strtoll`
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. [rescinded 22 July 1999]
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
 #include "CRT.h"
 #include "stdlib.h"
 
@@ -57,29 +27,7 @@ __CRT_mb_cur_max()
 	return 1;
 }
 
-#ifndef ULONG_MAX
-#define	ULONG_MAX	((unsigned long)(~0L))		/* 0xFFFFFFFF */
-#endif
 
-#ifndef LONG_MAX
-#define	LONG_MAX	((long)(ULONG_MAX >> 1))	/* 0x7FFFFFFF */
-#endif
-
-#ifndef LONG_MIN
-#define	LONG_MIN	((long)(~LONG_MAX))		/* 0x80000000 */
-#endif
-
-#ifndef ULLONG_MAX
-#define ULLONG_MAX (~(unsigned long long)0) /* 0xFFFFFFFFFFFFFFFF */
-#endif
-
-#ifndef LLONG_MAX
-#define LLONG_MAX ((long long)(ULLONG_MAX >> 1)) /* 0x7FFFFFFFFFFFFFFF */
-#endif
-
-#ifndef LLONG_MIN
-#define LLONG_MIN (~LLONG_MAX) /* 0x8000000000000000 */
-#endif
 
 const double __stdlib_string_to_double_table[17] =
 {
@@ -461,171 +409,6 @@ atof(const char* nptr)
 	return strtod(nptr, NULL);
 }
 
-long int
-_C_DECL 
-strtol(const char* nptr, char** endptr, int base)
-{
-	assert(nptr);
-	register const char* s = nptr;
-	register unsigned long acc;
-	register int c;
-	register unsigned long cutoff;
-	register int neg = 0, any, cutlim;
-
-	/*
-	 * Skip white space and pick up leading +/- sign if any.
-	 * If base is 0, allow 0x for hex and 0 for octal, else
-	 * assume decimal; if base is already 16, allow 0x.
-	 */
-	do {
-		c = *s++;
-	} while (isspace(c));
-	if (c == '-') {
-		neg = 1;
-		c = *s++;
-	}
-	else if (c == '+')
-		c = *s++;
-	if ((base == 0 || base == 16) &&
-		c == '0' && (*s == 'x' || *s == 'X')) {
-		c = s[1];
-		s += 2;
-		base = 16;
-	}
-	if (base == 0)
-		base = c == '0' ? 8 : 10;
-
-	/*
-	 * Compute the cutoff value between legal numbers and illegal
-	 * numbers.  That is the largest legal value, divided by the
-	 * base.  An input number that is greater than this value, if
-	 * followed by a legal input character, is too big.  One that
-	 * is equal to this value may be valid or not; the limit
-	 * between valid and invalid numbers is then based on the last
-	 * digit.  For instance, if the range for longs is
-	 * [-2147483648..2147483647] and the input base is 10,
-	 * cutoff will be set to 214748364 and cutlim to either
-	 * 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
-	 * a value > 214748364, or equal but the next digit is > 7 (or 8),
-	 * the number is too big, and we will return a range error.
-	 *
-	 * Set any if any `digits' consumed; make it negative to indicate
-	 * overflow.
-	 */
-	cutoff = neg ? -(unsigned long)LONG_MIN : LONG_MAX;
-	cutlim = cutoff % (unsigned long)base;
-	cutoff /= (unsigned long)base;
-	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c))
-			c -= '0';
-		else if (isalpha(c))
-			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		else
-			break;
-		if (c >= base)
-			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
-			any = -1;
-		else {
-			any = 1;
-			acc *= base;
-			acc += c;
-		}
-	}
-	if (any < 0) {
-		acc = neg ? LONG_MIN : LONG_MAX;
-		errno = ERANGE;
-	}
-	else if (neg)
-		acc = -acc;
-	if (endptr != 0)
-		*endptr = (char*)(any ? s - 1 : nptr);
-	return (acc);
-	return 0;
-}
-
-long long int
-_C_DECL 
-strtoll(const char* nptr, char** endptr, int base)
-{
-	assert(nptr);
-	register const char* s = nptr;
-	register long long int acc;
-	register int c;
-	register long long int cutoff;
-	register int neg = 0, any, cutlim;
-
-	/*
-	 * Skip white space and pick up leading +/- sign if any.
-	 * If base is 0, allow 0x for hex and 0 for octal, else
-	 * assume decimal; if base is already 16, allow 0x.
-	 */
-	do {
-		c = *s++;
-	} while (isspace(c));
-	if (c == '-') {
-		neg = 1;
-		c = *s++;
-	}
-	else if (c == '+')
-		c = *s++;
-	if ((base == 0 || base == 16) &&
-		c == '0' && (*s == 'x' || *s == 'X')) {
-		c = s[1];
-		s += 2;
-		base = 16;
-	}
-	if (base == 0)
-		base = c == '0' ? 8 : 10;
-
-	/*
-	 * Compute the cutoff value between legal numbers and illegal
-	 * numbers.  That is the largest legal value, divided by the
-	 * base.  An input number that is greater than this value, if
-	 * followed by a legal input character, is too big.  One that
-	 * is equal to this value may be valid or not; the limit
-	 * between valid and invalid numbers is then based on the last
-	 * digit.  For instance, if the range for longs is
-	 * [-2147483648..2147483647] and the input base is 10,
-	 * cutoff will be set to 214748364 and cutlim to either
-	 * 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
-	 * a value > 214748364, or equal but the next digit is > 7 (or 8),
-	 * the number is too big, and we will return a range error.
-	 *
-	 * Set any if any `digits' consumed; make it negative to indicate
-	 * overflow.
-	 */
-	cutoff = neg ? -(long long int)LLONG_MIN : LLONG_MAX;
-	cutlim = cutoff % (long long int)base;
-	cutoff /= (long long int)base;
-	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c))
-			c -= '0';
-		else if (isalpha(c))
-			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		else
-			break;
-		if (c >= base)
-			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
-			any = -1;
-		else {
-			any = 1;
-			acc *= base;
-			acc += c;
-		}
-	}
-	if (any < 0) {
-		acc = neg ? LLONG_MIN : LLONG_MAX;
-		errno = ERANGE;
-	}
-	else if (neg)
-		acc = -acc;
-	if (endptr != 0)
-		*endptr = (char*)(any ? s - 1 : nptr);
-	return (acc);
-}
-
 unsigned long int 
 _C_DECL 
 strtoul(const char* nptr, char** endptr, int base)
@@ -972,6 +755,7 @@ __CRT_dectohex(uint64_t dec, char* buf, int* sz)
 //  2 - hex 7FA
 //  3 - octal 610
 char __CRT_itoa_buffer[31]; // for vsnprintf
+char __CRT_dtoa_buffer[31]; // for vsnprintf
 void 
 _C_DECL 
 __CRT_itoa(int val, char* buf, size_t bufSz, int mode)
@@ -1137,4 +921,165 @@ __CRT_ulltoa(uint64_t val, /*not const*/ char* buf, size_t bufSz, int mode)
 		buf[0] = '0';
 		buf[1] = 0;
 	}
+}
+
+// `buf` is a __CRT_dtoa_buffer if it called by __CRT_vsnprintf
+// I can use __CRT_itoa_buffer here for i1 and i2
+// mode:
+//  0 - normal lowercase, nan
+//  1 - normal uppercase, NAN
+//  2 - scientific lowercase
+//  3 - scientific uppercase
+void 
+_C_DECL 
+__CRT_dtoa(double val, char* buf, size_t bufSz, int mode)
+{
+	if (isnan(val))
+	{
+		switch (mode)
+		{
+		default:
+		case 0:
+		case 2:
+			buf[0] = 'n';
+			buf[1] = 'a';
+			buf[2] = 'n';
+			break;
+		case 3:
+		case 1:
+			buf[0] = 'N';
+			buf[1] = 'A';
+			buf[2] = 'N';
+			break;
+		}
+		buf[3] = 0;
+		return;
+	}
+
+	if (isinf(val))
+	{
+		switch (mode)
+		{
+		default:
+		case 0:
+		case 2:
+			buf[0] = 'i';
+			buf[1] = 'n';
+			buf[2] = 'f';
+			break;
+		case 3:
+		case 1:
+			buf[0] = 'I';
+			buf[1] = 'N';
+			buf[2] = 'F';
+			break;
+		}
+		buf[3] = 0;
+		return;
+	}
+
+	int isMinus = 0;
+	if (val < 0.0)
+		isMinus = 1;
+
+
+	int bufInd = 0;
+	if (isMinus)
+	{
+		buf[bufInd++] = '-';
+		buf[bufInd] = 0;
+	}
+
+	double ipart = 0.0;
+	double in = modf(val, &ipart);
+
+	int numOfZeros = 0; // I don't khow how to do dtoa()
+	// so, if I have (val=0.003), ipart will be 0
+	// in will be 0.003
+	// but down here I just make 2 integers, then I call ulltoa
+	// and then combine 2 integers together.
+	// In `in *= 10000000000000000;` I `move` right part (right from .) to
+	//  the left. This is for i2. It's ok if val=123.5678, but it's bad
+	//   when val have zeros after point, like 0.003. So result will be
+	//   not "0.003", it will be "0.3". I need to put zeros after point.
+	double in2 = in;
+	if (in2 != 0.0)
+	{
+		for (int i = 0; i < 17; ++i)
+		{
+			in2 /= 0.1;
+			if ((long long)in2 > 0.0)
+			{
+				break;
+			}
+			else
+			{
+				++numOfZeros;
+			}
+		}
+	}
+
+	in *= 10000000000000000;
+
+	uint64_t i1 = (uint64_t)ipart;
+	uint64_t i2 = (uint64_t)in;
+
+	__CRT_ulltoa(i1, __CRT_itoa_buffer, 30, 0);
+	if (__CRT_itoa_buffer[0])
+	{
+		for(int i = 0; i < 30; ++i)
+		{
+			if (!__CRT_itoa_buffer[i])
+				break;
+
+			buf[bufInd++] = __CRT_itoa_buffer[i];
+			buf[bufInd] = 0;
+
+			if (bufInd == bufSz)
+				return;
+		}
+	}
+
+	struct lconv* loc = localeconv();
+
+	buf[bufInd++] = loc->decimal_point[0];
+	buf[bufInd] = 0;
+
+	if (numOfZeros)
+	{
+		for (int i = 0; i < numOfZeros; ++i)
+		{
+			buf[bufInd++] = '0';
+			buf[bufInd] = 0;
+			if (bufInd == bufSz)
+				return;
+		}
+	}
+
+	if (bufInd == bufSz)
+		return;
+
+	__CRT_ulltoa(i2, __CRT_itoa_buffer, 30, 0);
+	if (__CRT_itoa_buffer[0])
+	{
+		for (int i = 0; i < 30; ++i)
+		{
+			if (!__CRT_itoa_buffer[i])
+				break;
+
+			buf[bufInd++] = __CRT_itoa_buffer[i];
+			buf[bufInd] = 0;
+
+			if (bufInd == bufSz)
+				return;
+		}
+	}
+	buf[bufInd] = 0;
+}
+
+void 
+_C_DECL 
+__CRT_ftoa(float val, char* buf, size_t bufSz, int mode)
+{
+	__CRT_dtoa(val, buf, bufSz, mode);
 }

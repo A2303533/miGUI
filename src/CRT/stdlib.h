@@ -118,6 +118,14 @@ extern "C" {
 	void _C_DECL __CRT_uitoa(uint32_t val, /*not const*/ char* buf, size_t bufSz, int mode);
 	void _C_DECL __CRT_lltoa(long long val, /*not const*/ char* buf, size_t bufSz, int mode);
 	void _C_DECL __CRT_ulltoa(uint64_t val, /*not const*/ char* buf, size_t bufSz, int mode);
+	
+	// mode:
+	//  0 - normal lowercase, nan
+	//  1 - normal uppercase, NAN
+	//  2 - scientific lowercase
+	//  3 - scientific uppercase
+	void _C_DECL __CRT_dtoa(double val, char* buf, size_t bufSz, int mode);
+	void _C_DECL __CRT_ftoa(float val, char* buf, size_t bufSz, int mode);
 
 #ifdef __cplusplus
 }

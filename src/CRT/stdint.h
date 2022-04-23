@@ -6,8 +6,6 @@
 extern "C" {
 #endif
 
-#ifdef _MSC_VER
-	
 	// more modern than 9899:1999
 	typedef signed char        int8_t;
 	typedef short              int16_t;
@@ -47,9 +45,6 @@ extern "C" {
 	typedef unsigned int       uintptr_t;
 #endif
 
-#else
-#error here
-#endif
 
 	// 7.18.2.1
 #define INT8_MIN         (-127i8 - 1)
