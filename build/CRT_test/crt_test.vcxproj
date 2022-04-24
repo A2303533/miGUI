@@ -32,7 +32,9 @@
     <ClCompile Include="..\..\src\CRT\float.c" />
     <ClCompile Include="..\..\src\CRT\fpclassify.c" />
     <ClCompile Include="..\..\src\CRT\isinf.c" />
+    <ClCompile Include="..\..\src\CRT\k_cos.c" />
     <ClCompile Include="..\..\src\CRT\k_rem_pio2.c" />
+    <ClCompile Include="..\..\src\CRT\k_sin.c" />
     <ClCompile Include="..\..\src\CRT\k_tan.c" />
     <ClCompile Include="..\..\src\CRT\locale.c" />
     <ClCompile Include="..\..\src\CRT\math.c" />
@@ -44,6 +46,7 @@
     <ClCompile Include="..\..\src\CRT\string.c" />
     <ClCompile Include="..\..\src\CRT\strtol.c" />
     <ClCompile Include="..\..\src\CRT\s_atan.c" />
+    <ClCompile Include="..\..\src\CRT\s_cos.c" />
     <ClCompile Include="..\..\src\CRT\s_fabs.c" />
     <ClCompile Include="..\..\src\CRT\s_floor.c" />
     <ClCompile Include="..\..\src\CRT\s_isfinite.c" />
@@ -51,6 +54,7 @@
     <ClCompile Include="..\..\src\CRT\s_scalbln.c" />
     <ClCompile Include="..\..\src\CRT\s_scalbn.c" />
     <ClCompile Include="..\..\src\CRT\s_signbit.c" />
+    <ClCompile Include="..\..\src\CRT\s_sin.c" />
     <ClCompile Include="..\..\src\CRT\s_tan.c" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -194,7 +198,7 @@
       <EnableCOMDATFolding>
       </EnableCOMDATFolding>
       <OptimizeReferences>false</OptimizeReferences>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>
       </EntryPointSymbol>
       <Driver>NotSet</Driver>
@@ -272,7 +276,7 @@
       <EnableCOMDATFolding>
       </EnableCOMDATFolding>
       <OptimizeReferences>false</OptimizeReferences>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>
       </EntryPointSymbol>
       <Driver>NotSet</Driver>

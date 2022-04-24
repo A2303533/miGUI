@@ -154,6 +154,14 @@ extern "C" {
 	float _C_DECL __CRT_ieee754_atan2f(float y, float x);
 	long double _C_DECL __CRT_ieee754_atan2l(long double y, long double x);
 
+	double _C_DECL __CRT_sin(double x);
+	float _C_DECL __CRT_sinf(float x);
+	long double _C_DECL __CRT_sinl(long double x);
+
+	long double _C_DECL __CRT_cosl(long double x);
+	float _C_DECL __CRT_cosf(float x);
+	double _C_DECL __CRT_cos(double x);
+
 	static __inline int
 		__CRT_inline_isnan(double __x)
 	{
@@ -194,6 +202,16 @@ extern "C" {
 	double _C_DECL atan2(double y, double x);
 	float _C_DECL atan2f(float y, float x);
 	long double _C_DECL atan2l(long double y, long double x);
+
+	// 7.12.4.5
+	double _C_DECL cos(double x);
+	float _C_DECL cosf(float x);
+	long double _C_DECL cosl(long double x);
+
+	// 7.12.4.6
+	double _C_DECL sin(double x);
+	float _C_DECL sinf(float x);
+	long double _C_DECL sinl(long double x);
 
 	// 7.12.4.7
 	double _C_DECL tan(double x);

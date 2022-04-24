@@ -122,6 +122,48 @@ atan2l(long double y, long double x)
 
 double 
 _C_DECL 
+cos(double x)
+{
+	return __CRT_cos(x);
+}
+
+float 
+_C_DECL 
+cosf(float x)
+{
+	return __CRT_cosf(x);
+}
+
+long double 
+_C_DECL 
+cosl(long double x)
+{
+	return __CRT_cosl(x);
+}
+
+double 
+_C_DECL 
+sin(double x)
+{
+	return __CRT_sin(x);
+}
+
+float 
+_C_DECL 
+sinf(float x)
+{
+	return __CRT_sinf(x);
+}
+
+long double 
+_C_DECL 
+sinl(long double x)
+{
+	return __CRT_sinl(x);
+}
+
+double 
+_C_DECL 
 tan(double x)
 {
 	return __CRT_tan(x);
@@ -228,25 +270,56 @@ scalblnl(long double x, int n)
 	return __CRT_scalblnl(x, n);
 }
 
+#include <intrin.h>
+
 double 
 _C_DECL 
 sqrt(double x)
 {
+#ifdef __CRT_INTRIN
+	__m128d d;
+	d.m128d_f64[0] = x;
+	d.m128d_f64[1] = 0;
+
+	__m128d d2 = _mm_sqrt_pd(d);
+	return d2.m128d_f64[0];
+#else
 	return __CRT_ieee754_sqrt(x);
+#endif
 }
+
+//#define __CRT_INTRIN
 
 float 
 _C_DECL 
 sqrtf(float x)
 {
+#ifdef __CRT_INTRIN
+	__m128d d;
+	d.m128d_f64[0] = x;
+	d.m128d_f64[1] = 0;
+
+	__m128d d2 = _mm_sqrt_pd(d);
+	return d2.m128d_f64[0];
+#else
 	return __CRT_ieee754_sqrtf(x);
+#endif
 }
 
 long double 
 _C_DECL 
 sqrtl(long double x)
 {
+#ifdef __CRT_INTRIN
+	__m128d d;
+	d.m128d_f64[0] = x;
+	d.m128d_f64[1] = 0;
+
+	__m128d d2 = _mm_sqrt_pd(d);
+	return d2.m128d_f64[0];
+#else
 	return __CRT_sqrtl(x);
+#endif
 }
 
 double 

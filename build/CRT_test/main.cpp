@@ -135,6 +135,16 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	printf("acos(%f): [%f]\n", testFloat, acos(testFloat));
 
 	testFloat = 0.f;
+	printf("Test sqrt");
+	for (int i = 0; i < 2000000; ++i)
+	{
+		double r = sqrt(i);
+		if (isfinite(r))
+			testFloat += r * 0.0001f;
+	}
+	printf(": [%f]\n", testFloat);
+
+	testFloat = 0.f;
 	printf("sqrt(%f): [%f]\n", testFloat, sqrt(testFloat));
 	testFloat = 10.f;
 	printf("sqrt(%f): [%f]\n", testFloat, sqrt(testFloat));
@@ -194,20 +204,6 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
 	testFloat = 0.5f;
 	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
-	testFloat = 0.9f;
-	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
-	testFloat = 0.2f;
-	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
-	testFloat = 1.1f;
-	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
-	testFloat = 1.7f;
-	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
-	testFloat = 1.5f;
-	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
-	testFloat = -1.1f;
-	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
-	testFloat = -1.9f;
-	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
 
 	double x = 5.f, y = 3.f;
 	printf("atan2(%f, %f): [%f]\n", x, y, atan2(y, x));
@@ -215,6 +211,16 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	printf("atan2(%f, %f): [%f]\n", x, y, atan2(y, x));
 	x = 5.f, y = 13.f;
 	printf("atan2(%f, %f): [%f]\n", x, y, atan2(y, x));
+
+	testFloat = 0.5f;
+	printf("sin(%f): [%f]\n", testFloat, sin(testFloat));
+	testFloat = -0.5f;
+	printf("sin(%f): [%f]\n", testFloat, sin(testFloat));
+
+	testFloat = 0.5f;
+	printf("cos(%f): [%f]\n", testFloat, cos(testFloat));
+	testFloat = -0.5f;
+	printf("cos(%f): [%f]\n", testFloat, cos(testFloat));
 
 	__CRT_shutdown();
 }
