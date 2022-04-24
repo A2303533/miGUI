@@ -102,5 +102,9 @@
     <ClCompile Include="..\..\src\CRT\s_tan.c">
       <Filter>CRT</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\src\CRT\e_atan2.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -209,5 +209,12 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	testFloat = -1.9f;
 	printf("floor(%f): [%f]\n", testFloat, floor(testFloat));
 
+	double x = 5.f, y = 3.f;
+	printf("atan2(%f, %f): [%f]\n", x, y, atan2(y, x));
+	x = 15.f, y = 3.f;
+	printf("atan2(%f, %f): [%f]\n", x, y, atan2(y, x));
+	x = 5.f, y = 13.f;
+	printf("atan2(%f, %f): [%f]\n", x, y, atan2(y, x));
+
 	__CRT_shutdown();
 }

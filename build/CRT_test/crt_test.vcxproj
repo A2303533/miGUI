@@ -25,6 +25,7 @@
     <ClCompile Include="..\..\src\CRT\errno.c" />
     <ClCompile Include="..\..\src\CRT\e_acos.c" />
     <ClCompile Include="..\..\src\CRT\e_asin.c" />
+    <ClCompile Include="..\..\src\CRT\e_atan2.c" />
     <ClCompile Include="..\..\src\CRT\e_rem_pio2.c" />
     <ClCompile Include="..\..\src\CRT\e_sqrt.c" />
     <ClCompile Include="..\..\src\CRT\fenv.c" />

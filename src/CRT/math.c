@@ -101,6 +101,27 @@ atanl(long double x)
 
 double 
 _C_DECL 
+atan2(double y, double x)
+{
+	return __CRT_ieee754_atan2(y, x);
+}
+
+float 
+_C_DECL 
+atan2f(float y, float x)
+{
+	return __CRT_ieee754_atan2f(y, x);
+}
+
+long double 
+_C_DECL 
+atan2l(long double y, long double x)
+{
+	return __CRT_ieee754_atan2l(y, x);
+}
+
+double 
+_C_DECL 
 tan(double x)
 {
 	return __CRT_tan(x);
