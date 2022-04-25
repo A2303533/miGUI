@@ -24,8 +24,11 @@
     <ClCompile Include="..\..\src\CRT\ctype.c" />
     <ClCompile Include="..\..\src\CRT\errno.c" />
     <ClCompile Include="..\..\src\CRT\e_acos.c" />
+    <ClCompile Include="..\..\src\CRT\e_acosh.c" />
     <ClCompile Include="..\..\src\CRT\e_asin.c" />
     <ClCompile Include="..\..\src\CRT\e_atan2.c" />
+    <ClCompile Include="..\..\src\CRT\e_atanh.c" />
+    <ClCompile Include="..\..\src\CRT\e_log.c" />
     <ClCompile Include="..\..\src\CRT\e_rem_pio2.c" />
     <ClCompile Include="..\..\src\CRT\e_sqrt.c" />
     <ClCompile Include="..\..\src\CRT\fenv.c" />
@@ -45,12 +48,14 @@
     <ClCompile Include="..\..\src\CRT\stdlib.c" />
     <ClCompile Include="..\..\src\CRT\string.c" />
     <ClCompile Include="..\..\src\CRT\strtol.c" />
+    <ClCompile Include="..\..\src\CRT\s_asinh.c" />
     <ClCompile Include="..\..\src\CRT\s_atan.c" />
     <ClCompile Include="..\..\src\CRT\s_cos.c" />
     <ClCompile Include="..\..\src\CRT\s_fabs.c" />
     <ClCompile Include="..\..\src\CRT\s_floor.c" />
     <ClCompile Include="..\..\src\CRT\s_isfinite.c" />
     <ClCompile Include="..\..\src\CRT\s_isnormal.c" />
+    <ClCompile Include="..\..\src\CRT\s_log1p.c" />
     <ClCompile Include="..\..\src\CRT\s_scalbln.c" />
     <ClCompile Include="..\..\src\CRT\s_scalbn.c" />
     <ClCompile Include="..\..\src\CRT\s_signbit.c" />

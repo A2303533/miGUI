@@ -94,6 +94,7 @@
 static	const double	one	= 1.0, tiny=1.0e-300;
 
 double
+_C_DECL
 __CRT_ieee754_sqrt(double x)
 {
 	double z;
@@ -193,6 +194,7 @@ __CRT_ieee754_sqrt(double x)
 #pragma warning(push)
 #pragma warning(disable: 4244)
 float
+_C_DECL
 __CRT_ieee754_sqrtf(float x)
 {
 	float z;
@@ -260,6 +262,7 @@ __CRT_ieee754_sqrtf(float x)
 #pragma warning(pop)
 
 long double
+_C_DECL
 __CRT_sqrtl(long double x)
 {
 	return __CRT_ieee754_sqrt(x);

@@ -100,6 +100,7 @@ _C_DECL
 fegetenv(fenv_t* envp)
 {
 	*envp = __CRT_fe_dfl_env;
+	return 0;
 }
 
 int 

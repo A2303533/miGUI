@@ -4,19 +4,6 @@
 
 extern __CRT_main_struct __crt;
 
-/*
- * ANSI/POSIX
- */
-union __CRT_infinity_un {
-	unsigned char	__uc[8];
-	double		__ud;
-};
-
-union __CRT_nan_un {
-	unsigned char	__uc[sizeof(float)];
-	float		__uf;
-};
-
 /* bytes for +Infinity on a 387 */
 const union __CRT_infinity_un __CRT_infinity_ = { { 0, 0, 0, 0, 0, 0, 0xf0, 0x7f } };
 /* bytes for NaN */
@@ -181,6 +168,111 @@ _C_DECL
 tanl(long double x)
 {
 	return __CRT_tanl(x);
+}
+
+double
+_C_DECL
+acosh(double x)
+{
+	return __CRT_ieee754_acosh(x);
+}
+
+float 
+_C_DECL 
+acoshf(float x)
+{
+	return __CRT_ieee754_acoshf(x);
+}
+
+long double 
+_C_DECL 
+acoshl(long double x)
+{
+	return __CRT_ieee754_acoshl(x);
+}
+
+double 
+_C_DECL 
+asinh(double x)
+{
+	return __CRT_asinh(x);
+}
+
+float 
+_C_DECL 
+asinhf(float x)
+{
+	return __CRT_asinhf(x);
+}
+
+long double 
+_C_DECL 
+asinhl(long double x)
+{
+	return __CRT_asinhl(x);
+}
+
+double 
+_C_DECL 
+atanh(double x)
+{
+	return __CRT_ieee754_atanh(x);
+}
+
+float 
+_C_DECL 
+atanhf(float x)
+{
+	return __CRT_ieee754_atanhf(x);
+}
+
+long double 
+_C_DECL 
+atanhl(long double x)
+{
+	return __CRT_ieee754_atanhl(x);
+}
+
+double 
+_C_DECL 
+log(double x)
+{
+	return __CRT_ieee754_log(x);
+}
+
+float 
+_C_DECL 
+logf(float x)
+{
+	return __CRT_ieee754_logf(x);
+}
+
+long double 
+_C_DECL 
+logl(long double x)
+{
+	return __CRT_ieee754_logl(x);
+}
+
+double 
+_C_DECL 
+log1p(double x)
+{
+	return __CRT_log1p(x);
+}
+
+float 
+_C_DECL 
+log1pf(float x)
+{
+	return __CRT_log1pf(x);
+}
+
+long double 
+_C_DECL 
+log1pl(long double x)
+{
+	return __CRT_log1pl(x);
 }
 
 double 

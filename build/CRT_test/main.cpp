@@ -222,5 +222,40 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	testFloat = -0.5f;
 	printf("cos(%f): [%f]\n", testFloat, cos(testFloat));
 
+	testFloat = 2.f;
+	printf("acosh(%f): [%f]\n", testFloat, acosh(testFloat));
+	testFloat = 1.f;
+	printf("acosh(%f): [%f]\n", testFloat, acosh(testFloat));
+	testFloat = 0.f;
+	printf("acosh(%f): [%f]\n", testFloat, acosh(testFloat));
+
+	testFloat = 2.f;
+	printf("asinh(%f): [%f]\n", testFloat, asinh(testFloat));
+	testFloat = 1.f;
+	printf("asinh(%f): [%f]\n", testFloat, asinh(testFloat));
+	testFloat = 0.f;
+	printf("asinh(%f): [%f]\n", testFloat, asinh(testFloat));
+
+	testFloat = 100.f;
+	printf("log(%f): [%f]\n", testFloat, log(testFloat));
+	testFloat = 40.f;
+	printf("log(%f): [%f]\n", testFloat, log(testFloat));
+	testFloat = -4.f;
+	printf("log(%f): [%f]\n", testFloat, log(testFloat));
+
+	testFloat = 1.f;
+	printf("log1p(%f): [%f]\n", testFloat, log1p(testFloat));
+	testFloat = 2.f;
+	printf("log1p(%f): [%f]\n", testFloat, log1p(testFloat));
+	testFloat = 3.f;
+	printf("log1p(%f): [%f]\n", testFloat, log1p(testFloat));
+
+	testFloat = 0.6f;
+	printf("atanh(%f): [%f]\n", testFloat, atanh(testFloat));
+	testFloat = -0.5f;
+	printf("atanh(%f): [%f]\n", testFloat, atanh(testFloat));
+	testFloat = -2.f;
+	printf("atanh(%f): [%f]\n", testFloat, atanh(testFloat));
+
 	__CRT_shutdown();
 }

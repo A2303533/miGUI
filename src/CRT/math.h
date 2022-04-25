@@ -24,6 +24,19 @@
 typedef float float_t;
 typedef double double_t;
 
+/*
+ * ANSI/POSIX
+ */
+union __CRT_infinity_un {
+	unsigned char	__uc[8];
+	double		__ud;
+};
+
+union __CRT_nan_un {
+	unsigned char	__uc[sizeof(float)];
+	float		__uf;
+};
+
 #define	M_E		2.7182818284590452354	/* e */
 #define	M_LOG2E		1.4426950408889634074	/* log 2e */
 #define	M_LOG10E	0.43429448190325182765	/* log 10e */
@@ -162,24 +175,41 @@ extern "C" {
 	float _C_DECL __CRT_cosf(float x);
 	double _C_DECL __CRT_cos(double x);
 
+	double _C_DECL __CRT_ieee754_log(double x);
+	float _C_DECL __CRT_ieee754_logf(float x);
+	long double _C_DECL __CRT_ieee754_logl(long double x);
+
+	double _C_DECL __CRT_log1p(double x);
+	float _C_DECL __CRT_log1pf(float x);
+	long double _C_DECL __CRT_log1pl(long double x);
+
+	double _C_DECL __CRT_ieee754_acosh(double x);
+	float _C_DECL __CRT_ieee754_acoshf(float x);
+	long double _C_DECL __CRT_ieee754_acoshl(long double x);
+
+	double _C_DECL __CRT_asinh(double x);
+	float _C_DECL __CRT_asinhf(float x);
+	long double _C_DECL __CRT_asinhl(long double x);
+
+	double _C_DECL __CRT_ieee754_atanh(double x);
+	float _C_DECL __CRT_ieee754_atanhf(float x);
+	long double _C_DECL __CRT_ieee754_atanhl(long double x);
+
 	static __inline int
 		__CRT_inline_isnan(double __x)
 	{
-
 		return (__x != __x);
 	}
 
 	static __inline int
 		__CRT_inline_isnanf(float __x)
 	{
-
 		return (__x != __x);
 	}
 
 	static __inline int
 		__CRT_inline_isnanl(long double __x)
 	{
-
 		return (__x != __x);
 	}
 
@@ -217,6 +247,33 @@ extern "C" {
 	double _C_DECL tan(double x);
 	float _C_DECL tanf(float x);
 	long double _C_DECL tanl(long double x);
+
+	// 7.12.5.1
+	double _C_DECL acosh(double x);
+	float _C_DECL acoshf(float x);
+	long double _C_DECL acoshl(long double x);
+
+	// 7.12.5.2
+	double _C_DECL asinh(double x);
+	float _C_DECL asinhf(float x);
+	long double _C_DECL asinhl(long double x);
+
+	// 7.12.5.3
+	double _C_DECL atanh(double x);
+	float _C_DECL atanhf(float x);
+	long double _C_DECL atanhl(long double x);
+
+	// 7.12.6.7
+	// log e
+	double _C_DECL log(double x);
+	float _C_DECL logf(float x);
+	long double _C_DECL logl(long double x);
+
+	// 7.12.6.9
+	double _C_DECL log1p(double x);
+	float _C_DECL log1pf(float x);
+	long double _C_DECL log1pl(long double x);
+
 
 	// 7.12.6.12
 	double _C_DECL modf(double value, double* iptr);
