@@ -6,6 +6,7 @@
 #include "CRT/math.h"
 #include "CRT/pool.h"
 #include "CRT/WinAPI.h"
+#include "CRT/ctype.h"
 
 #include <vcruntime_typeinfo.h>
 type_info::~type_info() noexcept
@@ -256,6 +257,6 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	printf("atanh(%f): [%f]\n", testFloat, atanh(testFloat));
 	testFloat = -2.f;
 	printf("atanh(%f): [%f]\n", testFloat, atanh(testFloat));
-
+	
 	__CRT_shutdown();
 }

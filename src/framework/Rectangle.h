@@ -40,8 +40,8 @@ namespace mgf
 	{
 	protected:
 		mgElementRectangle_s* m_elementRectangle = 0;
-	public:
 		Rectangle();
+	public:
 		Rectangle(Window* w);
 		virtual  ~Rectangle();
 

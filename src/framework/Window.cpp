@@ -41,8 +41,10 @@
 
 using namespace mgf;
 
-Window::Window()
+Window::Window(Context* ctx)
 {
+	m_window = mgCreateWindow(ctx->m_gui_context, 0, 0, 300, 200);
+	m_window->titlebarFont = ((mgf::FontImpl*)ctx->GetBackend()->GetDefaultFont())->m_font;
 }
 
 Window::~Window()

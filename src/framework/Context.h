@@ -62,7 +62,7 @@ namespace mgf
 
 		void OnWindowSize();
 		
-		mgf::Window* CreateWindow();
+		//mgf::Window* CreateWindow();
 		/*
 		struct mgPopupItemInfo_s popupItems[] =
 		{

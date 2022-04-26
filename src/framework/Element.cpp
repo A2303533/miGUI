@@ -33,74 +33,61 @@
 
 using namespace mgf;
 
-void Element_onMouseEnter(struct mgElement_s* e) { 
-	Element* el = (Element*)e->userData; 
-	if (el->onMouseEnter)
-		el->onMouseEnter(el);
-}
-void Element_onMouseLeave(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onMouseLeave)
-		el->onMouseLeave(el);
-}
-void Element_onClickLMB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onClickLMB)
-		el->onClickLMB(el);
-}
-void Element_onClickRMB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onClickRMB)
-		el->onClickRMB(el);
-}
-void Element_onClickMMB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onClickMMB)
-		el->onClickMMB(el);
-}
-void Element_onClickX1MB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onClickX1MB)
-		el->onClickX1MB(el);
-}
-void Element_onClickX2MB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onClickX2MB)
-		el->onClickX2MB(el);
-}
-void Element_onReleaseLMB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onReleaseLMB)
-		el->onReleaseLMB(el);
-}
-void Element_onReleaseRMB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onReleaseRMB)
-		el->onReleaseRMB(el);
-}
-void Element_onReleaseMMB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onReleaseMMB)
-		el->onReleaseMMB(el);
-}
-void Element_onReleaseX1MB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onReleaseX1MB)
-		el->onReleaseX1MB(el);
-}
-void Element_onReleaseX2MB(struct mgElement_s* e) {
-	Element* el = (Element*)e->userData;
-	if (el->onReleaseX2MB)
-		el->onReleaseX2MB(el);
-}
-
-
 Element::Element()
 {
 }
 
 Element::~Element()
 {
+}
+
+void Element_onMouseEnter(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnMouseEnter();
+}
+void Element_onMouseLeave(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnMouseLeave();
+}
+void Element_onClickLMB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnClickLMB();
+}
+void Element_onClickRMB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnClickRMB();
+}
+void Element_onClickMMB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnClickMMB();
+}
+void Element_onClickX1MB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnClickX1MB();
+}
+void Element_onClickX2MB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnClickX2MB();
+}
+void Element_onReleaseLMB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnReleaseLMB();
+}
+void Element_onReleaseRMB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnReleaseRMB();
+}
+void Element_onReleaseMMB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnReleaseMMB();
+}
+void Element_onReleaseX1MB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnReleaseX1MB();
+}
+void Element_onReleaseX2MB(struct mgElement_s* e) {
+	Element* el = (Element*)e->userData;
+	el->OnReleaseX2MB();
 }
 
 void Element::PostInit()
@@ -282,4 +269,64 @@ bool Element::IsEnabled()
 mgElement_s* Element::GetElement()
 {
 	return m_element;
+}
+
+void Element::OnMouseEnter()
+{
+
+}
+
+void Element::OnMouseLeave()
+{
+
+}
+
+void Element::OnClickLMB()
+{
+
+}
+
+void Element::OnClickRMB()
+{
+
+}
+
+void Element::OnClickMMB()
+{
+
+}
+
+void Element::OnClickX1MB()
+{
+
+}
+
+void Element::OnClickX2MB()
+{
+
+}
+
+void Element::OnReleaseLMB()
+{
+
+}
+
+void Element::OnReleaseRMB()
+{
+
+}
+
+void Element::OnReleaseMMB()
+{
+
+}
+
+void Element::OnReleaseX1MB()
+{
+
+}
+
+void Element::OnReleaseX2MB()
+{
+
 }

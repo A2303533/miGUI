@@ -192,8 +192,8 @@ void BackendGDI::BeginDraw()
 	RECT r;
 	r.left = 0;
 	r.top = 0;
-	r.right = m_window->m_size.x + m_window->m_borderSize.x;
-	r.bottom = m_window->m_size.y + m_window->m_borderSize.y;
+	r.right = m_window->m_size.x;
+	r.bottom = m_window->m_size.y;
 	FillRect(m_window->m_hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
 }
 
@@ -201,9 +201,10 @@ void BackendGDI::EndDraw()
 {
 	HDC dc = GetWindowDC(m_window->m_hWnd);
 	BitBlt(dc,
-		0, 0,
-		m_window->m_size.x + m_window->m_borderSize.x,
-		m_window->m_size.y + m_window->m_borderSize.y,
+		m_window->m_borderSize.x,
+		m_window->m_borderSize.y,
+		m_window->m_size.x,
+		m_window->m_size.y,
 		m_window->m_hdcMem,
 		0, 0,
 		SRCCOPY);
@@ -269,11 +270,12 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	HBRUSH brsh = CreateSolidBrush(RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
 	SelectObject(m_window->m_hdcMem, brsh);
 
+
 	RECT r;
-	r.left = rct->left + m_window->m_borderSize.x;
-	r.top = rct->top + m_window->m_borderSize.y;
-	r.right = rct->right + m_window->m_borderSize.x;
-	r.bottom = rct->bottom + m_window->m_borderSize.y;
+	r.left = rct->left;
+	r.top = rct->top;
+	r.right = rct->right;
+	r.bottom = rct->bottom;
 
 	HRGN rgn = 0;
 
@@ -289,14 +291,12 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			r.right -= 2;
 		}
 		rgn = CreateRectRgn(
-			m_clipRect.left + m_window->m_borderSize.x, 
-			m_clipRect.top + m_window->m_borderSize.y,
-			m_clipRect.right + m_window->m_borderSize.x,
-			m_clipRect.bottom + m_window->m_borderSize.y);
+			m_clipRect.left,
+			m_clipRect.top,
+			m_clipRect.right,
+			m_clipRect.bottom);
 		SelectClipRgn(m_window->m_hdcMem, rgn);
 		FillRect(m_window->m_hdcMem, &r, brsh);
-
-		
 	}break;
 	case mgDrawRectangleReason_listItemBG1:
 	case mgDrawRectangleReason_listItemBG2:
@@ -305,10 +305,10 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	case mgDrawRectangleReason_tableColTitleColBG:
 	{
 		rgn = CreateRectRgn(
-			m_clipRect.left + m_window->m_borderSize.x,
-			m_clipRect.top + m_window->m_borderSize.y,
-			m_clipRect.right + m_window->m_borderSize.x,
-			m_clipRect.bottom + m_window->m_borderSize.y);
+			m_clipRect.left,
+			m_clipRect.top,
+			m_clipRect.right,
+			m_clipRect.bottom);
 		SelectClipRgn(m_window->m_hdcMem, rgn);
 		MoveToEx(m_window->m_hdcMem, r.right - 1, r.top, 0);
 		HPEN p = CreatePen(0, 2, RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
@@ -320,10 +320,10 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	case mgDrawRectangleReason_tableRowBG2:
 	{
 		rgn = CreateRectRgn(
-			m_clipRect.left + m_window->m_borderSize.x,
-			m_clipRect.top + m_window->m_borderSize.y,
-			m_clipRect.right + m_window->m_borderSize.x,
-			m_clipRect.bottom + m_window->m_borderSize.y);
+			m_clipRect.left,
+			m_clipRect.top,
+			m_clipRect.right,
+			m_clipRect.bottom);
 		SelectClipRgn(m_window->m_hdcMem, rgn);
 		MoveToEx(m_window->m_hdcMem, r.left, r.bottom, 0);
 		HPEN p = CreatePen(0, 2, RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
@@ -335,8 +335,8 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	{
 		{
 			Gdiplus::Rect gdirct;
-			gdirct.X = rct->left + m_window->m_borderSize.x;
-			gdirct.Y = rct->top + m_window->m_borderSize.y;
+			gdirct.X = rct->left;
+			gdirct.Y = rct->top;
 			gdirct.Width = rct->right - rct->left + 5;
 			gdirct.Height = rct->bottom - rct->top + 4;
 
@@ -367,10 +367,10 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 		}
 		
 		rgn = CreateRectRgn(
-				m_clipRect.left + m_window->m_borderSize.x,
-				m_clipRect.top + m_window->m_borderSize.y,
-				m_clipRect.right + m_window->m_borderSize.x,
-				m_clipRect.bottom + m_window->m_borderSize.y);
+				m_clipRect.left,
+				m_clipRect.top,
+				m_clipRect.right,
+				m_clipRect.bottom);
 			SelectClipRgn(m_window->m_hdcMem, rgn);
 		FillRect(m_window->m_hdcMem, &r, brsh);
 
@@ -394,8 +394,8 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 		if (texture)
 		{
 			Gdiplus::Rect gdirct;
-			gdirct.X = rct->left + m_window->m_borderSize.x;
-			gdirct.Y = rct->top + m_window->m_borderSize.y;
+			gdirct.X = rct->left;
+			gdirct.Y = rct->top;
 			gdirct.Width = rct->right - rct->left;
 			gdirct.Height = rct->bottom - rct->top;
 			
@@ -482,15 +482,15 @@ void BackendGDI::DrawText(int reason, void* object, mgPoint* position, const wch
 	SetBkMode(m_window->m_hdcMem, TRANSPARENT);
 
 	HRGN rgn = CreateRectRgn(
-		m_clipRect.left + m_window->m_borderSize.x,
-		m_clipRect.top + m_window->m_borderSize.y,
-		m_clipRect.right + m_window->m_borderSize.x,
-		m_clipRect.bottom + m_window->m_borderSize.y);
+		m_clipRect.left,
+		m_clipRect.top,
+		m_clipRect.right,
+		m_clipRect.bottom);
 
 	SelectClipRgn(m_window->m_hdcMem, rgn);
 	TextOutW(m_window->m_hdcMem, 
-		position->x + m_window->m_borderSize.x, 
-		position->y + m_window->m_borderSize.y, 
+		position->x, 
+		position->y, 
 		text, textLen);
 	DeleteObject(rgn);
 	SelectClipRgn(m_window->m_hdcMem, 0);
@@ -615,10 +615,17 @@ Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool ital
 		
 		SelectObject(m_window->m_hdcMem, f->implementation);
 
+#ifdef _UNICODE
 		TEXTMETRICW tm;
 		GetTextMetrics(m_window->m_hdcMem, &tm);
 		f->maxSize.x = tm.tmMaxCharWidth;
 		f->maxSize.y = tm.tmHeight;
+#else
+		TEXTMETRICA tm;
+		GetTextMetrics(m_window->m_hdcMem, &tm);
+		f->maxSize.x = tm.tmMaxCharWidth;
+		f->maxSize.y = tm.tmHeight;
+#endif
 
 		ReleaseDC(this->m_window->m_hWnd, g_dc);
 		newFont->m_font = f;

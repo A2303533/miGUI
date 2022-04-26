@@ -11,9 +11,19 @@ extern "C" {
 #endif
 
 	/*7.4.1.1*/
+	/// <summary>
+	/// Return 1 if character is digit or character (basic latin alphabet).
+	/// </summary>
+	/// <param name="c" >- character</param>
+	/// <returns>1 if true</returns>
 	int _C_DECL isalnum(int c);
 
 	/*7.4.1.2*/
+	/// <summary>
+	/// Return 1 if character is character (basic latin alphabet).
+	/// </summary>
+	/// <param name="c" >- character</param>
+	/// <returns>1 if true</returns>
 	int _C_DECL isalpha(int c);
 
 	/*7.4.1.3*/

@@ -522,6 +522,8 @@ mgUpdateWindow(struct mgWindow_s* w)
 		mgWindowRebuildMenu(w);
 		topIndent += w->menu->currentHeight;
 	}
+	
+	//topIndent = 0;
 
 	static float posX = 0;
 	static float posXlerp = 0;
@@ -779,6 +781,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 		w->rootElement->transformLocal.buildArea = w->rect;
 		w->rootElement->transformLocal.clipArea = w->rect;
 		w->rootElement->transformLocal.clipArea.top += topIndent;
+		w->rootElement->transformLocal.buildArea.top += topIndent;
 		
 		if (w->contentHeight > w->clientHeight)
 		{
@@ -941,8 +944,8 @@ mgUpdateWindow(struct mgWindow_s* w)
 	
 		if ((w->flags & mgWindowFlag_withTitlebar))
 		{
-			w->rootElement->transformWorld.buildArea.top += topIndent;
-			w->rootElement->transformWorld.buildArea.bottom += topIndent;
+		//	w->rootElement->transformWorld.buildArea.top += topIndent;
+		//	w->rootElement->transformWorld.buildArea.bottom += topIndent;
 		}
 	}
 

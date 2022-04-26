@@ -47,6 +47,9 @@ namespace mgf
 	
 	class Element;
 
+	/// <summary>
+	/// delete this
+	/// </summary>
 	using ElementCallback = void(*)(Element*);
 
 	class Element
@@ -91,7 +94,19 @@ namespace mgf
 		virtual void SetRectBottom(int v);
 		virtual void SetPositionAndSize(int posX, int posY, int sizeX, int sizeY);
 
-		ElementCallback onMouseEnter = 0;
+		virtual void OnMouseEnter();
+		virtual void OnMouseLeave();
+		virtual void OnClickLMB();
+		virtual void OnClickRMB();
+		virtual void OnClickMMB();
+		virtual void OnClickX1MB();
+		virtual void OnClickX2MB();
+		virtual void OnReleaseLMB();
+		virtual void OnReleaseRMB();
+		virtual void OnReleaseMMB();
+		virtual void OnReleaseX1MB();
+		virtual void OnReleaseX2MB();
+		/*ElementCallback onMouseEnter = 0;
 		ElementCallback onMouseLeave = 0;
 		ElementCallback onClickLMB = 0;
 		ElementCallback onClickRMB = 0;
@@ -102,7 +117,7 @@ namespace mgf
 		ElementCallback onReleaseRMB = 0;
 		ElementCallback onReleaseMMB = 0;
 		ElementCallback onReleaseX1MB = 0;
-		ElementCallback onReleaseX2MB = 0;
+		ElementCallback onReleaseX2MB = 0;*/
 	};
 }
 

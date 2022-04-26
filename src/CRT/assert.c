@@ -20,5 +20,6 @@ __assert(
 #endif
 
 	exit(EXIT_FAILURE);
+	//abort()
 }
 

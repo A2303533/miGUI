@@ -99,7 +99,7 @@ namespace mgf
 
 		bool m_isVisible = true;
 	public:
-		Window();
+		Window(Context*);
 		virtual ~Window();
 
 		void SetTitle(const wchar_t* t, Font* optionalFont);

@@ -99,13 +99,13 @@ void Context::OnWindowSize()
 	mgOnWindowSize(m_gui_context, m_gui_context->windowSize.x, m_gui_context->windowSize.y);
 }
 
-Window* Context::CreateWindow()
-{
-	Window* newWindow = new Window;
-	newWindow->m_window = mgCreateWindow(m_gui_context, 0, 0, 300, 200);
-	newWindow->m_window->titlebarFont = ((mgf::FontImpl*)this->m_backend->GetDefaultFont())->m_font;
-	return newWindow;
-}
+//Window* Context::CreateWindow()
+//{
+//	Window* newWindow = new Window;
+//	newWindow->m_window = mgCreateWindow(m_gui_context, 0, 0, 300, 200);
+//	newWindow->m_window->titlebarFont = ((mgf::FontImpl*)this->m_backend->GetDefaultFont())->m_font;
+//	return newWindow;
+//}
 
 void Context::DrawBegin()
 {

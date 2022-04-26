@@ -18,7 +18,7 @@ extern "C" {
 }
 #endif
 
-/*7.2:1*/
+/*7.2.1.1*/
 #ifdef NDEBUG
 #define assert(ignore) ((void)0)
 #else

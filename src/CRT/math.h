@@ -262,6 +262,12 @@ extern "C" {
 	double _C_DECL atanh(double x);
 	float _C_DECL atanhf(float x);
 	long double _C_DECL atanhl(long double x);
+	
+
+	// 7.12.5.4
+	/*double _C_DECL cosh(double x);
+	float _C_DECL coshf(float x);
+	long double _C_DECL coshl(long double x);*/
 
 	// 7.12.6.7
 	// log e
