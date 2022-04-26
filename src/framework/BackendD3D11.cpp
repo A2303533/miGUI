@@ -39,6 +39,10 @@
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 
+#include "framework/GSD3D11.h"
+
+extern PFND3DCOMPILEPROC g_D3DCompile;
+
 using namespace mgf;
 
 extern mgf::Backend* g_backend;
@@ -310,7 +314,7 @@ bool BackendD3D11::D3D11_createConstantBuffer(int byteSize, ID3D11Buffer** cb) {
 bool BackendD3D11::D3D11_createGeometryShaders(const char* target, const char* shaderText, const char* entryPoint, ID3D11GeometryShader** gs) {
 	ID3D10Blob* m_GsBlob = nullptr;
 	ID3D10Blob* m_errorBlob = nullptr;
-	HRESULT hr = D3DCompile(shaderText, strlen(shaderText), 0, 0, 0, entryPoint, target, 0, 0, &m_GsBlob, &m_errorBlob);
+	HRESULT hr = g_D3DCompile(shaderText, strlen(shaderText), 0, 0, 0, entryPoint, target, 0, 0, &m_GsBlob, &m_errorBlob);
 	if (FAILED(hr)) {
 		char* message = (char*)m_errorBlob->GetBufferPointer();
 		printf("Geometry shader compile error: %s\n", message);
@@ -333,7 +337,7 @@ bool BackendD3D11::D3D11_createShaders(const char* vertexTarget, const char* pix
 	ID3D10Blob* m_PsBlob = nullptr;
 	ID3D10Blob* m_errorBlob = nullptr;
 
-	HRESULT hr = D3DCompile(vertexShader, strlen(vertexShader), 0, 0, 0, vertexEntryPoint, vertexTarget, 0, 0, &m_VsBlob, &m_errorBlob);
+	HRESULT hr = g_D3DCompile(vertexShader, strlen(vertexShader), 0, 0, 0, vertexEntryPoint, vertexTarget, 0, 0, &m_VsBlob, &m_errorBlob);
 
 	if (FAILED(hr)) {
 		char* message = (char*)m_errorBlob->GetBufferPointer();
@@ -341,7 +345,7 @@ bool BackendD3D11::D3D11_createShaders(const char* vertexTarget, const char* pix
 		return false;
 	}
 
-	hr = D3DCompile(pixelShader, strlen(pixelShader), 0, 0, 0, pixelEntryPoint, pixelTarget, 0, 0, &m_PsBlob, &m_errorBlob);
+	hr = g_D3DCompile(pixelShader, strlen(pixelShader), 0, 0, 0, pixelEntryPoint, pixelTarget, 0, 0, &m_PsBlob, &m_errorBlob);
 
 	if (FAILED(hr)) {
 		char* message = (char*)m_errorBlob->GetBufferPointer();

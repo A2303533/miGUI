@@ -30,6 +30,14 @@
 #ifndef _MG_FRAMEWORK_CONFIG_H_
 #define _MG_FRAMEWORK_CONFIG_H_
 
+//#define MGF_NO_BACKEND_GDI
+#define MGF_NO_BACKEND_OPENGL
+//#define MGF_NO_BACKEND_D3D11
+//#define MGF_NO_GS_D3D11
+
+#ifndef MGF_NO_GS_D3D11
+#define MGF_GS_D3D11
+#endif
 
 #ifndef MGF_NO_BACKEND_GDI
 #define MGF_BACKEND_GDI
@@ -43,5 +51,7 @@
 #ifndef MGF_NO_BACKEND_D3D11
 #define MGF_BACKEND_D3D11
 #endif
+
+
 
 #endif

@@ -372,11 +372,15 @@ mgDrawWindow_f(struct mgWindow_s* w)
 
 		if (w->menu)
 		{
-			w->context->gpu->setClipRect(&w->menuRect);
+			mgRect menuRect = w->menuRect;
+
+			menuRect.right = w->rect.right;
+
+			w->context->gpu->setClipRect(&menuRect);
 
 			if((w->flags & mgWindowFlag_noMenuBG) == 0)
 				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowMenuBG, w,
-					&w->menuRect,
+					&menuRect,
 					&style->windowMenuBG,
 					&style->windowMenuBG,
 					0, 0);
