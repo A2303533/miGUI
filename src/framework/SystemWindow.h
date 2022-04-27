@@ -112,6 +112,12 @@ namespace mgf
 		mgRect m_customTitlebarHitRect;
 		uint32_t m_customTitlebarSize = 20;
 	public:
+
+		/// <summary>
+		/// No initialization
+		/// </summary>
+		SystemWindow();
+
 		SystemWindow(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize);
 		virtual ~SystemWindow();
 
@@ -124,6 +130,9 @@ namespace mgf
 		virtual void SetTitle(const wchar_t*);
 		virtual void SetVisible(bool);
 		virtual bool IsVisible();
+
+		// Only set m_size
+		virtual void SetSize(int x, int y);
 
 		mgPoint* GetSizeMinimum();
 
@@ -160,6 +169,8 @@ namespace mgf
 		virtual void Maximize();
 		virtual void Minimize();
 		virtual void Restore();
+
+		const mgPoint& GetBorderSize();
 
 		// return true close application
 		virtual bool OnClose();

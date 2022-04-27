@@ -38,7 +38,19 @@ namespace mgf
 {
 	class Backend : public BaseClass
 	{
+	protected:
+		/// <summary>
+		/// Indent for final drawing.
+		/// For GDI its good to move it down that system menu will be draw correctly
+		/// </summary>
+		mgPoint m_endDrawIndent;
 	public:
+		virtual void SetEndDrawIndent(int x, int y)
+		{
+			m_endDrawIndent.x = x;
+			m_endDrawIndent.y = y;
+		}
+
 		virtual void* GetVideoDriverAPI() = 0;
 
 		/*
@@ -53,6 +65,7 @@ namespace mgf
 		* for active window.
 		*/
 		virtual void UpdateBackbuffer() = 0;
+
 
 		virtual void BeginDraw() = 0;
 		virtual void EndDraw() = 0;

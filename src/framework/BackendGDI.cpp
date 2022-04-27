@@ -201,8 +201,8 @@ void BackendGDI::EndDraw()
 {
 	HDC dc = GetWindowDC(m_window->m_hWnd);
 	BitBlt(dc,
-		m_window->m_borderSize.x,
-		m_window->m_borderSize.y,
+		m_window->m_borderSize.x + m_endDrawIndent.x,
+		m_window->m_borderSize.y + m_endDrawIndent.y,
 		m_window->m_size.x,
 		m_window->m_size.y,
 		m_window->m_hdcMem,

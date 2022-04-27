@@ -45,6 +45,11 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 #endif
 
+SystemWindow::SystemWindow()
+{
+
+}
+
 SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize)
 {
 #ifdef MG_PLATFORM_WINDOWS
@@ -139,6 +144,11 @@ void* SystemWindow::GetUserData()
 	return m_userData;
 }
 
+const mgPoint& SystemWindow::GetBorderSize()
+{
+    return m_borderSize;
+}
+
 void SystemWindow::SetTitle(const wchar_t* t)
 {
 #ifdef MG_PLATFORM_WINDOWS
@@ -162,6 +172,12 @@ bool SystemWindow::IsVisible()
 const mgPoint& SystemWindow::GetSize()
 {
     return m_size;
+}
+
+void SystemWindow::SetSize(int x, int y)
+{
+    m_size.x = x;
+    m_size.y = y;
 }
 
 void SystemWindow::UpdateBackbuffer()
@@ -679,11 +695,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (wheelDelta)
                     pW->m_context->m_input->mouseWheelDelta = (float)wheelDelta / (float)WHEEL_DELTA;
 
+                RECT rct;
+                GetWindowRect(hWnd, &rct);
+
                 POINT cursorPoint;
                 GetCursorPos(&cursorPoint);
-                ScreenToClient(hWnd, &cursorPoint);
-                pW->m_context->m_input->mousePosition.x = cursorPoint.x;
-                pW->m_context->m_input->mousePosition.y = cursorPoint.y;
+                //ScreenToClient(hWnd, &cursorPoint);
+                pW->m_context->m_input->mousePosition.x = cursorPoint.x - rct.left - pW->GetBorderSize().x;
+                pW->m_context->m_input->mousePosition.y = cursorPoint.y - rct.top - pW->GetBorderSize().y;
+
                 // printf("%i %i\n", cursorPoint.x, cursorPoint.y);
 
                 if (flags)
