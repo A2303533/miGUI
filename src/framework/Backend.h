@@ -96,10 +96,26 @@ namespace mgf
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) = 0;
 		virtual void DestroyFont(Font*) = 0;
 		virtual Font* GetDefaultFont() = 0;
-		// GDI
+		
+		/// <summary>
+		/// Only for GDI. Create font from file.
+		/// </summary>
+		/// <param name="file"></param>
+		/// <param name="size"></param>
+		/// <param name="bold"></param>
+		/// <param name="italic"></param>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		virtual Font* CreateFontPrivate(const wchar_t* file, int size, bool bold, bool italic, const wchar_t* name) { return 0; };
 
 		virtual void SetIcon(mgf::Icons*, int id) {}
+		
+		/// <summary>
+		/// Copy image to texture. Must be same size and same other parameters.
+		/// </summary>
+		/// <param name="t">- texture</param>
+		/// <param name="i">- image</param>
+		virtual void UpdateTexture(mgTexture* t, mgImage* i) {}
 	};
 }
 

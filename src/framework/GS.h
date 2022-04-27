@@ -18,7 +18,7 @@ namespace mgf
 #endif
 	};
 
-	class GS : BaseClass
+	class GS : public BaseClass
 	{
 	protected:
 		GSVideoDriverType m_videoDriverType = GSVideoDriverType::Unknown;
@@ -67,6 +67,13 @@ namespace mgf
 		virtual void SetTexture(uint32_t slot, GSTexture*) = 0;
 		virtual void SetMesh(GSMesh*) = 0;
 		virtual void Draw() = 0;
+
+		/// <summary>
+		/// Copy GPU texture data to mgf::Image.
+		/// </summary>
+		/// <param name="t">- texture</param>
+		/// <param name="i">- image. must be with same parameters with t</param>
+		virtual void GetTextureCopyForImage(GSTexture* t, Image* i) = 0;
 	};
 
 }

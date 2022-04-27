@@ -435,6 +435,38 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			}
 		}
 	}break;
+	case mgDrawRectangleReason_rectangleWithTexture:
+	{
+		if (texture)
+		{
+			Gdiplus::Rect gdirct;
+			gdirct.X = rct->left;
+			gdirct.Y = rct->top;
+			gdirct.Width = rct->right - rct->left;
+			gdirct.Height = rct->bottom - rct->top;
+
+			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
+
+			{
+				Gdiplus::Bitmap* bmp = (Gdiplus::Bitmap*)texture->implementation;
+
+				Gdiplus::Rect clrct;
+				clrct.X = 0;
+				clrct.Y = 0;
+				clrct.Width = bmp->GetWidth();
+				clrct.Height = bmp->GetHeight();
+
+				Gdiplus::Bitmap* bitmap = ((Gdiplus::Bitmap*)texture->implementation);
+
+				auto status = graphics.DrawImage(bitmap, gdirct,
+					0,
+					0,
+					clrct.Width,
+					clrct.Height,
+					Gdiplus::UnitPixel);
+			}
+		}
+	}break;
 	case mgDrawRectangleReason_windowTitlebar:
 	case mgDrawRectangleReason_windowBG:
 	{
@@ -664,6 +696,36 @@ Font* BackendGDI::GetDefaultFont()
 void BackendGDI::SetIcon(mgf::Icons* ic, int id)
 {
 	m_context->m_gui_context->currentIcon = &ic->GetMGIcons()->iconNodes[id];
+}
+
+void BackendGDI::UpdateTexture(mgTexture* t, mgImage* img)
+{
+	Gdiplus::Bitmap* gdiImage = (Gdiplus::Bitmap*)t->implementation;
+	memcpy(t->sourceCopy->data, img->data, img->dataSize);
+	
+	/*Gdiplus::Rect gdirect;
+	gdirect.X = 0;
+	gdirect.Y = 0;
+	gdirect.Width = img->width;
+	gdirect.Height = img->height;
+
+	Gdiplus::BitmapData bitmapData;
+	Gdiplus::Status s = gdiImage->LockBits(&gdirect, Gdiplus::ImageLockModeWrite, gdiImage->GetPixelFormat(), &bitmapData);
+
+	if (s == Gdiplus::Status::Ok)
+	{
+		uint8_t* dst = (uint8_t*)bitmapData.Scan0;
+		uint8_t* src = img->data;
+		
+		for (uint32_t i = 0; i < img->height; ++i)
+		{
+			memcpy(dst, src, img->pitch);
+			dst += img->pitch;
+			src += img->pitch;
+		}
+
+		gdiImage->UnlockBits(&bitmapData);
+	}*/
 }
 
 #endif

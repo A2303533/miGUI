@@ -199,6 +199,7 @@ GSD3D11Texture::GSD3D11Texture(GSTextureInfo* ti, ID3D11Device* d, ID3D11DeviceC
 	}
 	else
 	{
+		// RTT
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.Width = m_textureInfo.m_width;

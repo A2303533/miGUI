@@ -195,6 +195,10 @@ extern "C" {
 	float _C_DECL __CRT_ieee754_atanhf(float x);
 	long double _C_DECL __CRT_ieee754_atanhl(long double x);
 
+	double _C_DECL __CRT_ieee754_exp(double x);
+	float _C_DECL __CRT_ieee754_expf(float x);
+	long double _C_DECL __CRT_ieee754_expl(long double x);
+
 	static __inline int
 		__CRT_inline_isnan(double __x)
 	{
@@ -265,9 +269,14 @@ extern "C" {
 	
 
 	// 7.12.5.4
-	/*double _C_DECL cosh(double x);
+	double _C_DECL cosh(double x);
 	float _C_DECL coshf(float x);
-	long double _C_DECL coshl(long double x);*/
+	long double _C_DECL coshl(long double x);
+
+	// 7.12.6.1
+	double _C_DECL exp(double x);
+	float _C_DECL expf(float x);
+	long double _C_DECL expl(long double x);
 
 	// 7.12.6.7
 	// log e

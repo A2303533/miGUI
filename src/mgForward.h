@@ -83,6 +83,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_windowMenuActiveItemBG,
 	mgDrawRectangleReason_tooltip,
 	mgDrawRectangleReason_rectangle,
+	mgDrawRectangleReason_rectangleWithTexture,
 	mgDrawRectangleReason_buttonBG,
 	mgDrawRectangleReason_buttonIcon,
 	mgDrawRectangleReason_dockBG,

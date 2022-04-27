@@ -75,7 +75,7 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 		return false;
 	}
 
-	g_D3D11CreateDevice = (PFND3D11CREATEDEVICEPROC)GetProcAddress(m_dllD3DCompiler, "D3D11CreateDevice");
+	g_D3D11CreateDevice = (PFND3D11CREATEDEVICEPROC)GetProcAddress(m_dllD3D11, "D3D11CreateDevice");
 	if (!g_D3D11CreateDevice)
 	{
 		LogWriteError("Can't get procedure address (D3D11CreateDevice) from D3D11.dll");
@@ -119,15 +119,24 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 	IDXGIFactory1* dxgiFactory = nullptr;
 	hr = m_d3d11Device->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
 	if (FAILED(hr))
-		throw "Can't QueryInterface : IID_IDXGIDevice";
+	{
+		LogWriteError("Can't QueryInterface : IID_IDXGIDevice");
+		return false;
+	}
 
 	hr = dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
 	if (FAILED(hr))
-		throw "Can't get DXGI adapter";
+	{
+		LogWriteError("Can't get DXGI adapter");
+		return false;
+	}
 
 	hr = dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
 	if (FAILED(hr))
-		throw "Can't get DXGI factory";
+	{
+		LogWriteError("Can't get DXGI factory");
+		return false;
+	}
 
 	DXGI_SWAP_CHAIN_DESC	swapChainDesc;
 	memset(&swapChainDesc, 0, sizeof(swapChainDesc));
@@ -143,7 +152,10 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 
 	hr = dxgiFactory->CreateSwapChain(m_d3d11Device, &swapChainDesc, &m_SwapChain);
 	if (FAILED(hr))
-		throw "Can't create Swap Chain";
+	{
+		LogWriteError("Can't create Swap Chain");
+		return false;
+	}
 
 	dxgiFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
 	dxgiDevice->Release();
@@ -170,7 +182,10 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	if (FAILED(m_d3d11Device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilStateEnabled)))
-		throw "Can't create Direct3D 11 depth stencil state";
+	{
+		LogWriteError("Can't create Direct3D 11 depth stencil state");
+		return false;
+	}
 
 	m_d3d11DevCon->OMSetDepthStencilState(this->m_depthStencilStateEnabled, 0);
 
@@ -178,8 +193,10 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 	depthStencilDesc.StencilEnable = false;
 	depthStencilDesc.DepthEnable = false;
 	if (FAILED(m_d3d11Device->CreateDepthStencilState(&depthStencilDesc, &this->m_depthStencilStateDisabled)))
-		throw "Can't create Direct3D 11 depth stencil state";
-
+	{
+		LogWriteError("Can't create Direct3D 11 depth stencil state");
+		return false;
+	}
 
 	D3D11_RASTERIZER_DESC	rasterDesc;
 	ZeroMemory(&rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -195,7 +212,10 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
 	if (FAILED(m_d3d11Device->CreateRasterizerState(&rasterDesc, &m_RasterizerSolid)))
-		throw "Can not create rasterizer state";
+	{
+		LogWriteError("Can not create rasterizer state");
+		return false;
+	}
 
 	rasterDesc.CullMode = D3D11_CULL_NONE;
 	m_d3d11Device->CreateRasterizerState(&rasterDesc, &m_RasterizerSolidNoBackFaceCulling);
@@ -222,15 +242,24 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	if (FAILED(m_d3d11Device->CreateBlendState(&bd, &m_blendStateAlphaEnabled)))
-		throw "Can't create Direct3D 11 blend state";
+	{
+		LogWriteError("Can't create Direct3D 11 blend state");
+		return false;
+	}
 
 	bd.AlphaToCoverageEnable = 1;
 	if (FAILED(m_d3d11Device->CreateBlendState(&bd, &m_blendStateAlphaEnabledWithATC)))
-		throw "Can't create Direct3D 11 blend state";
+	{
+		LogWriteError("Can't create Direct3D 11 blend state");
+		return false;
+	}
 
 	bd.RenderTarget[0].BlendEnable = FALSE;
 	if (FAILED(m_d3d11Device->CreateBlendState(&bd, &m_blendStateAlphaDisabled)))
-		throw "Can't create Direct3D 11 blend state";
+	{
+		LogWriteError("Can't create Direct3D 11 blend state");
+		return false;
+	}
 
 	float blendFactor[4];
 	blendFactor[0] = 0.0f;
@@ -271,8 +300,11 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 		m_whiteTexture = (GSD3D11Texture*)this->CreateTexture(&inf);
 	}
 
-	outParams->m_d3d11Device = m_d3d11Device;
-	outParams->m_d3d11DevCon = m_d3d11DevCon;
+	if (outParams)
+	{
+		outParams->m_d3d11Device = m_d3d11Device;
+		outParams->m_d3d11DevCon = m_d3d11DevCon;
+	}
 
 	m_shaderScreenQuad = new GSD3D11ShaderScreenQuad(m_d3d11Device);
 	m_shaderScreenQuad->init();
@@ -661,6 +693,49 @@ bool GSD3D11::_createBackBuffer(uint32_t x, uint32_t y)
 		return false;
 	m_d3d11DevCon->OMSetRenderTargets(1, &m_MainTargetView, m_depthStencilView);
 	return true;
+}
+
+void GSD3D11::GetTextureCopyForImage(GSTexture* t, Image* i)
+{
+	D3D11_TEXTURE2D_DESC desc;
+	GSD3D11Texture* texture = (GSD3D11Texture*)t;
+	texture->m_texture->GetDesc(&desc);
+
+	desc.BindFlags = 0;
+	desc.MiscFlags &= D3D11_RESOURCE_MISC_TEXTURECUBE;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+	desc.Usage = D3D11_USAGE_STAGING;
+
+	ID3D11Texture2D* staging = 0;
+
+	HRESULT hr = m_d3d11Device->CreateTexture2D(&desc, nullptr, &staging);
+	if (FAILED(hr))
+		return;
+
+	m_d3d11DevCon->CopyResource(staging, texture->m_texture);
+	
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	hr = m_d3d11DevCon->Map(staging, 0, D3D11_MAP_READ, 0, &mapped);
+	if (FAILED(hr))
+		return;
+
+	uint32_t rowPitch = i->GetPitch();
+	uint8_t* dptr = i->GetData();
+	auto sptr = static_cast<const uint8_t*>(mapped.pData);
+	size_t msize = std::min<size_t>(rowPitch, mapped.RowPitch);
+	if (sptr)
+	{
+		for (size_t h = 0; h < desc.Height; ++h)
+		{
+			memcpy(dptr, sptr, msize);
+			sptr += mapped.RowPitch;
+			dptr += rowPitch;
+		}
+	}
+
+	m_d3d11DevCon->Unmap(staging, 0);
+	staging->Release();
+	return;
 }
 
 #endif

@@ -235,6 +235,45 @@ atanhl(long double x)
 
 double 
 _C_DECL 
+cosh(double x)
+{
+}
+
+float 
+_C_DECL 
+coshf(float x)
+{
+}
+
+long double 
+_C_DECL 
+coshl(long double x)
+{
+}
+
+double 
+_C_DECL 
+exp(double x)
+{
+	return __CRT_ieee754_exp(x);
+}
+
+float 
+_C_DECL 
+expf(float x)
+{
+	return __CRT_ieee754_expf(x);
+}
+
+long double 
+_C_DECL 
+expl(long double x)
+{
+	return __CRT_ieee754_expl(x);
+}
+
+double 
+_C_DECL 
 log(double x)
 {
 	return __CRT_ieee754_log(x);

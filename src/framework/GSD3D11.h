@@ -2,10 +2,10 @@
 #ifndef __MGF_GSD3D11_H_
 #define __MGF_GSD3D11_H_
 
-#include "GS.h"
+#include "framework/GS.h"
 #include <d3d11.h>
 
-typedef HRESULT(*PFND3DCOMPILEPROC)(
+typedef HRESULT(WINAPI*PFND3DCOMPILEPROC)(
 	LPCVOID pSrcData,
 	SIZE_T SrcDataSize,
 	LPCSTR pSourceName,
@@ -19,7 +19,7 @@ typedef HRESULT(*PFND3DCOMPILEPROC)(
 	ID3DBlob** ppErrorMsgs);
  
 //HRESULT D3D11CreateDevice
-typedef HRESULT(*PFND3D11CREATEDEVICEPROC)(
+typedef HRESULT(WINAPI*PFND3D11CREATEDEVICEPROC)(
 	IDXGIAdapter* pAdapter,
 	D3D_DRIVER_TYPE         DriverType,
 	HMODULE                 Software,
@@ -115,6 +115,8 @@ namespace mgf
 		virtual void SetTexture(uint32_t slot, GSTexture*) override;
 		virtual void SetMesh(GSMesh*) override;
 		virtual void Draw() override;
+
+		virtual void GetTextureCopyForImage(GSTexture* t, Image* i) override;
 
 		void UpdateGUIProjection();
 	};

@@ -140,6 +140,8 @@ do {								\
 int	__ieee754_rem_pio2(double, double*);
 #endif
 
+double	__ldexp_exp(double, int);
+
 /*
  * The rnint() family rounds to the nearest integer for a restricted range
  * range of args (up to about 2**MANT_DIG).  We assume that the current

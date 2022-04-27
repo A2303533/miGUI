@@ -49,7 +49,7 @@ namespace mgf
 		virtual void SetColor(int, int); // ARGB 0xFFrrggbb
 		virtual void SetColor(int); // ARGB 0xFFrrggbb
 
-
+		virtual void SetTexture(mgTexture*);
 	};
 }
 

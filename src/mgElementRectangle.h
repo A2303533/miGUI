@@ -33,6 +33,9 @@
 typedef struct mgElementRectangle_s {
 	mgColor color1;
 	mgColor color2;
+	
+	mgTexture* texture; // opt
+
 } mgElementRectangle;
 
 

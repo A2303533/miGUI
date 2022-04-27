@@ -76,5 +76,8 @@ void Rectangle::SetColor(int c)
 	mgColorSetAsIntegerARGB(&m_elementRectangle->color2, c);
 }
 
-
+void Rectangle::SetTexture(mgTexture* t)
+{
+	m_elementRectangle->texture = t;
+}
 

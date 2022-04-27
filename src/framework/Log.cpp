@@ -28,18 +28,24 @@ public:
 			sprintf(buffer, "Info: %s", m_buffer);
 			if (m_onInfo)
 				m_onInfo(buffer);
+			else
+				fprintf(stdout, "%s", buffer);
 		}break;
 		case Log::EMT_ERROR:
 		{
 			sprintf(buffer, "Error: %s", m_buffer);
 			if (m_onError)
 				m_onError(buffer);
+			else
+				fprintf(stderr, "%s", buffer);
 		}break;
 		case Log::EMT_WARNING:
 		{
 			sprintf(buffer, "Warning: %s", m_buffer);
 			if (m_onWarning)
 				m_onWarning(buffer);
+			else
+				fprintf(stderr, "%s", buffer);
 		}break;
 		default:
 			break;

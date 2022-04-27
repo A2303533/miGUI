@@ -325,8 +325,13 @@ miGUI_onDraw_rectangle(mgElement* e)
 	mgElementRectangle* impl = (mgElementRectangle*)e->implementation;
 
 	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-	e->window->context->gpu->drawRectangle(mgDrawRectangleReason_rectangle, impl, 
-		&e->transformWorld.buildArea, &impl->color1, &impl->color2, 0, 0);
+	e->window->context->gpu->drawRectangle(
+		impl->texture ? mgDrawRectangleReason_rectangleWithTexture : mgDrawRectangleReason_rectangle,
+		impl,
+		&e->transformWorld.buildArea, &impl->color1, &impl->color2, 
+		impl->texture, 
+		0
+	);
 }
 
 void

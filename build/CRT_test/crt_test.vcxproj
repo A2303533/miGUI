@@ -28,6 +28,8 @@
     <ClCompile Include="..\..\src\CRT\e_asin.c" />
     <ClCompile Include="..\..\src\CRT\e_atan2.c" />
     <ClCompile Include="..\..\src\CRT\e_atanh.c" />
+    <ClCompile Include="..\..\src\CRT\e_cosh.c" />
+    <ClCompile Include="..\..\src\CRT\e_exp.c" />
     <ClCompile Include="..\..\src\CRT\e_log.c" />
     <ClCompile Include="..\..\src\CRT\e_rem_pio2.c" />
     <ClCompile Include="..\..\src\CRT\e_sqrt.c" />
@@ -36,6 +38,7 @@
     <ClCompile Include="..\..\src\CRT\fpclassify.c" />
     <ClCompile Include="..\..\src\CRT\isinf.c" />
     <ClCompile Include="..\..\src\CRT\k_cos.c" />
+    <ClCompile Include="..\..\src\CRT\k_exp.c" />
     <ClCompile Include="..\..\src\CRT\k_rem_pio2.c" />
     <ClCompile Include="..\..\src\CRT\k_sin.c" />
     <ClCompile Include="..\..\src\CRT\k_tan.c" />
