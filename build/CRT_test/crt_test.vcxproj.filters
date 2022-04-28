@@ -142,5 +142,8 @@
     <ClCompile Include="..\..\src\CRT\k_exp.c">
       <Filter>CRT</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\CRT\complex.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

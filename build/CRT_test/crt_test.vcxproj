@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\CRT\assert.c" />
+    <ClCompile Include="..\..\src\CRT\complex.c" />
     <ClCompile Include="..\..\src\CRT\CRT_vs.c" />
     <ClCompile Include="..\..\src\CRT\ctype.c" />
     <ClCompile Include="..\..\src\CRT\errno.c" />

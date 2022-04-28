@@ -9,6 +9,7 @@
 #include "CRT/ctype.h"
 
 #include <vcruntime_typeinfo.h>
+#include <complex.h>
 type_info::~type_info() noexcept
 {
 }
@@ -134,7 +135,7 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	printf("acos(%f): [%f]\n", testFloat, acos(testFloat));
 	testFloat = 1.f;
 	printf("acos(%f): [%f]\n", testFloat, acos(testFloat));
-
+	
 	testFloat = 0.f;
 	printf("Test sqrt");
 	for (int i = 0; i < 2000000; ++i)
