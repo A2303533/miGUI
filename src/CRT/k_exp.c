@@ -84,27 +84,27 @@ __ldexp_exp(double x, int expt)
 	return (exp_x * scale);
 }
 
-double complex
-__ldexp_cexp(double complex z, int expt)
-{
-	double c, exp_x, s, scale1, scale2, x, y;
-	int ex_expt, half_expt;
-
-	x = creal(z);
-	y = cimag(z);
-	exp_x = __frexp_exp(x, &ex_expt);
-	expt += ex_expt;
-
-	/*
-	 * Arrange so that scale1 * scale2 == 2**expt.  We use this to
-	 * compensate for scalbn being horrendously slow.
-	 */
-	half_expt = expt / 2;
-	INSERT_WORDS(scale1, (0x3ff + half_expt) << 20, 0);
-	half_expt = expt - half_expt;
-	INSERT_WORDS(scale2, (0x3ff + half_expt) << 20, 0);
-
-	sincos(y, &s, &c);
-	return (CMPLX(c * exp_x * scale1 * scale2,
-	    s * exp_x * scale1 * scale2));
-}
+//double complex
+//__ldexp_cexp(double complex z, int expt)
+//{
+//	double c, exp_x, s, scale1, scale2, x, y;
+//	int ex_expt, half_expt;
+//
+//	x = creal(z);
+//	y = cimag(z);
+//	exp_x = __frexp_exp(x, &ex_expt);
+//	expt += ex_expt;
+//
+//	/*
+//	 * Arrange so that scale1 * scale2 == 2**expt.  We use this to
+//	 * compensate for scalbn being horrendously slow.
+//	 */
+//	half_expt = expt / 2;
+//	INSERT_WORDS(scale1, (0x3ff + half_expt) << 20, 0);
+//	half_expt = expt - half_expt;
+//	INSERT_WORDS(scale2, (0x3ff + half_expt) << 20, 0);
+//
+//	sincos(y, &s, &c);
+//	return (CMPLX(c * exp_x * scale1 * scale2,
+//	    s * exp_x * scale1 * scale2));
+//}

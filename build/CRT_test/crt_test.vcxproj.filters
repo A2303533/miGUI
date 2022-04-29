@@ -145,5 +145,14 @@
     <ClCompile Include="..\..\src\CRT\complex.c">
       <Filter>CRT</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\CRT\catrig.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_hypot.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_copysign.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

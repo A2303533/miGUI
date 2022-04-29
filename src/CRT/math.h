@@ -126,6 +126,7 @@ extern "C" {
 	int	_C_DECL __CRT_signbitf(float);
 	int	_C_DECL __CRT_signbitl(long double);
 
+
 	double _C_DECL __CRT_modf(double x, double* iptr);
 
 	double _C_DECL __CRT_scalbn(double x, int n);
@@ -198,6 +199,14 @@ extern "C" {
 	double _C_DECL __CRT_ieee754_exp(double x);
 	float _C_DECL __CRT_ieee754_expf(float x);
 	long double _C_DECL __CRT_ieee754_expl(long double x);
+
+	double _C_DECL __CRT_ieee754_hypot(double x, double y);
+	float _C_DECL __CRT_ieee754_hypotf(float x, float y);
+	long double _C_DECL __CRT_ieee754_hypotl(long double x, long double y);
+
+	double _C_DECL __CRT_copysign(double x, double y);
+	float _C_DECL __CRT_copysignf(float x, float y);
+	long double _C_DECL __CRT_copysignl(long double x, long double y);
 
 	static __inline int
 		__CRT_inline_isnan(double __x)
@@ -307,6 +316,11 @@ extern "C" {
 	double _C_DECL fabs(double x);
 	float _C_DECL fabsf(float x);
 	long double _C_DECL fabsl(long double x);
+
+	// 7.12.7.3
+	double _C_DECL hypot(double x, double y);
+	float _C_DECL hypotf(float x, float y);
+	long double _C_DECL hypotl(long double x, long double y);
 	
 	// 7.12.7.5
 	double _C_DECL sqrt(double x);
@@ -317,6 +331,11 @@ extern "C" {
 	double _C_DECL floor(double x);
 	float _C_DECL floorf(float x);
 	long double _C_DECL floorl(long double x);
+
+	// 7.12.11.1
+	double _C_DECL copysign(double x, double y);
+	float _C_DECL copysignf(float x, float y);
+	long double _C_DECL copysignl(long double x, long double y);
 
 #ifdef __cplusplus
 }

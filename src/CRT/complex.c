@@ -2,464 +2,464 @@
 #include "complex.h"
 
 
-complex_d 
+double_complex 
 _C_DECL 
-cacos(complex_d)
+cacos(double_complex z)
+{
+	return __CRT_cacos(z);
+}
+
+float_complex 
+_C_DECL 
+cacosf(float_complex z)
+{
+	return __CRT_cacosf(z);
+}
+
+long_double_complex 
+_C_DECL 
+cacosl(long_double_complex z)
+{
+	return __CRT_cacosl(z);
+}
+
+double_complex 
+_C_DECL 
+casin(double_complex z)
+{
+	return __CRT_casin(z);
+}
+
+float_complex 
+_C_DECL 
+casinf(float_complex z)
+{
+	return __CRT_casinf(z);
+}
+
+long_double_complex 
+_C_DECL 
+casinl(long_double_complex z)
+{
+	return __CRT_casinl(z);
+}
+
+double_complex 
+_C_DECL 
+catan(double_complex z)
+{
+	return __CRT_catan(z);
+}
+
+float_complex 
+_C_DECL 
+catanf(float_complex z)
+{
+	return __CRT_catanf(z);
+}
+
+long_double_complex 
+_C_DECL 
+catanl(long_double_complex z)
+{
+	return __CRT_catanl(z);
+}
+
+double_complex 
+_C_DECL 
+ccos(double_complex)
 {
 
 }
 
-complex_f 
+float_complex 
 _C_DECL 
-cacosf(complex_f)
+ccosf(float_complex)
 {
 
 }
 
-complex_l 
+long_double_complex 
 _C_DECL 
-cacosl(complex_l)
+ccosl(long_double_complex)
 {
 
 }
 
-complex_d 
+double_complex 
 _C_DECL 
-casin(complex_d)
+csin(double_complex)
 {
 
 }
 
-complex_f 
+float_complex 
 _C_DECL 
-casinf(complex_f)
+csinf(float_complex)
 {
 
 }
 
-complex_l 
+long_double_complex 
 _C_DECL 
-casinl(complex_l)
+csinl(long_double_complex)
 {
 
 }
 
-complex_d 
+double_complex 
 _C_DECL 
-catan(complex_d)
+ctan(double_complex)
 {
 
 }
 
-complex_f 
+float_complex 
 _C_DECL 
-catanf(complex_f)
+ctanf(float_complex)
 {
 
 }
 
-complex_l 
+long_double_complex 
 _C_DECL 
-catanl(complex_l)
+ctanl(long_double_complex)
 {
 
 }
 
-complex_d 
+double_complex 
 _C_DECL 
-ccos(complex_d)
+cacosh(double_complex z)
+{
+	return __CRT_cacosh(z);
+}
+
+float_complex 
+_C_DECL 
+cacoshf(float_complex z)
+{
+	return __CRT_cacoshf(z);
+}
+
+long_double_complex 
+_C_DECL 
+cacoshl(long_double_complex z)
+{
+	return __CRT_cacoshl(z);
+}
+
+double_complex 
+_C_DECL 
+casinh(double_complex z)
+{
+	return __CRT_casinh(z);
+}
+
+float_complex 
+_C_DECL 
+casinhf(float_complex z)
+{
+	return __CRT_casinhf(z);
+}
+
+long_double_complex 
+_C_DECL 
+casinhl(long_double_complex z)
+{
+	return __CRT_casinhl(z);
+}
+
+double_complex 
+_C_DECL 
+catanh(double_complex z)
+{
+	return __CRT_catanh(z);
+}
+
+float_complex 
+_C_DECL 
+catanhf(float_complex z)
+{
+	return __CRT_catanhf(z);
+}
+
+long_double_complex 
+_C_DECL 
+catanhl(long_double_complex z)
+{
+	return __CRT_catanhl(z);
+}
+
+double_complex 
+_C_DECL 
+ccosh(double_complex)
 {
 
 }
 
-complex_f 
+float_complex 
 _C_DECL 
-ccosf(complex_f)
+ccoshf(float_complex)
 {
 
 }
 
-complex_l 
+long_double_complex 
 _C_DECL 
-ccosl(complex_l)
+ccoshl(long_double_complex)
 {
 
 }
 
-complex_d 
+double_complex 
 _C_DECL 
-csin(complex_d)
+csinh(double_complex)
 {
 
 }
 
-complex_f 
+float_complex 
 _C_DECL 
-csinf(complex_f)
+csinhf(float_complex)
 {
 
 }
 
-complex_l 
+long_double_complex 
 _C_DECL 
-csinl(complex_l)
+csinhl(long_double_complex)
 {
 
 }
 
-complex_d 
+double_complex 
 _C_DECL 
-ctan(complex_d)
+ctanh(double_complex)
 {
 
 }
 
-complex_f 
+float_complex 
 _C_DECL 
-ctanf(complex_f)
+ctanhf(float_complex)
 {
 
 }
 
-complex_l 
+long_double_complex 
 _C_DECL 
-ctanl(complex_l)
+ctanhl(long_double_complex)
 {
 
 }
 
-complex_d 
+double_complex 
 _C_DECL 
-cacosh(complex_d)
+cexp(double_complex)
 {
 
 }
 
-complex_f 
+float_complex 
 _C_DECL 
-cacoshf(complex_f)
+cexpf(float_complex)
 {
 
 }
 
-complex_l 
+long_double_complex 
 _C_DECL 
-cacoshl(complex_l)
+cexpl(long_double_complex)
 {
 
 }
 
-complex_d 
+double_complex 
 _C_DECL 
-casinh(complex_d)
+clog(double_complex)
 {
 
 }
 
-complex_f 
+float_complex 
 _C_DECL 
-casinhf(complex_f)
+clogf(float_complex)
 {
 
 }
 
-complex_l 
+long_double_complex 
 _C_DECL 
-casinhl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-catanh(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-catanhf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-catanhl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-ccosh(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-ccoshf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-ccoshl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-csinh(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-csinhf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-csinhl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-ctanh(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-ctanhf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-ctanhl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-cexp(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-cexpf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-cexpl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-clog(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-clogf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-clogl(complex_l)
-{
-
-}
-
-double 
-_C_DECL 
-cabs(complex_d)
-{
-
-}
-
-float 
-_C_DECL 
-cabsf(complex_f)
-{
-
-}
-
-long double 
-_C_DECL 
-cabsl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-cpow(complex_d x, complex_d y)
-{
-
-}
-
-complex_f 
-_C_DECL 
-cpowf(complex_f x, complex_f y)
-{
-
-}
-
-complex_l 
-_C_DECL 
-cpowl(complex_l x, complex_l y)
-{
-
-}
-
-complex_d 
-_C_DECL 
-csqrt(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-csqrtf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-csqrtl(complex_l)
+clogl(long_double_complex)
 {
 
 }
 
 double 
 _C_DECL 
-carg(complex_d)
+cabs(double_complex)
 {
 
 }
 
 float 
 _C_DECL 
-cargf(complex_f)
+cabsf(float_complex)
 {
 
 }
 
 long double 
 _C_DECL 
-cargl(complex_l)
+cabsl(long_double_complex)
+{
+
+}
+
+double_complex 
+_C_DECL 
+cpow(double_complex x, double_complex y)
+{
+
+}
+
+float_complex 
+_C_DECL 
+cpowf(float_complex x, float_complex y)
+{
+
+}
+
+long_double_complex 
+_C_DECL 
+cpowl(long_double_complex x, long_double_complex y)
+{
+
+}
+
+double_complex 
+_C_DECL 
+csqrt(double_complex)
+{
+
+}
+
+float_complex 
+_C_DECL 
+csqrtf(float_complex)
+{
+
+}
+
+long_double_complex 
+_C_DECL 
+csqrtl(long_double_complex)
 {
 
 }
 
 double 
 _C_DECL 
-cimag(complex_d)
+carg(double_complex)
 {
 
 }
 
 float 
 _C_DECL 
-cimagf(complex_f)
+cargf(float_complex)
 {
 
 }
 
 long double 
 _C_DECL 
-cimagl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-conj(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-conjf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-conjl(complex_l)
-{
-
-}
-
-complex_d 
-_C_DECL 
-cproj(complex_d)
-{
-
-}
-
-complex_f 
-_C_DECL 
-cprojf(complex_f)
-{
-
-}
-
-complex_l 
-_C_DECL 
-cprojl(complex_l)
+cargl(long_double_complex)
 {
 
 }
 
 double 
 _C_DECL 
-creal(complex_d)
+cimag(double_complex z)
 {
-
+	return z.a[1];
 }
 
 float 
 _C_DECL 
-crealf(complex_f)
+cimagf(float_complex z)
 {
-
+	return z.a[1];
 }
 
 long double 
 _C_DECL 
-creall(complex_l)
+cimagl(long_double_complex z)
+{
+	return z.a[1];
+}
+
+double_complex 
+_C_DECL 
+conj(double_complex)
 {
 
+}
+
+float_complex 
+_C_DECL 
+conjf(float_complex)
+{
+
+}
+
+long_double_complex 
+_C_DECL 
+conjl(long_double_complex)
+{
+
+}
+
+double_complex 
+_C_DECL 
+cproj(double_complex)
+{
+
+}
+
+float_complex 
+_C_DECL 
+cprojf(float_complex)
+{
+
+}
+
+long_double_complex 
+_C_DECL 
+cprojl(long_double_complex)
+{
+
+}
+
+double 
+_C_DECL 
+creal(double_complex z)
+{
+	return z.a[0];
+}
+
+float 
+_C_DECL 
+crealf(float_complex z)
+{
+	return z.a[0];
+}
+
+long double 
+_C_DECL 
+creall(long_double_complex z)
+{
+	return z.a[0];
 }

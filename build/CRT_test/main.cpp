@@ -9,7 +9,6 @@
 #include "CRT/ctype.h"
 
 #include <vcruntime_typeinfo.h>
-#include <complex.h>
 type_info::~type_info() noexcept
 {
 }
@@ -141,6 +140,24 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	for (int i = 0; i < 2000000; ++i)
 	{
 		double r = sqrt(i);
+		if (isfinite(r))
+			testFloat += r * 0.0001f;
+	}
+	printf(": [%f]\n", testFloat);
+	testFloat = 0.f;
+	printf("Test sin 1");
+	for (int i = 0; i < 2000000; ++i)
+	{
+		double r = sin(i);
+		if (isfinite(r))
+			testFloat += r * 0.0001f;
+	}
+	printf(": [%f]\n", testFloat);
+	testFloat = 0.f;
+	printf("Test sin 2");
+	for (int i = 0; i < 2000000; ++i)
+	{
+		double r = sinl(i);
 		if (isfinite(r))
 			testFloat += r * 0.0001f;
 	}

@@ -337,6 +337,27 @@ fabsl(long double x)
 
 double 
 _C_DECL 
+hypot(double x, double y)
+{
+	return __CRT_ieee754_hypot(x, y);
+}
+
+float 
+_C_DECL 
+hypotf(float x, float y)
+{
+	return __CRT_ieee754_hypotf(x, y);
+}
+
+long double 
+_C_DECL 
+hypotl(long double x, long double y)
+{
+	return __CRT_ieee754_hypotl(x, y);
+}
+
+double 
+_C_DECL 
 modf(double x, double* iptr)
 {
 	return __CRT_modf(x, iptr);
@@ -474,4 +495,24 @@ floorl(long double x)
 	return __CRT_floorl(x);
 }
 
+double 
+_C_DECL 
+copysign(double x, double y)
+{
+	return __CRT_copysign(x, y);
+}
+
+float 
+_C_DECL 
+copysignf(float x, float y)
+{
+	return __CRT_copysignf(x, y);
+}
+
+long double 
+_C_DECL 
+copysignl(long double x, long double y)
+{
+	return __CRT_copysignl(x, y);
+}
 

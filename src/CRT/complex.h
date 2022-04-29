@@ -29,195 +29,209 @@
  */
 
 #pragma once
-#ifndef __COMPLEX__
-#define __COMPLEX__
+#ifndef _COMPLEX_H
+#define _COMPLEX_H
 
 #include "CRT.h"
 
 
+#ifdef _MSC_VER
+#define	complex 
+#endif // _MSC_VER
+#include "math.h"
+#include "math_private.h"
+
+
 /*ISO/IEC 9899:TC3, N1256*/
 
-#ifdef _MSC_VER
-#ifndef _C_COMPLEX_T
-#define _C_COMPLEX_T // Also defined by UCRT <complex.h>
-struct _C_double_complex {
-	double _Val[2];
-};
-struct _C_float_complex {
-	float _Val[2];
-};
-struct _C_ldouble_complex {
-	long double _Val[2];
-};
-#endif // _C_COMPLEX_T
-#endif // _MSC_VER
-
-#define	complex_f struct _C_float_complex
-#define	complex_d struct _C_double_complex
-#define	complex_l struct _C_ldouble_complex
 #define	_Complex_I	((float _Complex)1.0i)
 #define	I		_Complex_I
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+	double_complex _C_DECL __CRT_casinh(double_complex z);
+	float_complex _C_DECL __CRT_casinhf(float_complex z);
+	long_double_complex _C_DECL __CRT_casinhl(long_double_complex z);
+
+	double_complex _C_DECL __CRT_casin(double_complex z);
+	float_complex _C_DECL __CRT_casinf(float_complex z);
+	long_double_complex _C_DECL __CRT_casinl(long_double_complex z);
+
+	double_complex _C_DECL __CRT_cacos(double_complex z);
+	float_complex _C_DECL __CRT_cacosf(float_complex z);
+	long_double_complex _C_DECL __CRT_cacosl(long_double_complex z);
+
+	double_complex _C_DECL __CRT_cacosh(double_complex z);
+	float_complex _C_DECL __CRT_cacoshf(float_complex z);
+	long_double_complex _C_DECL __CRT_cacoshl(long_double_complex z);
+
+	double_complex _C_DECL __CRT_catanh(double_complex z);
+	float_complex _C_DECL __CRT_catanhf(float_complex z);
+	long_double_complex _C_DECL __CRT_catanhl(long_double_complex z);
+
+	double_complex _C_DECL __CRT_catan(double_complex z);
+	float_complex _C_DECL __CRT_catanf(float_complex z);
+	long_double_complex _C_DECL __CRT_catanl(long_double_complex z);
+
 	// 7.3.5.1
 	/// <summary>
 	/// the complex arc cosine
 	/// </summary>
-	complex_d _C_DECL cacos(complex_d);
-	complex_f _C_DECL cacosf(complex_f);
-	complex_l _C_DECL cacosl(complex_l);
+	double_complex _C_DECL cacos(double_complex);
+	float_complex _C_DECL cacosf(float_complex);
+	long_double_complex _C_DECL cacosl(long_double_complex);
 
 	// 7.3.5.2
 	/// <summary>
 	/// the complex arc sine
 	/// </summary>
-	complex_d _C_DECL casin(complex_d);
-	complex_f _C_DECL casinf(complex_f);
-	complex_l _C_DECL casinl(complex_l);
+	double_complex _C_DECL casin(double_complex);
+	float_complex _C_DECL casinf(float_complex);
+	long_double_complex _C_DECL casinl(long_double_complex);
 
 	// 7.3.5.3
 	/// <summary>
 	/// the complex arc tangent
 	/// </summary>
-	complex_d _C_DECL catan(complex_d);
-	complex_f _C_DECL catanf(complex_f);
-	complex_l _C_DECL catanl(complex_l);
+	double_complex _C_DECL catan(double_complex);
+	float_complex _C_DECL catanf(float_complex);
+	long_double_complex _C_DECL catanl(long_double_complex);
 
 	// 7.3.5.4
 	/// <summary>
 	/// the complex cosine
 	/// </summary>
-	complex_d _C_DECL ccos(complex_d);
-	complex_f _C_DECL ccosf(complex_f);
-	complex_l _C_DECL ccosl(complex_l);
+	double_complex _C_DECL ccos(double_complex);
+	float_complex _C_DECL ccosf(float_complex);
+	long_double_complex _C_DECL ccosl(long_double_complex);
 
 	// 7.3.5.5
 	/// <summary>
 	/// the complex sine
 	/// </summary>
-	complex_d _C_DECL csin(complex_d);
-	complex_f _C_DECL csinf(complex_f);
-	complex_l _C_DECL csinl(complex_l);
+	double_complex _C_DECL csin(double_complex);
+	float_complex _C_DECL csinf(float_complex);
+	long_double_complex _C_DECL csinl(long_double_complex);
 
 	// 7.3.5.6
 	/// <summary>
 	/// the complex tangent
 	/// </summary>
-	complex_d _C_DECL ctan(complex_d);
-	complex_f _C_DECL ctanf(complex_f);
-	complex_l _C_DECL ctanl(complex_l);
+	double_complex _C_DECL ctan(double_complex);
+	float_complex _C_DECL ctanf(float_complex);
+	long_double_complex _C_DECL ctanl(long_double_complex);
 
 	// 7.3.6.1
 	/// <summary>
 	/// the complex arc hyperbolic cosine
 	/// </summary>
-	complex_d _C_DECL cacosh(complex_d);
-	complex_f _C_DECL cacoshf(complex_f);
-	complex_l _C_DECL cacoshl(complex_l);
+	double_complex _C_DECL cacosh(double_complex);
+	float_complex _C_DECL cacoshf(float_complex);
+	long_double_complex _C_DECL cacoshl(long_double_complex);
 
 	// 7.3.6.2
 	/// <summary>
 	/// the complex arc hyperbolic sine
 	/// </summary>
-	complex_d _C_DECL casinh(complex_d);
-	complex_f _C_DECL casinhf(complex_f);
-	complex_l _C_DECL casinhl(complex_l);
+	double_complex _C_DECL casinh(double_complex);
+	float_complex _C_DECL casinhf(float_complex);
+	long_double_complex _C_DECL casinhl(long_double_complex);
 
 	// 7.3.6.3
 	/// <summary>
 	/// the complex arc hyperbolic tangent
 	/// </summary>
-	complex_d _C_DECL catanh(complex_d);
-	complex_f _C_DECL catanhf(complex_f);
-	complex_l _C_DECL catanhl(complex_l);
+	double_complex _C_DECL catanh(double_complex);
+	float_complex _C_DECL catanhf(float_complex);
+	long_double_complex _C_DECL catanhl(long_double_complex);
 
 	// 7.3.6.4
 	/// <summary>
 	/// the complex hyperbolic cosine
 	/// </summary>
-	complex_d _C_DECL ccosh(complex_d);
-	complex_f _C_DECL ccoshf(complex_f);
-	complex_l _C_DECL ccoshl(complex_l);
+	double_complex _C_DECL ccosh(double_complex);
+	float_complex _C_DECL ccoshf(float_complex);
+	long_double_complex _C_DECL ccoshl(long_double_complex);
 
 	// 7.3.6.5
 	/// <summary>
 	/// the complex hyperbolic sine
 	/// </summary>
-	complex_d _C_DECL csinh(complex_d);
-	complex_f _C_DECL csinhf(complex_f);
-	complex_l _C_DECL csinhl(complex_l);
+	double_complex _C_DECL csinh(double_complex);
+	float_complex _C_DECL csinhf(float_complex);
+	long_double_complex _C_DECL csinhl(long_double_complex);
 
 	// 7.3.6.6
 	/// <summary>
 	/// the complex hyperbolic tangent
 	/// </summary>
-	complex_d _C_DECL ctanh(complex_d);
-	complex_f _C_DECL ctanhf(complex_f);
-	complex_l _C_DECL ctanhl(complex_l);
+	double_complex _C_DECL ctanh(double_complex);
+	float_complex _C_DECL ctanhf(float_complex);
+	long_double_complex _C_DECL ctanhl(long_double_complex);
 
 	// 7.3.7.1
 	/// <summary>
 	/// the complex base-e exponential
 	/// </summary>
-	complex_d _C_DECL cexp(complex_d);
-	complex_f _C_DECL cexpf(complex_f);
-	complex_l _C_DECL cexpl(complex_l);
+	double_complex _C_DECL cexp(double_complex);
+	float_complex _C_DECL cexpf(float_complex);
+	long_double_complex _C_DECL cexpl(long_double_complex);
 
 	// 7.3.7.2
 	/// <summary>
 	/// the complex natural (base-e) logarithm
 	/// </summary>
-	complex_d _C_DECL clog(complex_d);
-	complex_f _C_DECL clogf(complex_f);
-	complex_l _C_DECL clogl(complex_l);
+	double_complex _C_DECL clog(double_complex);
+	float_complex _C_DECL clogf(float_complex);
+	long_double_complex _C_DECL clogl(long_double_complex);
 
 	// 7.3.8.1
-	double _C_DECL cabs(complex_d);
-	float _C_DECL cabsf(complex_f);
-	long double _C_DECL cabsl(complex_l);
+	double _C_DECL cabs(double_complex);
+	float _C_DECL cabsf(float_complex);
+	long double _C_DECL cabsl(long_double_complex);
 
 	// 7.3.8.2
-	complex_d _C_DECL cpow(complex_d x, complex_d y);
-	complex_f _C_DECL cpowf(complex_f x, complex_f y);
-	complex_l _C_DECL cpowl(complex_l x, complex_l y);
+	double_complex _C_DECL cpow(double_complex x, double_complex y);
+	float_complex _C_DECL cpowf(float_complex x, float_complex y);
+	long_double_complex _C_DECL cpowl(long_double_complex x, long_double_complex y);
 
 	// 7.3.8.3
-	complex_d _C_DECL csqrt(complex_d);
-	complex_f _C_DECL csqrtf(complex_f);
-	complex_l _C_DECL csqrtl(complex_l);
+	double_complex _C_DECL csqrt(double_complex);
+	float_complex _C_DECL csqrtf(float_complex);
+	long_double_complex _C_DECL csqrtl(long_double_complex);
 
 	// 7.3.9.1
-	double _C_DECL carg(complex_d);
-	float _C_DECL cargf(complex_f);
-	long double _C_DECL cargl(complex_l);
+	double _C_DECL carg(double_complex);
+	float _C_DECL cargf(float_complex);
+	long double _C_DECL cargl(long_double_complex);
 
 	// 7.3.9.2
-	double _C_DECL cimag(complex_d);
-	float _C_DECL cimagf(complex_f);
-	long double _C_DECL cimagl(complex_l);
+	double _C_DECL cimag(double_complex);
+	float _C_DECL cimagf(float_complex);
+	long double _C_DECL cimagl(long_double_complex);
 
 	// 7.3.9.3
 	/// <summary>
 	/// the complex conjugate
 	/// </summary>
-	complex_d _C_DECL conj(complex_d);
-	complex_f _C_DECL conjf(complex_f);
-	complex_l _C_DECL conjl(complex_l);
+	double_complex _C_DECL conj(double_complex);
+	float_complex _C_DECL conjf(float_complex);
+	long_double_complex _C_DECL conjl(long_double_complex);
 
 	// 7.3.9.4
 	/// <summary>
 	/// compute a projection of z onto the Riemann sphere:
 	/// </summary>
-	complex_d _C_DECL cproj(complex_d);
-	complex_f _C_DECL cprojf(complex_f);
-	complex_l _C_DECL cprojl(complex_l);
+	double_complex _C_DECL cproj(double_complex);
+	float_complex _C_DECL cprojf(float_complex);
+	long_double_complex _C_DECL cprojl(long_double_complex);
 
 	// 7.3.9.5
-	double _C_DECL creal(complex_d);
-	float _C_DECL crealf(complex_f);
-	long double _C_DECL creall(complex_l);
+	double _C_DECL creal(double_complex);
+	float _C_DECL crealf(float_complex);
+	long double _C_DECL creall(long_double_complex);
 
 #ifdef __cplusplus
 }
