@@ -293,4 +293,23 @@ double_complex __ldexp_cexp(double_complex z, int expt);
 double __ldexp_exp(double x, int expt);
 float __ldexp_expf(float x, int expt);
 
+/*
+#define	_2sum(a, b) do {	\
+	__typeof__(a) __s, __w;	\
+				\
+	__w = (a) + (b);	\
+	__s = __w - (a);	\
+	(b) = ((a) - (__w - __s)) + ((b) - __s); \
+	(a) = __w;		\
+} while (0)
+
+#define	_2sumF(a, b) do {	\
+	__typeof__(a) __w;	\
+				\
+	__w = (a) + (b);	\
+	(b) = ((a) - __w) + (b); \
+	(a) = __w;		\
+} while (0)
+*/
+
 #endif

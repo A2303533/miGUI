@@ -222,6 +222,10 @@ extern "C" {
 	double _C_DECL __CRT_ieee754_cosh(double x);
 	float _C_DECL __ieee754_coshf(float x);
 	long double _C_DECL __CRT_ieee754_coshl(long double x);
+	
+	double _C_DECL __CRT_ieee754_sinh(double x);
+	long double _C_DECL __CRT_ieee754_sinhl(long double x);
+	float _C_DECL __CRT_ieee754_sinhf(float x);
 
 	static __inline int
 		__CRT_inline_isnan(double __x)
@@ -350,6 +354,11 @@ extern "C" {
 	double _C_DECL hypot(double x, double y);
 	float _C_DECL hypotf(float x, float y);
 	long double _C_DECL hypotl(long double x, long double y);
+
+	// 7.12.7.4
+	double _C_DECL pow(double x, double y);
+	float _C_DECL powf(float x, float y);
+	long double _C_DECL powl(long double x, long double y);
 	
 	// 7.12.7.5
 	double _C_DECL sqrt(double x);

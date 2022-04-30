@@ -83,6 +83,34 @@ extern "C" {
 	float_complex _C_DECL __CRT_ccosf(float_complex z);
 	long_double_complex _C_DECL __CRT_ccosl(long_double_complex z);
 
+	double_complex _C_DECL __CRT_csinh(double_complex z);
+	float_complex _C_DECL __CRT_csinhf(float_complex z);
+	long_double_complex _C_DECL __CRT_csinhl(long_double_complex z);
+
+	double_complex _C_DECL __CRT_csin(double_complex z);
+	float_complex _C_DECL __CRT_csinf(float_complex z);
+	long_double_complex _C_DECL __CRT_csinl(long_double_complex z);
+
+	long_double_complex _C_DECL __CRT_ctanhl(long_double_complex z);
+	float_complex _C_DECL __CRT_ctanhf(float_complex z);
+	double_complex _C_DECL __CRT_ctanh(double_complex z);
+
+	double_complex _C_DECL __CRT_ctan(double_complex z);
+	float_complex _C_DECL __CRT_ctanf(float_complex z);
+	long_double_complex _C_DECL __CRT_ctanl(long_double_complex z);
+
+	long_double_complex _C_DECL __CRT_cexpl(long_double_complex z);
+	float_complex _C_DECL __CRT_cexpf(float_complex z);
+	double_complex _C_DECL __CRT_cexp(double_complex z);
+
+	long_double_complex _C_DECL __CRT_clogl(long_double_complex z);
+	float_complex _C_DECL __CRT_clogf(float_complex z);
+	double_complex _C_DECL __CRT_clog(double_complex z);
+
+	double_complex _C_DECL __CRT_cpow(double_complex a, double_complex z);
+	float_complex _C_DECL __CRT_cpowf(float_complex a, float_complex z);
+	long_double_complex _C_DECL __CRT_cpowl(long_double_complex a, long_double_complex z);
+
 	// 7.3.5.1
 	/// <summary>
 	/// the complex arc cosine

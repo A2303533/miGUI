@@ -80,6 +80,8 @@ __CRT_ieee754_cosh(double x)
 	return huge*huge;
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 float
 _C_DECL
 __ieee754_coshf(float x)
@@ -117,6 +119,7 @@ __ieee754_coshf(float x)
 	/* |x| > overflowthresold, cosh(x) overflow */
 	return huge * huge;
 }
+#pragma warning(pop)
 
 long double
 _C_DECL

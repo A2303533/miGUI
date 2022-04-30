@@ -264,6 +264,8 @@ do_hard_work(double x, double y, double *rx, int *B_is_usable, double *B,
 	}
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 /*
  * casinh(z) = z + O(z^3)   as z -> 0
  *
@@ -337,6 +339,7 @@ __CRT_casinh(double_complex z)
 		ry = atan2(new_y, sqrt_A2my2);
 	return (CMPLX(copysign(rx, x), copysign(ry, y)));
 }
+#pragma warning(pop)
 
 float_complex
 _C_DECL
@@ -407,6 +410,8 @@ __CRT_casinl(long_double_complex z)
 	return z;
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 /*
  * cacos(z) = PI/2 - casin(z)
  * but do the computation carefully so cacos(z) is accurate when z is
@@ -489,6 +494,7 @@ __CRT_cacos(double_complex z)
 		ry = -ry;
 	return (CMPLX(rx, ry));
 }
+#pragma warning(pop)
 
 float_complex
 _C_DECL

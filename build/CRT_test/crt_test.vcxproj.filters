@@ -178,5 +178,26 @@
     <ClCompile Include="..\..\src\CRT\k_expf.c">
       <Filter>CRT</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_sinh.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_sinhf.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_csinh.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_ctanh.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_cexp.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_clog.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_cpow.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

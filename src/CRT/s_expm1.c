@@ -128,6 +128,8 @@ Q5  =  -2.01099218183624371326e-07; /* BE8AFDB7 6E09C32D */
 
 static volatile double huge = 1.0e+300;
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 double
 _C_DECL
 __CRT_expm1(double x)
@@ -216,6 +218,7 @@ __CRT_expm1(double x)
 	}
 	return y;
 }
+#pragma warning(pop)
 
 long double
 _C_DECL

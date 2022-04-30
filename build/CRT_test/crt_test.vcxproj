@@ -35,6 +35,8 @@
     <ClCompile Include="..\..\src\CRT\e_hypot.c" />
     <ClCompile Include="..\..\src\CRT\e_log.c" />
     <ClCompile Include="..\..\src\CRT\e_rem_pio2.c" />
+    <ClCompile Include="..\..\src\CRT\e_sinh.c" />
+    <ClCompile Include="..\..\src\CRT\e_sinhf.c" />
     <ClCompile Include="..\..\src\CRT\e_sqrt.c" />
     <ClCompile Include="..\..\src\CRT\fenv.c" />
     <ClCompile Include="..\..\src\CRT\float.c" />
@@ -58,8 +60,13 @@
     <ClCompile Include="..\..\src\CRT\s_asinh.c" />
     <ClCompile Include="..\..\src\CRT\s_atan.c" />
     <ClCompile Include="..\..\src\CRT\s_ccosh.c" />
+    <ClCompile Include="..\..\src\CRT\s_cexp.c" />
+    <ClCompile Include="..\..\src\CRT\s_clog.c" />
     <ClCompile Include="..\..\src\CRT\s_copysign.c" />
     <ClCompile Include="..\..\src\CRT\s_cos.c" />
+    <ClCompile Include="..\..\src\CRT\s_cpow.c" />
+    <ClCompile Include="..\..\src\CRT\s_csinh.c" />
+    <ClCompile Include="..\..\src\CRT\s_ctanh.c" />
     <ClCompile Include="..\..\src\CRT\s_exp2.c" />
     <ClCompile Include="..\..\src\CRT\s_exp2f.c" />
     <ClCompile Include="..\..\src\CRT\s_expm1.c" />

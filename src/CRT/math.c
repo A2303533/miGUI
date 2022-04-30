@@ -258,18 +258,21 @@ double
 _C_DECL 
 sinh(double x)
 {
+	return __CRT_ieee754_sinh(x);
 }
 
 float 
 _C_DECL 
 sinhf(float x)
 {
+	return __CRT_ieee754_sinhf(x);
 }
 
 long double 
 _C_DECL 
 sinhl(long double x)
 {
+	return __CRT_ieee754_sinhl(x);
 }
 
 double 

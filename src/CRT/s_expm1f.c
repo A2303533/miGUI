@@ -20,6 +20,8 @@
 #include "math.h"
 #include "math_private.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4305)
 static const float
 one		= 1.0,
 tiny		= 1.0e-30,
@@ -36,7 +38,10 @@ Q1 = -3.3333212137e-2,		/* -0x888868.0p-28 */
 Q2 =  1.5807170421e-3;		/*  0xcf3010.0p-33 */
 
 static volatile float huge = 1.0e+30;
+#pragma warning(pop)
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 float
 _C_DECL
 __CRT_expm1f(float x)
@@ -122,3 +127,4 @@ __CRT_expm1f(float x)
 	}
 	return y;
 }
+#pragma warning(pop)

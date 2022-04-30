@@ -88,44 +88,44 @@ ccosl(long_double_complex z)
 
 double_complex 
 _C_DECL 
-csin(double_complex)
+csin(double_complex z)
 {
-
+	return __CRT_csin(z);
 }
 
 float_complex 
 _C_DECL 
-csinf(float_complex)
+csinf(float_complex z)
 {
-
+	return __CRT_csinf(z);
 }
 
 long_double_complex 
 _C_DECL 
-csinl(long_double_complex)
+csinl(long_double_complex z)
 {
-
+	return __CRT_csinl(z);
 }
 
 double_complex 
 _C_DECL 
-ctan(double_complex)
+ctan(double_complex z)
 {
-
+	return __CRT_ctan(z);
 }
 
 float_complex 
 _C_DECL 
-ctanf(float_complex)
+ctanf(float_complex z)
 {
-
+	return __CRT_ctanf(z);
 }
 
 long_double_complex 
 _C_DECL 
-ctanl(long_double_complex)
+ctanl(long_double_complex z)
 {
-
+	return __CRT_ctanl(z);
 }
 
 double_complex 
@@ -214,128 +214,128 @@ ccoshl(long_double_complex z)
 
 double_complex 
 _C_DECL 
-csinh(double_complex)
+csinh(double_complex z)
 {
-
+	return __CRT_csinh(z);
 }
 
 float_complex 
 _C_DECL 
-csinhf(float_complex)
+csinhf(float_complex z)
 {
-
+	return __CRT_csinhf(z);
 }
 
 long_double_complex 
 _C_DECL 
-csinhl(long_double_complex)
+csinhl(long_double_complex z)
 {
-
+	return __CRT_csinhl(z);
 }
 
 double_complex 
 _C_DECL 
-ctanh(double_complex)
+ctanh(double_complex z)
 {
-
+	return __CRT_ctanh(z);
 }
 
 float_complex 
 _C_DECL 
-ctanhf(float_complex)
+ctanhf(float_complex z)
 {
-
+	return __CRT_ctanhf(z);
 }
 
 long_double_complex 
 _C_DECL 
-ctanhl(long_double_complex)
+ctanhl(long_double_complex z)
 {
-
+	return __CRT_ctanhl(z);
 }
 
 double_complex 
 _C_DECL 
-cexp(double_complex)
+cexp(double_complex z)
 {
-
+	return __CRT_cexp(z);
 }
 
 float_complex 
 _C_DECL 
-cexpf(float_complex)
+cexpf(float_complex z)
 {
-
+	return __CRT_cexpf(z);
 }
 
 long_double_complex 
 _C_DECL 
-cexpl(long_double_complex)
+cexpl(long_double_complex z)
 {
-
+	return __CRT_cexpl(z);
 }
 
 double_complex 
 _C_DECL 
-clog(double_complex)
+clog(double_complex z)
 {
-
+	return __CRT_clog(z);
 }
 
 float_complex 
 _C_DECL 
-clogf(float_complex)
+clogf(float_complex z)
 {
-
+	return __CRT_clogf(z);
 }
 
 long_double_complex 
 _C_DECL 
-clogl(long_double_complex)
+clogl(long_double_complex z)
 {
-
+	return __CRT_clogl(z);
 }
 
 double 
 _C_DECL 
-cabs(double_complex)
+cabs(double_complex z)
 {
-
+	return hypot(creal(z), cimag(z));
 }
 
 float 
 _C_DECL 
-cabsf(float_complex)
+cabsf(float_complex z)
 {
-
+	return hypotf(crealf(z), cimagf(z));
 }
 
 long double 
 _C_DECL 
-cabsl(long_double_complex)
+cabsl(long_double_complex z)
 {
-
+	return hypotl(creall(z), cimagl(z));
 }
 
 double_complex 
 _C_DECL 
 cpow(double_complex x, double_complex y)
 {
-
+	return __CRT_cpow(x, y);
 }
 
 float_complex 
 _C_DECL 
 cpowf(float_complex x, float_complex y)
 {
-
+	return __CRT_cpowf(x, y);
 }
 
 long_double_complex 
 _C_DECL 
 cpowl(long_double_complex x, long_double_complex y)
 {
-
+	return __CRT_cpowl(x, y);
 }
 
 double_complex 
