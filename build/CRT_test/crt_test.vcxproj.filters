@@ -154,5 +154,29 @@
     <ClCompile Include="..\..\src\CRT\s_copysign.c">
       <Filter>CRT</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_ccosh.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_sincos.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_sincosf.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_exp2.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_exp2f.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_expm1.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_expm1f.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\k_expf.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

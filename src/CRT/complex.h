@@ -75,6 +75,14 @@ extern "C" {
 	float_complex _C_DECL __CRT_catanf(float_complex z);
 	long_double_complex _C_DECL __CRT_catanl(long_double_complex z);
 
+	double_complex _C_DECL __CRT_ccosh(double_complex z);
+	float_complex _C_DECL __CRT_ccoshf(float_complex z);
+	long_double_complex _C_DECL __CRT_ccoshl(long_double_complex z);
+
+	double_complex _C_DECL __CRT_ccos(double_complex z);
+	float_complex _C_DECL __CRT_ccosf(float_complex z);
+	long_double_complex _C_DECL __CRT_ccosl(long_double_complex z);
+
 	// 7.3.5.1
 	/// <summary>
 	/// the complex arc cosine

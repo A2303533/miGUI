@@ -237,17 +237,38 @@ double
 _C_DECL 
 cosh(double x)
 {
+	return __CRT_ieee754_cosh(x);
 }
 
 float 
 _C_DECL 
 coshf(float x)
 {
+	return __CRT_ieee754_coshf(x);
 }
 
 long double 
 _C_DECL 
 coshl(long double x)
+{
+	return __CRT_ieee754_coshl(x);
+}
+
+double 
+_C_DECL 
+sinh(double x)
+{
+}
+
+float 
+_C_DECL 
+sinhf(float x)
+{
+}
+
+long double 
+_C_DECL 
+sinhl(long double x)
 {
 }
 
@@ -270,6 +291,48 @@ _C_DECL
 expl(long double x)
 {
 	return __CRT_ieee754_expl(x);
+}
+
+double 
+_C_DECL 
+exp2(double x)
+{
+	return __CRT_exp2(x);
+}
+
+float 
+_C_DECL 
+exp2f(float x)
+{
+	return __CRT_exp2f(x);
+}
+
+long double 
+_C_DECL 
+exp2l(long double x)
+{
+	return __CRT_exp2l(x);
+}
+
+double 
+_C_DECL 
+expm1(double x)
+{
+	return __CRT_expm1(x);
+}
+
+float 
+_C_DECL 
+expm1f(float x)
+{
+	return __CRT_expm1f(x);
+}
+
+long double 
+_C_DECL 
+expm1l(long double x)
+{
+	return __CRT_expm1l(x);
 }
 
 double 

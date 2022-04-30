@@ -67,23 +67,23 @@ catanl(long_double_complex z)
 
 double_complex 
 _C_DECL 
-ccos(double_complex)
+ccos(double_complex z)
 {
-
+	return __CRT_ccos(z);
 }
 
 float_complex 
 _C_DECL 
-ccosf(float_complex)
+ccosf(float_complex z)
 {
-
+	return __CRT_ccosf(z);
 }
 
 long_double_complex 
 _C_DECL 
-ccosl(long_double_complex)
+ccosl(long_double_complex z)
 {
-
+	return __CRT_ccosl(z);
 }
 
 double_complex 
@@ -193,23 +193,23 @@ catanhl(long_double_complex z)
 
 double_complex 
 _C_DECL 
-ccosh(double_complex)
+ccosh(double_complex z)
 {
-
+	return __CRT_ccosh(z);
 }
 
 float_complex 
 _C_DECL 
-ccoshf(float_complex)
+ccoshf(float_complex z)
 {
-
+	return __CRT_ccoshf(z);
 }
 
 long_double_complex 
 _C_DECL 
-ccoshl(long_double_complex)
+ccoshl(long_double_complex z)
 {
-
+	return __CRT_ccoshl(z);
 }
 
 double_complex 

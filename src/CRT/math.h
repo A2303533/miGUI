@@ -126,6 +126,9 @@ extern "C" {
 	int	_C_DECL __CRT_signbitf(float);
 	int	_C_DECL __CRT_signbitl(long double);
 
+	void _C_DECL sincos(double, double*, double*);
+	void _C_DECL sincosf(float, float*, float*);
+	void _C_DECL sincosl(long double, long double*, long double*);
 
 	double _C_DECL __CRT_modf(double x, double* iptr);
 
@@ -208,6 +211,18 @@ extern "C" {
 	float _C_DECL __CRT_copysignf(float x, float y);
 	long double _C_DECL __CRT_copysignl(long double x, long double y);
 
+	double _C_DECL __CRT_exp2(double x);
+	long double _C_DECL __CRT_exp2l(long double x);
+	float _C_DECL __CRT_exp2f(float x);
+
+	double _C_DECL __CRT_expm1(double x);
+	float _C_DECL __CRT_expm1f(float x);
+	long double _C_DECL __CRT_expm1l(long double x);
+
+	double _C_DECL __CRT_ieee754_cosh(double x);
+	float _C_DECL __ieee754_coshf(float x);
+	long double _C_DECL __CRT_ieee754_coshl(long double x);
+
 	static __inline int
 		__CRT_inline_isnan(double __x)
 	{
@@ -276,16 +291,30 @@ extern "C" {
 	float _C_DECL atanhf(float x);
 	long double _C_DECL atanhl(long double x);
 	
-
 	// 7.12.5.4
 	double _C_DECL cosh(double x);
 	float _C_DECL coshf(float x);
 	long double _C_DECL coshl(long double x);
 
+	// 7.12.5.5
+	double _C_DECL sinh(double x);
+	float _C_DECL sinhf(float x);
+	long double _C_DECL sinhl(long double x);
+
 	// 7.12.6.1
 	double _C_DECL exp(double x);
 	float _C_DECL expf(float x);
 	long double _C_DECL expl(long double x);
+
+	// 7.12.6.2
+	double _C_DECL exp2(double x);
+	float _C_DECL exp2f(float x);
+	long double _C_DECL exp2l(long double x);
+
+	// 7.12.6.3
+	double _C_DECL expm1(double x);
+	float _C_DECL expm1f(float x);
+	long double _C_DECL expm1l(long double x);
 
 	// 7.12.6.7
 	// log e

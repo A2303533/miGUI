@@ -286,6 +286,11 @@ CMPLXL(long double x, long double y)
 }
 #endif
 
+double_complex __ldexp_cexp(double_complex z, int expt);
+
 #endif /* _COMPLEX_H */
+
+double __ldexp_exp(double x, int expt);
+float __ldexp_expf(float x, int expt);
 
 #endif

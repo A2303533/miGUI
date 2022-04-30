@@ -42,6 +42,7 @@
     <ClCompile Include="..\..\src\CRT\isinf.c" />
     <ClCompile Include="..\..\src\CRT\k_cos.c" />
     <ClCompile Include="..\..\src\CRT\k_exp.c" />
+    <ClCompile Include="..\..\src\CRT\k_expf.c" />
     <ClCompile Include="..\..\src\CRT\k_rem_pio2.c" />
     <ClCompile Include="..\..\src\CRT\k_sin.c" />
     <ClCompile Include="..\..\src\CRT\k_tan.c" />
@@ -56,8 +57,13 @@
     <ClCompile Include="..\..\src\CRT\strtol.c" />
     <ClCompile Include="..\..\src\CRT\s_asinh.c" />
     <ClCompile Include="..\..\src\CRT\s_atan.c" />
+    <ClCompile Include="..\..\src\CRT\s_ccosh.c" />
     <ClCompile Include="..\..\src\CRT\s_copysign.c" />
     <ClCompile Include="..\..\src\CRT\s_cos.c" />
+    <ClCompile Include="..\..\src\CRT\s_exp2.c" />
+    <ClCompile Include="..\..\src\CRT\s_exp2f.c" />
+    <ClCompile Include="..\..\src\CRT\s_expm1.c" />
+    <ClCompile Include="..\..\src\CRT\s_expm1f.c" />
     <ClCompile Include="..\..\src\CRT\s_fabs.c" />
     <ClCompile Include="..\..\src\CRT\s_floor.c" />
     <ClCompile Include="..\..\src\CRT\s_isfinite.c" />
@@ -67,6 +73,8 @@
     <ClCompile Include="..\..\src\CRT\s_scalbn.c" />
     <ClCompile Include="..\..\src\CRT\s_signbit.c" />
     <ClCompile Include="..\..\src\CRT\s_sin.c" />
+    <ClCompile Include="..\..\src\CRT\s_sincos.c" />
+    <ClCompile Include="..\..\src\CRT\s_sincosf.c" />
     <ClCompile Include="..\..\src\CRT\s_tan.c" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
