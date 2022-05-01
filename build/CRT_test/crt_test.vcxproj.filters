@@ -4,6 +4,9 @@
     <Filter Include="CRT">
       <UniqueIdentifier>{845b6c5c-6e11-4a52-8d4f-f20cd0d1d19f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CRT\math">
+      <UniqueIdentifier>{bb297a76-d4cb-42f6-93bd-9f592d2275f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\CRT\signal.c">
@@ -30,18 +33,6 @@
     <ClCompile Include="..\..\src\CRT\ctype.c">
       <Filter>CRT</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_acos.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_asin.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_rem_pio2.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_sqrt.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\CRT\errno.c">
       <Filter>CRT</Filter>
     </ClCompile>
@@ -54,150 +45,312 @@
     <ClCompile Include="..\..\src\CRT\fpclassify.c">
       <Filter>CRT</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\isinf.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\k_rem_pio2.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\k_tan.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\CRT\locale.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\math.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\modf.c">
       <Filter>CRT</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\CRT\pool.c">
       <Filter>CRT</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_atan.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_fabs.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_floor.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_isfinite.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_isnormal.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_scalbln.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_scalbn.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_signbit.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_tan.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="..\..\src\CRT\e_atan2.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_sin.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\k_cos.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\k_sin.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_cos.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_acosh.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_log.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_log1p.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_asinh.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_atanh.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_cosh.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\e_exp.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\k_exp.c">
-      <Filter>CRT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CRT\complex.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\b_tgamma.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\CRT\catrig.c">
-      <Filter>CRT</Filter>
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\complex.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_acos.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_acosh.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_asin.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_atan2.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_atanh.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_cosh.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_exp.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\CRT\e_hypot.c">
-      <Filter>CRT</Filter>
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_copysign.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_lgamma.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_ccosh.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_lgamma_r.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_sincos.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_lgammaf.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_sincosf.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_lgammaf_r.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_exp2.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_log.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_exp2f.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_log2.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_expm1.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_log2f.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_expm1f.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_log10.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\k_expf.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_log10f.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_pow.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_powf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_rem_pio2.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\CRT\e_sinh.c">
-      <Filter>CRT</Filter>
+      <Filter>CRT\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\CRT\e_sinhf.c">
-      <Filter>CRT</Filter>
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_csinh.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\e_sqrt.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CRT\s_ctanh.c">
-      <Filter>CRT</Filter>
+    <ClCompile Include="..\..\src\CRT\k_cos.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\k_exp.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\k_expf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\k_rem_pio2.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\k_sin.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\k_tan.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\math.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\modf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_asinh.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_atan.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_cbrt.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_cbrtf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_ccosh.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_ceil.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_ceilf.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\CRT\s_cexp.c">
-      <Filter>CRT</Filter>
+      <Filter>CRT\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\CRT\s_clog.c">
-      <Filter>CRT</Filter>
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_copysign.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_cos.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\CRT\s_cpow.c">
-      <Filter>CRT</Filter>
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_csinh.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_csqrt.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_csqrtf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_ctanh.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_erf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_erff.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_exp2.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_exp2f.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_expm1.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_expm1f.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_fabs.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_floor.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_frexpf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_frexp.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_ilogb.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_ilogbf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_isfinite.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_isnormal.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\isinf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_log1p.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_logb.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_logbf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_scalbn.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_scalbln.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_signbit.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_signgam.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_sin.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_sincos.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_sincosf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_tan.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_sinpif.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_sinpi.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_cospi.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_cospif.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_rint.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_rintf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_round.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_roundf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_trunc.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_truncf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_fmod.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_fmodf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_remainder.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\e_remainderf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_remquo.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_remquof.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_nextafter.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_nextafterf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_fmax.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_fmaxf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_fmin.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_fminf.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_fma.c">
+      <Filter>CRT\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\CRT\s_fmaf.c">
+      <Filter>CRT\math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

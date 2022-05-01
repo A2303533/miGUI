@@ -84,7 +84,7 @@ __CRT_ieee754_cosh(double x)
 #pragma warning(disable: 4244)
 float
 _C_DECL
-__ieee754_coshf(float x)
+__CRT_ieee754_coshf(float x)
 {
 	float t, w;
 	int32_t ix;

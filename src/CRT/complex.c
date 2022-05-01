@@ -340,44 +340,44 @@ cpowl(long_double_complex x, long_double_complex y)
 
 double_complex 
 _C_DECL 
-csqrt(double_complex)
+csqrt(double_complex z)
 {
-
+	return __CRT_csqrt(z);
 }
 
 float_complex 
 _C_DECL 
-csqrtf(float_complex)
+csqrtf(float_complex z)
 {
-
+	return __CRT_csqrtf(z);
 }
 
 long_double_complex 
 _C_DECL 
-csqrtl(long_double_complex)
+csqrtl(long_double_complex z)
 {
-
+	return __CRT_csqrtl(z);
 }
 
 double 
 _C_DECL 
-carg(double_complex)
+carg(double_complex z)
 {
-
+	return (atan2(cimag(z), creal(z)));
 }
 
 float 
 _C_DECL 
-cargf(float_complex)
+cargf(float_complex z)
 {
-
+	return (atan2f(cimagf(z), crealf(z)));
 }
 
 long double 
 _C_DECL 
-cargl(long_double_complex)
+cargl(long_double_complex z)
 {
-
+	return (atan2l(cimagl(z), creall(z)));
 }
 
 double 
@@ -403,45 +403,57 @@ cimagl(long_double_complex z)
 
 double_complex 
 _C_DECL 
-conj(double_complex)
+conj(double_complex z)
 {
-
+	return (CMPLX(creal(z), -cimag(z)));
 }
 
 float_complex 
 _C_DECL 
-conjf(float_complex)
+conjf(float_complex z)
 {
-
+	return (CMPLXF(crealf(z), -cimagf(z)));
 }
 
 long_double_complex 
 _C_DECL 
-conjl(long_double_complex)
+conjl(long_double_complex z)
 {
-
+	return (CMPLXL(creall(z), -cimagl(z)));
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 double_complex 
 _C_DECL 
-cproj(double_complex)
+cproj(double_complex z)
 {
-
+	if (!isinf(creal(z)) && !isinf(cimag(z)))
+		return (z);
+	else
+		return (CMPLX(INFINITY, copysign(0.0, cimag(z))));
 }
 
 float_complex 
 _C_DECL 
-cprojf(float_complex)
+cprojf(float_complex z)
 {
-
+	if (!isinf(crealf(z)) && !isinf(cimagf(z)))
+		return (z);
+	else
+		return (CMPLXF(INFINITY, copysignf(0.0, cimagf(z))));
 }
 
 long_double_complex 
 _C_DECL 
-cprojl(long_double_complex)
+cprojl(long_double_complex z)
 {
-
+	if (!isinf(creall(z)) && !isinf(cimagl(z)))
+		return (z);
+	else
+		return (CMPLXL(INFINITY, copysignl(0.0, cimagl(z))));
 }
+#pragma warning(pop)
 
 double 
 _C_DECL 

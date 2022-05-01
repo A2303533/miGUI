@@ -220,12 +220,98 @@ extern "C" {
 	long double _C_DECL __CRT_expm1l(long double x);
 
 	double _C_DECL __CRT_ieee754_cosh(double x);
-	float _C_DECL __ieee754_coshf(float x);
+	float _C_DECL __CRT_ieee754_coshf(float x);
 	long double _C_DECL __CRT_ieee754_coshl(long double x);
 	
 	double _C_DECL __CRT_ieee754_sinh(double x);
 	long double _C_DECL __CRT_ieee754_sinhl(long double x);
 	float _C_DECL __CRT_ieee754_sinhf(float x);
+
+	long double _C_DECL __CRT_ieee754_powl(long double x, long double y);
+	double _C_DECL __CRT_ieee754_pow(double x, double y);
+	float _C_DECL __CRT_ieee754_powf(float x, float y);
+
+	long double _C_DECL __CRT_frexpl(long double x, int* eptr);
+	double _C_DECL __CRT_frexp(double x, int* eptr);
+	float _C_DECL __CRT_frexpf(float x, int* eptr);
+
+	long double _C_DECL __CRT_ieee754_log10l(long double x);
+	double _C_DECL __CRT_ieee754_log10(double x);
+	float _C_DECL __CRT_ieee754_log10f(float x);
+
+	int _C_DECL __CRT_ilogbl(long double x);
+	int _C_DECL __CRT_ilogbf(float x);
+	int _C_DECL __CRT_ilogb(double x);
+
+	long double _C_DECL __CRT_ieee754_log2l(long double x);
+	double _C_DECL __CRT_ieee754_log2(double x);
+	float _C_DECL __CRT_ieee754_log2f(float x);
+
+	long double _C_DECL __CRT_logbl(long double x);
+	double _C_DECL __CRT_logb(double x);
+	float _C_DECL __CRT_logbf(float x);
+
+	long double _C_DECL __CRT_cbrtl(long double x);
+	double _C_DECL __CRT_cbrt(double x);
+	float _C_DECL __CRT_cbrtf(float x);
+
+	double _C_DECL __CRT_erf(double x);
+	long double _C_DECL __CRT_erfl(long double x);
+	float _C_DECL __CRT_erff(float x);
+
+	double _C_DECL __CRT_erfc(double x);
+	long double _C_DECL __CRT_erfcl(long double x);
+	float _C_DECL __CRT_erfcf(float x);
+
+	long double _C_DECL __CRT_ieee754_lgammal(long double x);
+	double _C_DECL __CRT_ieee754_lgamma(double x);
+	float _C_DECL __CRT_ieee754_lgammaf(float x);
+
+	long double _C_DECL __CRT_ceill(long double x);
+	double _C_DECL __CRT_ceil(double x);
+	float _C_DECL __CRT_ceilf(float x);
+
+	double _C_DECL __CRT_tgamma(double x);
+
+	long double _C_DECL __CRT_rintl(long double x);
+	double _C_DECL __CRT_rint(double x);
+	float _C_DECL __CRT_rintf(float x);
+
+	long double _C_DECL __CRT_roundl(long double x);
+	double _C_DECL __CRT_round(double x);
+	float _C_DECL __CRT_roundf(float x);
+
+	float _C_DECL __CRT_truncf(float x);
+	double _C_DECL __CRT_trunc(double x);
+	long double _C_DECL __CRT_truncl(long double x);
+
+	long double _C_DECL __CRT_ieee754_fmodl(long double x, long double y);
+	double _C_DECL __CRT_ieee754_fmod(double x, double y);
+	float _C_DECL __CRT_ieee754_fmodf(float x, float y);
+
+	long double _C_DECL __CRT_ieee754_remainderl(long double x, long double p);
+	double _C_DECL __CRT_ieee754_remainder(double x, double p);
+	float _C_DECL __CRT_ieee754_remainderf(float x, float p);
+
+	long double _C_DECL __CRT_remquol(long double x, long double y, int* quo);
+	double _C_DECL __CRT_remquo(double x, double y, int* quo);
+	float _C_DECL __CRT_remquof(float x, float y, int* quo);
+
+	long double _C_DECL __CRT_nextafterl(long double x, long double y);
+	double _C_DECL __CRT_nextafter(double x, double y);
+	float _C_DECL __CRT_nextafterf(float x, float y);
+
+	long double _C_DECL __CRT_fmaxl(long double x, long double y);
+	double _C_DECL __CRT_fmax(double x, double y);
+	float _C_DECL __CRT_fmaxf(float x, float y);
+
+	long double _C_DECL __CRT_fminl(long double x, long double y);
+	double _C_DECL __CRT_fmin(double x, double y);
+	float _C_DECL __CRT_fminf(float x, float y);
+
+	double _C_DECL __CRT_fma(double x, double y, double z);
+	long double _C_DECL __CRT_fmal(long double x, long double y, long double z);
+	float _C_DECL __CRT_fmaf(float x, float y, float z);
 
 	static __inline int
 		__CRT_inline_isnan(double __x)
@@ -320,17 +406,46 @@ extern "C" {
 	float _C_DECL expm1f(float x);
 	long double _C_DECL expm1l(long double x);
 
+	// 7.12.6.4
+	double _C_DECL frexp(double value, int *exp);
+	float _C_DECL frexpf(float value, int* exp);
+	long double _C_DECL frexpl(long double value, int* exp);
+
+	// 7.12.6.5
+	int _C_DECL ilogb(double x);
+	int _C_DECL ilogbf(float x);
+	int _C_DECL ilogbl(long double x);
+
+	// 7.12.6.6
+	double _C_DECL ldexp(double value, int exp);
+	float _C_DECL ldexpf(float value, int exp);
+	long double _C_DECL ldexpl(long double value, int exp);
+
 	// 7.12.6.7
 	// log e
 	double _C_DECL log(double x);
 	float _C_DECL logf(float x);
 	long double _C_DECL logl(long double x);
 
+	// 7.12.6.8
+	double _C_DECL log10(double x);
+	float _C_DECL log10f(float x);
+	long double _C_DECL log10l(long double x);
+
 	// 7.12.6.9
 	double _C_DECL log1p(double x);
 	float _C_DECL log1pf(float x);
 	long double _C_DECL log1pl(long double x);
 
+	// 7.12.6.10
+	double _C_DECL log2(double x);
+	float _C_DECL log2f(float x);
+	long double _C_DECL log2l(long double x);
+
+	// 7.12.6.11
+	double _C_DECL logb(double x);
+	float _C_DECL logbf(float x);
+	long double _C_DECL logbl(long double x);
 
 	// 7.12.6.12
 	double _C_DECL modf(double value, double* iptr);
@@ -344,6 +459,14 @@ extern "C" {
 	double _C_DECL scalbln(double x, int n);
 	float _C_DECL scalblnf(float x, int n);
 	long double _C_DECL scalblnl(long double x, int n);
+
+	// 7.12.7.1
+	/// <summary>
+	/// real cube root
+	/// </summary>
+	double _C_DECL cbrt(double x);
+	float _C_DECL cbrtf(float x);
+	long double _C_DECL cbrtl(long double x);
 
 	// 7.12.7.2
 	double _C_DECL fabs(double x);
@@ -364,16 +487,149 @@ extern "C" {
 	double _C_DECL sqrt(double x);
 	float _C_DECL sqrtf(float x);
 	long double _C_DECL sqrtl(long double x);
+
+	// 7.12.8.1
+	double _C_DECL erf(double x);
+	float _C_DECL erff(float x);
+	long double _C_DECL erfl(long double x);
+
+	// 7.12.8.2
+	double _C_DECL erfc(double x);
+	float _C_DECL erfcf(float x);
+	long double _C_DECL erfcl(long double x);
+
+	// 7.12.8.3
+	double _C_DECL lgamma(double x);
+	float _C_DECL lgammaf(float x);
+	long double _C_DECL lgammal(long double x);
+
+	// 7.12.8.4
+	double _C_DECL tgamma(double x);
+	float _C_DECL tgammaf(float x);
+	long double _C_DECL tgammal(long double x);
 	
+	// 7.12.9.1
+	double _C_DECL ceil(double x);
+	float _C_DECL ceilf(float x);
+	long double _C_DECL ceill(long double x);
+
 	// 7.12.9.2
 	double _C_DECL floor(double x);
 	float _C_DECL floorf(float x);
 	long double _C_DECL floorl(long double x);
 
+	// 7.12.9.3
+	double _C_DECL nearbyint(double x);
+	float _C_DECL nearbyintf(float x);
+	long double _C_DECL nearbyintl(long double x);
+
+	// 7.12.9.4
+	double _C_DECL rint(double x);
+	float _C_DECL rintf(float x);
+	long double _C_DECL rintl(long double x);
+
+	// 7.12.9.5
+	long int _C_DECL lrint(double x);
+	long int _C_DECL lrintf(float x);
+	long int _C_DECL lrintl(long double x);
+	long long int _C_DECL llrint(double x);
+	long long int _C_DECL llrintf(float x);
+	long long int _C_DECL llrintl(long double x);
+
+	// 7.12.9.6
+	double _C_DECL round(double x);
+	float _C_DECL roundf(float x);
+	long double _C_DECL roundl(long double x);
+
+	// 7.12.9.7
+	/// <summary>
+	/// will call lrint
+	/// </summary>
+	long int _C_DECL lround(double x);
+	long int _C_DECL lroundf(float x);
+	long int _C_DECL lroundl(long double x);
+	long long int _C_DECL llround(double x);
+	long long int _C_DECL llroundf(float x);
+	long long int _C_DECL llroundl(long double x);
+
+	// 7.12.9.8
+	double _C_DECL trunc(double x);
+	float _C_DECL truncf(float x);
+	long double _C_DECL truncl(long double x);
+
+	// 7.12.10.1
+	double _C_DECL fmod(double x, double y);
+	float _C_DECL fmodf(float x, float y);
+	long double _C_DECL fmodl(long double x, long double y);
+
+	// 7.12.10.2
+	double _C_DECL remainder(double x, double y);
+	float _C_DECL remainderf(float x, float y);
+	long double _C_DECL remainderl(long double x, long double y);
+
+	// 7.12.10.3
+	double _C_DECL remquo(double x, double y, int* quo);
+	float _C_DECL remquof(float x, float y, int* quo);
+	long double _C_DECL remquol(long double x, long double y, int* quo);
+
 	// 7.12.11.1
 	double _C_DECL copysign(double x, double y);
 	float _C_DECL copysignf(float x, float y);
 	long double _C_DECL copysignl(long double x, long double y);
+
+	// 7.12.11.2
+	double _C_DECL nan(const char* tagp);
+	float _C_DECL nanf(const char* tagp);
+	long double _C_DECL nanl(const char* tagp);
+
+	// 7.12.11.3
+	double _C_DECL nextafter(double x, double y);
+	float _C_DECL nextafterf(float x, float y);
+	long double _C_DECL nextafterl(long double x, long double y);
+
+	// 7.12.11.4
+	double _C_DECL nexttoward(double x, long double y);
+	float _C_DECL nexttowardf(float x, long double y);
+	long double _C_DECL nexttowardl(long double x, long double y);
+
+	// 7.12.12.1
+	double _C_DECL fdim(double x, double y);
+	float _C_DECL fdimf(float x, float y);
+	long double _C_DECL fdiml(long double x, long double y);
+
+	// 7.12.12.2
+	double _C_DECL fmax(double x, double y);
+	float _C_DECL fmaxf(float x, float y);
+	long double _C_DECL fmaxl(long double x, long double y);
+
+	// 7.12.12.3
+	double _C_DECL fmin(double x, double y);
+	float _C_DECL fminf(float x, float y);
+	long double _C_DECL fminl(long double x, long double y);
+
+	// 7.12.13.1
+	double _C_DECL fma(double x, double y, double z);
+	float _C_DECL fmaf(float x, float y, float z);
+	long double _C_DECL fmal(long double x, long double y, long double z);
+
+	// 7.12.14.1
+#define	isgreater(x, y) (!isunordered((x), (y)) && (x) > (y))
+
+	// 7.12.14.2
+#define	isgreaterequal(x, y) (!isunordered((x), (y)) && (x) >= (y))
+
+	// 7.12.14.3
+#define	isless(x, y) (!isunordered((x), (y)) && (x) < (y))
+
+	// 7.12.14.4
+#define	islessequal(x, y) (!isunordered((x), (y)) && (x) <= (y))
+
+	// 7.12.14.5
+#define	islessgreater(x, y) (!isunordered((x), (y)) && \
+					((x) > (y) || (y) > (x)))
+
+	// 7.12.14.6
+#define	isunordered(x, y)	(isnan(x) || isnan(y))
 
 #ifdef __cplusplus
 }

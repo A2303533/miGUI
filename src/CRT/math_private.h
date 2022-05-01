@@ -293,6 +293,15 @@ double_complex __ldexp_cexp(double_complex z, int expt);
 double __ldexp_exp(double x, int expt);
 float __ldexp_expf(float x, int expt);
 
+double __kernel_sin(double x, double y, int iy);
+double __kernel_cos(double x, double y);
+
+float __kernel_sindf(double x);
+float __kernel_cosdf(double x);
+
+double sinpi(double x);
+double cospi(double x);
+
 /*
 #define	_2sum(a, b) do {	\
 	__typeof__(a) __s, __w;	\

@@ -276,5 +276,8 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	testFloat = -2.f;
 	printf("atanh(%f): [%f]\n", testFloat, atanh(testFloat));
 	
+	testFloat = -2.09f;
+	printf("lrint(%i): [%i]\n", lrint(testFloat), (int)testFloat);
+
 	__CRT_shutdown();
 }
