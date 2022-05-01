@@ -91,10 +91,15 @@ __CRT_on_atexitProcs()
 	}
 }
 
-
-
-double 
-_except1(int flags, int opcode, double arg, double res, unsigned int* cw)
+double
+__cdecl
+_except1(
+	DWORD fpe, 
+    DWORD op,
+	double arg, 
+	double res, 
+	DWORD cw, 
+	void* unk)
 {
 	/*???????*/
 	return 0.;
@@ -103,6 +108,7 @@ _except1(int flags, int opcode, double arg, double res, unsigned int* cw)
 int 
 _global_init_i(_PIFV* a, _PIFV* b)
 {
+
 	_PIFV* pfbegin = a;
 	_PIFV* pfend = b;
 
@@ -140,6 +146,8 @@ __CRT_init()
 {
 	if (__crt_ready)
 		exit(EXIT_FAILURE);
+
+	_except1(0, 0, 0, 0, 0, 0);
 
 	memset(&__crt, 0, sizeof(__CRT_main_struct));
 	__crt.processHeap = GetProcessHeap(); // CRT_vs.c - for Visual Studio

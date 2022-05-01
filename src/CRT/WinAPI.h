@@ -6,6 +6,8 @@
 extern "C" {
 #endif
 
+	typedef unsigned long DWORD, * PDWORD, * LPDWORD;
+
 	__declspec(dllimport) int __stdcall MessageBoxA( void*, const char*, const char*, unsigned int);
 	__declspec(dllimport) void* __stdcall GetProcessHeap(void);
 	#define HEAP_ZERO_MEMORY                0x00000008      

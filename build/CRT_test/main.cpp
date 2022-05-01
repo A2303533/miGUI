@@ -14,6 +14,8 @@ type_info::~type_info() noexcept
 }
 void __cdecl operator delete(void*, unsigned int) {}
 
+
+
 //#define SUCCESS 0
 //#define FAILURE -1
 
