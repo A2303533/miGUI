@@ -20,10 +20,11 @@
 #pragma comment(linker, "/NODEFAULTLIB")
 /*need to use libcmt.lib;libvcruntime.lib;*/
 /*use LinkTimeCodeGeneration*/
-// No (/OPT:NOREF)
+// /OPT:REF
 
 #pragma comment(linker, "/ENTRY:\"__CRT_main\"")
 
+#define __CRT_INTRIN
 
 typedef void (*_PVFV)(void);
 typedef int (*_PIFV)(void);

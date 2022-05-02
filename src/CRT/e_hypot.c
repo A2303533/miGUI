@@ -106,7 +106,7 @@ __CRT_ieee754_hypot(double x, double y)
 	    t1 = 0;
 	    SET_HIGH_WORD(t1,ha);
 	    t2 = a-t1;
-	    w  = __CRT_ieee754_sqrt(t1*t1-(b*(-b)-t2*(a+t1)));
+	    w  = sqrt(t1*t1-(b*(-b)-t2*(a+t1)));
 	} else {
 	    a  = a+a;
 	    y1 = 0;
@@ -115,7 +115,7 @@ __CRT_ieee754_hypot(double x, double y)
 	    t1 = 0;
 	    SET_HIGH_WORD(t1,ha+0x00100000);
 	    t2 = a - t1;
-	    w  = __CRT_ieee754_sqrt(t1*y1-(w*(-w)-(t1*y2+t2*b)));
+	    w  = sqrt(t1*y1-(w*(-w)-(t1*y2+t2*b)));
 	}
 	if(k!=0) {
 	    t1 = 0.0;
@@ -175,7 +175,7 @@ __CRT_ieee754_hypotf(float x, float y)
 	if (w > b) {
 		SET_FLOAT_WORD(t1, ha & 0xfffff000);
 		t2 = a - t1;
-		w = __CRT_ieee754_sqrtf(t1 * t1 - (b * (-b) - t2 * (a + t1)));
+		w = sqrtf(t1 * t1 - (b * (-b) - t2 * (a + t1)));
 	}
 	else {
 		a = a + a;
@@ -183,7 +183,7 @@ __CRT_ieee754_hypotf(float x, float y)
 		y2 = b - y1;
 		SET_FLOAT_WORD(t1, (ha + 0x00800000) & 0xfffff000);
 		t2 = a - t1;
-		w = __CRT_ieee754_sqrtf(t1 * y1 - (w * (-w) - (t1 * y2 + t2 * b)));
+		w = sqrtf(t1 * y1 - (w * (-w) - (t1 * y2 + t2 * b)));
 	}
 	if (k != 0) {
 		SET_FLOAT_WORD(t1, (127 + k) << 23);

@@ -111,7 +111,7 @@ __CRT_ieee754_powf(float x, float y)
 	if(hy==0x40000000) return x*x; /* y is  2 */
 	if(hy==0x3f000000) {	/* y is  0.5 */
 	    if(hx>=0)	/* x >= +0 */
-	    return __CRT_ieee754_sqrtf(x);
+	    return sqrtf(x);
 	}
 
 	ax   = fabsf(x);

@@ -35,8 +35,6 @@ huge=  1.00000000000000000000e+300;
 
 double _C_DECL __CRT_ieee754_log(double x);
 float _C_DECL __CRT_ieee754_logf(float x);
-double _C_DECL __CRT_ieee754_sqrt(double x);
-float _C_DECL __CRT_ieee754_sqrtf(float x);
 
 double
 _C_DECL
@@ -54,10 +52,10 @@ __CRT_asinh(double x)
 	    w = __CRT_ieee754_log(fabs(x))+ln2;
 	} else if (ix>0x40000000) {	/* 2**28 > |x| > 2.0 */
 	    t = fabs(x);
-	    w = __CRT_ieee754_log(2.0*t+one/(__CRT_ieee754_sqrt(x*x+one)+t));
+	    w = __CRT_ieee754_log(2.0*t+one/(sqrt(x*x+one)+t));
 	} else {		/* 2.0 > |x| > 2**-28 */
 	    t = x*x;
-	    w =log1p(fabs(x)+t/(one+ __CRT_ieee754_sqrt(one+t)));
+	    w =log1p(fabs(x)+t/(one+ sqrt(one+t)));
 	}
 	if(hx>0) return w; else return -w;
 }
@@ -88,11 +86,11 @@ __CRT_asinhf(float x)
 	}
 	else if (ix > 0x40000000) {	/* 2**28 > |x| > 2.0 */
 		t = fabsf(x);
-		w = __CRT_ieee754_logf((float)2.0 * t + one / (__CRT_ieee754_sqrtf(x * x + one) + t));
+		w = __CRT_ieee754_logf((float)2.0 * t + one / (sqrtf(x * x + one) + t));
 	}
 	else {		/* 2.0 > |x| > 2**-28 */
 		t = x * x;
-		w = log1pf(fabsf(x) + t / (one + __CRT_ieee754_sqrtf(one + t)));
+		w = log1pf(fabsf(x) + t / (one + sqrtf(one + t)));
 	}
 	if (hx > 0) return w; else return -w;
 }

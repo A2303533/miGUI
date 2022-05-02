@@ -276,10 +276,17 @@ sciencific: %e\n", 0xf, "World!", '$', -1, 1234, 1234, 5678, f, f, '#', 444, 30.
 	testFloat = -0.5f;
 	printf("atanh(%f): [%f]\n", testFloat, atanh(testFloat));
 	testFloat = -2.f;
-	printf("atanh(%f): [%f]\n", testFloat, atanh(testFloat));
+	printf("atanh(%f): [%%f]\n", testFloat, atanh(testFloat));
 	
 	testFloat = -2.09f;
 	printf("lrint(%i): [%i]\n", lrint(testFloat), (int)testFloat);
+
+	printf("Characters: [%3c] %c %lc\n", 'a', 65, 66);
+	printf("Decimals: %d %ld %lli\n", 1977, 650000L, 0xFFFFFFFFFF);
+	printf("Decimals2: %01d %020lli\n", 444, 0xfffffffffffff);
+	printf("Preceding with blanks: %10d \n", 1977);
+	printf("Preceding with zeros: %010d \n", 1977);
+	printf("Some different radices: %d %x %o %#x %#o \n", 100, 100, 100, 100, 100);
 
 	__CRT_shutdown();
 }

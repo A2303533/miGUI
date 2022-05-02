@@ -96,11 +96,11 @@ __CRT_ieee754_acoshf(float x)
 	}
 	else if (hx > 0x40000000) {	/* 2**28 > x > 2 */
 		t = x * x;
-		return __CRT_ieee754_logf((float)2.0 * x - one / (x + __CRT_ieee754_sqrtf(t - one)));
+		return __CRT_ieee754_logf((float)2.0 * x - one / (x + sqrtf(t - one)));
 	}
 	else {			/* 1<x<2 */
 		t = x - one;
-		return log1pf(t + __CRT_ieee754_sqrtf((float)2.0 * t + t * t));
+		return log1pf(t + sqrtf((float)2.0 * t + t * t));
 	}
 }
 #pragma warning(pop)

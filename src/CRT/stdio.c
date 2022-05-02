@@ -4,6 +4,7 @@
 #include "ctype.h"
 #include "errno.h"
 #include "stdarg.h"
+//#include "wchar.h"
 
 
 #ifdef __CRT_WIN32
@@ -419,6 +420,164 @@ setvbuf(FILE* stream, char* buf, int mode, size_t size)
 	return -1; //not supported;
 }
 
+const char*
+_C_DECL
+__CRT_vsnprintf_getNumber(const char* fmt, int* number)
+{
+	static char buffer[30];
+	int i = 0;
+	while (*fmt)
+	{
+		switch (*fmt)
+		{
+		case '0':case '1':case '2':case '3':case '4':
+		case '5':case '6':case '7':case '8':case '9':
+		{
+			buffer[i] = *fmt;
+			buffer[i+1] = 0;
+			++fmt;
+			++i;
+		}break;
+		default:
+			goto out;
+		}
+	}
+out:;
+
+	if (buffer[0])
+		*number = atoi(buffer);
+
+	return fmt;
+}
+// Get valid specifier. That thing after %.
+// If not valid, return next char (skip %).
+// type:
+//  0 - nothing, skip
+//  1 - c
+//  2 - lc
+//  3 - d\i
+//  4 - ld\li
+//  5 - lld\lli
+// leftPads: number of ' ' or '0' to write before writing the variable
+// flags:
+//   0x1 - pads with ' '
+//   0x2 - pads with '0'
+const char* 
+_C_DECL
+__CRT_vsnprintf_(const char* fmt, int* type, int* leftPads, int* flags )
+{
+	// *fmt is '%' so next char
+	++fmt;
+
+	const char* saveFmt = fmt;
+	*type = 0;
+	*leftPads = 0;
+	*flags = 0;
+
+begin:;
+	switch (*fmt)
+	{
+	case '0':
+	{
+		++fmt;
+		*flags |= 0x2;
+
+		// now how much leftPads
+		switch (*fmt)
+		{
+		case '1':case '2':case '3':case '4':
+		case '5':case '6':case '7':case '8':case '9':
+		{
+			fmt = __CRT_vsnprintf_getNumber(fmt, leftPads);
+			// now *fmt must be d\i\li\lli\ld\lld or other...
+			// easy to use goto
+			goto begin;
+		}break;
+		default:
+			break;
+		}
+	}break;
+	case '1':case '2':case '3':case '4':
+	case '5':case '6':case '7':case '8':case '9':
+	{
+		// need to get number
+		fmt = __CRT_vsnprintf_getNumber(fmt, leftPads);
+
+		// it can be pads with ' '
+		*flags |= 0x1;
+
+		// next fmt can be '.'
+		switch (*fmt)
+		{
+		case '.':
+			break;
+		default: // no, probably *fmt is c d i or other
+			goto begin;
+			break;
+		}
+
+	}break;
+	case 'c':
+	{
+		*type = 1;
+		++fmt;
+	}break;
+	case 'i':
+	case 'd':
+	{
+		*type = 3;
+		++fmt;
+	}break;
+	case 'l':
+	{
+		// li\ld lli\lld lc
+		
+		++fmt;
+		if (*fmt)
+		{
+			switch (*fmt)
+			{
+			case 'c':
+				*type = 2;
+				++fmt;
+				break;
+			case 'd':
+			case 'i':
+				*type = 4;
+				++fmt;
+				break;
+			case 'l':
+			{
+				++fmt;
+				if (*fmt)
+				{
+					switch (*fmt)
+					{
+					case 'd':
+					case 'i':
+						*type = 5;
+						++fmt;
+						break;
+					}
+				}
+			}break;
+			default:
+				break;
+			}
+		}
+
+		//*type = 1;
+	}break;
+	default:
+		break;
+	}
+
+	if (*type == 0)
+		fmt = saveFmt;
+
+	return fmt;
+}
+
 int
 _C_DECL
 __CRT_vsnprintf(
@@ -431,164 +590,152 @@ __CRT_vsnprintf(
 )
 {
 	size_t format_len = strlen(format);
-
-	int state = 0; // 1 = %
 	int buffer_current_size = 0;
 	int result = 0;
 	
 	const char* arg_constChar = 0;
 
-	for (size_t i = 0; i < format_len; ++i)
+	//enum
+	//{
+	//	__vsnprintf_state_clear = 0,
+	//	__vsnprintf_state_ready = 1, // %
+	//	__vsnprintf_state_l = 2,     // l
+	//};
+
+	//int state = __vsnprintf_state_clear;
+
+	int type = 0;
+	int flags = 0;
+	int leftPad = 0;
+
+	//for (size_t i = 0; i < format_len; ++i)
+	const char* fmt = format;
+	while(*fmt)
 	{
-		switch (format[i])
+		type = 0;
+		flags = 0;
+		leftPad = 0;
+
+		switch (*fmt)
 		{
 		case '%':
-			if (state == 1)
-				goto _default;
-			if (!state)
-				state = 1;
+			fmt = __CRT_vsnprintf_(fmt, &type, &leftPad, &flags);
+			if (!type)
+			{
+				s[buffer_current_size++] = *fmt; // must be '%'
+				s[buffer_current_size] = 0;
+				++fmt;
+			}
 			break;
-		case 'd':
-		case 'i':
-		{
-			if (!state)
-				goto _default;
-			int arg = va_arg(ap, int);
-			__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
-			arg_constChar = __CRT_itoa_buffer;
-			if (arg_constChar)
-				goto putStr;
-		}break;
-		case 'x':
-		case 'X':
-		case 'o':
-		case 'u':
-		{
-			if (!state)
-				goto _default;
-			unsigned int arg = va_arg(ap, unsigned int);
-
-			int md = 0;
-			switch (format[i])
-			{
-			case 'o':
-				md = 3;
-				break;
-			case 'x':
-				md = 1;
-				break;
-			case 'X':
-				md = 2;
-				break;
-			default:
-				break;
-			}
-			__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
-
-			arg_constChar = __CRT_itoa_buffer;
-			if (arg_constChar)
-				goto putStr;
-		}break;
-		case 'F':
-		case 'f':
-		case 'E':
-		case 'e':
-		{
-			if (!state)
-				goto _default;
-			double arg = va_arg(ap, double);
-			
-			int md = 0;
-			switch (format[i])
-			{
-			case 'F':
-				md = 1;
-				break;
-			case 'f':
-				break;
-			case 'E':
-				md = 3;
-				break;
-			case 'e':
-				md = 2;
-				break;
-			}
-
-			__CRT_dtoa(arg, __CRT_dtoa_buffer, 30, md);
-			arg_constChar = __CRT_dtoa_buffer;
-			if (arg_constChar)
-				goto putStr;
-			/*
-			switch (format[i])
-			{
-			case 'o':
-				md = 3;
-				break;
-			case 'x':
-				md = 1;
-				break;
-			case 'X':
-				md = 2;
-				break;
-			default:
-				break;
-			}
-			__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
-
-			arg_constChar = __CRT_itoa_buffer;
-			if (arg_constChar)
-				goto putStr;*/
-		}break;
-		case 's':
-		{
-			if (!state)
-				goto _default;
-			arg_constChar = va_arg(ap, const char*);
-			if (arg_constChar)
-				goto putStr;
-		}break;
-		case 'c':
-		{
-			if (!state)
-				goto _default;
-			char c = va_arg(ap, char);
-			__CRT_itoa_buffer[0] = c;
-			__CRT_itoa_buffer[1] = 0;
-			arg_constChar = __CRT_itoa_buffer;
-			goto putStr;
-		}break;
 		default:
-		_default:;
-			state = 0;
-			s[buffer_current_size++] = format[i];
+			s[buffer_current_size++] = *fmt;
 			s[buffer_current_size] = 0;
+			++fmt;
 			break;
 		}
-		if(arg_constChar)
+
+		if (type)
 		{
-		putStr:;
-			size_t argLen = strlen(arg_constChar);
-			if (argLen)
+			arg_constChar = 0;
+
+			switch (type)
 			{
-				for (size_t i2 = 0; i2 < argLen; ++i2)
+			case 1:
+			case 2:
+			{
+				int c = va_arg(ap, int);
+				__CRT_itoa_buffer[0] = (char)c;
+				__CRT_itoa_buffer[1] = 0;
+				if (leftPad && (flags & 0x1))
 				{
-					s[buffer_current_size++] = arg_constChar[i2];
-					s[buffer_current_size] = 0;
-					if (buffer_current_size == n) // or n-1 ?
+					flags = 0;
+					int leftPadNum = leftPad - 1;
+					if (leftPadNum)
 					{
-						result += buffer_current_size;
-						if (onFull)
+						__CRT_itoa_buffer[leftPadNum] = (char)c;
+						__CRT_itoa_buffer[leftPadNum + 1] = 0;
+						for (int i = 0; i < leftPadNum; ++i)
 						{
-							if (onFull(stream, s, n))
+							__CRT_itoa_buffer[i] = ' ';
+						}
+					}
+				}
+
+				arg_constChar = __CRT_itoa_buffer;
+			}break;
+			case 3:
+			{
+				int arg = va_arg(ap, int);
+				__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
+				arg_constChar = __CRT_itoa_buffer;
+			}break;
+			case 4:
+			{
+				long int arg = va_arg(ap, long int);
+				__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
+				arg_constChar = __CRT_itoa_buffer;
+			}break;
+			case 5:
+			{
+				long long int arg = va_arg(ap, long long int);
+				__CRT_lltoa(arg, __CRT_itoa_buffer, 30, 0);
+				arg_constChar = __CRT_itoa_buffer;
+			}break;
+			}
+
+			if (arg_constChar)
+			{
+				size_t argLen = strlen(arg_constChar);
+				if (argLen)
+				{
+					if (leftPad)
+					{
+						if ((flags & 0x1) || (flags & 0x2))
+						{
+							int leftPadNum = leftPad - argLen;
+							if (leftPadNum > 0)
 							{
-								return result;
+								char leftPadChar = ' ';
+								if(flags & 0x2)
+									leftPadChar = '0';
+
+								// copy of code below
+								for (int i = 0; i < leftPadNum; ++i)
+								{
+									s[buffer_current_size++] = leftPadChar;
+									s[buffer_current_size] = 0;
+									if (buffer_current_size == n) // or n-1 ?
+									{
+										result += buffer_current_size;
+										if (onFull)
+										{
+											if (onFull(stream, s, n))
+												return result;
+											buffer_current_size = 0;
+										}
+									}
+								}
 							}
-							buffer_current_size = 0;
+						}
+					}
+
+					for (size_t i2 = 0; i2 < argLen; ++i2)
+					{
+						s[buffer_current_size++] = arg_constChar[i2];
+						s[buffer_current_size] = 0;
+						if (buffer_current_size == n) // or n-1 ?
+						{
+							result += buffer_current_size;
+							if (onFull)
+							{
+								if (onFull(stream, s, n))
+									return result;
+								buffer_current_size = 0;
+							}
 						}
 					}
 				}
 			}
-			arg_constChar = 0;
 		}
 
 		if (buffer_current_size == n) // or n-1 ?
@@ -597,12 +744,215 @@ __CRT_vsnprintf(
 			if (onFull)
 			{
 				if (onFull(stream, s, n))
-				{
 					return result;
-				}
 				buffer_current_size = 0;
 			}
 		}
+
+	//	switch (format[i])
+	//	{
+	//	case '0': case '1': case '2': case '3': case '4': 
+	//	case '5': case '6': case '7': case '8': case '9':
+	//	{
+	//		if (!state)
+	//			goto _default;
+
+	//		if (state == __vsnprintf_state_ready)
+	//		{
+	//			// %10* or %010*
+	//		}
+
+	//	}break;
+	//	case '%':
+	//		if (state == __vsnprintf_state_ready)
+	//			goto _default;
+	//		if (!state)
+	//			state = __vsnprintf_state_ready;
+	//		break;
+	//	case 'd':
+	//	case 'i':
+	//	{
+	//		if (!state)
+	//			goto _default;
+
+	//		if (state == __vsnprintf_state_ready)
+	//		{
+	//			int arg = va_arg(ap, int);
+	//			__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
+	//			arg_constChar = __CRT_itoa_buffer;
+	//			if (arg_constChar)
+	//				goto putStr;
+	//		}
+	//		else if (state == __vsnprintf_state_l)
+	//		{
+	//			long int arg = va_arg(ap, long int);
+	//			__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
+	//			arg_constChar = __CRT_itoa_buffer;
+	//			if (arg_constChar)
+	//				goto putStr;
+	//		}
+	//	}break;
+	//	case 'l':
+	//	{
+	//		if (!state)
+	//			goto _default;
+
+	//		if (state == __vsnprintf_state_ready)
+	//			state = __vsnprintf_state_l;
+	//	}break;
+	//	case 'x':
+	//	case 'X':
+	//	case 'o':
+	//	case 'u':
+	//	{
+	//		if (!state)
+	//			goto _default;
+	//		unsigned int arg = va_arg(ap, unsigned int);
+
+	//		int md = 0;
+	//		switch (format[i])
+	//		{
+	//		case 'o':
+	//			md = 3;
+	//			break;
+	//		case 'x':
+	//			md = 1;
+	//			break;
+	//		case 'X':
+	//			md = 2;
+	//			break;
+	//		default:
+	//			break;
+	//		}
+	//		__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
+
+	//		arg_constChar = __CRT_itoa_buffer;
+	//		if (arg_constChar)
+	//			goto putStr;
+	//	}break;
+	//	case 'F':
+	//	case 'f':
+	//	case 'E':
+	//	case 'e':
+	//	{
+	//		if (!state)
+	//			goto _default;
+	//		double arg = va_arg(ap, double);
+	//		
+	//		int md = 0;
+	//		switch (format[i])
+	//		{
+	//		case 'F':
+	//			md = 1;
+	//			break;
+	//		case 'f':
+	//			break;
+	//		case 'E':
+	//			md = 3;
+	//			break;
+	//		case 'e':
+	//			md = 2;
+	//			break;
+	//		}
+
+	//		__CRT_dtoa(arg, __CRT_dtoa_buffer, 30, md);
+	//		arg_constChar = __CRT_dtoa_buffer;
+	//		if (arg_constChar)
+	//			goto putStr;
+	//		/*
+	//		switch (format[i])
+	//		{
+	//		case 'o':
+	//			md = 3;
+	//			break;
+	//		case 'x':
+	//			md = 1;
+	//			break;
+	//		case 'X':
+	//			md = 2;
+	//			break;
+	//		default:
+	//			break;
+	//		}
+	//		__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
+
+	//		arg_constChar = __CRT_itoa_buffer;
+	//		if (arg_constChar)
+	//			goto putStr;*/
+	//	}break;
+	//	case 's':
+	//	{
+	//		if (!state)
+	//			goto _default;
+	//		arg_constChar = va_arg(ap, const char*);
+	//		if (arg_constChar)
+	//			goto putStr;
+	//	}break;
+	//	case 'c':
+	//	{
+	//		if (!state)
+	//			goto _default;
+	//		char c = va_arg(ap, char);
+	//		__CRT_itoa_buffer[0] = c;
+	//		__CRT_itoa_buffer[1] = 0;
+	//		arg_constChar = __CRT_itoa_buffer;
+	//		goto putStr;
+	//	}break;
+	//	default:
+	//	_default:;
+	//		if (state == __vsnprintf_state_l)
+	//		{
+	//			__CRT_itoa_buffer[0] = '%';
+	//			__CRT_itoa_buffer[1] = 0;
+	//			arg_constChar = __CRT_itoa_buffer;
+	//			goto putStr;
+	//		}
+
+	//		state = __vsnprintf_state_clear;
+	//		s[buffer_current_size++] = format[i];
+	//		s[buffer_current_size] = 0;
+	//		break;
+	//	}
+	//	if(arg_constChar)
+	//	{
+	//	putStr:;
+	//		size_t argLen = strlen(arg_constChar);
+	//		if (argLen)
+	//		{
+	//			for (size_t i2 = 0; i2 < argLen; ++i2)
+	//			{
+	//				s[buffer_current_size++] = arg_constChar[i2];
+	//				s[buffer_current_size] = 0;
+	//				if (buffer_current_size == n) // or n-1 ?
+	//				{
+	//					result += buffer_current_size;
+	//					if (onFull)
+	//					{
+	//						if (onFull(stream, s, n))
+	//						{
+	//							return result;
+	//						}
+	//						buffer_current_size = 0;
+	//					}
+	//				}
+	//			}
+	//		}
+	//		arg_constChar = 0;
+	//		state = __vsnprintf_state_clear;
+	//	}
+
+	//	if (buffer_current_size == n) // or n-1 ?
+	//	{
+	//		result += buffer_current_size;
+	//		if (onFull)
+	//		{
+	//			if (onFull(stream, s, n))
+	//			{
+	//				return result;
+	//			}
+	//			buffer_current_size = 0;
+	//		}
+	//	}
 	}
 	return result ? result : -1;
 }

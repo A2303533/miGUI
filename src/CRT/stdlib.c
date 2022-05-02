@@ -111,6 +111,26 @@ strtod(const char* nptr, char** endptr)
 	const struct lconv* lc = localeconv();
 	char decimal_point = *lc->decimal_point;
 
+	size_t str_len = strlen(nptr);
+	if (str_len >= 3)
+	{
+		char bf[4] = { 0,0,0,0 };
+		for (int i = 0; i < 3; ++i)
+		{
+			if (isupper(nptr[i]))
+				bf[i] = tolower(nptr[i]);
+			else
+				bf[i] = nptr[i];
+		}
+		if (strcmp(bf, "inf"))
+			return INFINITY;
+		
+		if (strcmp(bf, "nan"))
+		{
+			result = NAN;
+		}
+	}
+
 	/*with - or not*/
 	if (*str_ptr == '-')
 	{
