@@ -17,11 +17,9 @@ typedef struct {
     char* tmpfn;        // auto delete tmpfile when fclose
     unsigned int flags; // need to know for freopen
     unsigned long long pos;
-    //unsigned char* p;   // current position, at least for buffer (i don't know about Windows HANDLE)
-    //unsigned char* b;   // begin, first byte of buffer
-    //unsigned char* buf; // buffer, FILE can handle with byte buffers
-    //unsigned int bufSz; // buf size. all operations like fput will put data in buffer. use fflush.
-    //unsigned int bufAlc; // buf allocated size
+
+    unsigned char* buf; // buffer, FILE can handle byte buffers
+    unsigned int bufSz; // buf size. all operations like fput will put data in buffer. use fflush.
 
     // I DON't know for what this:
     unsigned int fpi;
@@ -95,7 +93,7 @@ extern "C" {
     // return __CRT_EXST_... 
     int _C_DECL __CRT_exist(const char*);
     int _C_DECL __CRT_wexist(const wchar_t*);
-    
+
     // 7.19.5.1
     int _C_DECL fclose(FILE* stream);
 
@@ -169,6 +167,9 @@ extern "C" {
 
     // 7.19.6.14
     int _C_DECL vsscanf(const char* s, const char* format, va_list arg);
+
+    // 7.19.7.3
+    int _C_DECL fputc(int c, FILE* stream);
 
     // 7.19.8.2
     size_t _C_DECL fwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream);

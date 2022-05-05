@@ -407,9 +407,31 @@ fwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream)
 {
 	unsigned int written = 0;
 #ifdef __CRT_WIN32
-	WriteFile(stream->handle, ptr, nmemb * size, &written, NULL);
+	if (stream)
+	{
+
+		if (stream->handle)
+		{
+			WriteFile(stream->handle, ptr, nmemb * size, &written, NULL);
+		}
+		else if (!stream->handle && stream->buf)
+		{
+			uint8_t* bytes = ptr;
+			for (size_t i1 = 0; i1 < size; ++i1)
+			{
+				for (size_t i2 = 0; i2 < nmemb; ++i2)
+				{
+					if (stream->pos < stream->bufSz)
+					{
+						stream->buf[stream->pos] = bytes[i2];
+						++stream->pos;
+					}
+				}
+			}
+		}
+		stream->pos += written;
+	}
 #endif
-	stream->pos += written;
 	return written;
 }
 
@@ -422,7 +444,7 @@ setvbuf(FILE* stream, char* buf, int mode, size_t size)
 
 const char*
 _C_DECL
-__CRT_vsnprintf_getNumber(const char* fmt, int* number)
+__CRT_vprintf_getNumber(const char* fmt, int* number)
 {
 	static char buffer[30];
 	int i = 0;
@@ -452,31 +474,87 @@ out:;
 // Get valid specifier. That thing after %.
 // If not valid, return next char (skip %).
 // type:
+enum __CRT_vprintf_type {
+	__CRT_vprintf_type_nothing = 0,
+	__CRT_vprintf_type_c,
+	__CRT_vprintf_type_lc,
+	__CRT_vprintf_type_d_i,
+	__CRT_vprintf_type_ld_li,
+	__CRT_vprintf_type_lld_lli,
+	__CRT_vprintf_type_x,
+	__CRT_vprintf_type_X,
+	__CRT_vprintf_type_o,
+	__CRT_vprintf_type_s,
+	__CRT_vprintf_type_ls,
+};
 //  0 - nothing, skip
 //  1 - c
 //  2 - lc
 //  3 - d\i
 //  4 - ld\li
 //  5 - lld\lli
+//  6 - x
+//  7 - X
+//  8 - o
+//  9 - s
+//  10 - ls
 // leftPads: number of ' ' or '0' to write before writing the variable
 // flags:
 //   0x1 - pads with ' '
 //   0x2 - pads with '0'
-const char* 
+//   0x4 - '0x'
+//   0x8 - '0X'
+//   0x10 - '0' for ctal
+const char*
 _C_DECL
-__CRT_vsnprintf_(const char* fmt, int* type, int* leftPads, int* flags )
+__CRT_vprintf_(const char* fmt, int* type, int* leftPads, int* flags)
 {
 	// *fmt is '%' so next char
 	++fmt;
 
 	const char* saveFmt = fmt;
-	*type = 0;
+	*type = __CRT_vprintf_type_nothing;
 	*leftPads = 0;
 	*flags = 0;
 
 begin:;
 	switch (*fmt)
 	{
+	case '#':
+	{
+		++fmt;
+		// #x #X #o
+		switch (*fmt)
+		{
+		case 'x':
+			*type = __CRT_vprintf_type_x;
+			*flags |= 0x4;
+			++fmt;
+			break;
+		case 'X':
+			*type = __CRT_vprintf_type_X;
+			*flags |= 0x8;
+			++fmt;
+			break;
+		case 'o':
+			*type = __CRT_vprintf_type_o;
+			*flags |= 0x10;
+			++fmt;
+			break;
+		}
+	}break;
+	case 'o':
+		++fmt;
+		*type = __CRT_vprintf_type_o;
+		break;
+	case 'x':
+		++fmt;
+		*type = __CRT_vprintf_type_x;
+		break;
+	case 'X':
+		++fmt;
+		*type = __CRT_vprintf_type_X;
+		break;
 	case '0':
 	{
 		++fmt;
@@ -488,7 +566,7 @@ begin:;
 		case '1':case '2':case '3':case '4':
 		case '5':case '6':case '7':case '8':case '9':
 		{
-			fmt = __CRT_vsnprintf_getNumber(fmt, leftPads);
+			fmt = __CRT_vprintf_getNumber(fmt, leftPads);
 			// now *fmt must be d\i\li\lli\ld\lld or other...
 			// easy to use goto
 			goto begin;
@@ -501,7 +579,7 @@ begin:;
 	case '5':case '6':case '7':case '8':case '9':
 	{
 		// need to get number
-		fmt = __CRT_vsnprintf_getNumber(fmt, leftPads);
+		fmt = __CRT_vprintf_getNumber(fmt, leftPads);
 
 		// it can be pads with ' '
 		*flags |= 0x1;
@@ -517,33 +595,41 @@ begin:;
 		}
 
 	}break;
+	case 's':
+		++fmt;
+		*type = __CRT_vprintf_type_s;
+		break;
 	case 'c':
 	{
-		*type = 1;
+		*type = __CRT_vprintf_type_c;
 		++fmt;
 	}break;
 	case 'i':
 	case 'd':
 	{
-		*type = 3;
+		*type = __CRT_vprintf_type_d_i;
 		++fmt;
 	}break;
 	case 'l':
 	{
-		// li\ld lli\lld lc
-		
+		// li\ld lli\lld lc ls
+
 		++fmt;
 		if (*fmt)
 		{
 			switch (*fmt)
 			{
+			case 's':
+				*type = __CRT_vprintf_type_ls;
+				++fmt;
+				break;
 			case 'c':
-				*type = 2;
+				*type = __CRT_vprintf_type_lc;
 				++fmt;
 				break;
 			case 'd':
 			case 'i':
-				*type = 4;
+				*type = __CRT_vprintf_type_ld_li;
 				++fmt;
 				break;
 			case 'l':
@@ -555,7 +641,7 @@ begin:;
 					{
 					case 'd':
 					case 'i':
-						*type = 5;
+						*type = __CRT_vprintf_type_lld_lli;
 						++fmt;
 						break;
 					}
@@ -565,8 +651,6 @@ begin:;
 				break;
 			}
 		}
-
-		//*type = 1;
 	}break;
 	default:
 		break;
@@ -580,385 +664,6 @@ begin:;
 
 int
 _C_DECL
-__CRT_vsnprintf(
-	char* __restrict s, 
-	size_t n, 
-	const char* __restrict format, 
-	va_list ap,
-	FILE* stream, 
-	int(*onFull)(FILE*, const char*, size_t) // return 1 for end
-)
-{
-	size_t format_len = strlen(format);
-	int buffer_current_size = 0;
-	int result = 0;
-	
-	const char* arg_constChar = 0;
-
-	//enum
-	//{
-	//	__vsnprintf_state_clear = 0,
-	//	__vsnprintf_state_ready = 1, // %
-	//	__vsnprintf_state_l = 2,     // l
-	//};
-
-	//int state = __vsnprintf_state_clear;
-
-	int type = 0;
-	int flags = 0;
-	int leftPad = 0;
-
-	//for (size_t i = 0; i < format_len; ++i)
-	const char* fmt = format;
-	while(*fmt)
-	{
-		type = 0;
-		flags = 0;
-		leftPad = 0;
-
-		switch (*fmt)
-		{
-		case '%':
-			fmt = __CRT_vsnprintf_(fmt, &type, &leftPad, &flags);
-			if (!type)
-			{
-				s[buffer_current_size++] = *fmt; // must be '%'
-				s[buffer_current_size] = 0;
-				++fmt;
-			}
-			break;
-		default:
-			s[buffer_current_size++] = *fmt;
-			s[buffer_current_size] = 0;
-			++fmt;
-			break;
-		}
-
-		if (type)
-		{
-			arg_constChar = 0;
-
-			switch (type)
-			{
-			case 1:
-			case 2:
-			{
-				int c = va_arg(ap, int);
-				__CRT_itoa_buffer[0] = (char)c;
-				__CRT_itoa_buffer[1] = 0;
-				if (leftPad && (flags & 0x1))
-				{
-					flags = 0;
-					int leftPadNum = leftPad - 1;
-					if (leftPadNum)
-					{
-						__CRT_itoa_buffer[leftPadNum] = (char)c;
-						__CRT_itoa_buffer[leftPadNum + 1] = 0;
-						for (int i = 0; i < leftPadNum; ++i)
-						{
-							__CRT_itoa_buffer[i] = ' ';
-						}
-					}
-				}
-
-				arg_constChar = __CRT_itoa_buffer;
-			}break;
-			case 3:
-			{
-				int arg = va_arg(ap, int);
-				__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
-				arg_constChar = __CRT_itoa_buffer;
-			}break;
-			case 4:
-			{
-				long int arg = va_arg(ap, long int);
-				__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
-				arg_constChar = __CRT_itoa_buffer;
-			}break;
-			case 5:
-			{
-				long long int arg = va_arg(ap, long long int);
-				__CRT_lltoa(arg, __CRT_itoa_buffer, 30, 0);
-				arg_constChar = __CRT_itoa_buffer;
-			}break;
-			}
-
-			if (arg_constChar)
-			{
-				size_t argLen = strlen(arg_constChar);
-				if (argLen)
-				{
-					if (leftPad)
-					{
-						if ((flags & 0x1) || (flags & 0x2))
-						{
-							int leftPadNum = leftPad - argLen;
-							if (leftPadNum > 0)
-							{
-								char leftPadChar = ' ';
-								if(flags & 0x2)
-									leftPadChar = '0';
-
-								// copy of code below
-								for (int i = 0; i < leftPadNum; ++i)
-								{
-									s[buffer_current_size++] = leftPadChar;
-									s[buffer_current_size] = 0;
-									if (buffer_current_size == n) // or n-1 ?
-									{
-										result += buffer_current_size;
-										if (onFull)
-										{
-											if (onFull(stream, s, n))
-												return result;
-											buffer_current_size = 0;
-										}
-									}
-								}
-							}
-						}
-					}
-
-					for (size_t i2 = 0; i2 < argLen; ++i2)
-					{
-						s[buffer_current_size++] = arg_constChar[i2];
-						s[buffer_current_size] = 0;
-						if (buffer_current_size == n) // or n-1 ?
-						{
-							result += buffer_current_size;
-							if (onFull)
-							{
-								if (onFull(stream, s, n))
-									return result;
-								buffer_current_size = 0;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if (buffer_current_size == n) // or n-1 ?
-		{
-			result += buffer_current_size;
-			if (onFull)
-			{
-				if (onFull(stream, s, n))
-					return result;
-				buffer_current_size = 0;
-			}
-		}
-
-	//	switch (format[i])
-	//	{
-	//	case '0': case '1': case '2': case '3': case '4': 
-	//	case '5': case '6': case '7': case '8': case '9':
-	//	{
-	//		if (!state)
-	//			goto _default;
-
-	//		if (state == __vsnprintf_state_ready)
-	//		{
-	//			// %10* or %010*
-	//		}
-
-	//	}break;
-	//	case '%':
-	//		if (state == __vsnprintf_state_ready)
-	//			goto _default;
-	//		if (!state)
-	//			state = __vsnprintf_state_ready;
-	//		break;
-	//	case 'd':
-	//	case 'i':
-	//	{
-	//		if (!state)
-	//			goto _default;
-
-	//		if (state == __vsnprintf_state_ready)
-	//		{
-	//			int arg = va_arg(ap, int);
-	//			__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
-	//			arg_constChar = __CRT_itoa_buffer;
-	//			if (arg_constChar)
-	//				goto putStr;
-	//		}
-	//		else if (state == __vsnprintf_state_l)
-	//		{
-	//			long int arg = va_arg(ap, long int);
-	//			__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
-	//			arg_constChar = __CRT_itoa_buffer;
-	//			if (arg_constChar)
-	//				goto putStr;
-	//		}
-	//	}break;
-	//	case 'l':
-	//	{
-	//		if (!state)
-	//			goto _default;
-
-	//		if (state == __vsnprintf_state_ready)
-	//			state = __vsnprintf_state_l;
-	//	}break;
-	//	case 'x':
-	//	case 'X':
-	//	case 'o':
-	//	case 'u':
-	//	{
-	//		if (!state)
-	//			goto _default;
-	//		unsigned int arg = va_arg(ap, unsigned int);
-
-	//		int md = 0;
-	//		switch (format[i])
-	//		{
-	//		case 'o':
-	//			md = 3;
-	//			break;
-	//		case 'x':
-	//			md = 1;
-	//			break;
-	//		case 'X':
-	//			md = 2;
-	//			break;
-	//		default:
-	//			break;
-	//		}
-	//		__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
-
-	//		arg_constChar = __CRT_itoa_buffer;
-	//		if (arg_constChar)
-	//			goto putStr;
-	//	}break;
-	//	case 'F':
-	//	case 'f':
-	//	case 'E':
-	//	case 'e':
-	//	{
-	//		if (!state)
-	//			goto _default;
-	//		double arg = va_arg(ap, double);
-	//		
-	//		int md = 0;
-	//		switch (format[i])
-	//		{
-	//		case 'F':
-	//			md = 1;
-	//			break;
-	//		case 'f':
-	//			break;
-	//		case 'E':
-	//			md = 3;
-	//			break;
-	//		case 'e':
-	//			md = 2;
-	//			break;
-	//		}
-
-	//		__CRT_dtoa(arg, __CRT_dtoa_buffer, 30, md);
-	//		arg_constChar = __CRT_dtoa_buffer;
-	//		if (arg_constChar)
-	//			goto putStr;
-	//		/*
-	//		switch (format[i])
-	//		{
-	//		case 'o':
-	//			md = 3;
-	//			break;
-	//		case 'x':
-	//			md = 1;
-	//			break;
-	//		case 'X':
-	//			md = 2;
-	//			break;
-	//		default:
-	//			break;
-	//		}
-	//		__CRT_uitoa(arg, __CRT_itoa_buffer, 30, md);
-
-	//		arg_constChar = __CRT_itoa_buffer;
-	//		if (arg_constChar)
-	//			goto putStr;*/
-	//	}break;
-	//	case 's':
-	//	{
-	//		if (!state)
-	//			goto _default;
-	//		arg_constChar = va_arg(ap, const char*);
-	//		if (arg_constChar)
-	//			goto putStr;
-	//	}break;
-	//	case 'c':
-	//	{
-	//		if (!state)
-	//			goto _default;
-	//		char c = va_arg(ap, char);
-	//		__CRT_itoa_buffer[0] = c;
-	//		__CRT_itoa_buffer[1] = 0;
-	//		arg_constChar = __CRT_itoa_buffer;
-	//		goto putStr;
-	//	}break;
-	//	default:
-	//	_default:;
-	//		if (state == __vsnprintf_state_l)
-	//		{
-	//			__CRT_itoa_buffer[0] = '%';
-	//			__CRT_itoa_buffer[1] = 0;
-	//			arg_constChar = __CRT_itoa_buffer;
-	//			goto putStr;
-	//		}
-
-	//		state = __vsnprintf_state_clear;
-	//		s[buffer_current_size++] = format[i];
-	//		s[buffer_current_size] = 0;
-	//		break;
-	//	}
-	//	if(arg_constChar)
-	//	{
-	//	putStr:;
-	//		size_t argLen = strlen(arg_constChar);
-	//		if (argLen)
-	//		{
-	//			for (size_t i2 = 0; i2 < argLen; ++i2)
-	//			{
-	//				s[buffer_current_size++] = arg_constChar[i2];
-	//				s[buffer_current_size] = 0;
-	//				if (buffer_current_size == n) // or n-1 ?
-	//				{
-	//					result += buffer_current_size;
-	//					if (onFull)
-	//					{
-	//						if (onFull(stream, s, n))
-	//						{
-	//							return result;
-	//						}
-	//						buffer_current_size = 0;
-	//					}
-	//				}
-	//			}
-	//		}
-	//		arg_constChar = 0;
-	//		state = __vsnprintf_state_clear;
-	//	}
-
-	//	if (buffer_current_size == n) // or n-1 ?
-	//	{
-	//		result += buffer_current_size;
-	//		if (onFull)
-	//		{
-	//			if (onFull(stream, s, n))
-	//			{
-	//				return result;
-	//			}
-	//			buffer_current_size = 0;
-	//		}
-	//	}
-	}
-	return result ? result : -1;
-}
-
-int
-_C_DECL
 vsnprintf(char* __restrict s, size_t n, const char* __restrict format, va_list arg)
 {
 	int written_num = -1;
@@ -966,61 +671,32 @@ vsnprintf(char* __restrict s, size_t n, const char* __restrict format, va_list a
 	{
 		size_t format_len = strlen(format);
 		if (format_len)
-			written_num = __CRT_vsnprintf(s, n, format, arg, NULL, NULL);
+		{
+			FILE f;
+			memset(&f, 0, sizeof(FILE));
+
+			f.buf = s;
+			f.bufSz = n;
+
+			return vfprintf(&f, format, arg);
+		}
 	}
 	return written_num;
 }
 
-
 int
 _C_DECL
-snprintf(char* __restrict str, size_t n, char const* __restrict fmt, ...)
+snprintf(char* /*__restrict*/ str, size_t n, char const* /*__restrict*/ fmt, ...)
 {
 	int r = -1;
 	if (str && n && fmt)
 	{
 		va_list ap;
 		va_start(ap, fmt);
-		r = __CRT_vsnprintf(str, n, fmt, ap, NULL, NULL);
+		r = vsnprintf(str, n, fmt, ap, NULL, NULL);
 		va_end(ap);
 	}
 	return r;
-}
-
-
-char __CRT_vfprintf_buffer[200];
-int __CRT_vfprintf_buffer_onFull(
-	FILE* stream, 
-	const char* buf, size_t sz)
-{
-	fwrite(buf, 1, sz, stream); // __CRT_vsnprintf must have `n` parameter < 200
-	__CRT_vfprintf_buffer[0] = 0;
-	return 0;
-}
-int
-_C_DECL
-__CRT_vfprintf(FILE* stream, const char* __restrict format, va_list vl)
-{
-	__CRT_vfprintf_buffer[199] = 0;
-	int written_num = -1;
-	if (format)
-	{
-		size_t format_len = strlen(format);
-		if (format_len)
-		{
-			__CRT_vsnprintf(__CRT_vfprintf_buffer, 150, format, vl, stream, __CRT_vfprintf_buffer_onFull);
-			if (__CRT_vfprintf_buffer[0])
-			{
-				fwrite(__CRT_vfprintf_buffer, 1, strlen(__CRT_vfprintf_buffer), stream);
-				__CRT_vfprintf_buffer[0] = 0;
-			}
-		}
-		else
-			stream->erri = EDOM;
-	}
-	else
-		stream->erri = EDOM;
-	return written_num;
 }
 
 int 
@@ -1029,7 +705,7 @@ fprintf(FILE* stream, const char* format, ...)
 {
 	va_list ap;
 	va_start(ap, format);
-	int r = __CRT_vfprintf(stream, format, ap);
+	int r = vfprintf(stream, format, ap);
 	va_end(ap);
 	return r;
 }
@@ -1047,7 +723,7 @@ printf(const char* format, ...)
 {
 	va_list ap;
 	va_start(ap, format);
-	int r = __CRT_vfprintf(__crt._->_stdout, format, ap);
+	int r = vfprintf(__crt._->_stdout, format, ap);
 	va_end(ap);
 	return r;
 }
@@ -1063,7 +739,11 @@ int
 _C_DECL 
 sprintf(char* s, const char* format, ...)
 {
-
+	va_list ap;
+	va_start(ap, format);
+	int r = vsprintf(s, format, ap);
+	va_end(ap);
+	return r;
 }
 
 int 
@@ -1075,9 +755,178 @@ sscanf(char* s, const char* format, ...)
 
 int 
 _C_DECL 
-vfprintf(FILE* stream, const char* format, va_list vl)
+vfprintf(FILE* stream, const char* format, va_list ap)
 {
-	return __CRT_vfprintf(stream, format, vl);
+	int written_num = 0;
+	if (format)
+	{
+		size_t format_len = strlen(format);
+		if (format_len)
+		{
+			size_t format_len = strlen(format);
+			//int buffer_current_size = 0;
+			const char* arg_constChar = 0;
+			const wchar_t* arg_constWchar = 0;
+
+			int type = __CRT_vprintf_type_nothing;
+			int flags = 0;
+			int leftPad = 0;
+
+			const char* fmt = format;
+			while (*fmt)
+			{
+				type = 0;
+				flags = 0;
+				leftPad = 0;
+
+				switch (*fmt)
+				{
+				case '%':
+					fmt = __CRT_vprintf_(fmt, &type, &leftPad, &flags);
+					if (!type)
+					{
+						//	s[buffer_current_size++] = *fmt; // must be '%'
+						//	s[buffer_current_size] = 0;
+						written_num += fputc('%', stream);
+						++fmt;
+					}
+					break;
+				default:
+					written_num += fputc(*fmt, stream);
+					++fmt;
+					break;
+				}
+
+				if (type)
+				{
+					arg_constChar = 0;
+
+					switch (type)
+					{
+					case __CRT_vprintf_type_c:
+					case __CRT_vprintf_type_lc:
+					{
+						int c = va_arg(ap, int);
+						__CRT_itoa_buffer[0] = (char)c;
+						__CRT_itoa_buffer[1] = 0;
+						if (leftPad && (flags & 0x1))
+						{
+							flags = 0;
+							int leftPadNum = leftPad - 1;
+							if (leftPadNum)
+							{
+								//__CRT_itoa_buffer[leftPadNum] = (char)c;
+								//__CRT_itoa_buffer[leftPadNum + 1] = 0;
+								for (int i = 0; i < leftPadNum; ++i)
+								{
+									//__CRT_itoa_buffer[i] = ' ';
+									written_num += fputc(' ', stream);
+								}
+							}
+						}
+
+						arg_constChar = __CRT_itoa_buffer;
+					}break;
+					case __CRT_vprintf_type_d_i:
+					{
+						int arg = va_arg(ap, int);
+						__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
+						arg_constChar = __CRT_itoa_buffer;
+					}break;
+					case __CRT_vprintf_type_ld_li:
+					{
+						long int arg = va_arg(ap, long int);
+						__CRT_itoa(arg, __CRT_itoa_buffer, 30, 0);
+						arg_constChar = __CRT_itoa_buffer;
+					}break;
+					case __CRT_vprintf_type_lld_lli:
+					{
+						long long int arg = va_arg(ap, long long int);
+						__CRT_lltoa(arg, __CRT_itoa_buffer, 30, 0);
+						arg_constChar = __CRT_itoa_buffer;
+					}break;
+					case __CRT_vprintf_type_x: //x
+					{
+						unsigned int arg = va_arg(ap, unsigned int);
+						__CRT_uitoa(arg, __CRT_itoa_buffer, 30, 1);
+						arg_constChar = __CRT_itoa_buffer;
+						if (flags & 0x4)
+						{
+							fputc('0', stream);
+							fputc('x', stream);
+						}
+					}break;
+					case __CRT_vprintf_type_X: //X
+					{
+						unsigned int arg = va_arg(ap, unsigned int);
+						__CRT_uitoa(arg, __CRT_itoa_buffer, 30, 2);
+						arg_constChar = __CRT_itoa_buffer;
+						if (flags & 0x8)
+						{
+							fputc('0', stream);
+							fputc('X', stream);
+						}
+					}break;
+					case __CRT_vprintf_type_o: //o
+					{
+						unsigned int arg = va_arg(ap, unsigned int);
+						__CRT_uitoa(arg, __CRT_itoa_buffer, 30, 3);
+						arg_constChar = __CRT_itoa_buffer;
+						if (flags & 0x10)
+							fputc('0', stream);
+					}break;
+					case __CRT_vprintf_type_s: //s
+					{
+						arg_constChar = va_arg(ap, char*);
+					}break;
+					case __CRT_vprintf_type_ls:
+					{
+						arg_constWchar = va_arg(ap, wchar_t*);
+						if (arg_constWchar)
+							fwprintf(stream, "%s", arg_constWchar);
+					}break;
+					}
+
+					if (arg_constChar)
+					{
+						size_t argLen = strlen(arg_constChar);
+						if (argLen)
+						{
+							if (leftPad)
+							{
+								if ((flags & 0x1) || (flags & 0x2))
+								{
+									int leftPadNum = leftPad - argLen;
+									if (leftPadNum > 0)
+									{
+										char leftPadChar = ' ';
+										if (flags & 0x2)
+											leftPadChar = '0';
+										// copy of code below
+										for (int i = 0; i < leftPadNum; ++i)
+										{
+											written_num += fputc(leftPadChar, stream);
+										}
+									}
+								}
+							}
+
+							for (size_t i2 = 0; i2 < argLen; ++i2)
+							{
+								written_num += fputc(arg_constChar[i2], stream);
+							}
+						}
+					}
+				}
+			}
+			return written_num ? written_num : EDOM;
+		}
+		else
+			stream->erri = EDOM;
+	}
+	else
+		stream->erri = EDOM;
+	return written_num;
 }
 
 int 
@@ -1091,7 +940,7 @@ int
 _C_DECL 
 vprintf(const char* format, va_list arg)
 {
-	return __CRT_vfprintf(__crt._->_stdout, format, arg);
+	return vfprintf(__crt._->_stdout, format, arg);
 }
 
 int 
@@ -1105,7 +954,7 @@ int
 _C_DECL 
 vsprintf(const char* s, const char* format, va_list arg)
 {
-
+	return vsnprintf(s, 0xffff, format, arg);
 }
 
 int 
@@ -1115,3 +964,21 @@ vsscanf(const char* s, const char* format, va_list arg)
 
 }
 
+int
+_C_DECL
+fputc(int c, FILE* stream)
+{
+	char ch = (char)c;
+
+	/*if (stream->handle)
+	{*/
+	if (fwrite(&c, 1, 1, stream))
+		return 1;
+	/*}
+	else if(stream->buf)
+	{
+
+	}*/
+
+	return EOF;
+}

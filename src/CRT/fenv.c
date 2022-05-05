@@ -32,12 +32,17 @@
 
 #include "fenv.h"
 
-//#define	__INITIAL_FPUCW_I386__	0x127F
-const fenv_t __CRT_fe_dfl_env = {
-	
-	//__INITIAL_NPXCW__,
-	0x127F,
+// freebsd-src/sys/x86/include/fpu.h
+#define	__INITIAL_FPUCW__	0x037F
+#define	__INITIAL_FPUCW_I386__	0x127F
+#define	__INITIAL_NPXCW__	__INITIAL_FPUCW_I386__
+#define	__INITIAL_MXCSR__	0x1F80
+#define	__INITIAL_MXCSR_MASK__	0xFFBF
 
+#ifdef __CRT_ARCH_x86
+//freebsd-src/lib/msun/i387/fenv.c
+const fenv_t __CRT_fe_dfl_env = {
+	__INITIAL_NPXCW__,
 	0x0000,
 	0x0000,
 	0x1f80,
@@ -45,6 +50,18 @@ const fenv_t __CRT_fe_dfl_env = {
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff }
 };
+#else
+//freebsd-src/lib/msun/amd64/fenv.c
+const fenv_t __CRT_fe_dfl_env = {
+	{ 0xffff0000 | __INITIAL_FPUCW__,
+	  0xffff0000,
+	  0xffffffff,
+	  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff }
+	},
+	__INITIAL_MXCSR__
+};
+#endif
 
 int 
 _C_DECL 
