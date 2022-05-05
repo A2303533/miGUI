@@ -374,7 +374,12 @@ mgDrawWindow_f(struct mgWindow_s* w)
 		{
 			mgRect menuRect = w->menuRect;
 
-			menuRect.right = w->rect.right;
+
+			if (w->dockPanelWindow)
+				menuRect.right = w->dockPanelWindow->rect.right;
+			else
+				menuRect.right = w->rect.right;
+
 
 			w->context->gpu->setClipRect(&menuRect);
 
