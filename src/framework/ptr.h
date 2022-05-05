@@ -36,7 +36,10 @@ namespace mgf
 	class Ptr
 	{
 	public:
-		Ptr() {}
+		Ptr()
+			:
+			m_data(0) 
+		{}
 		Ptr(T* o)
 			:
 			m_data(o) 
@@ -51,7 +54,7 @@ namespace mgf
 			return *this;
 		}
 
-		T* m_data = 0;
+		T* m_data;
 	};
 }
 

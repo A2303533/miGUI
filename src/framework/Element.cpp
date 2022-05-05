@@ -34,6 +34,10 @@
 using namespace mgf;
 
 Element::Element()
+:
+m_element(0),
+m_userData(0),
+m_alignment(LeftTop)
 {
 }
 
@@ -201,41 +205,41 @@ void Element::SetRectBottom(int v)
 	m_element->transformWorld = m_element->transformLocal;
 }
 
-ElementAlignment Element::GetAlignment()
+Element::Alignment Element::GetAlignment()
 {
 	return m_alignment;
 }
 
-void Element::SetAlignment(ElementAlignment a)
+void Element::SetAlignment(Element::Alignment a)
 {
 	m_alignment = a;
 	switch (a)
 	{
-	case mgf::ElementAlignment::LeftTop:
+	case LeftTop:
 		m_element->align = mgAlignment_leftTop;
 		break;
-	case mgf::ElementAlignment::Top:
+	case Top:
 		m_element->align = mgAlignment_top;
 		break;
-	case mgf::ElementAlignment::RightTop:
+	case RightTop:
 		m_element->align = mgAlignment_rightTop;
 		break;
-	case mgf::ElementAlignment::Right:
+	case Right:
 		m_element->align = mgAlignment_right;
 		break;
-	case mgf::ElementAlignment::RightBottom:
+	case RightBottom:
 		m_element->align = mgAlignment_rightBottom;
 		break;
-	case mgf::ElementAlignment::Bottom:
+	case Bottom:
 		m_element->align = mgAlignment_bottom;
 		break;
-	case mgf::ElementAlignment::LeftBottom:
+	case LeftBottom:
 		m_element->align = mgAlignment_leftBottom;
 		break;
-	case mgf::ElementAlignment::Left:
+	case Left:
 		m_element->align = mgAlignment_left;
 		break;
-	case mgf::ElementAlignment::Center:
+	case Center:
 		m_element->align = mgAlignment_center;
 		break;
 	}

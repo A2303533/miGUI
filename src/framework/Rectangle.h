@@ -39,7 +39,7 @@ namespace mgf
 	class Rectangle : public Element
 	{
 	protected:
-		mgElementRectangle_s* m_elementRectangle = 0;
+		mgElementRectangle_s* m_elementRectangle;
 		Rectangle();
 	public:
 		Rectangle(Window* w);

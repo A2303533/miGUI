@@ -54,13 +54,19 @@ public:
 
 	char m_buffer[1024];
 
-	bool m_isInit = false;
+	bool m_isInit;
 
-	void(*m_onError)(const char* message) = nullptr;
-	void(*m_onInfo)(const char* message) = nullptr;
-	void(*m_onWarning)(const char* message) = nullptr;
+	void(*m_onError)(const char* message);
+	void(*m_onInfo)(const char* message);
+	void(*m_onWarning)(const char* message);
 };
-Log::Log(){}
+Log::Log()
+	:
+	m_isInit(false),
+	m_onError(0),
+	m_onInfo(0),
+	m_onWarning(0)
+{}
 Log::~Log() {}
 
 Log g_loger;
@@ -69,7 +75,7 @@ void mgf::LogWriteError(const char* format, ...)
 {
 	va_list arg;
 	va_start(arg, format);
-	std::vsnprintf(g_loger.m_buffer, 1024, format, arg);
+	vsnprintf(g_loger.m_buffer, 1024, format, arg);
 	va_end(arg);
 	g_loger.print(Log::EMT_ERROR);
 }
@@ -78,7 +84,7 @@ void mgf::LogWriteInfo(const char* format, ...)
 {
 	va_list arg;
 	va_start(arg, format);
-	std::vsnprintf(g_loger.m_buffer, 1024, format, arg);
+	vsnprintf(g_loger.m_buffer, 1024, format, arg);
 	va_end(arg);
 	g_loger.print(Log::EMT_INFO);
 }
@@ -87,7 +93,7 @@ void mgf::LogWriteWarning(const char* format, ...)
 {
 	va_list arg;
 	va_start(arg, format);
-	std::vsnprintf(g_loger.m_buffer, 1024, format, arg);
+	vsnprintf(g_loger.m_buffer, 1024, format, arg);
 	va_end(arg);
 	g_loger.print(Log::EMT_WARNING);
 }
@@ -98,7 +104,7 @@ void mgf::LogWriteErrorW(const wchar_t* format, ...)
 	std::memset(buff, 0, 1024 * sizeof(wchar_t));
 	va_list arg;
 	va_start(arg, format);
-	std::vswprintf(buff, 1024, format, arg);
+	vswprintf(buff, 1024, format, arg);
 	va_end(arg);
 	for (int i = 0; i < 1024; ++i)
 	{
@@ -113,7 +119,7 @@ void mgf::LogWriteInfoW(const wchar_t* format, ...)
 	std::memset(buff, 0, 1024 * sizeof(wchar_t));
 	va_list arg;
 	va_start(arg, format);
-	std::vswprintf(buff, 1024, format, arg);
+	vswprintf(buff, 1024, format, arg);
 	va_end(arg);
 	for (int i = 0; i < 1024; ++i)
 	{
@@ -128,7 +134,7 @@ void mgf::LogWriteWarningW(const wchar_t* format, ...)
 	std::memset(buff, 0, 1024 * sizeof(wchar_t));
 	va_list arg;
 	va_start(arg, format);
-	std::vswprintf(buff, 1024, format, arg);
+	vswprintf(buff, 1024, format, arg);
 	va_end(arg);
 	for (int i = 0; i < 1024; ++i)
 	{

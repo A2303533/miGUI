@@ -62,7 +62,7 @@ Image* mgf::Image_png(const char* fn)
 	dataSize = image.size();
 
 	data = (unsigned char*)malloc(dataSize);
-	memcpy(data, image.data(), dataSize);
+	memcpy(data, &image.front(), dataSize);
 
 	/*struct pixel
 	{

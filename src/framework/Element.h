@@ -32,45 +32,39 @@
 
 namespace mgf
 {
-	enum class ElementAlignment
-	{
-		LeftTop,
-		Top,
-		RightTop,
-		Right,
-		RightBottom,
-		Bottom,
-		LeftBottom,
-		Left,
-		Center
-	};
-	
 	class Element;
 
 	/// <summary>
 	/// delete this
 	/// </summary>
-	using ElementCallback = void(*)(Element*);
+	typedef void(*ElementCallback)(Element*);
 
 	class Element
 	{
-	protected:
-		mgElement_s* m_element = 0;
-		void* m_userData = 0;
-		ElementAlignment m_alignment = ElementAlignment::LeftTop;
-
-		void PostInit();
 	public:
 		Element();
 		virtual ~Element();
+
+		enum Alignment
+		{
+			LeftTop,
+			Top,
+			RightTop,
+			Right,
+			RightBottom,
+			Bottom,
+			LeftBottom,
+			Left,
+			Center
+		};
 
 		virtual mgElement_s* GetElement();
 
 		virtual void SetUserData(void*);
 		virtual void* GetUserData();
 
-		virtual ElementAlignment GetAlignment();
-		virtual void SetAlignment(ElementAlignment);
+		virtual Alignment GetAlignment();
+		virtual void SetAlignment(Alignment);
 		
 		virtual void SetUserStyle(mgStyle_s*);
 
@@ -118,6 +112,13 @@ namespace mgf
 		ElementCallback onReleaseMMB = 0;
 		ElementCallback onReleaseX1MB = 0;
 		ElementCallback onReleaseX2MB = 0;*/
+
+	protected:
+		mgElement_s* m_element;
+		void* m_userData;
+		Alignment m_alignment;
+
+		void PostInit();
 	};
 }
 

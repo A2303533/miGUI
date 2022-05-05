@@ -71,6 +71,8 @@ Framework* mgf::GetFramework()
 }
 
 Framework::Framework()
+	:
+	m_run(true)
 {
 #ifdef MG_PLATFORM_WINDOWS
 	wchar_t wcharBuffer[0xfff];
@@ -108,7 +110,7 @@ bool Framework::Run()
 {
 	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
 	{
-		auto c = m_contexts[i];
+		Context* c = m_contexts[i];
 		mgStartFrame(c->GetGUIContext());
 	}
 
@@ -124,7 +126,7 @@ bool Framework::Run()
 
 	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
 	{
-		auto c = m_contexts[i];
+		Context* c = m_contexts[i];
 		if(c->m_window->m_isVisible)
 			mgUpdate(c->m_gui_context);
 	}
@@ -136,7 +138,7 @@ void Framework::DrawAll()
 {
 	for (size_t i = 0, sz = m_contexts.size(); i < sz; ++i)
 	{
-		auto c = m_contexts[i];
+		Context* c = m_contexts[i];
 		if (!c->m_window->m_isVisible)
 			continue;
 

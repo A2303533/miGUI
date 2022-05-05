@@ -55,6 +55,22 @@ void Table_onBeginGetUserElement(struct mgElement_s*);
 
 
 Table::Table(Window* w, uint32_t colNum, Font* f)
+	:
+	m_elementTable(0),
+	onTextInputCharEnter(0),
+	onTextInputEndEdit(0),
+	onDrawRow(0),
+	onIsRowSelected(0),
+	onRowClick(0),
+	onCellClick(0),
+	onCellTextInputActivate(0),
+	onCellTextInputCharEnter(0),
+	onCellTextInputEndEdit(0),
+	onColTitleText(0),
+	onColTitleClick(0),
+	onGetUserElementNum(0),
+	onGetUserElement(0),
+	onBeginGetUserElement(0)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
@@ -80,7 +96,7 @@ Table::Table(Window* w, uint32_t colNum, Font* f)
 	{
 		m_colSizes.push_back(100);
 	}
-	m_elementTable->colsSizes = m_colSizes.data();
+	m_elementTable->colsSizes = &m_colSizes.front();
 
 	/*m_elementTable->onTextInputCharEnter = LB_onTextInputCharEnter;
 	m_elementTable->onTextInputEndEdit = LB_onEndEdit;

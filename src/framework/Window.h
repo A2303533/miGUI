@@ -49,47 +49,65 @@ namespace mgf
 		friend class Table;
 
 	protected:
-		mgWindow_s* m_window = 0;
+		mgWindow_s* m_window;
 		std::basic_string<wchar_t> m_title;
 		std::vector<Element*> m_elements;
 
-		mgMenu_s* m_menu = 0;
+		mgMenu_s* m_menu;
 		/*struct _menuItem
 		{
 			StringW m_title;
 		};
 		std::vector<_menuItem> m_menuItems;
 		_menuItem m_menu_currItem;*/
-		Font* m_menuFont = 0;
+		Font* m_menuFont;
 
 		struct _menuPopupItemInfo
 		{
+			_menuPopupItemInfo()
+				:
+				id(0),
+				enabled(true),
+				icon(0),
+				icon_index(0),
+				popup(0)
+			{}
 			StringW title;
-			uint32_t id = 0;
+			uint32_t id;
 			StringW shortcut_text;
-			bool enabled = true;
-			Icons* icon = 0;
-			uint32_t icon_index = 0;
+			bool enabled;
+			Icons* icon;
+			uint32_t icon_index;
 
-			mgPopup_s* popup = 0;
+			mgPopup_s* popup;
 		};
 		/*std::vector<_menuPopupItemInfo> m_menuPopupItems[5];
 		int m_menuPopupItemsIndices[5];
 		int m_menuPopupItemsCurr = 0;*/
 		struct _menuTreeNode
 		{
-			_menuTreeNode* children = 0;
-			_menuTreeNode* siblings = 0;
-			_menuTreeNode* parent = 0;
+			_menuTreeNode()
+				:
+				children(0),
+				siblings(0),
+				parent(0)
+			{}
+			_menuTreeNode* children;
+			_menuTreeNode* siblings;
+			_menuTreeNode* parent;
 
 			_menuPopupItemInfo itemInfo;
 		};
 		struct _menuTree
 		{
-			_menuTreeNode* m_root = 0;
+			_menuTree()
+				:
+				m_root(0)
+			{}
+			_menuTreeNode* m_root;
 		}
 		m_menuTree;
-		_menuTreeNode* m_menuNodeCurr = 0;
+		_menuTreeNode* m_menuNodeCurr;
 		std::stack<_menuTreeNode*> m_menuNodeCurrPrev;
 
 		_menuTreeNode* _menu_getLastSibling(_menuTreeNode*, int* num);
@@ -97,7 +115,7 @@ namespace mgf
 		mgPopup_s* _menu_rebuild_createPopup(_menuTreeNode*);
 		void _menu_addMenuItem(bool isSub, const wchar_t* title, uint32_t id, const wchar_t* shortcut_text, bool enabled);
 
-		bool m_isVisible = true;
+		bool m_isVisible;
 	public:
 		Window(Context*);
 		virtual ~Window();

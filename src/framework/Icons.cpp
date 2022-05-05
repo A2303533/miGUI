@@ -37,6 +37,8 @@ using namespace mgf;
 
 Icons::Icons(Backend* b)
 	:
+	m_icons(0),
+	m_texture(0),
 	m_backend(b)
 {
 }
@@ -62,7 +64,7 @@ int Icons::Add(int left, int top, int sizeX, int sizeY)
 	m_icons = mgCreateIcons(m_texture, m_textureSize.x, m_textureSize.y, sz);
 	for (int i = 0; i < sz; ++i)
 	{
-		auto& rct = m_rects[i];
+		mgRect& rct = m_rects[i];
 		mgSetIcon(m_icons, i, rct.left, rct.top, rct.right, rct.bottom);
 	}
 

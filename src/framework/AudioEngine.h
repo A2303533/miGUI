@@ -34,7 +34,7 @@ namespace mgf
 {
 	class AudioEngine : public BaseClass
 	{
-		void* m_implementationData = 0;
+		void* m_implementationData;
 	public:
 		AudioEngine();
 		virtual ~AudioEngine();

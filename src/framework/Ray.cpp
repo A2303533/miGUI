@@ -29,6 +29,8 @@
 #include "framework/mgf.h"
 #include "framework/Ray.h"
 
+#include "CRT/float.h"
+
 using namespace mgf;
 
 Ray::Ray()
@@ -86,7 +88,7 @@ float Ray::distanceToLine(const v4f& lineP0, const v4f& lineP1)
 	float D = a * c - b * b;
 	float sc, tc;
 
-	if (D < std::numeric_limits<float>::epsilon())
+	if (D < FLT_EPSILON)
 	{
 		sc = 0.f;
 		tc = (b > c ? d / b : e / c);
@@ -134,7 +136,7 @@ void Ray::update()
 	if (m_ky == 3)
 		m_ky = 0;
 
-	auto dir_data = m_direction.data();
+	float* dir_data = m_direction.data();
 	if (dir_data[m_kz])
 		std::swap(m_kx, m_ky);
 
@@ -152,7 +154,7 @@ bool Ray::planeIntersection(const v4f& planePoint, const v4f& planeNormal, float
 {
 	float det = (planeNormal.x * m_direction.x) + (planeNormal.y * m_direction.y) + (planeNormal.z * m_direction.z);
 
-	if (std::fabs(det) < std::numeric_limits<float>::epsilon()) return false;
+	if (std::fabs(det) < FLT_EPSILON) return false;
 
 	v4f v;
 	v.x = planePoint.x - m_origin.x;

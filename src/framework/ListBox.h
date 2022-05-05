@@ -43,7 +43,7 @@ namespace mgf
 
 	class ListBox : public Element
 	{
-		mgElementList_s* m_elementList = 0;
+		mgElementList_s* m_elementList;
 	public:
 		ListBox(Window* w, Font*);
 		virtual ~ListBox();
@@ -60,7 +60,7 @@ namespace mgf
 		// 0 - no limit;
 		void SetTextInputCharLimit(uint32_t);
 		
-		wchar_t(*onTextInputCharEnter)(ListBox*, wchar_t) = 0;
+		wchar_t(*onTextInputCharEnter)(ListBox*, wchar_t);
 		/*
 		* i:
 		*	1 - Enter
@@ -69,7 +69,7 @@ namespace mgf
 		* str: new text
 		* editItem: first byte for edited item
 		*/
-		int(*onTextInputEndEdit)(ListBox*, int i, const wchar_t* str, void* editItem) = 0;
+		int(*onTextInputEndEdit)(ListBox*, int i, const wchar_t* str, void* editItem);
 
 		/*
 		* If you need selection

@@ -36,7 +36,9 @@
 
 namespace mgf
 {
-	using ContextOnDraw = void(*)(Context*,Backend*);
+	class Context;
+
+	typedef void(*ContextOnDraw)(Context*,Backend*);
 
 	class SystemWindow;
 
@@ -46,15 +48,15 @@ namespace mgf
 		friend class Framework;
 		friend class SystemWindow;
 
-		SystemWindow* m_window = 0;
-		Backend* m_backend = 0;
-		ContextOnDraw m_onDraw = 0;
+		SystemWindow* m_window;
+		Backend* m_backend;
+		ContextOnDraw m_onDraw;
 	public:
 		Context(mgf::SystemWindow*, Backend* backend);
 		virtual ~Context();
 
-		mgContext_s* m_gui_context = 0;
-		mgInputContext_s* m_input = 0;
+		mgContext_s* m_gui_context;
+		mgInputContext_s* m_input;
 
 		mgContext_s* GetGUIContext();
 		mgf::SystemWindow* GetSystemWindow();

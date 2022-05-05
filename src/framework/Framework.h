@@ -49,7 +49,7 @@ namespace mgf
 		Framework();
 		virtual ~Framework();
 		
-		bool m_run = true;
+		bool m_run;
 
 		Context* CreateContext(mgf::SystemWindow*, Backend* backend);
 

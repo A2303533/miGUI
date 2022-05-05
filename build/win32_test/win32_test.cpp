@@ -8,6 +8,7 @@
 #include "miGUILoader.h"
 
 #include <time.h>
+#include <stdio.h>
 
 #include <objidl.h>
 #include <gdiplus.h>
@@ -98,9 +99,8 @@ void gui_beginDraw()
     FillRect(hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
 
 
-    UINT dpi = GetDpiForWindow(g_hwnd);
-    int padding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
-    borderSize.x = GetSystemMetricsForDpi(SM_CXFRAME, dpi) + padding;
+    int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
+    borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
     borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
 }
 struct stacktrace {
@@ -497,11 +497,14 @@ void saveDock(struct mgElement_s* e)
     int* saveData = mgDockGetSaveData(g_gui_context, &saveDataSize);
     if (saveData)
     {
-        HANDLE f = CreateFile(L"dock.data", GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
+        //HANDLE f = CreateFile(L"dock.data", GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
+        FILE* f = fopen("dock.data", "wb");
         if (f)
         {
-            WriteFile(f, (void*)saveData, saveDataSize * sizeof(int), 0, 0);
-            CloseHandle(f);
+            //WriteFile(f, (void*)saveData, saveDataSize * sizeof(int), 0, 0);
+            //CloseHandle(f);
+            fwrite(saveData, saveDataSize * sizeof(int), 1, f);
+            fclose(f);
         }
         free(saveData);
     }
@@ -526,18 +529,20 @@ mgWindow* loadDockCallback(int windowID)
 }
 void loadDock(struct mgElement_s* e)
 {
-
-    HANDLE f = CreateFile(L"dock.data", GENERIC_READ, FILE_SHARE_READ, 0, OPEN_ALWAYS, 0, 0);
+    FILE* f = fopen("dock.data", "rb");
     if (f)
     {
-        int fileSize = GetFileSize(f, 0);
+        fseek(f, 0, SEEK_END);
+        int fileSize = ftell(f);
+        fseek(f, 0, SEEK_SET);
+
         int* data = (int*)malloc(fileSize);
         if (data)
         {
-            ReadFile(f, (void*)data, fileSize, 0, 0);
+            fread((void*)data, fileSize, 1, f);
         }
 
-        CloseHandle(f);
+        fclose(f);
 
         mgDockLoadData(g_gui_context, data, fileSize / 4, loadDockCallback);
 
@@ -672,7 +677,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         mgPointSet(&pos, 100, 120);
         eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Save dock", g_win32font);
         eb->onReleaseLMB = saveDock;
-        eb->enabled = 0;
+        eb->enabled = 1;
 
         mgPointSet(&pos, 100, 160);
         eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Load dock", g_win32font);

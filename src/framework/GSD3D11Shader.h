@@ -15,7 +15,7 @@ namespace mgf
 		const char* pixelShader,
 		const char* vertexEntryPoint,
 		const char* pixelEntryPoint,
-		MeshVertexType vertexType,
+		Mesh::MeshVertexType vertexType,
 		ID3D11VertexShader** vs,
 		ID3D11PixelShader** ps,
 		ID3D11InputLayout** il);

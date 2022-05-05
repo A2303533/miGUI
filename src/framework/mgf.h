@@ -30,9 +30,14 @@
 #ifndef _MG_FRAMEWORK_H_
 #define _MG_FRAMEWORK_H_
 
-#include <stdint.h>
-
 #include "config.h"
+
+#ifdef MGF_USE_CRT
+#include "CRT\stdint.h"
+#else
+
+#endif
+
 
 #include "mgDefs.h"
 #include "mgForward.h"

@@ -40,11 +40,14 @@ struct pixel4
 };
 
 Image::Image()
+	:
+m_image(0)
 {
 }
 
 Image::Image(mgImage_s* ptr)
-	:m_image(ptr)
+	:
+m_image(ptr)
 {
 
 }

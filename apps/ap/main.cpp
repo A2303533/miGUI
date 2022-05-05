@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
 
 		mainWindow.m_data->SetVisible(true);
 	
-		guiWindow = context.m_data->CreateWindow();
+		guiWindow = new mgf::Window(g_data.context);
 		guiWindow.m_data->SetTitle(L"Window", 0);
 		guiWindow.m_data->SetWithCloseButton(false);
 		guiWindow.m_data->SetWithCollapseButton(false);

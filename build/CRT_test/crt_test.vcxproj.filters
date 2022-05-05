@@ -352,5 +352,8 @@
     <ClCompile Include="..\..\src\CRT\s_fmaf.c">
       <Filter>CRT\math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\CRT\wchar.c">
+      <Filter>CRT</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

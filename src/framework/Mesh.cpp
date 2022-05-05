@@ -3,7 +3,16 @@
 
 using namespace mgf;
 
-Mesh::Mesh() {}
+Mesh::Mesh() 
+	:
+	m_vertices(0),
+	m_indices(0),
+	m_indexType(MeshIndexType::MeshIndexType_u16),
+	m_vCount(0),
+	m_iCount(0),
+	m_stride(0),
+	m_vertexType(MeshVertexType::MeshVertexType_Triangle)
+{}
 
 Mesh::~Mesh()
 {
@@ -134,16 +143,16 @@ void Mesh::GenerateTangents_u32()
 }
 void Mesh::GenerateTangents()
 {
-	if (m_vertexType != MeshVertexType::Triangle)
+	if (m_vertexType != MeshVertexType::MeshVertexType_Triangle)
 		return;
 
 	switch (m_indexType)
 	{
-	case MeshIndexType::_u16:
+	case MeshIndexType::MeshIndexType_u16:
 	default:
 		GenerateTangents_u16();
 		break;
-	case MeshIndexType::_u32:
+	case MeshIndexType::MeshIndexType_u32:
 		GenerateTangents_u32();
 		break;
 	}

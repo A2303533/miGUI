@@ -42,6 +42,12 @@
 using namespace mgf;
 
 Window::Window(Context* ctx)
+	:
+m_window(0),
+m_menu(0),
+m_menuFont(0),
+m_menuNodeCurr(0),
+m_isVisible(true)
 {
 	m_window = mgCreateWindow(ctx->m_gui_context, 0, 0, 300, 200);
 	m_window->titlebarFont = ((mgf::FontImpl*)ctx->GetBackend()->GetDefaultFont())->m_font;
@@ -49,7 +55,7 @@ Window::Window(Context* ctx)
 
 Window::~Window()
 {
-	auto elements = m_elements.data();
+	mgf::Element** elements = &m_elements.front();
 	for (size_t i = 0, sz = m_elements.size(); i < sz; ++i)
 	{
 		delete(elements[i]);
@@ -364,7 +370,7 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 {
 	std::vector<mgPopupItemInfo_s> popupItems;
 
-	auto curr = firstNode;
+	_menuTreeNode* curr = firstNode;
 	while (true)
 	{
 		mgPopupItemInfo_s info;
@@ -395,7 +401,7 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 	mgPopup* newPopup = 0;
 	if (popupItems.size())
 	{
-		newPopup = mgCreatePopup(popupItems.data(), popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
+		newPopup = mgCreatePopup(&popupItems.front(), popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
 		newPopup->onIsItemEnabled = Window_onIsItemEnabled;
 		newPopup->onIsItemChecked = Window_onIsItemChecked;
 		newPopup->onIsItemRadio = Window_onIsItemRadio;
@@ -426,12 +432,12 @@ void Window::RebuildMenu()
 		return;
 
 	int num = 0;
-	auto lastSib = _menu_getLastSibling(m_menuTree.m_root, &num);
+	_menuTreeNode* lastSib = _menu_getLastSibling(m_menuTree.m_root, &num);
 
 	mgMenuItemInfo* mii = new mgMenuItemInfo[num];
 	int index = 0;
 
-	auto currSib = m_menuTree.m_root;
+	_menuTreeNode* currSib = m_menuTree.m_root;
 	while(true)
 	{
 		mii[index].popup = 0;
@@ -510,7 +516,7 @@ void Window::BeginMenu(const wchar_t* title, uint32_t id)
 	else
 	{
 		int num = 0;
-		auto lastSib = _menu_getLastSibling(m_menuTree.m_root, &num);
+		_menuTreeNode* lastSib = _menu_getLastSibling(m_menuTree.m_root, &num);
 		lastSib->siblings = newNode;
 	}
 	m_menuNodeCurr = newNode;
@@ -542,7 +548,7 @@ void Window::_menu_addMenuItem(
 	else
 	{
 		int num = 0;
-		auto lastSib = _menu_getLastSibling(m_menuNodeCurr->children, &num);
+		_menuTreeNode* lastSib = _menu_getLastSibling(m_menuNodeCurr->children, &num);
 		lastSib->siblings = newNode;
 	}
 

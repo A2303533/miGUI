@@ -39,14 +39,24 @@
 
 struct AudioEngineImplementationData
 {
+	AudioEngineImplementationData()
+		:
 #ifdef MG_PLATFORM_WINDOWS
-	IMMDevice* m_device = 0;
-	HANDLE      _ShutdownEvent = 0;
+	m_device(0),
+	_ShutdownEvent(0)
+#endif
+	{}
+
+#ifdef MG_PLATFORM_WINDOWS
+	IMMDevice* m_device;
+	HANDLE      _ShutdownEvent;
 #endif
 };
 
 
 mgf::AudioEngine::AudioEngine()
+	:
+m_implementationData(0)
 {
 #ifdef MG_PLATFORM_WINDOWS
 	AudioEngineImplementationData* iData = new AudioEngineImplementationData;

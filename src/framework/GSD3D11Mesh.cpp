@@ -49,7 +49,7 @@ GSD3D11Mesh::GSD3D11Mesh(GSMeshInfo* mi, ID3D11Device* d, ID3D11DeviceContext* d
 	{
 		uint32_t index_sizeof = sizeof(uint16_t);
 		m_indexType = DXGI_FORMAT_R16_UINT;
-		if (mesh->m_indexType == MeshIndexType::_u32)
+		if (mesh->m_indexType == Mesh::MeshIndexType_u32)
 		{
 			m_indexType = DXGI_FORMAT_R32_UINT;
 			index_sizeof = sizeof(uint32_t);

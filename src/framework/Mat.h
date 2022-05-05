@@ -30,9 +30,6 @@
 #ifndef _MGF_MAT_H_
 #define _MGF_MAT_H_
 
-#include <cmath>
-#include <cassert>
-
 #include "Vec.h"
 #include "Quat.h"
 
@@ -84,7 +81,7 @@ namespace mgf
 
 
 		void		identity() {
-			auto* p = this->getPtr();
+			float* p = this->getPtr();
 			p[0u] = 1.f;
 			p[1u] = 0.f;
 			p[2u] = 0.f;
@@ -272,18 +269,18 @@ namespace mgf
 		bool invert()
 		{
 			Mat4 mat;
-			auto ptr = this->getPtr();
+			float* ptr = this->getPtr();
 			for (unsigned column = 0; column < 4; ++column)
 			{
 				// Swap row in case our pivot point is not working
-				auto column_data = m_data[column].data();
+				float* column_data = m_data[column].data();
 				if (column_data[column] == 0)
 				{
 					unsigned big = column;
 					for (unsigned row = 0; row < 4; ++row)
 					{
-						auto row_data = m_data[row].data();
-						auto big_data = m_data[big].data();
+						float* row_data = m_data[row].data();
+						float* big_data = m_data[big].data();
 						if (fabs(row_data[column]) > fabs(big_data[column]))
 							big = row;
 					}
@@ -293,11 +290,11 @@ namespace mgf
 					// Swap rows                               
 					else for (unsigned j = 0; j < 4; ++j)
 					{
-						auto big_data = m_data[big].data();
+						float* big_data = m_data[big].data();
 						std::swap(column_data[j], big_data[j]);
 
-						auto other_column_data = mat.m_data[column].data();
-						auto other_big_data = mat.m_data[big].data();
+						float* other_column_data = mat.m_data[column].data();
+						float* other_big_data = mat.m_data[big].data();
 						std::swap(other_column_data[j], other_big_data[j]);
 					}
 				}
@@ -307,7 +304,7 @@ namespace mgf
 				{
 					if (row != column)
 					{
-						auto row_data = m_data[row].data();
+						float* row_data = m_data[row].data();
 						float coeff = row_data[column] / column_data[column];
 						if (coeff != 0)
 						{
@@ -315,8 +312,8 @@ namespace mgf
 							{
 								row_data[j] -= coeff * column_data[j];
 
-								auto other_row_data = mat.m_data[row].data();
-								auto other_column_data = mat.m_data[column].data();
+								float* other_row_data = mat.m_data[row].data();
+								float* other_column_data = mat.m_data[column].data();
 								other_row_data[j] -= coeff * other_column_data[j];
 							}
 							// Set the element to 0 for safety
@@ -331,8 +328,8 @@ namespace mgf
 			{
 				for (unsigned column = 0; column < 4; ++column)
 				{
-					auto other_row_data = mat.m_data[row].data();
-					auto row_data = m_data[row].data();
+					float* other_row_data = mat.m_data[row].data();
+					float* row_data = m_data[row].data();
 					other_row_data[column] /= row_data[row];
 				}
 			}
@@ -494,7 +491,7 @@ namespace mgf
 
 
 		void		identity() {
-			auto* p = this->getPtr();
+			float* p = this->getPtr();
 			p[0] = 1.f;
 			p[1] = 0.f;
 			p[2] = 0.f;

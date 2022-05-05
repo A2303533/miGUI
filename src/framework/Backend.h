@@ -45,6 +45,14 @@ namespace mgf
 		/// </summary>
 		mgPoint m_endDrawIndent;
 	public:
+
+		Backend()
+			:
+			m_getTextSize(0)
+		{}
+	
+		virtual ~Backend(){};
+
 		virtual void SetEndDrawIndent(int x, int y)
 		{
 			m_endDrawIndent.x = x;
@@ -101,11 +109,9 @@ namespace mgf
 		virtual mgRect SetClipRect(mgRect* r) = 0;
 
 		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) = 0;
-
-		void (*m_getTextSize)(const wchar_t* text, mgFont*, mgPoint*) = 0;
-
+		void (*m_getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
+		
 		virtual mgTexture_s* GetDefaultIcons() = 0;
-
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) = 0;
 		virtual void DestroyFont(Font*) = 0;
 		virtual Font* GetDefaultFont() = 0;

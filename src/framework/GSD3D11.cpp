@@ -474,7 +474,7 @@ GSTexture* GSD3D11::CreateRenderTargetTexture(uint32_t w, uint32_t h, GSTextureI
 	if (opt)
 		ti = *opt;
 
-	ti.m_textureType = GSTextureType::RTT;
+	ti.m_textureType = GSTextureInfo::Type_RTT;
 	ti.m_width = w;
 	ti.m_height = h;
 
@@ -569,7 +569,7 @@ bool GSD3D11::_updateMainTarget()
 	mesh->m_iCount = 6;
 	mesh->m_vCount = 4;
 	mesh->m_stride = sizeof(VertexGUI);
-	mesh->m_vertexType = MeshVertexType::GUI;
+	mesh->m_vertexType = Mesh::MeshVertexType_GUI;
 	mesh->m_vertices = (uint8_t*)malloc(mesh->m_vCount * mesh->m_stride);
 	mesh->m_indices = (uint8_t*)malloc(mesh->m_iCount * sizeof(uint16_t));
 	uint16_t* inds = (uint16_t*)mesh->m_indices;

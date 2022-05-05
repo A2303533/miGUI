@@ -37,6 +37,8 @@
 using namespace mgf;
 
 TextInput::TextInput(Window* w, Font* f)
+:
+m_elementText(0)
 {
 	assert(w);
 	assert(f);

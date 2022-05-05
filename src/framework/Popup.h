@@ -39,16 +39,16 @@ namespace mgf
 		friend class Context;
 
 		// I think it's possible to create one class for system popup and for migui popup
-		void* m_implementation = 0;
+		void* m_implementation;
 
 		enum
 		{
 			type_system,
 			type_migui
 		}
-		m_type = type_migui;
+		m_type;
 
-		Context* m_context = 0;
+		Context* m_context;
 	public:
 		Popup(Context*);
 		virtual ~Popup();

@@ -38,7 +38,7 @@ namespace mgf
 {
 	class TextInput : public Element
 	{
-		mgElementTextInput_s* m_elementText = 0;
+		mgElementTextInput_s* m_elementText;
 	public:
 		TextInput(Window* w, Font* f);
 		virtual ~TextInput();

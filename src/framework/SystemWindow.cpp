@@ -46,11 +46,34 @@ static unsigned int LocaleIdToCodepage(unsigned int lcid);
 #endif
 
 SystemWindow::SystemWindow()
+	:
+#ifdef MG_PLATFORM_WINDOWS
+	m_hWnd(0),
+	m_hdcMem(0),
+	m_hbmMem(0),
+	m_hbmOld(0),
+#endif
+	m_userData(0),
+	m_isVisible(false),
+	m_isCustomTitlebar(false),
+	m_customTitlebarSize(20),
+	m_context(0)
 {
-
 }
 
 SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize)
+	:
+#ifdef MG_PLATFORM_WINDOWS
+	m_hWnd(0),
+	m_hdcMem(0),
+	m_hbmMem(0),
+	m_hbmOld(0),
+#endif
+	m_userData(0),
+	m_isVisible(false),
+	m_isCustomTitlebar(false),
+	m_customTitlebarSize(20),
+	m_context(0)
 {
 #ifdef MG_PLATFORM_WINDOWS
     WNDCLASSEXW wcex;
@@ -61,7 +84,7 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     wcex.cbWndExtra = 0;
     wcex.hInstance = GetModuleHandle(0);
     wcex.hIcon = 0;// LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_WIN32TEST));
-    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hCursor = LoadCursor(0, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wcex.lpszMenuName = 0;
 
@@ -805,7 +828,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SETCURSOR: {
         if (pW->m_context)
         {
-            auto id = LOWORD(lParam);
+            int id = LOWORD(lParam);
             switch (id)
             {
             default:

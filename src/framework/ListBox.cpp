@@ -45,6 +45,10 @@ void LB_onItemClick(struct mgElement_s* e, void* item, uint32_t itemIndex, uint3
 int LB_onDrawItem(struct mgElement_s*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
 
 ListBox::ListBox(Window* w, Font* f)
+	:
+	m_elementList(0),
+	onTextInputCharEnter(0),
+	onTextInputEndEdit(0)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);

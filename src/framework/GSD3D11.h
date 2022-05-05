@@ -2,6 +2,8 @@
 #ifndef __MGF_GSD3D11_H_
 #define __MGF_GSD3D11_H_
 
+#ifdef MGF_GS_D3D11
+
 #include "framework/GS.h"
 #include <d3d11.h>
 
@@ -122,4 +124,6 @@ namespace mgf
 	};
 
 }
+#endif
+
 #endif

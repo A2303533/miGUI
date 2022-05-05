@@ -38,9 +38,9 @@ namespace mgf
 {
 	class Button : public Element
 	{
-		mgElementButton_s* m_elementButton = 0;
+		mgElementButton_s* m_elementButton;
 		std::wstring m_text;
-		Icons* m_icons = 0;
+		Icons* m_icons;
 	public:
 		Button(Window* w);
 		virtual ~Button();

@@ -34,9 +34,11 @@ namespace mgf
 {
 	class BaseClass
 	{
-		int refCount = 1;
+		int refCount;
 	public:
-		BaseClass() {}
+		BaseClass():
+		  refCount(1)
+		{}
 		virtual ~BaseClass() {}
 
 		void AddRef() { ++refCount; }

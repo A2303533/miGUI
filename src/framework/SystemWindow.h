@@ -76,7 +76,10 @@ namespace mgf
 {
 	struct SystemWindowOSData
 	{
-		void* handle = 0;
+		SystemWindowOSData()
+			: handle(0)
+		{}
+		void* handle;
 	};
 
 	class SystemWindow : public BaseClass
@@ -87,30 +90,27 @@ namespace mgf
 		friend class Context;
 		friend class Framework;
 
-#ifdef MG_PLATFORM_WINDOWS
-		HWND m_hWnd = 0;
-		//HDC m_dc = 0;
-		wchar_t m_className[20];
-
-		/*double bufferring for GDI*/
-		HDC m_hdcMem = 0;
-		HBITMAP m_hbmMem = 0;
-		HBITMAP m_hbmOld = 0;
-#endif
 		SystemWindowOSData m_OSData;
 
-		void* m_userData = 0;
-
-		bool m_isVisible = false;
+#ifdef MG_PLATFORM_WINDOWS
+		wchar_t m_className[20];
+		HWND m_hWnd;
+		/*double bufferring for GDI*/
+		HDC m_hdcMem;
+		HBITMAP m_hbmMem;
+		HBITMAP m_hbmOld;
+#endif
+		void* m_userData;
+		bool m_isVisible;
 
 		mgRect m_clientRect;
 		mgPoint m_size;
 		mgPoint m_borderSize;
 		mgPoint m_sizeMinimum;
 
-		bool m_isCustomTitlebar = false;
+		bool m_isCustomTitlebar;
 		mgRect m_customTitlebarHitRect;
-		uint32_t m_customTitlebarSize = 20;
+		uint32_t m_customTitlebarSize;
 	public:
 
 		/// <summary>
@@ -178,7 +178,7 @@ namespace mgf
 		// call this after SetUseCustomTitleBar
 		virtual void Rebuild();
 
-		Context* m_context = 0;
+		Context* m_context;
 	};
 }
 

@@ -10,24 +10,27 @@
 
 namespace mgf
 {
-	enum class GSVideoDriverType : uint32_t
-	{
-		Unknown,
-#ifdef MGF_GS_D3D11
-		Direct3D11
-#endif
-	};
+	
 
 	class GS : public BaseClass
 	{
+	public:
+		enum DriverType
+			{
+				DriverType_Unknown,
+		#ifdef MGF_GS_D3D11
+				DriverType_Direct3D11
+		#endif
+			};
+
 	protected:
-		GSVideoDriverType m_videoDriverType = GSVideoDriverType::Unknown;
-		SystemWindow* m_activeWindow = 0;
+		DriverType m_videoDriverType;
+		SystemWindow* m_activeWindow;
 	public:
 		GS();
 		virtual ~GS();
 
-		enum MatrixType : uint32_t
+		enum MatrixType
 		{
 			MatrixType_World,
 			MatrixType_View,
@@ -41,7 +44,7 @@ namespace mgf
 
 		Mat4 m_matrices[MatrixType__count];
 
-		GSVideoDriverType GetVideoDriverType();
+		DriverType GetVideoDriverType();
 		SystemWindow* GetActiveWindow();
 
 		virtual void UseVSync(bool) = 0;

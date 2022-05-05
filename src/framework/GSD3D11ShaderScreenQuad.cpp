@@ -55,7 +55,7 @@ bool GSD3D11ShaderScreenQuad::init()
 		text,
 		"VSMain",
 		"PSMain",
-		MeshVertexType::GUI,
+		Mesh::MeshVertexType_GUI,
 		&this->m_vShader,
 		&this->m_pShader,
 		&this->m_vLayout))

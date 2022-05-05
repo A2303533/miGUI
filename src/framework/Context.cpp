@@ -39,8 +39,13 @@
 
 using namespace mgf;
 
-Context::Context(mgf::SystemWindow* sysWnd, 
-	Backend* backend)
+Context::Context(mgf::SystemWindow* sysWnd, Backend* backend)
+:
+m_window(0),
+m_backend(0),
+m_onDraw(0),
+m_gui_context(0),
+m_input(0)
 {
 	//m_window = new mgf::SystemWindowImpl(windowFlags, windowPosition, windowSize);
 	m_window = (SystemWindow*)sysWnd;

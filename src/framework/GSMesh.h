@@ -9,10 +9,13 @@ namespace mgf
 	class GSMeshInfo
 	{
 	public:
-		GSMeshInfo() {}
+		GSMeshInfo() 
+			:
+		m_meshPtr(0)
+		{}
 		~GSMeshInfo() {}
 
-		Mesh* m_meshPtr = nullptr;
+		Mesh* m_meshPtr;
 	};
 
 	class GSMesh : public BaseClass

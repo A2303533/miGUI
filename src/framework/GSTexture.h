@@ -4,70 +4,82 @@
 
 namespace mgf
 {
-	enum class GSTextureType : uint32_t
-	{
-		Texture2D,
-		RTT
-	};
-
-	enum class GSTextureComparisonFunc : uint32_t
-	{
-		Never,
-		Less,
-		Equal,
-		LessEqual,
-		Greater,
-		NotEqual,
-		GreaterEqual,
-		Always
-	};
-
-	enum class GSTextureAddressMode : uint32_t
-	{
-		Wrap,
-		Mirror,
-		Clamp,
-		Border,
-		MirrorOnce
-	};
-
-	enum class GSTextureFilter : uint32_t
-	{
-		// min mag mip / point linear
-		PPP,
-		PPL,
-		PLP,
-		PLL,
-		LPP,
-		LPL,
-		LLP,
-		LLL,
-		ANISOTROPIC,
-		// comparison
-		CMP_PPP,
-		CMP_PPL,
-		CMP_PLP,
-		CMP_PLL,
-		CMP_LPP,
-		CMP_LPL,
-		CMP_LLP,
-		CMP_LLL,
-		CMP_ANISOTROPIC,
-	};
-
 	class GSTextureInfo
 	{
 	public:
-		GSTextureInfo() {}
+		GSTextureInfo()
+			:
+			m_textureType(Type_Texture2D),
+			m_filter(Filter_PPP),
+			m_addressMode(AddressMode_Wrap),
+			m_comparisonFunc(GSTextureInfo::ComparisonFunc_Always),
+			m_anisotropicLevel(1),
+			m_flags(0),
+			m_width(0),
+			m_height(0),
+			m_imagePtr(0),
+			m_imagePathPtr(0)
+		{}
 		~GSTextureInfo() {}
 
-		GSTextureType m_textureType = GSTextureType::Texture2D;
-		GSTextureFilter m_filter = GSTextureFilter::PPP;
-		GSTextureAddressMode m_addressMode = GSTextureAddressMode::Wrap;
-		GSTextureComparisonFunc m_comparisonFunc = GSTextureComparisonFunc::Always;
-		int32_t m_anisotropicLevel = 1;
+		enum Type
+		{
+			Type_Texture2D,
+			Type_RTT
+		};
 
-		uint32_t m_flags = 0;
+		enum ComparisonFunc
+		{
+			ComparisonFunc_Never,
+			ComparisonFunc_Less,
+			ComparisonFunc_Equal,
+			ComparisonFunc_LessEqual,
+			ComparisonFunc_Greater,
+			ComparisonFunc_NotEqual,
+			ComparisonFunc_GreaterEqual,
+			ComparisonFunc_Always
+		};
+
+		enum AddressMode
+		{
+			AddressMode_Wrap,
+			AddressMode_Mirror,
+			AddressMode_Clamp,
+			AddressMode_Border,
+			AddressMode_MirrorOnce
+		};
+
+		enum Filter
+		{
+			// min mag mip / point linear
+			Filter_PPP,
+			Filter_PPL,
+			Filter_PLP,
+			Filter_PLL,
+			Filter_LPP,
+			Filter_LPL,
+			Filter_LLP,
+			Filter_LLL,
+			Filter_ANISOTROPIC,
+			// comparison
+			Filter_CMP_PPP,
+			Filter_CMP_PPL,
+			Filter_CMP_PLP,
+			Filter_CMP_PLL,
+			Filter_CMP_LPP,
+			Filter_CMP_LPL,
+			Filter_CMP_LLP,
+			Filter_CMP_LLL,
+			Filter_CMP_ANISOTROPIC,
+		};
+
+		Type m_textureType;
+		Filter m_filter;
+		AddressMode m_addressMode;
+		ComparisonFunc m_comparisonFunc;
+		int32_t m_anisotropicLevel;
+
+		uint32_t m_flags;
 		enum
 		{
 			flag_useMipmaps = 0x1,
@@ -94,14 +106,14 @@ namespace mgf
 			}
 		}
 
-		uint32_t m_width = 0;
-		uint32_t m_height = 0;
+		uint32_t m_width;
+		uint32_t m_height;
 
-		mgImage* m_imagePtr = nullptr;
+		mgImage* m_imagePtr;
 
 		// if use miGetTexture then this ptr will have address to CacheNode<miGPUTexture>.m_path.data()
 		// and then you can use Unload/Reload
-		const wchar_t* m_imagePathPtr = nullptr;
+		const wchar_t* m_imagePathPtr;
 	};
 
 	class GSTexture : public mgf::BaseClass

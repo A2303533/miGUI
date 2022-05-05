@@ -122,35 +122,37 @@ namespace mgf
 		typedef char_type value_type;
 
 		String_base()
-			:m_data(nullptr), m_allocated(String_wordSize), m_size(0)
+			:m_data(0), m_allocated(String_wordSize), m_size(0)
 		{
 			reallocate(m_allocated);
 		}
 
 		template<typename other_type>
 		String_base(const other_type* str)
-			: m_data(nullptr), m_allocated(String_wordSize), m_size(0)
+			: m_data(0), m_allocated(String_wordSize), m_size(0)
 		{
 			reallocate(m_allocated);
 			assign(str);
 		}
 
 		String_base(this_const_reference str)
-			: m_data(nullptr), m_allocated(String_wordSize), m_size(0)
+			: m_data(0), m_allocated(String_wordSize), m_size(0)
 		{
 			reallocate(m_allocated);
 			assign(str);
 		}
 
+#if _MSC_VER > 1500 // > VS2008?
 		String_base(this_type&& str)
-			: m_data(nullptr), m_allocated(String_wordSize), m_size(0)
+			: m_data(0), m_allocated(String_wordSize), m_size(0)
 		{
 			reallocate(m_allocated);
 			assign(str);
 		}
+#endif
 
 		String_base(char_type c)
-			: m_data(nullptr), m_allocated(String_wordSize), m_size(0)
+			: m_data(0), m_allocated(String_wordSize), m_size(0)
 		{
 			size_t new_size = 1u;
 			reallocate((new_size + 1u) + String_wordSize);
@@ -321,10 +323,12 @@ namespace mgf
 			return *this;
 		}
 
+#if _MSC_VER > 1500 // > VS2008?
 		this_type& operator=(this_type&& str) {
 			assign(str);
 			return *this;
 		}
+#endif
 
 
 		template<typename other_type>
@@ -574,7 +578,7 @@ namespace mgf
 
 			String_base<char> output;
 			std::mbstate_t state = std::mbstate_t();
-			std::size_t len = 1 + std::wcsrtombs(nullptr, (const wchar_t**)&old, 0, &state);
+			std::size_t len = 1 + std::wcsrtombs(0, (const wchar_t**)&old, 0, &state);
 			std::vector<char> mbstr(len);
 			std::wcsrtombs(&mbstr[0], (const wchar_t**)&old, mbstr.size(), &state);
 			output.append(&mbstr[0]);
@@ -587,7 +591,7 @@ namespace mgf
 			const char* old = m_data;
 
 			std::mbstate_t state = std::mbstate_t();
-			std::size_t len = 1 + std::mbsrtowcs(nullptr, &old, 0, &state);
+			std::size_t len = 1 + std::mbsrtowcs(0, &old, 0, &state);
 			std::vector<wchar_t> wstr(len);
 			std::mbsrtowcs(&wstr[0], &old, wstr.size(), &state);
 			output.append(&wstr[0]);

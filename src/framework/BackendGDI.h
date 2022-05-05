@@ -48,23 +48,23 @@ namespace mgf
 	{
 		friend class Context;
 
-		mgf::SystemWindow* m_window = 0;
-		mgf::Context* m_context = 0;
+		mgf::SystemWindow* m_window;
+		mgf::Context* m_context;
 
-		void* m_gpu = 0;
-		Gdiplus::GdiplusStartupInput m_gdiplusStartupInput = 0;
-		ULONG_PTR m_gdiplusToken = 0;
+		void* m_gpu;
+		Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
+		ULONG_PTR m_gdiplusToken;
 
 		//Gdiplus::Bitmap* m_gdiimage_defaultIcons = 0;
-		mgTexture_s* m_defaultIcons = 0;
-		Font* m_defaultFont = 0;
+		mgTexture_s* m_defaultIcons;
+		Font* m_defaultFont;
 
 		mgRect m_clipRect;
 
 		void _createBackbuffer(mgf::SystemWindow* impl);
 
-		Image* blackImage = 0;
-		Gdiplus::Bitmap* blackBitmap = 0;
+		Image* blackImage;
+		Gdiplus::Bitmap* blackBitmap;
 
 	public:
 		BackendGDI();

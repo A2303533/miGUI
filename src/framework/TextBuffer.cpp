@@ -37,8 +37,11 @@
 using namespace mgf;
 
 TextBuffer::TextBuffer()
+	:
+	m_begin(0),
+	m_end(0),
+	m_curr(0)
 {
-
 }
 
 TextBuffer::~TextBuffer()

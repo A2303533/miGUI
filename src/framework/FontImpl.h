@@ -42,9 +42,9 @@ namespace mgf
 		virtual mgPoint GetMaxSize() override;
 		virtual mgFont_s* GetMGFont() override;
 
-		Backend* m_backend = 0;
-		Context* m_context = 0;
-		mgFont* m_font = 0;
+		Backend* m_backend;
+		Context* m_context;
+		mgFont* m_font;
 
 		StringW m_private;
 	};

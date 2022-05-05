@@ -42,68 +42,68 @@ GSD3D11Texture::GSD3D11Texture(GSTextureInfo* ti, ID3D11Device* d, ID3D11DeviceC
 	m_textureInfo = *ti;
 
 	D3D11_FILTER filter;
-	GSTextureFilter tf = m_textureInfo.m_filter;
+	GSTextureInfo::Filter tf = m_textureInfo.m_filter;
 	switch (tf)
 	{
-	case GSTextureFilter::PPP:
+	case GSTextureInfo::Filter::Filter_PPP:
 		filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_POINT;
 		break;
-	case GSTextureFilter::PPL:
+	case GSTextureInfo::Filter::Filter_PPL:
 		filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
 		break;
-	case GSTextureFilter::PLP:
+	case GSTextureInfo::Filter::Filter_PLP:
 		filter = D3D11_FILTER::D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
 		break;
-	case GSTextureFilter::PLL:
+	case GSTextureInfo::Filter::Filter_PLL:
 		filter = D3D11_FILTER::D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
 		break;
-	case GSTextureFilter::LPP:
+	case GSTextureInfo::Filter::Filter_LPP:
 		filter = D3D11_FILTER::D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
 		break;
-	case GSTextureFilter::LPL:
+	case GSTextureInfo::Filter::Filter_LPL:
 		filter = D3D11_FILTER::D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
 		break;
-	case GSTextureFilter::LLP:
+	case GSTextureInfo::Filter::Filter_LLP:
 		filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
 		break;
-	case GSTextureFilter::LLL:
+	case GSTextureInfo::Filter::Filter_LLL:
 		filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		break;
-	case GSTextureFilter::ANISOTROPIC:
+	case GSTextureInfo::Filter::Filter_ANISOTROPIC:
 		filter = D3D11_FILTER::D3D11_FILTER_ANISOTROPIC;
 		break;
-	case GSTextureFilter::CMP_PPP:
+	case GSTextureInfo::Filter::Filter_CMP_PPP:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
 		break;
-	case GSTextureFilter::CMP_PPL:
+	case GSTextureInfo::Filter::Filter_CMP_PPL:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
 		break;
-	case GSTextureFilter::CMP_PLP:
+	case GSTextureInfo::Filter::Filter_CMP_PLP:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT;
 		break;
-	case GSTextureFilter::CMP_PLL:
+	case GSTextureInfo::Filter::Filter_CMP_PLL:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
 		break;
-	case GSTextureFilter::CMP_LPP:
+	case GSTextureInfo::Filter::Filter_CMP_LPP:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
 		break;
-	case GSTextureFilter::CMP_LPL:
+	case GSTextureInfo::Filter::Filter_CMP_LPL:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
 		break;
-	case GSTextureFilter::CMP_LLP:
+	case GSTextureInfo::Filter::Filter_CMP_LLP:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
 		break;
-	case GSTextureFilter::CMP_LLL:
+	case GSTextureInfo::Filter::Filter_CMP_LLL:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 		break;
-	case GSTextureFilter::CMP_ANISOTROPIC:
+	case GSTextureInfo::Filter::Filter_CMP_ANISOTROPIC:
 		filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_ANISOTROPIC;
 		break;
 	default:
 		break;
 	}
 
-	if (m_textureInfo.m_textureType == GSTextureType::Texture2D)
+	if (m_textureInfo.m_textureType == GSTextureInfo::Type_Texture2D)
 	{
 		mgImage* img = (mgImage*)m_textureInfo.m_imagePtr;
 
@@ -254,20 +254,20 @@ GSD3D11Texture::GSD3D11Texture(GSTextureInfo* ti, ID3D11Device* d, ID3D11DeviceC
 	D3D11_TEXTURE_ADDRESS_MODE tam;
 	switch (m_textureInfo.m_addressMode)
 	{
-	case GSTextureAddressMode::Wrap:
+	case GSTextureInfo::AddressMode_Wrap:
 	default:
 		tam = D3D11_TEXTURE_ADDRESS_WRAP;
 		break;
-	case GSTextureAddressMode::Mirror:
+	case GSTextureInfo::AddressMode_Mirror:
 		tam = D3D11_TEXTURE_ADDRESS_MIRROR;
 		break;
-	case GSTextureAddressMode::Clamp:
+	case GSTextureInfo::AddressMode_Clamp:
 		tam = D3D11_TEXTURE_ADDRESS_CLAMP;
 		break;
-	case GSTextureAddressMode::Border:
+	case GSTextureInfo::AddressMode_Border:
 		tam = D3D11_TEXTURE_ADDRESS_BORDER;
 		break;
-	case GSTextureAddressMode::MirrorOnce:
+	case GSTextureInfo::AddressMode_MirrorOnce:
 		tam = D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
 		break;
 	}
@@ -275,28 +275,28 @@ GSD3D11Texture::GSD3D11Texture(GSTextureInfo* ti, ID3D11Device* d, ID3D11DeviceC
 	D3D11_COMPARISON_FUNC cmpFunc;
 	switch (m_textureInfo.m_comparisonFunc)
 	{
-	case GSTextureComparisonFunc::Never:
+	case GSTextureInfo::ComparisonFunc_Never:
 		cmpFunc = D3D11_COMPARISON_NEVER;
 		break;
-	case GSTextureComparisonFunc::Less:
+	case GSTextureInfo::ComparisonFunc_Less:
 		cmpFunc = D3D11_COMPARISON_LESS;
 		break;
-	case GSTextureComparisonFunc::Equal:
+	case GSTextureInfo::ComparisonFunc_Equal:
 		cmpFunc = D3D11_COMPARISON_EQUAL;
 		break;
-	case GSTextureComparisonFunc::LessEqual:
+	case GSTextureInfo::ComparisonFunc_LessEqual:
 		cmpFunc = D3D11_COMPARISON_LESS_EQUAL;
 		break;
-	case GSTextureComparisonFunc::Greater:
+	case GSTextureInfo::ComparisonFunc_Greater:
 		cmpFunc = D3D11_COMPARISON_GREATER;
 		break;
-	case GSTextureComparisonFunc::NotEqual:
+	case GSTextureInfo::ComparisonFunc_NotEqual:
 		cmpFunc = D3D11_COMPARISON_NOT_EQUAL;
 		break;
-	case GSTextureComparisonFunc::GreaterEqual:
+	case GSTextureInfo::ComparisonFunc_GreaterEqual:
 		cmpFunc = D3D11_COMPARISON_GREATER_EQUAL;
 		break;
-	case GSTextureComparisonFunc::Always:
+	case GSTextureInfo::ComparisonFunc_Always:
 	default:
 		cmpFunc = D3D11_COMPARISON_ALWAYS;
 		break;

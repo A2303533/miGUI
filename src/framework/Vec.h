@@ -30,16 +30,11 @@
 #ifndef _MGF_VEC_H_
 #define _MGF_VEC_H_
 
-#include <cmath>
-#include <cassert>
+#include "CRT/cmath.h"
+#include "CRT/cassert.h"
 
 namespace mgf
 {
-	enum class VectorComponent
-	{
-		x, y, z, w
-	};
-
 	struct v4i
 	{
 		v4i() :x(0), y(0), z(0), w(0) {}

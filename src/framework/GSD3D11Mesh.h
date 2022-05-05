@@ -25,7 +25,7 @@ namespace mgf
 
 		DXGI_FORMAT m_indexType = DXGI_FORMAT_R16_UINT;
 
-		MeshVertexType m_vertexType = MeshVertexType::Triangle;
+		Mesh::MeshVertexType m_vertexType = Mesh::MeshVertexType_Triangle;
 	};
 
 }

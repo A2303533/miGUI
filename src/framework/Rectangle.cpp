@@ -35,13 +35,17 @@
 using namespace mgf;
 
 Rectangle::Rectangle()
-	:Element()
+	:
+	Element(),
+	m_elementRectangle(0)
 {
 
 }
 
 Rectangle::Rectangle(Window* w)
-	: Element()
+	: 
+	Element(),
+	m_elementRectangle(0)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);

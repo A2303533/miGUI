@@ -6,6 +6,9 @@
 using namespace mgf;
 
 GS::GS() 
+:
+m_videoDriverType(DriverType_Unknown),
+m_activeWindow(0)
 {
 }
 
@@ -13,7 +16,7 @@ GS::~GS()
 {
 }
 
-GSVideoDriverType GS::GetVideoDriverType()
+GS::DriverType GS::GetVideoDriverType()
 {
 	return m_videoDriverType;
 }

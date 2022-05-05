@@ -79,7 +79,7 @@ bool mgf::GSD3D11_createShaders(
 	const char* pixelShader,
 	const char* vertexEntryPoint,
 	const char* pixelEntryPoint,
-	MeshVertexType vertexType,
+	Mesh::MeshVertexType vertexType,
 	ID3D11VertexShader** vs,
 	ID3D11PixelShader** ps,
 	ID3D11InputLayout** il)
@@ -148,7 +148,7 @@ bool mgf::GSD3D11_createShaders(
 		return false;
 	}
 
-	if (vertexType != MeshVertexType::Null)
+	if (vertexType != Mesh::MeshVertexType_Null)
 	{
 		D3D11_INPUT_ELEMENT_DESC vertexLayout[8];
 		uint32_t vertexLayoutSize = 0;
@@ -165,7 +165,7 @@ bool mgf::GSD3D11_createShaders(
 		int ind = 0;
 		switch (vertexType)
 		{
-		case MeshVertexType::GUI:
+		case Mesh::MeshVertexType_GUI:
 			ind = 0;
 			vertexLayout[ind].SemanticName = "POSITION";
 			vertexLayout[ind].SemanticIndex = 0;
@@ -184,7 +184,7 @@ bool mgf::GSD3D11_createShaders(
 			vertexLayout[ind].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			vertexLayout[ind].InstanceDataStepRate = 0;
 			break;
-		case MeshVertexType::Triangle:
+		case Mesh::MeshVertexType_Triangle:
 			ind = 0;
 			vertexLayout[ind].SemanticName = "POSITION";
 			vertexLayout[ind].SemanticIndex = 0;
@@ -239,7 +239,7 @@ bool mgf::GSD3D11_createShaders(
 			vertexLayout[ind].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			vertexLayout[ind].InstanceDataStepRate = 0;
 			break;
-		case MeshVertexType::AnimatedTriangle:
+		case Mesh::MeshVertexType_AnimatedTriangle:
 			ind = 0;
 			vertexLayout[ind].SemanticName = "POSITION";
 			vertexLayout[ind].SemanticIndex = 0;
@@ -313,7 +313,7 @@ bool mgf::GSD3D11_createShaders(
 			vertexLayout[ind].InstanceDataStepRate = 0;
 
 			break;
-		case MeshVertexType::Line:
+		case Mesh::MeshVertexType_Line:
 			ind = 0;
 			vertexLayout[ind].SemanticName = "POSITION";
 			vertexLayout[ind].SemanticIndex = 0;
@@ -341,7 +341,7 @@ bool mgf::GSD3D11_createShaders(
 			vertexLayout[ind].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			vertexLayout[ind].InstanceDataStepRate = 0;
 			break;
-		case MeshVertexType::AnimatedLine:
+		case Mesh::MeshVertexType_AnimatedLine:
 			ind = 0;
 			vertexLayout[ind].SemanticName = "POSITION";
 			vertexLayout[ind].SemanticIndex = 0;
@@ -387,7 +387,7 @@ bool mgf::GSD3D11_createShaders(
 			vertexLayout[ind].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			vertexLayout[ind].InstanceDataStepRate = 0;
 			break;
-		case MeshVertexType::Point:
+		case Mesh::MeshVertexType_Point:
 			ind = 0;
 			vertexLayout[ind].SemanticName = "POSITION";
 			vertexLayout[ind].SemanticIndex = 0;
@@ -406,7 +406,7 @@ bool mgf::GSD3D11_createShaders(
 			vertexLayout[ind].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			vertexLayout[ind].InstanceDataStepRate = 0;
 			break;
-		case MeshVertexType::AnimatedPoint:
+		case Mesh::MeshVertexType_AnimatedPoint:
 			ind = 0;
 			vertexLayout[ind].SemanticName = "POSITION";
 			vertexLayout[ind].SemanticIndex = 0;

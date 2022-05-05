@@ -40,6 +40,9 @@ using namespace mgf;
 extern Backend* g_backend;
 
 Button::Button(Window* w)
+	:
+	m_elementButton(0),
+	m_icons(0)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);

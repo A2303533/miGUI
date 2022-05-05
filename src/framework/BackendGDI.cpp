@@ -119,6 +119,16 @@ mgRect BackendGDI_setClipRect(mgRect* r)
 }
 
 BackendGDI::BackendGDI()
+:
+m_window(0),
+m_context(0),
+m_gpu(0),
+m_gdiplusStartupInput(0),
+m_gdiplusToken(0),
+m_defaultIcons(0),
+m_defaultFont(0),
+blackImage(0),
+blackBitmap(0)
 {
 	GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
 
@@ -359,7 +369,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			Gdiplus::Bitmap::ApplyEffect(&outputBitmapBlur, 1, &brt, &rectOfInterest, 0, &outputBitmapBlurAndBrt);
 
 			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
-			auto status = graphics.DrawImage(outputBitmapBlurAndBrt, gdirct,
+			Gdiplus::Status status = graphics.DrawImage(outputBitmapBlurAndBrt, gdirct,
 				-1, -1, 21, 21, Gdiplus::UnitPixel);
 			delete outputBitmapBlur;
 			delete outputBitmapBlurAndBrt;
@@ -424,7 +434,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 					Gdiplus::ColorMatrixFlagsDefault,
 					Gdiplus::ColorAdjustTypeBitmap);
 
-				auto status = graphics.DrawImage(bitmapCopy, gdirct,
+				Gdiplus::Status status = graphics.DrawImage(bitmapCopy, gdirct,
 					m_context->m_gui_context->currentIcon->lt.x,
 					m_context->m_gui_context->currentIcon->lt.y,
 					m_context->m_gui_context->currentIcon->sz.x,
@@ -458,7 +468,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 
 				Gdiplus::Bitmap* bitmap = ((Gdiplus::Bitmap*)texture->implementation);
 
-				auto status = graphics.DrawImage(bitmap, gdirct,
+				Gdiplus::Status status = graphics.DrawImage(bitmap, gdirct,
 					0,
 					0,
 					clrct.Width,

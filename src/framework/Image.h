@@ -39,7 +39,7 @@ namespace mgf
 		friend Image* Image_bmp(const char* fn);
 		friend Image* Image_png(const char* fn);
 
-		mgImage_s* m_image = 0;
+		mgImage_s* m_image;
 
 		void _convert_r8g8b8_to_r8g8b8a8();
 		void _convert_r8g8b8_to_a8r8g8b8();

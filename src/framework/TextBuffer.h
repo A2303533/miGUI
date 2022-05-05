@@ -70,9 +70,9 @@ namespace mgf
 
 
 		StringW m_buffer;
-		const wchar_t* m_begin = 0;
-		const wchar_t* m_end = 0;
-		const wchar_t* m_curr = 0;
+		const wchar_t* m_begin;
+		const wchar_t* m_end;
+		const wchar_t* m_curr;
 
 		bool IsEnd();
 		void ToBegin();

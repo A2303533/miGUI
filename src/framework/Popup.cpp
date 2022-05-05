@@ -38,6 +38,8 @@ using namespace mgf;
 
 Popup::Popup(Context* c)
 	:
+	m_implementation(0),
+	m_type(type_migui),
 	m_context(c)
 {
 }

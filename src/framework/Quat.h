@@ -30,9 +30,6 @@
 #ifndef _MGF_QUAT_H_
 #define _MGF_QUAT_H_
 
-#include <cmath>
-#include <cassert>
-
 #include "Vec.h"
 #include "Quat.h"
 

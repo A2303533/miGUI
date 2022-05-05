@@ -39,11 +39,11 @@ namespace mgf
 		friend class Framework;
 		friend class Button;
 
-		mgIcons_s* m_icons = 0;
-		mgTexture* m_texture = 0;
+		mgIcons_s* m_icons;
+		mgTexture* m_texture;
 		mgPoint m_textureSize;
 
-		Backend* m_backend = 0;
+		Backend* m_backend;
 		std::vector<mgRect> m_rects;
 	public:
 		Icons(Backend*);

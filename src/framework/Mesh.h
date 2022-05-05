@@ -68,34 +68,33 @@ namespace mgf
 		mgf::v4i Bones;
 	};
 
-	// тип
-	// ещё надо будет добавить для анимированных моделей
-	enum class MeshVertexType : uint32_t
-	{
-		Null, // 0
-		GUI,
-		Triangle,
-		AnimatedTriangle,
-		Line,
-		AnimatedLine,
-		Point,
-		AnimatedPoint,
-	};
-
-	// предпологается что при создании MDL индекс будет устанавливаться автоматически, в зависимости от количества треугольников 
-	//  пока не протестировано. условие такое if (modelInds.size() / 3 > 21845) newModel->m_indexType = yyMeshIndexType::uint32_t; 
-	enum class MeshIndexType : uint32_t
-	{
-		_u16,
-		_u32
-	};
-
-
 	class Mesh
 	{
 	public:
 		Mesh();
 		~Mesh();
+
+		// тип
+		// ещё надо будет добавить для анимированных моделей
+		enum MeshVertexType
+		{
+			MeshVertexType_Null, // 0
+			MeshVertexType_GUI,
+			MeshVertexType_Triangle,
+			MeshVertexType_AnimatedTriangle,
+			MeshVertexType_Line,
+			MeshVertexType_AnimatedLine,
+			MeshVertexType_Point,
+			MeshVertexType_AnimatedPoint,
+		};
+
+		// предпологается что при создании MDL индекс будет устанавливаться автоматически, в зависимости от количества треугольников 
+		//  пока не протестировано. условие такое if (modelInds.size() / 3 > 21845) newModel->m_indexType = yyMeshIndexType::uint32_t; 
+		enum MeshIndexType
+		{
+			MeshIndexType_u16,
+			MeshIndexType_u32
+		};
 
 		void calculateTangents(mgf::v3f& normal, mgf::v3f& tangent, mgf::v3f& binormal,
 			const mgf::v3f& vt1, const mgf::v3f& vt2, const mgf::v3f& vt3, // vertices
@@ -107,15 +106,15 @@ namespace mgf
 
 		mgf::Aabb m_aabb;
 
-		uint8_t* m_vertices = nullptr;
-		uint8_t* m_indices = nullptr;
-		MeshIndexType m_indexType = MeshIndexType::_u16;
+		uint8_t* m_vertices;
+		uint8_t* m_indices;
+		MeshIndexType m_indexType;
 
-		uint32_t m_vCount = 0;
-		uint32_t m_iCount = 0;
-		uint32_t m_stride = 0;
+		uint32_t m_vCount;
+		uint32_t m_iCount;
+		uint32_t m_stride;
 
-		MeshVertexType m_vertexType = MeshVertexType::Triangle;
+		MeshVertexType m_vertexType;
 
 		mgf::StringA m_name;
 	};
