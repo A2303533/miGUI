@@ -30,8 +30,8 @@
 #ifndef _MGF_VEC_H_
 #define _MGF_VEC_H_
 
-#include "CRT/cmath.h"
-#include "CRT/cassert.h"
+#include <cmath>
+#include <cassert>
 
 namespace mgf
 {

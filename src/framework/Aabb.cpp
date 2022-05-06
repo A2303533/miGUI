@@ -29,8 +29,7 @@
 #include "framework/mgf.h"
 #include "framework/Aabb.h"
 
-//#include <float.h>
-#include "CRT/float.h"
+#include <float.h>
 
 using namespace mgf;
 

@@ -34,11 +34,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#if (_MSC_VER > 1500)
 #include <stdint.h>
-#else
-#include "CRT/stdint.h"
-#endif
+
 
 #if defined(WIN32) | defined(_WIN64) | defined(_WIN32)
 #define MG_PLATFORM_WINDOWS

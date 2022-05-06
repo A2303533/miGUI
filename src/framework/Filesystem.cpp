@@ -26,45 +26,61 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MG_FRAMEWORK_H_
-#define _MG_FRAMEWORK_H_
+#include "mgf.h"
+#include "Filesystem.h"
 
-#include "config.h"
-
-// VS: Zc:__cplusplus compiler option
-#if __cplusplus > 199711L
-#define MGF_NOEXCEPT noexcept
-#define MGF_CXX11_RVALUE_REFERENCES
-#else
-#define MGF_NOEXCEPT
+#ifdef _WIN32
+#include <Windows.h>
 #endif
 
-#ifdef _MSC_VER
-#define MGF_FORCEINLINE __forceinline
-#else
-#define MGF_FORCEINLINE inline
+using namespace mgf;
+
+filesystem::path& filesystem::path::assign(const char* str)
+{
+    m_string.clear();
+    std::mbstate_t state = std::mbstate_t();
+    std::size_t len = 1 + std::mbsrtowcs(0, &str, 0, &state);
+    std::vector<wchar_t> wstr(len);
+    std::mbsrtowcs(&wstr[0], &str, wstr.size(), &state);
+    m_string.append(&wstr[0]);
+    return *this;
+}
+
+bool filesystem::exists(const filesystem::path& p)
+{
+#ifdef _WIN32
+	unsigned int attr = GetFileAttributesW(p.c_str());
+	if (attr != INVALID_FILE_ATTRIBUTES)
+	{
+		return true;
+
+		//switch (attr)
+		//{
+		//default: return true;
+		//case FILE_ATTRIBUTE_DIRECTORY: return __CRT_EXST_DIR;
+		//}
+	}
 #endif
 
-#include "mgDefs.h"
-#include "mgForward.h"
-#include "mgPoint.h"
-#include "mgRect.h"
-#include "mgVec4.h"
-#include "mgColor.h"
-#include "mgFont.h"
-#include "mgImage.h"
-#include "mgTexture.h"
-#include "mgTexture.h"
-#include "mgStyle.h"
-#include "mgInputContex.h"
+    return false;
+}
 
-#include "framework/forward.h"
-#include "framework/BaseClass.h"
-#include "framework/Ptr.h"
-#include "framework/SystemWindow.h"
-#include "framework/Backend.h"
-#include "framework/Context.h"
-#include "framework/Framework.h"
+bool filesystem::is_regular_file(const path& p)
+{
+#ifdef _WIN32
+	unsigned int attr = GetFileAttributesW(p.c_str());
+	if (attr != INVALID_FILE_ATTRIBUTES)
+	{
+		return true;
 
+		switch (attr)
+		{
+		default: 
+			return true;
+		case FILE_ATTRIBUTE_DIRECTORY: return false;
+		}
+	}
 #endif
+
+	return false;
+}

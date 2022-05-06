@@ -55,7 +55,7 @@ m_isVisible(true)
 
 Window::~Window()
 {
-	mgf::Element** elements = &m_elements.front();
+	mgf::Element** elements = m_elements.data();
 	for (size_t i = 0, sz = m_elements.size(); i < sz; ++i)
 	{
 		delete(elements[i]);
@@ -401,7 +401,7 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 	mgPopup* newPopup = 0;
 	if (popupItems.size())
 	{
-		newPopup = mgCreatePopup(&popupItems.front(), popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
+		newPopup = mgCreatePopup(popupItems.data(), popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
 		newPopup->onIsItemEnabled = Window_onIsItemEnabled;
 		newPopup->onIsItemChecked = Window_onIsItemChecked;
 		newPopup->onIsItemRadio = Window_onIsItemRadio;

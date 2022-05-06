@@ -18,6 +18,16 @@ using namespace mgf;
 PFND3DCOMPILEPROC g_D3DCompile = 0;
 PFND3D11CREATEDEVICEPROC g_D3D11CreateDevice = 0;
 
+#define MGFD3D_DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
+        EXTERN_C const GUID DECLSPEC_SELECTANY name \
+                = { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
+
+MGFD3D_DEFINE_GUID(MGF_D3D_IID_IDXGIFactory, 0x7b7166ec, 0x21c7, 0x44ae, 0xb2, 0x1a, 0xc9, 0xae, 0x32, 0x1a, 0xe3, 0x69);
+MGFD3D_DEFINE_GUID(MGF_D3D_IID_IDXGIAdapter, 0x2411e7e1, 0x12ac, 0x4ccf, 0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0);
+MGFD3D_DEFINE_GUID(MGF_D3D_IID_IDXGIDevice, 0x54ec77fa, 0x1377, 0x44e6, 0x8c, 0x32, 0x88, 0xfd, 0x5f, 0x44, 0xc8, 0x4c);
+MGFD3D_DEFINE_GUID(MGF_D3D_IID_ID3D11Texture2D, 0x6f15aaf2, 0xd208, 0x4e89, 0x9a, 0xb4, 0x48, 0x95, 0x35, 0xd3, 0x4f, 0x9c);
+
+
 GSD3D11::GSD3D11()
 {
 }
@@ -117,21 +127,21 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 	IDXGIDevice* dxgiDevice = nullptr;
 	IDXGIAdapter* dxgiAdapter = nullptr;
 	IDXGIFactory1* dxgiFactory = nullptr;
-	hr = m_d3d11Device->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
+	hr = m_d3d11Device->QueryInterface(MGF_D3D_IID_IDXGIDevice, (void**)&dxgiDevice);
 	if (FAILED(hr))
 	{
 		LogWriteError("Can't QueryInterface : IID_IDXGIDevice");
 		return false;
 	}
 
-	hr = dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
+	hr = dxgiDevice->GetParent(MGF_D3D_IID_IDXGIAdapter, (void**)&dxgiAdapter);
 	if (FAILED(hr))
 	{
 		LogWriteError("Can't get DXGI adapter");
 		return false;
 	}
 
-	hr = dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
+	hr = dxgiAdapter->GetParent(MGF_D3D_IID_IDXGIFactory, (void**)&dxgiFactory);
 	if (FAILED(hr))
 	{
 		LogWriteError("Can't get DXGI factory");
@@ -655,7 +665,7 @@ bool GSD3D11::_createBackBuffer(uint32_t x, uint32_t y)
 	ID3D11Texture2D* BackBuffer = 0;
 	if (FAILED(m_SwapChain->GetBuffer(
 		0,
-		IID_ID3D11Texture2D,
+		MGF_D3D_IID_ID3D11Texture2D,
 		(void**)&BackBuffer)))
 	{
 		return false;

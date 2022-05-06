@@ -29,7 +29,7 @@
 #include "framework/mgf.h"
 #include "framework/Ray.h"
 
-#include "CRT/float.h"
+#include <float.h>
 
 using namespace mgf;
 

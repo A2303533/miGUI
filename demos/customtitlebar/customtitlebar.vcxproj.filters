@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="mgf">
+      <UniqueIdentifier>{4abde55b-ef9e-4489-ab06-9894df0d57a6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\framework\Popup.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Quat.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Ray.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Rectangle.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\SystemWindow.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Table.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Text.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\TextBuffer.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\TextInput.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Vec.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Window.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Aabb.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\AudioEngine.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\BackendD3D11.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\BackendGDI.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Button.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Context.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Element.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\FontImpl.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Framework.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\GS.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\GSD3D11.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\GSD3D11Mesh.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\GSD3D11Shader.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\GSD3D11ShaderScreenQuad.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\GSD3D11Texture.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Icons.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Image.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Image_bmp.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Image_png.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\ListBox.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\lodepng.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Log.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Mat.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Mesh.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Filesystem.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="WindowMain.cpp" />
+    <ClCompile Include="WindowMainMenu.cpp" />
+    <ClCompile Include="..\..\src\miGUILoader.c" />
+    <ClCompile Include="..\..\src\DirectXTK\Src\DDSTextureLoader.cpp">
+      <Filter>mgf</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="WindowMain.h" />
+    <ClInclude Include="WindowMainMenu.h" />
+  </ItemGroup>
+</Project>
