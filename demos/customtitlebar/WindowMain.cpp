@@ -66,6 +66,7 @@ void WindowMain::OnDrawCustomTitleBar()
 	if (!m_app->m_framework->m_run)
 		return;
 
+
 	auto& wsz = GetSize();
 
 	mgRect rect;

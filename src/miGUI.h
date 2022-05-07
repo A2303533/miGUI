@@ -126,7 +126,7 @@ typedef struct mgWindow_s* (*PFNMGCREATEWINDOWPROC)(struct mgContext_s*, int px,
 extern PFNMGCREATEWINDOWPROC mgCreateWindow;
 #endif
 
-#ifdef MG_NO_DLL
+#if defined(MG_NO_DLL)
 MG_API void MG_C_DECL mgDestroyWindow_f(struct mgWindow_s*);
 #define mgDestroyWindow mgDestroyWindow_f
 #else

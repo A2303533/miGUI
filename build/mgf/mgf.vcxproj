@@ -21,32 +21,32 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{0f78a05e-34ce-4be5-a1f5-011e3db1913f}</ProjectGuid>
-    <RootNamespace>customtitlebar</RootNamespace>
+    <ProjectGuid>{68cb463b-a35a-43f3-aea7-fd22a30e47b6}</ProjectGuid>
+    <RootNamespace>mgf</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -72,34 +72,33 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\bin32\</OutDir>
+    <OutDir>..\..\libs\vs\32\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\bin32\</OutDir>
+    <OutDir>..\..\libs\vs\32\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\bin64\</OutDir>
+    <OutDir>..\..\libs\vs\64\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\bin64\</OutDir>
+    <OutDir>..\..\libs\vs\64\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\</AdditionalIncludeDirectories>
-      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\libs\vs\32\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>mgf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\libs\vs\32\$(TargetName).lib</ImportLibrary>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,34 +107,32 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\</AdditionalIncludeDirectories>
-      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\libs\vs\32\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>mgf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\libs\vs\32\$(TargetName).lib</ImportLibrary>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\</AdditionalIncludeDirectories>
-      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\libs\vs\64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>mgf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\libs\vs\64\$(TargetName).lib</ImportLibrary>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,30 +141,71 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\</AdditionalIncludeDirectories>
-      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\libs\vs\64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>mgf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\libs\vs\64\$(TargetName).lib</ImportLibrary>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="WindowMain.h" />
-    <ClInclude Include="WindowMainMenu.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="WindowMain.cpp" />
-    <ClCompile Include="WindowMainMenu.cpp" />
+    <ClCompile Include="..\..\src\DirectXTK\Src\DDSTextureLoader.cpp" />
+    <ClCompile Include="..\..\src\framework\Aabb.cpp" />
+    <ClCompile Include="..\..\src\framework\AudioEngine.cpp" />
+    <ClCompile Include="..\..\src\framework\BackendD3D11.cpp" />
+    <ClCompile Include="..\..\src\framework\BackendGDI.cpp" />
+    <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp" />
+    <ClCompile Include="..\..\src\framework\Button.cpp" />
+    <ClCompile Include="..\..\src\framework\Context.cpp" />
+    <ClCompile Include="..\..\src\framework\Element.cpp" />
+    <ClCompile Include="..\..\src\framework\Filesystem.cpp" />
+    <ClCompile Include="..\..\src\framework\FontImpl.cpp" />
+    <ClCompile Include="..\..\src\framework\Framework.cpp" />
+    <ClCompile Include="..\..\src\framework\GS.cpp" />
+    <ClCompile Include="..\..\src\framework\GSD3D11.cpp" />
+    <ClCompile Include="..\..\src\framework\GSD3D11Mesh.cpp" />
+    <ClCompile Include="..\..\src\framework\GSD3D11Shader.cpp" />
+    <ClCompile Include="..\..\src\framework\GSD3D11ShaderScreenQuad.cpp" />
+    <ClCompile Include="..\..\src\framework\GSD3D11Texture.cpp" />
+    <ClCompile Include="..\..\src\framework\Icons.cpp" />
+    <ClCompile Include="..\..\src\framework\Image.cpp" />
+    <ClCompile Include="..\..\src\framework\Image_bmp.cpp" />
+    <ClCompile Include="..\..\src\framework\Image_png.cpp" />
+    <ClCompile Include="..\..\src\framework\ListBox.cpp" />
+    <ClCompile Include="..\..\src\framework\lodepng.cpp" />
+    <ClCompile Include="..\..\src\framework\Log.cpp" />
+    <ClCompile Include="..\..\src\framework\Mat.cpp" />
+    <ClCompile Include="..\..\src\framework\Mesh.cpp" />
+    <ClCompile Include="..\..\src\framework\Popup.cpp" />
+    <ClCompile Include="..\..\src\framework\Quat.cpp" />
+    <ClCompile Include="..\..\src\framework\Ray.cpp" />
+    <ClCompile Include="..\..\src\framework\Rectangle.cpp" />
+    <ClCompile Include="..\..\src\framework\SystemWindow.cpp" />
+    <ClCompile Include="..\..\src\framework\Table.cpp" />
+    <ClCompile Include="..\..\src\framework\Text.cpp" />
+    <ClCompile Include="..\..\src\framework\TextBuffer.cpp" />
+    <ClCompile Include="..\..\src\framework\TextInput.cpp" />
+    <ClCompile Include="..\..\src\framework\Vec.cpp" />
+    <ClCompile Include="..\..\src\framework\Window.cpp" />
+    <ClCompile Include="..\..\src\mgCursor.c" />
+    <ClCompile Include="..\..\src\mgDockPanel.c" />
+    <ClCompile Include="..\..\src\mgElementButton.c" />
+    <ClCompile Include="..\..\src\mgElementList.c" />
+    <ClCompile Include="..\..\src\mgElementRectangle.c" />
+    <ClCompile Include="..\..\src\mgElementTable.c" />
+    <ClCompile Include="..\..\src\mgElementText.c" />
+    <ClCompile Include="..\..\src\mgElementTextInput.c" />
+    <ClCompile Include="..\..\src\mgFont.c" />
+    <ClCompile Include="..\..\src\mgMenu.c" />
+    <ClCompile Include="..\..\src\mgPopup.c" />
+    <ClCompile Include="..\..\src\mgWindow.c" />
+    <ClCompile Include="..\..\src\miGUI.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

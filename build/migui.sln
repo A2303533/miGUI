@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "d3d11_demo", "d3d11_demo\d3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ap", "..\apps\ap\ap.vcxproj", "{0704375E-91DB-4E4A-9D76-4ED5AD0F41B5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mgf", "mgf\mgf.vcxproj", "{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{0704375E-91DB-4E4A-9D76-4ED5AD0F41B5}.Release|x64.Build.0 = Release|x64
 		{0704375E-91DB-4E4A-9D76-4ED5AD0F41B5}.Release|x86.ActiveCfg = Release|Win32
 		{0704375E-91DB-4E4A-9D76-4ED5AD0F41B5}.Release|x86.Build.0 = Release|Win32
+		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Debug|x64.ActiveCfg = Debug|x64
+		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Debug|x64.Build.0 = Debug|x64
+		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Debug|x86.ActiveCfg = Debug|Win32
+		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Debug|x86.Build.0 = Debug|Win32
+		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Release|x64.ActiveCfg = Release|x64
+		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Release|x64.Build.0 = Release|x64
+		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Release|x86.ActiveCfg = Release|Win32
+		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

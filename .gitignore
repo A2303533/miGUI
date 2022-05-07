@@ -48,3 +48,12 @@ build/CRT_test/Debug
 build/CRT_test/Release
 build/CRT_test/x64/Debug
 build/CRT_test/x64/Release
+demos/.vs
+demos/customtitlebar/.vs
+demos/customtitlebar/Debug
+demos/customtitlebar/Release
+demos/customtitlebar/x64/Debug
+demos/customtitlebar/x64/Release
+build/mgf/Debug
+build/mgf/Release
+libs/

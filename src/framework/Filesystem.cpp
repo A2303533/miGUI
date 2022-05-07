@@ -53,7 +53,6 @@ bool filesystem::exists(const filesystem::path& p)
 	if (attr != INVALID_FILE_ATTRIBUTES)
 	{
 		return true;
-
 		//switch (attr)
 		//{
 		//default: return true;

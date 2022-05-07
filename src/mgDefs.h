@@ -41,7 +41,11 @@
 #define MG_PLATFORM_WINDOWS
 #define MG_C_DECL _cdecl
 #ifdef MG_DLL
+#ifdef MG_NO_DLL
+#define MG_API 
+#else
 #define MG_API _declspec(dllexport) 
+#endif
 #else
 #ifdef MG_NO_DLL
 #define MG_API 
@@ -49,9 +53,12 @@
 #define MG_API _declspec(dllimport) 
 #endif
 #endif
+
 #else
 #error Please write code for other OS
 #endif
+
+
 
 #ifdef _DEBUG
 #define MG_DEBUG

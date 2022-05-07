@@ -46,6 +46,8 @@
 #define MGF_FORCEINLINE inline
 #endif
 
+// For static library ('mgf' project) use preprocessor: MG_NO_DLL
+
 #include "mgDefs.h"
 #include "mgForward.h"
 #include "mgPoint.h"
