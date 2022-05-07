@@ -1195,7 +1195,7 @@ mgSetWindowTitle_f(struct mgWindow_s* w, const wchar_t* t)
 	int newLen = 0;
 	if (t)
 	{
-		newLen = wcslen(t);
+		newLen = (int)wcslen(t);
 		w->titlebarText = t;
 	}
 	w->titlebarTextLen = newLen;

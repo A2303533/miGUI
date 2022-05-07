@@ -3,6 +3,12 @@
 
 #include <Windows.h>
 
+#ifdef MG_DEBUG
+#pragma comment(lib, "mgfd.lib")
+#else
+#pragma comment(lib, "mgf.lib")
+#endif
+
 int main()
 {
 	Application* app = 0;

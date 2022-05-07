@@ -116,7 +116,7 @@ mgCreateText_f(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgF
 	impl->color.a = 1.f;
 	impl->font = font;
 	impl->text = text;
-	impl->textLen = wcslen(text);
+	impl->textLen = (int)wcslen(text);
 
 	mgSetParent_f(newElement, 0);
 	miGUI_onRebuild_text(newElement);

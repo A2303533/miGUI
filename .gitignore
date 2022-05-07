@@ -57,3 +57,6 @@ demos/customtitlebar/x64/Release
 build/mgf/Debug
 build/mgf/Release
 libs/
+build/mgf/x64/Debug
+
+build/mgf/x64/Release

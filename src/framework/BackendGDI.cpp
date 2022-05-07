@@ -603,11 +603,11 @@ void BackendGDI::UpdateBackbuffer()
 void BackendGDI::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 {
 	SelectObject(m_window->m_hdcMem, font->implementation);
-	int c = wcslen(text);
+	size_t c = wcslen(text);
 	if (!c)
 		return;
 	SIZE s;
-	GetTextExtentPoint32W(m_window->m_hdcMem, text, c, &s);
+	GetTextExtentPoint32W(m_window->m_hdcMem, text, (int)c, &s);
 	sz->x = s.cx;
 	sz->y = s.cy;
 }

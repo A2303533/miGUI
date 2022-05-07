@@ -797,7 +797,7 @@ mgDraw_f(mgContext* c)
 					0,
 					&pt,
 					c->tooltipText,
-					textLen,
+					(int)textLen,
 					&c->activeStyle->tooltipText,
 					c->tooltipFont);
 			}

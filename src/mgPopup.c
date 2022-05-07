@@ -483,10 +483,10 @@ mgCreatePopup_f(struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt)
 	{
 		newPopup->items[i].info = arr[i];
 		if(newPopup->items[i].info.text)
-			newPopup->items[i].textLen = wcslen(newPopup->items[i].info.text);
+			newPopup->items[i].textLen = (int)wcslen(newPopup->items[i].info.text);
 
 		if (newPopup->items[i].info.shortcutText)
-			newPopup->items[i].shortcutTextLen = wcslen(newPopup->items[i].info.shortcutText);
+			newPopup->items[i].shortcutTextLen = (int)wcslen(newPopup->items[i].info.shortcutText);
 	}
 
 	return newPopup;

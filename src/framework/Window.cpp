@@ -401,7 +401,7 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 	mgPopup* newPopup = 0;
 	if (popupItems.size())
 	{
-		newPopup = mgCreatePopup(popupItems.data(), popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
+		newPopup = mgCreatePopup(popupItems.data(), (int)popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
 		newPopup->onIsItemEnabled = Window_onIsItemEnabled;
 		newPopup->onIsItemChecked = Window_onIsItemChecked;
 		newPopup->onIsItemRadio = Window_onIsItemRadio;

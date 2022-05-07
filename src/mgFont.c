@@ -85,7 +85,7 @@ WriteINT(int i, FILE* f)
 	char itoaBuf[20];
 	_itoa(i, itoaBuf, 10);
 	itoaBuf[19] = 0;
-	int sz = strlen(itoaBuf);
+	int sz = (int)strlen(itoaBuf);
 	for (int i = 0; i < sz; ++i)
 	{
 		wchar_t ch = itoaBuf[i];

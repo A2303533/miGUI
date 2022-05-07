@@ -171,12 +171,12 @@ Image* Framework::LoadImage(const char* imageFile)
 {
 	assert(imageFile);
 
-	int slen = strlen(imageFile);
+	size_t slen = strlen(imageFile);
 	if (!slen || slen > 1999)
 		return 0;
 
 	char buffer[2000];
-	for (int i = 0; i < slen; ++i)
+	for (size_t i = 0; i < slen; ++i)
 	{
 		buffer[i] = tolower(imageFile[i]);
 	}

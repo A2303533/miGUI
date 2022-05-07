@@ -53,7 +53,7 @@ mgCreateMenu_f(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, mgFo
 
 		if (newMenu->items[i].info.text)
 		{
-			newMenu->items[i].textLen = wcslen(newMenu->items[i].info.text);
+			newMenu->items[i].textLen = (int)wcslen(newMenu->items[i].info.text);
 
 			mgPoint tsz;
 			c->getTextSize(newMenu->items[i].info.text, f, &tsz);

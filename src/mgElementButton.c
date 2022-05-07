@@ -249,7 +249,7 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const w
 	
 	impl->font = font;
 	impl->text = text;
-	impl->textLen = wcslen(text);
+	impl->textLen = (int)wcslen(text);
 	
 	mgSetParent_f(newElement, 0);
 

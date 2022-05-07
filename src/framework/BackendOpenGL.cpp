@@ -537,7 +537,7 @@ void BackendOpenGL::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 {
 	sz->x = 0;
 	sz->y = 0;
-	int c = wcslen(text);
+	int c = (int)wcslen(text);
 	if (!c)
 		return;
 	for (int i = 0; i < c; ++i)

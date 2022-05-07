@@ -45,7 +45,7 @@ Image* mgf::Image_png(const char* fn)
 	unsigned int height = 0;
 	int bits = 0;
 	int pitch = 0;
-	int dataSize = 0;
+	size_t dataSize = 0;
 	unsigned char* data = 0;
 	
 	int type = mgImageType_r8g8b8a8;
@@ -82,7 +82,7 @@ Image* mgf::Image_png(const char* fn)
 	img = new Image;
 	img->m_image = (mgImage_s*)calloc(1, sizeof(mgImage_s));
 	img->m_image->data = data;
-	img->m_image->dataSize = dataSize;
+	img->m_image->dataSize = (uint32_t)dataSize;
 	img->m_image->width = width;
 	img->m_image->height = height;
 	img->m_image->bits = bits;

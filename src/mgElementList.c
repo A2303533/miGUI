@@ -345,7 +345,7 @@ miGUI_onDraw_list(mgElement* e)
 				e->window->context->gpu->drawText(mgDrawTextReason_listbox, impl,
 					&pos,
 					str,
-					wcslen(str),
+					(int)wcslen(str),
 					&style->listItemText,
 					impl->font);
 			}

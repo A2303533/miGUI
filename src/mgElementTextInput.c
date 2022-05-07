@@ -111,7 +111,7 @@ mgTextInput_paste(mgElement* e)
 		wchar_t* buffer = (wchar_t*)GlobalLock(hData);
 		if (buffer)
 		{
-			uint32_t len = wcslen(buffer);
+			uint32_t len = (uint32_t)wcslen(buffer);
 			if(len)
 				mgTextInputPutText_f(impl, buffer, len);
 		}
@@ -1156,7 +1156,7 @@ mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text)
 
 	if (text)
 	{
-		uint32_t len = wcslen(text);
+		uint32_t len = (uint32_t)wcslen(text);
 		if (len)
 		{
 			if (len > e->allocated)

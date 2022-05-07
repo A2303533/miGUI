@@ -65,7 +65,7 @@ void Text::SetText(const wchar_t* t)
 {
 	m_text.assign(t);
 	m_elementText->text = m_text.data();
-	m_elementText->textLen = m_text.size();
+	m_elementText->textLen = (int)m_text.size();
 }
 
 void Text::SetFont(Font* f)

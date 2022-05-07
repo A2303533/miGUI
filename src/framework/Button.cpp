@@ -66,7 +66,7 @@ void Button::SetText(const wchar_t* t)
 	m_elementButton->text = 0;
 	int slen = 0;
 	if (t)
-		slen = wcslen(t);
+		slen = (int)wcslen(t);
 
 	if (slen)
 	{
