@@ -65,7 +65,7 @@ namespace mgf
 		* For example it's for SetPixelFormat if it's OpenGL
 		*/
 		virtual void InitWindow(mgf::SystemWindow*) = 0;
-		virtual void SetActiveWindow(mgf::SystemWindow*) = 0;
+		virtual mgf::SystemWindow* SetCurrentWindow(mgf::SystemWindow*) = 0;
 		virtual void SetActiveContext(mgf::Context*) = 0;
 
 		/*
@@ -75,7 +75,7 @@ namespace mgf
 		virtual void UpdateBackbuffer() = 0;
 
 
-		virtual void BeginDraw() = 0;
+		virtual void BeginDraw(int reason) = 0;
 		virtual void EndDraw() = 0;
 
 		virtual mgTexture* CreateTexture(mgImage* img) = 0;

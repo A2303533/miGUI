@@ -13,6 +13,7 @@
 #include "framework/BackendD3D11.h"
 #include "framework/Log.h"
 
+
 using namespace mgf;
 
 PFND3DCOMPILEPROC g_D3DCompile = 0;

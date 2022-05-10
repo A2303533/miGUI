@@ -42,12 +42,6 @@
 using namespace mgf;
 
 Window::Window(Context* ctx)
-	:
-m_window(0),
-m_menu(0),
-m_menuFont(0),
-m_menuNodeCurr(0),
-m_isVisible(true)
 {
 	m_window = mgCreateWindow(ctx->m_gui_context, 0, 0, 300, 200);
 	m_window->titlebarFont = ((mgf::FontImpl*)ctx->GetBackend()->GetDefaultFont())->m_font;
@@ -306,9 +300,10 @@ void Window::SetMenuTextIndent(int val)
 		m_menu->textIndent = val;
 }
 
-void Window::UseMenu(bool v, Font* f)
+void Window::UseMenu(bool v, bool useSystemWindowForPopup, Font* f)
 {
 	m_menuFont = f;
+	m_useSystemWindowForPopup = useSystemWindowForPopup;
 
 	if (m_menu)
 		m_menu->font = ((FontImpl*)f)->m_font;
@@ -401,7 +396,13 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 	mgPopup* newPopup = 0;
 	if (popupItems.size())
 	{
-		newPopup = mgCreatePopup(popupItems.data(), (int)popupItems.size(), ((FontImpl*)m_menuFont)->m_font);
+		int flags = 0;
+		if (m_useSystemWindowForPopup)
+		{
+			flags |= mgPopupFlags_systemWindow;
+		}
+
+		newPopup = mgCreatePopup(popupItems.data(), (int)popupItems.size(), ((FontImpl*)m_menuFont)->m_font, flags);
 		newPopup->onIsItemEnabled = Window_onIsItemEnabled;
 		newPopup->onIsItemChecked = Window_onIsItemChecked;
 		newPopup->onIsItemRadio = Window_onIsItemRadio;
@@ -466,13 +467,13 @@ void Window::RebuildMenu()
 
 	delete[] mii;
 
-	UseMenu(true, m_menuFont);
+	UseMenu(true, m_useSystemWindowForPopup, m_menuFont);
 }
 
 
 void Window::DeleteMenu()
 {
-	UseMenu(false, m_menuFont);
+	UseMenu(false, m_useSystemWindowForPopup, m_menuFont);
 	if (m_menu)
 		mgDestroyMenu(m_menu);
 	m_menu = 0;

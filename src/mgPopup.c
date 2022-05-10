@@ -30,45 +30,163 @@
 #include "mgFunctions.h"
 
 #include <wchar.h>
+#include <stdio.h>
+
+#ifdef MG_PLATFORM_WINDOWS
+#include <Windows.h>
+LRESULT CALLBACK PopupWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_MOUSEACTIVATE:
+		return MA_NOACTIVATE;
+	}
+	return DefWindowProc(hWnd, message, wParam, lParam);
+}
+#else
+#endif
+
+struct mgPopupSystemWindow
+{
+	struct mgSystemWindowOSData systemWindowData;
+};
+
+void
+mgPopupDestroySystemWindow(mgPopup* p)
+{
+	free(p->systemWindowImplementation);
+}
+
+void
+mgPopupInitSystemWindow(struct mgContext_s* c, mgPopup* p)
+{
+	int success = 0;
+	struct mgPopupSystemWindow* systemWindow = malloc(sizeof(struct mgPopupSystemWindow));
+
+#ifdef MG_PLATFORM_WINDOWS
+	static int isClassnameRegistered = 0;
+	static WNDCLASSEXW wcex;
+	if (!isClassnameRegistered)
+	{
+		memset(&wcex, 0, sizeof(WNDCLASSEXW));
+		wcex.cbSize = sizeof(WNDCLASSEX);
+		wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DROPSHADOW;
+		wcex.lpfnWndProc = PopupWndProc;
+		wcex.hInstance = GetModuleHandle(0);
+		wcex.hCursor = LoadCursor(0, IDC_ARROW);
+		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+		wcex.lpszClassName = L"popup_window";
+		RegisterClassExW(&wcex);
+		isClassnameRegistered = 1;
+	}
+
+	systemWindow->systemWindowData.hWnd = CreateWindowExW(
+		WS_EX_NOACTIVATE | WS_EX_WINDOWEDGE,
+		wcex.lpszClassName, L"pp",
+		WS_POPUP | WS_CHILD | WS_BORDER,
+		0,0, 10, 10, c->systemWindowData.hWnd, 0, wcex.hInstance, 0);
+
+	//ShowWindow(systemWindow->hwnd, SW_SHOWNOACTIVATE);
+	success = 1;
+#else
+#endif
+
+	if (success)
+	{
+		p->systemWindowImplementation = systemWindow;
+	}
+}
 
 void
 mgPopupFixPosition(struct mgContext_s* c, mgPopup* p)
 {
-	if (p->rect.right > c->windowSize.x)
+	if ((p->flags & mgPopupFlags_systemWindow) && p->systemWindowImplementation)
 	{
-		int v = p->rect.right - c->windowSize.x;
-		p->rect.left -= v;
-		p->rect.right -= v;
-	}
+#ifdef MG_PLATFORM_WINDOWS
+		RECT desktopRect;
+		GetWindowRect(GetDesktopWindow(), &desktopRect);
+		
+		struct mgPopupSystemWindow* ptr = p->systemWindowImplementation;
+		
+		RECT popupRect;
+		GetWindowRect(ptr->systemWindowData.hWnd, &popupRect);
 
-	if (p->rect.bottom > c->windowSize.y)
-	{
-		int v = p->rect.bottom - c->windowSize.y;
-		p->rect.top -= v;
-		p->rect.bottom -= v;
-	}
-
-	if (p->parent)
-	{
-		mgRect oldRect = p->rect;
-
-		if ((p->rect.left < p->parent->rect.right)
-			&& (p->rect.left > p->parent->rect.left))
+		if (popupRect.right > desktopRect.right)
 		{
-			int v = p->rect.left - p->parent->rect.left;
-			v += p->rect.right - p->rect.left;
+			int v = popupRect.right - desktopRect.right;
+
+			MoveWindow(ptr->systemWindowData.hWnd,
+				popupRect.left - v,
+				popupRect.top,
+				popupRect.right - popupRect.left,
+				popupRect.bottom - popupRect.top,
+				TRUE);
+
 			p->rect.left -= v;
 			p->rect.right -= v;
+		}
 
-			/*if rect outside of the window from left border*/
-			/*move to old rect and move little bit to the left*/
-			if (p->rect.left < 0)
+		int iTaskBarHeight = 0;
+		int iYScreenSize = 0;
+		RECT rWorkArea;
+		iYScreenSize = GetSystemMetrics(SM_CYSCREEN);
+		SystemParametersInfo(SPI_GETWORKAREA, 0, (PVOID)&rWorkArea, 0);
+		iTaskBarHeight = iYScreenSize - (rWorkArea.bottom - rWorkArea.top);
+
+		if (popupRect.bottom > (desktopRect.bottom + iTaskBarHeight))
+		{
+			int v = popupRect.bottom - desktopRect.bottom + iTaskBarHeight;
+
+			MoveWindow(ptr->systemWindowData.hWnd,
+				popupRect.left,
+				popupRect.top - v,
+				popupRect.right - popupRect.left,
+				popupRect.bottom - popupRect.top,
+				TRUE);
+
+			p->rect.top -= v;
+			p->rect.bottom -= v;
+		}
+#endif
+	}
+	else
+	{
+		if (p->rect.right > c->windowSize.x)
+		{
+			int v = p->rect.right - c->windowSize.x;
+			p->rect.left -= v;
+			p->rect.right -= v;
+		}
+
+		if (p->rect.bottom > c->windowSize.y)
+		{
+			int v = p->rect.bottom - c->windowSize.y;
+			p->rect.top -= v;
+			p->rect.bottom -= v;
+		}
+
+		if (p->parent)
+		{
+			mgRect oldRect = p->rect;
+
+			if ((p->rect.left < p->parent->rect.right)
+				&& (p->rect.left > p->parent->rect.left))
 			{
-				p->rect = oldRect;
-				
-				int v = p->rect.right - c->windowSize.x;
+				int v = p->rect.left - p->parent->rect.left;
+				v += p->rect.right - p->rect.left;
 				p->rect.left -= v;
 				p->rect.right -= v;
+
+				/*if rect outside of the window from left border*/
+				/*move to old rect and move little bit to the left*/
+				if (p->rect.left < 0)
+				{
+					p->rect = oldRect;
+
+					int v = p->rect.right - c->windowSize.x;
+					p->rect.left -= v;
+					p->rect.right -= v;
+				}
 			}
 		}
 	}
@@ -78,6 +196,16 @@ void
 mgPopupHideSub(struct mgPopup_s* p)
 {
 	p->subVisible = 0;
+	if (p->flags & mgPopupFlags_systemWindow)
+	{
+		if (p->systemWindowImplementation)
+		{
+#ifdef MG_PLATFORM_WINDOWS
+			struct mgPopupSystemWindow* ptr = p->systemWindowImplementation;
+			ShowWindow(ptr->systemWindowData.hWnd, SW_HIDE);
+#endif
+		}
+	}
 
 	for (int i = 0; i < p->itemsSize; ++i)
 	{
@@ -164,6 +292,36 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 			p->rect.right = p->rect.left + 20;
 			p->rect.bottom = p->rect.top + 20;
 		}
+
+		if (p->flags & mgPopupFlags_systemWindow)
+		{
+			if (p->systemWindowImplementation)
+			{
+				struct mgPopupSystemWindow* ptr = p->systemWindowImplementation;
+#ifdef MG_PLATFORM_WINDOWS
+				RECT rct;
+				GetWindowRect(c->systemWindowData.hWnd, &rct);
+
+				POINT pt;
+				pt.x = p->rect.left;
+				pt.y = p->rect.top;
+				ClientToScreen(c->systemWindowData.hWnd, &pt);
+
+				ptr->systemWindowData.size.x = p->rect.right - p->rect.left;
+				ptr->systemWindowData.size.y = p->rect.bottom - p->rect.top;
+
+				MoveWindow(ptr->systemWindowData.hWnd,
+					pt.x,
+					pt.y,
+					ptr->systemWindowData.size.x,
+					ptr->systemWindowData.size.y,
+					TRUE);
+				struct mgSystemWindowOSData* old = c->gpu->setCurrentWindow(&ptr->systemWindowData);
+				c->gpu->updateBackBuffer();
+				c->gpu->setCurrentWindow(old);
+#endif
+			}
+		}
 	}
 }
 
@@ -171,28 +329,49 @@ MG_API
 void MG_C_DECL
 mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 {
+	mgRect popupRect = p->rect;
+	struct mgSystemWindowOSData* oldWindow = 0;
+
+	int isSystemPopup = 0;
+
+	if ((p->flags & mgPopupFlags_systemWindow) && p->systemWindowImplementation)
+	{
+		struct mgPopupSystemWindow* ptr = p->systemWindowImplementation;
+		oldWindow = c->gpu->setCurrentWindow(&ptr->systemWindowData);
+		isSystemPopup = 1;
+
+		popupRect.left = 0;
+		popupRect.top = 0;
+		popupRect.right = ptr->systemWindowData.size.x;
+		popupRect.bottom = ptr->systemWindowData.size.y;
+
+		c->gpu->setClipRect(&popupRect);
+		c->gpu->beginDraw(mgBeginDrawReason_popupWindow);
+	}
+
+
 	mgStyle* style = p->userStyle ? p->userStyle : c->activeStyle;
 	
-	c->gpu->setClipRect(&p->rect);
+	c->gpu->setClipRect(&popupRect);
 	c->gpu->drawRectangle(mgDrawRectangleReason_popupBG, 
 		p,
-		&p->rect,
+		&popupRect,
 		&style->popupBG,
 		&style->popupBG,
 		0, 0);
 
 	mgPoint pt;
 	mgPoint pt2;
-	pt.x = p->rect.left + p->indent.x + p->iconLeftWidth;
-	pt.y = p->rect.top + p->indent.y;
+	pt.x = popupRect.left + p->indent.x + p->iconLeftWidth;
+	pt.y = popupRect.top + p->indent.y;
 	for (int i = 0; i < p->itemsSize; ++i)
 	{
 		if (p->items[i].info.type == mgPopupItemType_separator)
 		{
 			mgRect r;
-			r.left = p->rect.left;
+			r.left = popupRect.left;
 			r.top = pt.y;
-			r.right = p->rect.right;
+			r.right = popupRect.right;
 			r.bottom = r.top + 5;
 			c->gpu->drawRectangle(mgDrawRectangleReason_popupSeparator,
 				p,
@@ -211,9 +390,22 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 
 			if (&p->items[i] == p->nodeUnderCursor)
 			{
+				mgRect nodeRect = p->nodeUnderCursorRect;
+				if (isSystemPopup)
+				{
+					nodeRect.right -= p->rect.left;
+					nodeRect.left -= p->rect.left;
+					nodeRect.bottom -= p->rect.top;
+					nodeRect.top -= p->rect.top;
+
+					/*nodeRect.left = popupRect.left;
+					nodeRect.right = popupRect.right;
+					nodeRect.top = */
+				}
+
 				c->gpu->drawRectangle(mgDrawRectangleReason_popupHoverElement,
 					p,
-					&p->nodeUnderCursorRect,
+					&nodeRect,
 					&style->popupHoverElementBG,
 					&style->popupHoverElementBG,
 					0, 0);
@@ -256,8 +448,8 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 				c->currentIcon = &iconGroup->icons->iconNodes[iconID];
 
 				mgRect r;
-				r.left = p->rect.right - iconGroup->icons->iconNodes[iconID].sz.x;
-				r.right = p->rect.right;
+				r.left = popupRect.right - iconGroup->icons->iconNodes[iconID].sz.x;
+				r.right = popupRect.right;
 				r.top = pt.y;
 				r.bottom = pt.y + 11;
 				
@@ -314,7 +506,7 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 					c->currentIcon = &icons->iconNodes[iconID];
 
 					mgRect r;
-					r.left = p->rect.left + p->indent.x;
+					r.left = popupRect.left + p->indent.x;
 					r.right = r.left + icons->iconNodes[iconID].sz.x;
 					r.top = pt.y;
 					r.bottom = r.top + icons->iconNodes[iconID].sz.y;
@@ -330,6 +522,12 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 
 			pt.y += p->itemHeight;
 		}
+	}
+
+	if (oldWindow)
+	{
+		c->gpu->endDraw();
+		c->gpu->setCurrentWindow(oldWindow);
 	}
 
 	for (int i = 0; i < p->itemsSize; ++i)
@@ -384,10 +582,18 @@ _mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 							mgPoint pt2;
 							pt2.x = r.right - p->indent.x;
 							pt2.y = r.top - p->indent.y;
+
 							mgPopupSetPosition(c, p->items[i].info.subMenu, &pt2);
 
 							mgPopupFixPosition(c, p->items[i].info.subMenu);
 							p->items[i].info.subMenu->subVisible = 1;
+
+							if (p->items[i].info.subMenu->flags & mgPopupFlags_systemWindow)
+							{
+								struct mgPopupSystemWindow* ptr = p->items[i].info.subMenu->systemWindowImplementation;
+								ShowWindow(ptr->systemWindowData.hWnd, SW_SHOWNOACTIVATE);
+							}
+						//	mgShowPopup_f(c, p->items[i].info.subMenu, &pt2);
 						}
 						else
 						{
@@ -433,7 +639,6 @@ mgUpdatePopup_internal(struct mgContext_s* c, mgPopup* p)
 	}
 	mgPopupFixPosition(c, p);
 
-
 	if (mgPointInRect(&p->rect, &c->input->mousePosition))
 	{
 		if (!c->popupUnderCursor)
@@ -463,7 +668,7 @@ mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 
 MG_API
 struct mgPopup_s* MG_C_DECL
-mgCreatePopup_f(struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt)
+mgCreatePopup_f(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt, int flags)
 {
 	assert(arr);
 	assert(arrSize>0);
@@ -478,7 +683,8 @@ mgCreatePopup_f(struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt)
 	newPopup->textShortcutTextIndent = 20;
 	newPopup->iconRightWidth = 16;
 	newPopup->iconLeftWidth = 18;
-
+	newPopup->flags = flags;
+	
 	for (int i = 0; i < arrSize; ++i)
 	{
 		newPopup->items[i].info = arr[i];
@@ -487,6 +693,16 @@ mgCreatePopup_f(struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt)
 
 		if (newPopup->items[i].info.shortcutText)
 			newPopup->items[i].shortcutTextLen = (int)wcslen(newPopup->items[i].info.shortcutText);
+	}
+
+	if (newPopup->flags & mgPopupFlags_systemWindow)
+	{
+		mgPopupInitSystemWindow(c, newPopup);
+		for (int i = 0; i < newPopup->itemsSize; ++i)
+		{
+			if (newPopup->items[i].info.subMenu && newPopup->systemWindowImplementation)
+				mgPopupInitSystemWindow(c, newPopup->items[i].info.subMenu);
+		}
 	}
 
 	return newPopup;
@@ -499,6 +715,9 @@ mgDestroyPopup_f(struct mgPopup_s* p)
 	assert(p);
 	if (p)
 	{
+		if (p->systemWindowImplementation)
+			mgPopupDestroySystemWindow(p);
+
 		if (p->items)
 			free(p->items);
 		free(p);
@@ -510,13 +729,69 @@ void MG_C_DECL
 mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 {
 	assert(c);
+	
+	if (!p && c->activePopup)
+	{
+#ifdef MG_PLATFORM_WINDOWS
+		if ((c->activePopup->flags & mgPopupFlags_systemWindow) && c->activePopup->systemWindowImplementation)
+		{
+			struct mgPopupSystemWindow* ptr = c->activePopup->systemWindowImplementation;
+			ShowWindow(ptr->systemWindowData.hWnd, SW_HIDE);
+		}
+
+		for (int i = 0; i < c->activePopup->itemsSize; ++i)
+		{
+			if (c->activePopup->items[i].info.subMenu)
+				mgPopupHideSub(c->activePopup->items[i].info.subMenu);
+		}
+#endif
+	}
+
 	c->activePopup = p;
 
 	if (!p)
+	{
 		return;
+	}
 
 	if (p->onShow)
 		p->onShow(c, p);
+
+	if (p->flags & mgPopupFlags_systemWindow)
+	{
+		if (p->flags & mgPopupFlags_systemWindow)
+		{
+			/*if (!p->systemWindowImplementation)
+			{
+				mgPopupInitSystemWindow(c, p);
+				for (int i = 0; i < p->itemsSize; ++i)
+				{
+					if (p->items[i].info.subMenu && p->systemWindowImplementation)
+						mgPopupInitSystemWindow(c, p->items[i].info.subMenu);
+				}
+			}*/
+
+			for (int i = 0; i < p->itemsSize; ++i)
+			{
+				// If mgPopup with system window popup:
+				// p->items[i].info.subMenu is child for p
+				if (p->items[i].info.subMenu && p->systemWindowImplementation)
+				{
+#ifdef MG_PLATFORM_WINDOWS
+					struct mgPopupSystemWindow* parent_ptr = p->systemWindowImplementation;
+					struct mgPopupSystemWindow* child_ptr = p->items[i].info.subMenu->systemWindowImplementation;
+
+					//SetParent(child_ptr->systemWindowData.hWnd, parent_ptr->systemWindowData.hWnd);
+#endif
+				}
+			}
+		}
+
+#ifdef MG_PLATFORM_WINDOWS
+		struct mgPopupSystemWindow* ptr = p->systemWindowImplementation;
+		ShowWindow(ptr->systemWindowData.hWnd, SW_SHOWNOACTIVATE);
+#endif
+	}
 
 	for (int i = 0; i < p->itemsSize; ++i)
 	{

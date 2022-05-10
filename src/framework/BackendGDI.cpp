@@ -70,9 +70,9 @@ void BackendGDI_destroyTexture(mgTexture* t)
 	g_backend->DestroyTexture(t);
 }
 
-void BackendGDI_beginDraw()
+void BackendGDI_beginDraw(int reason)
 {
-	g_backend->BeginDraw();
+	g_backend->BeginDraw(reason);
 }
 
 void BackendGDI_endDraw()
@@ -120,17 +120,13 @@ mgRect BackendGDI_setClipRect(mgRect* r)
 	return g_backend->SetClipRect(r);
 }
 
+mgSystemWindowOSData* BackendGDI_setCurrentWindow(mgSystemWindowOSData* data)
+{
+	mgf::SystemWindow* w = g_backend->SetCurrentWindow((mgf::SystemWindow*)data->userData);
+	return w->GetOSData();
+}
+
 BackendGDI::BackendGDI()
-:
-m_window(0),
-m_context(0),
-m_gpu(0),
-m_gdiplusStartupInput(0),
-m_gdiplusToken(0),
-m_defaultIcons(0),
-m_defaultFont(0),
-blackImage(0),
-blackBitmap(0)
 {
 	GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
 
@@ -198,29 +194,29 @@ void* BackendGDI::GetVideoDriverAPI()
 	return m_gpu;
 }
 
-void BackendGDI::BeginDraw()
+void BackendGDI::BeginDraw(int reason)
 {
-	m_window->m_hbmOld = (HBITMAP)SelectObject(m_window->m_hdcMem, m_window->m_hbmMem);
+	m_currWindow->m_OSData.hbmOld = (HBITMAP)SelectObject(m_currWindow->m_OSData.hdcMem, m_currWindow->m_OSData.hbmMem);
 	RECT r;
 	r.left = 0;
 	r.top = 0;
-	r.right = m_window->m_size.x;
-	r.bottom = m_window->m_size.y;
-	FillRect(m_window->m_hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
+	r.right = m_currWindow->m_OSData.size.x;
+	r.bottom = m_currWindow->m_OSData.size.y;
+	FillRect(m_currWindow->m_OSData.hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
 }
 
 void BackendGDI::EndDraw()
 {
-	HDC dc = GetWindowDC(m_window->m_hWnd);
+	HDC dc = GetWindowDC(m_currWindow->m_OSData.hWnd);
 	BitBlt(dc,
-		m_window->m_borderSize.x + m_endDrawIndent.x,
-		m_window->m_borderSize.y + m_endDrawIndent.y,
-		m_window->m_size.x,
-		m_window->m_size.y,
-		m_window->m_hdcMem,
+		m_currWindow->m_borderSize.x + m_endDrawIndent.x,
+		m_currWindow->m_borderSize.y + m_endDrawIndent.y,
+		m_currWindow->m_size.x,
+		m_currWindow->m_size.y,
+		m_currWindow->m_OSData.hdcMem,
 		0, 0,
 		SRCCOPY);
-	ReleaseDC(m_window->m_hWnd, dc);
+	ReleaseDC(m_currWindow->m_OSData.hWnd, dc);
 }
 
 mgTexture* BackendGDI::CreateTexture(mgImage* img)
@@ -280,7 +276,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	unsigned int c1 = mgColorGetAsIntegerARGB(color1);
 	unsigned int c2 = mgColorGetAsIntegerARGB(color2);
 	HBRUSH brsh = CreateSolidBrush(RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
-	SelectObject(m_window->m_hdcMem, brsh);
+	SelectObject(m_currWindow->m_OSData.hdcMem, brsh);
 
 
 	RECT r;
@@ -307,8 +303,8 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			m_clipRect.top,
 			m_clipRect.right,
 			m_clipRect.bottom);
-		SelectClipRgn(m_window->m_hdcMem, rgn);
-		FillRect(m_window->m_hdcMem, &r, brsh);
+		SelectClipRgn(m_currWindow->m_OSData.hdcMem, rgn);
+		FillRect(m_currWindow->m_OSData.hdcMem, &r, brsh);
 	}break;
 	case mgDrawRectangleReason_listItemBG1:
 	case mgDrawRectangleReason_listItemBG2:
@@ -321,11 +317,11 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			m_clipRect.top,
 			m_clipRect.right,
 			m_clipRect.bottom);
-		SelectClipRgn(m_window->m_hdcMem, rgn);
-		MoveToEx(m_window->m_hdcMem, r.right - 1, r.top, 0);
+		SelectClipRgn(m_currWindow->m_OSData.hdcMem, rgn);
+		MoveToEx(m_currWindow->m_OSData.hdcMem, r.right - 1, r.top, 0);
 		HPEN p = CreatePen(0, 2, RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
-		SelectObject(m_window->m_hdcMem, p);
-		LineTo(m_window->m_hdcMem, r.right - 1, r.bottom);
+		SelectObject(m_currWindow->m_OSData.hdcMem, p);
+		LineTo(m_currWindow->m_OSData.hdcMem, r.right - 1, r.bottom);
 		DeleteObject(p);
 	}break;
 	case mgDrawRectangleReason_tableRowBG1:
@@ -336,11 +332,11 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			m_clipRect.top,
 			m_clipRect.right,
 			m_clipRect.bottom);
-		SelectClipRgn(m_window->m_hdcMem, rgn);
-		MoveToEx(m_window->m_hdcMem, r.left, r.bottom, 0);
+		SelectClipRgn(m_currWindow->m_OSData.hdcMem, rgn);
+		MoveToEx(m_currWindow->m_OSData.hdcMem, r.left, r.bottom, 0);
 		HPEN p = CreatePen(0, 2, RGB(c1 & 0xff, (c1 & 0xff00) >> 8, (c1 & 0xff0000) >> 16));
-		SelectObject(m_window->m_hdcMem, p);
-		LineTo(m_window->m_hdcMem, r.right, r.bottom);
+		SelectObject(m_currWindow->m_OSData.hdcMem, p);
+		LineTo(m_currWindow->m_OSData.hdcMem, r.right, r.bottom);
 		DeleteObject(p);
 	}break;
 	case mgDrawRectangleReason_popupBG:
@@ -370,7 +366,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			Gdiplus::Bitmap* outputBitmapBlurAndBrt = NULL;
 			Gdiplus::Bitmap::ApplyEffect(&outputBitmapBlur, 1, &brt, &rectOfInterest, 0, &outputBitmapBlurAndBrt);
 
-			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
+			Gdiplus::Graphics graphics(m_currWindow->m_OSData.hdcMem);
 			Gdiplus::Status status = graphics.DrawImage(outputBitmapBlurAndBrt, gdirct,
 				-1, -1, 21, 21, Gdiplus::UnitPixel);
 			delete outputBitmapBlur;
@@ -383,17 +379,17 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 				m_clipRect.top,
 				m_clipRect.right,
 				m_clipRect.bottom);
-			SelectClipRgn(m_window->m_hdcMem, rgn);
-		FillRect(m_window->m_hdcMem, &r, brsh);
+			SelectClipRgn(m_currWindow->m_OSData.hdcMem, rgn);
+		FillRect(m_currWindow->m_OSData.hdcMem, &r, brsh);
 
 		if (reason == mgDrawRectangleReason_popupBG)
 		{
 			HPEN p = CreatePen(0, 3, 0xf4f4f4);
-			SelectObject(m_window->m_hdcMem, p);
-			MoveToEx(m_window->m_hdcMem, r.left, r.top, 0);
-			LineTo(m_window->m_hdcMem, r.right, r.top);
-			MoveToEx(m_window->m_hdcMem, r.left, r.top, 0);
-			LineTo(m_window->m_hdcMem, r.left, r.bottom);
+			SelectObject(m_currWindow->m_OSData.hdcMem, p);
+			MoveToEx(m_currWindow->m_OSData.hdcMem, r.left, r.top, 0);
+			LineTo(m_currWindow->m_OSData.hdcMem, r.right, r.top);
+			MoveToEx(m_currWindow->m_OSData.hdcMem, r.left, r.top, 0);
+			LineTo(m_currWindow->m_OSData.hdcMem, r.left, r.bottom);
 			DeleteObject(p);
 		}
 	}break;
@@ -411,7 +407,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			gdirct.Width = rct->right - rct->left;
 			gdirct.Height = rct->bottom - rct->top;
 			
-			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
+			Gdiplus::Graphics graphics(m_currWindow->m_OSData.hdcMem);
 
 			{
 				Gdiplus::Bitmap* bmp = (Gdiplus::Bitmap*)texture->implementation;
@@ -457,7 +453,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			gdirct.Width = rct->right - rct->left;
 			gdirct.Height = rct->bottom - rct->top;
 
-			Gdiplus::Graphics graphics(this->m_window->m_hdcMem);
+			Gdiplus::Graphics graphics(m_currWindow->m_OSData.hdcMem);
 
 			{
 				Gdiplus::Bitmap* bmp = (Gdiplus::Bitmap*)texture->implementation;
@@ -488,7 +484,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 
 		rgn = CreateRoundRectRgn(r.left, r.top, r.right + 1, roundRectBtm, 7, 7);
 
-		SelectClipRgn(m_window->m_hdcMem, rgn);
+		SelectClipRgn(m_currWindow->m_OSData.hdcMem, rgn);
 		{
 			TRIVERTEX vertex[2];
 			vertex[0].x = r.left;
@@ -508,22 +504,22 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			GRADIENT_RECT gRect;
 			gRect.UpperLeft = 0;
 			gRect.LowerRight = 1;
-			GradientFill(m_window->m_hdcMem, vertex, 2, &gRect, 1, GRADIENT_FILL_RECT_V);
+			GradientFill(m_currWindow->m_OSData.hdcMem, vertex, 2, &gRect, 1, GRADIENT_FILL_RECT_V);
 		}
 	}break;
 	}
 
 	DeleteObject(rgn);
 	DeleteObject(brsh);
-	SelectClipRgn(m_window->m_hdcMem, 0);
+	SelectClipRgn(m_currWindow->m_OSData.hdcMem, 0);
 }
 
 void BackendGDI::DrawText(int reason, void* object, mgPoint* position, const wchar_t* text, int textLen,
 	mgColor* color, mgFont* font)
 {
-	SelectObject(m_window->m_hdcMem, font->implementation);
-	SetTextColor(m_window->m_hdcMem, mgColorGetAsIntegerBGR(color));
-	SetBkMode(m_window->m_hdcMem, TRANSPARENT);
+	SelectObject(m_currWindow->m_OSData.hdcMem, font->implementation);
+	SetTextColor(m_currWindow->m_OSData.hdcMem, mgColorGetAsIntegerBGR(color));
+	SetBkMode(m_currWindow->m_OSData.hdcMem, TRANSPARENT);
 
 	HRGN rgn = CreateRectRgn(
 		m_clipRect.left,
@@ -531,13 +527,13 @@ void BackendGDI::DrawText(int reason, void* object, mgPoint* position, const wch
 		m_clipRect.right,
 		m_clipRect.bottom);
 
-	SelectClipRgn(m_window->m_hdcMem, rgn);
-	TextOutW(m_window->m_hdcMem, 
+	SelectClipRgn(m_currWindow->m_OSData.hdcMem, rgn);
+	TextOutW(m_currWindow->m_OSData.hdcMem,
 		position->x, 
 		position->y, 
 		text, textLen);
 	DeleteObject(rgn);
-	SelectClipRgn(m_window->m_hdcMem, 0);
+	SelectClipRgn(m_currWindow->m_OSData.hdcMem, 0);
 }
 
 void BackendGDI::DrawLine(
@@ -548,7 +544,7 @@ void BackendGDI::DrawLine(
 	mgColor* color,
 	int size)
 {
-	Gdiplus::Graphics graphics(m_window->m_hdcMem);
+	Gdiplus::Graphics graphics(m_currWindow->m_OSData.hdcMem);
 	Gdiplus::Pen      pen(Gdiplus::Color(255, 0, 0, 255));
 	graphics.DrawLine(&pen, 0, 0, 200, 100);
 }
@@ -561,28 +557,30 @@ mgRect BackendGDI::SetClipRect(mgRect* r)
 }
 
 
-void BackendGDI::_createBackbuffer(mgf::SystemWindow* impl)
+void BackendGDI::_createBackbuffer()
 {
-	HDC dc = GetWindowDC(impl->m_hWnd);
-	impl->m_hdcMem = CreateCompatibleDC(dc);
+	HDC dc = GetWindowDC(m_currWindow->m_OSData.hWnd);
+	m_currWindow->m_OSData.hdcMem = CreateCompatibleDC(dc);
 	RECT r;
-	GetWindowRect(impl->m_hWnd, &r);
-	impl->m_hbmMem = CreateCompatibleBitmap(dc,
+	GetWindowRect(m_currWindow->m_OSData.hWnd, &r);
+	m_currWindow->m_OSData.hbmMem = CreateCompatibleBitmap(dc,
 		r.right - r.left,
 		r.bottom - r.top);
-	ReleaseDC(impl->m_hWnd, dc);
+	ReleaseDC(m_currWindow->m_OSData.hWnd, dc);
 }
 
 void BackendGDI::InitWindow(mgf::SystemWindow* w)
 {
-	if (m_window->m_hdcMem)
+	if (m_currWindow->m_OSData.hdcMem)
 		return;
-	_createBackbuffer(m_window);
+	_createBackbuffer();
 }
 
-void BackendGDI::SetActiveWindow(mgf::SystemWindow* w)
+mgf::SystemWindow* BackendGDI::SetCurrentWindow(mgf::SystemWindow* w)
 {
-	m_window = w;
+	mgf::SystemWindow* prev = m_currWindow;
+	m_currWindow = w;
+	return prev;
 }
 
 void BackendGDI::SetActiveContext(mgf::Context* c)
@@ -592,22 +590,22 @@ void BackendGDI::SetActiveContext(mgf::Context* c)
 
 void BackendGDI::UpdateBackbuffer()
 {
-	if (m_window->m_hdcMem)
-		DeleteDC(m_window->m_hdcMem);
-	if (m_window->m_hbmMem)
-		DeleteObject(m_window->m_hbmMem);
+	if (m_currWindow->m_OSData.hdcMem)
+		DeleteDC(m_currWindow->m_OSData.hdcMem);
+	if (m_currWindow->m_OSData.hbmMem)
+		DeleteObject(m_currWindow->m_OSData.hbmMem);
 	
-	_createBackbuffer(m_window);
+	_createBackbuffer();
 }
 
 void BackendGDI::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 {
-	SelectObject(m_window->m_hdcMem, font->implementation);
+	SelectObject(m_currWindow->m_OSData.hdcMem, font->implementation);
 	size_t c = wcslen(text);
 	if (!c)
 		return;
 	SIZE s;
-	GetTextExtentPoint32W(m_window->m_hdcMem, text, (int)c, &s);
+	GetTextExtentPoint32W(m_currWindow->m_OSData.hdcMem, text, (int)c, &s);
 	sz->x = s.cx;
 	sz->y = s.cy;
 }
@@ -639,7 +637,7 @@ Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool ital
 	newFont->m_context = this->m_context;
 	{
 		mgFont* f = (mgFont*)calloc(1, sizeof(mgFont));
-		HDC g_dc = GetWindowDC(this->m_window->m_hWnd);
+		HDC g_dc = GetWindowDC(m_currWindow->m_OSData.hWnd);
 		f->implementation = CreateFontW(
 			-MulDiv(size, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
 			0, 0, 0,
@@ -654,21 +652,21 @@ Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool ital
 			VARIABLE_PITCH,
 			file);
 		
-		SelectObject(m_window->m_hdcMem, f->implementation);
+		SelectObject(m_currWindow->m_OSData.hdcMem, f->implementation);
 
 #ifdef _UNICODE
 		TEXTMETRICW tm;
-		GetTextMetrics(m_window->m_hdcMem, &tm);
+		GetTextMetrics(m_currWindow->m_OSData.hdcMem, &tm);
 		f->maxSize.x = tm.tmMaxCharWidth;
 		f->maxSize.y = tm.tmHeight;
 #else
 		TEXTMETRICA tm;
-		GetTextMetrics(m_window->m_hdcMem, &tm);
+		GetTextMetrics(m_currWindow->m_OSData.hdcMem, &tm);
 		f->maxSize.x = tm.tmMaxCharWidth;
 		f->maxSize.y = tm.tmHeight;
 #endif
 
-		ReleaseDC(this->m_window->m_hWnd, g_dc);
+		ReleaseDC(m_currWindow->m_OSData.hWnd, g_dc);
 		newFont->m_font = f;
 	}
 	newFont->m_backend = this;

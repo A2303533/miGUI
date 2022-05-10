@@ -46,34 +46,10 @@ static unsigned int LocaleIdToCodepage(unsigned int lcid);
 #endif
 
 SystemWindow::SystemWindow()
-	:
-#ifdef MG_PLATFORM_WINDOWS
-	m_hWnd(0),
-	m_hdcMem(0),
-	m_hbmMem(0),
-	m_hbmOld(0),
-#endif
-	m_userData(0),
-	m_isVisible(false),
-	m_isCustomTitlebar(false),
-	m_customTitlebarSize(20),
-	m_context(0)
 {
 }
 
 SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize)
-	:
-#ifdef MG_PLATFORM_WINDOWS
-	m_hWnd(0),
-	m_hdcMem(0),
-	m_hbmMem(0),
-	m_hbmOld(0),
-#endif
-	m_userData(0),
-	m_isVisible(false),
-	m_isCustomTitlebar(false),
-	m_customTitlebarSize(20),
-	m_context(0)
 {
 #ifdef MG_PLATFORM_WINDOWS
     WNDCLASSEXW wcex;
@@ -95,7 +71,8 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     wcex.hIconSm = 0;// LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
     RegisterClassExW(&wcex);
 
-    m_hWnd = CreateWindowExW(
+    m_OSData.userData = this;
+    m_OSData.handle = CreateWindowExW(
         WS_EX_ACCEPTFILES,
         m_className,
         L"mgf",
@@ -109,8 +86,6 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
         wcex.hInstance,
         this
     );
-
-    m_OSData.handle = m_hWnd;
 
     KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
     KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
@@ -138,21 +113,21 @@ SystemWindow::~SystemWindow()
 {
     m_context = 0;
 #ifdef MG_PLATFORM_WINDOWS
-    if (m_hWnd)
+    if (m_OSData.handle)
     {
-        if (m_hdcMem)
-            DeleteDC(m_hdcMem);
-        if (m_hbmMem)
-            DeleteObject(m_hbmMem);
+        if (m_OSData.m_hdcMem)
+            DeleteDC((HDC)m_OSData.m_hdcMem);
+        if (m_OSData.m_hbmMem)
+            DeleteObject((HGDIOBJ)m_OSData.m_hbmMem);
 
         //ReleaseDC(m_hWnd, m_dc);
-        DestroyWindow(m_hWnd);
+        DestroyWindow((HWND)m_OSData.handle);
         UnregisterClass(m_className, GetModuleHandle(0));
     }
 #endif
 }
 
-SystemWindowOSData* SystemWindow::GetOSData()
+mgSystemWindowOSData* SystemWindow::GetOSData()
 {
 	return &m_OSData;
 }
@@ -175,7 +150,7 @@ const mgPoint& SystemWindow::GetBorderSize()
 void SystemWindow::SetTitle(const wchar_t* t)
 {
 #ifdef MG_PLATFORM_WINDOWS
-    SetWindowTextW(m_hWnd, t);
+    SetWindowTextW((HWND)m_OSData.handle, t);
 #endif
 }
 
@@ -183,7 +158,7 @@ void SystemWindow::SetVisible(bool v)
 {
     m_isVisible = v;
 #ifdef MG_PLATFORM_WINDOWS
-    ShowWindow(m_hWnd, v ? SW_SHOW : SW_HIDE);
+    ShowWindow((HWND)m_OSData.handle, v ? SW_SHOW : SW_HIDE);
 #endif
 }
 
@@ -216,7 +191,7 @@ void SystemWindow::OnSize()
         m_context->m_input->mouseButtonFlags1 = 0;
 
     RECT rc;
-    GetClientRect(m_hWnd, &rc);
+    GetClientRect((HWND)m_OSData.handle, &rc);
     m_size.x = rc.right - rc.left;
     m_size.y = rc.bottom - rc.top;
 
@@ -322,21 +297,21 @@ mgPoint* SystemWindow::GetSizeMinimum()
 void SystemWindow::Maximize()
 {
 #ifdef MG_PLATFORM_WINDOWS
-    ShowWindow(m_hWnd, SW_MAXIMIZE);
+    ShowWindow((HWND)m_OSData.handle, SW_MAXIMIZE);
 #endif
 }
 
 void SystemWindow::Minimize()
 {
 #ifdef MG_PLATFORM_WINDOWS
-    ShowWindow(m_hWnd, SW_MINIMIZE);
+    ShowWindow((HWND)m_OSData.handle, SW_MINIMIZE);
 #endif
 }
 
 void SystemWindow::Restore()
 {
 #ifdef MG_PLATFORM_WINDOWS
-    ShowWindow(m_hWnd, SW_RESTORE);
+    ShowWindow((HWND)m_OSData.handle, SW_RESTORE);
 #endif
 }
 
@@ -344,9 +319,9 @@ void SystemWindow::Rebuild()
 {
 #ifdef MG_PLATFORM_WINDOWS
     RECT size_rect;
-    GetWindowRect(m_hWnd, &size_rect);
+    GetWindowRect((HWND)m_OSData.handle, &size_rect);
     SetWindowPos(
-        m_hWnd, NULL,
+        (HWND)m_OSData.handle, NULL,
         size_rect.left, size_rect.top,
         size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
         SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE

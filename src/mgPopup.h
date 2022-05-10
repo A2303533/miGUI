@@ -62,8 +62,14 @@ struct mgPopupItem_s {
 	void* userData;
 };
 
+enum mgPopupFlags {
+	mgPopupFlags_systemWindow = 0x1,
+};
+
 typedef struct mgPopup_s {
 	mgRect rect;
+
+	int flags;
 
 	mgPoint indent;
 	int itemHeight;
@@ -102,6 +108,8 @@ typedef struct mgPopup_s {
 	/*you must set icons and iconID*/
 	int(*onIcon)(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s*,
 		struct mgIcons_s** icons, int* iconID, mgColor* color);
+
+	void* systemWindowImplementation; // pointer to some internal struct
 } mgPopup;
 
 #endif

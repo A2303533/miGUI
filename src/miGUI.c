@@ -222,7 +222,7 @@ mgGetDefaultPopupTextInput(mgContext* c)
 		{0, L"Delete", 0, 0, mgPopupItemType_default, 0, 0, 1},
 		{0, L"Select All", 0, 0, mgPopupItemType_default, 0, L"Ctrl+A", 1},
 	};
-	c->defaultPopupForTextInput = mgCreatePopup_f(items, 5, c->defaultPopupFont);
+	c->defaultPopupForTextInput = mgCreatePopup_f(c, items, 5, c->defaultPopupFont, 0);
 	return c->defaultPopupForTextInput;
 }
 

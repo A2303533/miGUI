@@ -114,7 +114,8 @@ void Context::OnWindowSize()
 
 void Context::DrawBegin()
 {
-	m_gui_context->gpu->beginDraw();
+#pragma message("Here must be `set active window`...or DrawBegin(int reason)")
+	m_gui_context->gpu->beginDraw(mgBeginDrawReason_systemWindow);
 }
 
 void Context::Draw()
@@ -142,7 +143,8 @@ void Context::DrawAll()
 	if (!m_gui_context)
 		return;
 
-	m_gui_context->gpu->beginDraw();
+#pragma message("Here must be `set active window`")
+	m_gui_context->gpu->beginDraw(mgBeginDrawReason_systemWindow);
 	mgDraw(m_gui_context);
 	if (m_onDraw)
 		m_onDraw(this, this->m_backend);
@@ -187,7 +189,7 @@ Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize)
 	FontImpl* fontImpl = (FontImpl*)f;
 
 	Popup* newPopup = new Popup(this);
-	newPopup->m_implementation = mgCreatePopup(arr, arrSize, fontImpl->m_font);
+	newPopup->m_implementation = mgCreatePopup(arr, arrSize, fontImpl->m_font, 0);
 
 	return newPopup;
 }

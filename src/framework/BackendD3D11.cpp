@@ -62,9 +62,9 @@ void BackendD3D11_destroyTexture(mgTexture* t)
 	g_backend->DestroyTexture(t);
 }
 
-void BackendD3D11_beginDraw()
+void BackendD3D11_beginDraw(int reason)
 {
-	g_backend->BeginDraw();
+	g_backend->BeginDraw(reason);
 }
 
 void BackendD3D11_endDraw()
@@ -431,7 +431,7 @@ void* BackendD3D11::GetVideoDriverAPI()
 	return m_gpu;
 }
 
-void BackendD3D11::BeginDraw()
+void BackendD3D11::BeginDraw(int reason)
 {
 	m_params.m_d3d11DevCon->IASetInputLayout(m_vLayout);
 	m_params.m_d3d11DevCon->VSSetShader(m_vShader, 0, 0);
@@ -736,14 +736,16 @@ void BackendD3D11::_createBackbuffer(mgf::SystemWindow* impl)
 
 void BackendD3D11::InitWindow(mgf::SystemWindow* w)
 {
-	if (m_window->m_hdcMem)
+	if (m_currWindow->m_OSData.hdcMem)
 		return;
 //	_createBackbuffer(m_window);
 }
 
-void BackendD3D11::SetActiveWindow(mgf::SystemWindow* w)
+mgf::SystemWindow* BackendD3D11::SetCurrentWindow(mgf::SystemWindow* w)
 {
-	m_window = w;
+	mgf::SystemWindow* prev = m_currWindow;
+	m_currWindow = w;
+	return prev;
 }
 
 void BackendD3D11::SetActiveContext(mgf::Context* c)
@@ -760,8 +762,8 @@ void BackendD3D11::UpdateBackbuffer()
 	
 	glViewport(0, 0, m_window->m_size.x, m_window->m_size.y);*/
 	
-	m_cbVertex_impl.m_ProjMtx.m_data[0] = mgf::v4f(2.0f / m_window->m_size.x, 0.0f, 0.0f, 0.0f);
-	m_cbVertex_impl.m_ProjMtx.m_data[1] = mgf::v4f(0.0f, 2.0f / -m_window->m_size.y, 0.0f, 0.0f);
+	m_cbVertex_impl.m_ProjMtx.m_data[0] = mgf::v4f(2.0f / m_currWindow->m_size.x, 0.0f, 0.0f, 0.0f);
+	m_cbVertex_impl.m_ProjMtx.m_data[1] = mgf::v4f(0.0f, 2.0f / -m_currWindow->m_size.y, 0.0f, 0.0f);
 	m_cbVertex_impl.m_ProjMtx.m_data[2] = mgf::v4f(0.0f, 0.0f, 0.5f, 0.0f);
 	m_cbVertex_impl.m_ProjMtx.m_data[3] = mgf::v4f(-1.f, 1.f, 0.5f, 1.0f);
 	//_createBackbuffer(m_window);

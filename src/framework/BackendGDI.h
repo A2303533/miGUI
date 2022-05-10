@@ -48,23 +48,24 @@ namespace mgf
 	{
 		friend class Context;
 
-		mgf::SystemWindow* m_window;
-		mgf::Context* m_context;
+		//mgSystemWindowOSData* m_currSystemWindowOSData = 0;
 
-		void* m_gpu;
-		Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
-		ULONG_PTR m_gdiplusToken;
+		mgf::SystemWindow* m_currWindow = 0;
+		mgf::Context* m_context = 0;
 
-		//Gdiplus::Bitmap* m_gdiimage_defaultIcons = 0;
-		mgTexture_s* m_defaultIcons;
-		Font* m_defaultFont;
+		void* m_gpu = 0;
+		Gdiplus::GdiplusStartupInput m_gdiplusStartupInput = 0;
+		ULONG_PTR m_gdiplusToken = 0;
+
+		mgTexture_s* m_defaultIcons = 0;
+		Font* m_defaultFont = 0;
 
 		mgRect m_clipRect;
 
-		void _createBackbuffer(mgf::SystemWindow* impl);
+		void _createBackbuffer();
 
-		Image* blackImage;
-		Gdiplus::Bitmap* blackBitmap;
+		Image* blackImage = 0;
+		Gdiplus::Bitmap* blackBitmap = 0;
 
 	public:
 		BackendGDI();
@@ -72,12 +73,12 @@ namespace mgf
 		virtual void* GetVideoDriverAPI() override;
 
 		virtual void InitWindow(mgf::SystemWindow*) override;
-		virtual void SetActiveWindow(mgf::SystemWindow*) override;
+		virtual mgf::SystemWindow* SetCurrentWindow(mgf::SystemWindow*) override;
 		virtual void SetActiveContext(mgf::Context*) override;
 
 		virtual void UpdateBackbuffer() override;
 
-		virtual void BeginDraw() override;
+		virtual void BeginDraw(int reason) override;
 		virtual void EndDraw() override;
 
 		virtual mgTexture* CreateTexture(mgImage* img)  override;

@@ -74,13 +74,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 namespace mgf
 {
-	struct SystemWindowOSData
+	// now mgSystemWindowOSData
+	/*struct SystemWindowOSData
 	{
 		SystemWindowOSData()
 			: handle(0)
 		{}
 		void* handle;
-	};
+	};*/
 
 	class SystemWindow : public BaseClass
 	{
@@ -90,27 +91,28 @@ namespace mgf
 		friend class Context;
 		friend class Framework;
 
-		SystemWindowOSData m_OSData;
-
+		struct mgSystemWindowOSData m_OSData;
 #ifdef MG_PLATFORM_WINDOWS
 		wchar_t m_className[20];
-		HWND m_hWnd;
+		//HWND m_hWnd = 0;
 		/*double bufferring for GDI*/
-		HDC m_hdcMem;
-		HBITMAP m_hbmMem;
-		HBITMAP m_hbmOld;
+		//HDC m_hdcMem = 0;
+		//HBITMAP m_hbmMem = 0;
+		//HBITMAP m_hbmOld = 0;
 #endif
-		void* m_userData;
-		bool m_isVisible;
+		//mgSystemWindowOSData m_OSdata;
+
+		void* m_userData = 0;
+		bool m_isVisible = false;
 
 		mgRect m_clientRect;
 		mgPoint m_size;
 		mgPoint m_borderSize;
 		mgPoint m_sizeMinimum;
 
-		bool m_isCustomTitlebar;
+		bool m_isCustomTitlebar = false;
 		mgRect m_customTitlebarHitRect;
-		uint32_t m_customTitlebarSize;
+		uint32_t m_customTitlebarSize = 20;
 	public:
 
 		/// <summary>
@@ -121,7 +123,7 @@ namespace mgf
 		SystemWindow(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize);
 		virtual ~SystemWindow();
 
-		SystemWindowOSData* GetOSData();
+		mgSystemWindowOSData* GetOSData();
 
 		void SetUserData(void*);
 		void* GetUserData();
@@ -178,7 +180,7 @@ namespace mgf
 		// call this after SetUseCustomTitleBar
 		virtual void Rebuild();
 
-		Context* m_context;
+		Context* m_context = 0;
 	};
 }
 

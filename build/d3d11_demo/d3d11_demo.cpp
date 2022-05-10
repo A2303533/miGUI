@@ -788,7 +788,7 @@ mgFont* g_font = 0;
 HKL KEYBOARD_INPUT_HKL = 0;
 unsigned int KEYBOARD_INPUT_CODEPAGE = 0;
 
-void gui_beginDraw()
+void gui_beginDraw(int reason)
 {
 }
 
@@ -908,7 +908,9 @@ void draw_gui()
     if (!g_gui_context)
         return;
 
-    g_gui_context->gpu->beginDraw();
+#pragma message("Here must be something like `set active window` before beginDraw")
+    g_gui_context->gpu->beginDraw(mgBeginDrawReason_systemWindow);
+
     mgRect rect;
     mgRectSet(&rect, 0, 0, 220, 180);
     gui_setClipRect(&rect);

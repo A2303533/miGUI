@@ -104,12 +104,12 @@ namespace mgf
 		virtual void* GetVideoDriverAPI() override;
 
 		virtual void InitWindow(mgf::SystemWindow*) override;
-		virtual void SetActiveWindow(mgf::SystemWindow*) override;
+		virtual void SetCurrentWindow(mgf::SystemWindow*) override;
 		virtual void SetActiveContext(mgf::Context*) override;
 
 		virtual void UpdateBackbuffer() override;
 
-		virtual void BeginDraw() override;
+		virtual void BeginDraw(int reason) override;
 		virtual void EndDraw() override;
 
 		virtual mgTexture* CreateTexture(mgImage* img)  override;

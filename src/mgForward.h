@@ -30,6 +30,7 @@
 #ifndef _MG_FORWARD_H_
 #define _MG_FORWARD_H_
 
+struct mgSystemWindowOSData;
 struct mgPoint_s;
 struct mgRect_s;
 struct mgVec4_s;
@@ -68,6 +69,12 @@ struct mgTexture_s;
 struct mgElementTextInput_s;
 struct mgElementList_s;
 struct mgElementTable_s;
+
+enum mgBeginDrawReason
+{
+	mgBeginDrawReason_systemWindow,
+	mgBeginDrawReason_popupWindow
+};
 
 enum mgDrawRectangleReason
 {

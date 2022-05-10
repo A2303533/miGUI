@@ -1003,7 +1003,7 @@ mgInitDockPanel_f(
 			{0, L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove", 1},
 			{0, L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide", 1},
 		};
-		c->dockPanel->windowTabPopup = mgCreatePopup_f(popupItems, 4, c->defaultPopupFont);
+		c->dockPanel->windowTabPopup = mgCreatePopup_f(c, popupItems, 4, c->defaultPopupFont, 0);
 	}
 
 	c->dockPanel->elementsSize = elementsSize + 1;

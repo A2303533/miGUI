@@ -27,47 +27,39 @@
 */
 
 #pragma once
-#ifndef _MG_FRAMEWORK_H_
-#define _MG_FRAMEWORK_H_
+#ifndef _MG_SYSTEMWNDDATA_H_
+#define _MG_SYSTEMWNDDATA_H_
 
-#include "config.h"
-
-// VS: Zc:__cplusplus compiler option
-#if __cplusplus > 199711L
-#define MGF_NOEXCEPT noexcept
-#define MGF_CXX11_RVALUE_REFERENCES
-#else
-#define MGF_NOEXCEPT
+#ifdef MG_PLATFORM_WINDOWS
+#include <Windows.h>
 #endif
 
-#ifdef _MSC_VER
-#define MGF_FORCEINLINE __forceinline
-#else
-#define MGF_FORCEINLINE inline
+struct mgSystemWindowOSData
+{
+#ifdef __cplusplus
+	mgSystemWindowOSData()
+		: 
+#ifdef MG_PLATFORM_WINDOWS
+		hWnd(0),
+		hdcMem(0),
+		hbmMem(0),
+		hbmOld(0),
+#endif
+		userData(0)
+	{}
 #endif
 
-// For static library ('mgf' project) use preprocessor: MG_NO_DLL
+#ifdef MG_PLATFORM_WINDOWS
+	HWND hWnd;
+	HDC hdcMem;
+	HBITMAP hbmMem;
+	HBITMAP hbmOld;
+#endif
 
-#include "mgDefs.h"
-#include "mgForward.h"
-#include "mgPoint.h"
-#include "mgRect.h"
-#include "mgVec4.h"
-#include "mgColor.h"
-#include "mgFont.h"
-#include "mgImage.h"
-#include "mgTexture.h"
-#include "mgTexture.h"
-#include "mgStyle.h"
-#include "mgInputContex.h"
-#include "mgSystemWindowData.h"
+	mgPoint position;
+	mgPoint size;
 
-#include "framework/forward.h"
-#include "framework/BaseClass.h"
-#include "framework/Ptr.h"
-#include "framework/SystemWindow.h"
-#include "framework/Backend.h"
-#include "framework/Context.h"
-#include "framework/Framework.h"
+	void* userData;
+};
 
 #endif

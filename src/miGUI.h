@@ -51,28 +51,34 @@ struct mgContext_s;
 #include "mgWindow.h"
 #include "mgElement.h"
 
-/* Before creating GUI context you must create this objects.
- VideoDriverAPI - callbacks for drawing.
- InputContext - information about pressed buttons, cursor position and other*/
+#include "mgSystemWindowData.h"
+
+// Before creating GUI context you must create this objects.
+// VideoDriverAPI - callbacks for drawing.
+// InputContext - information about pressed buttons, cursor position and other
 typedef struct mgVideoDriverAPI_s {
-	/* Create GPU texture using RGBA data.
-	 Library can generate fonts, fonts is a textures.*/
+	// Create GPU texture using RGBA data.
+	// Library can generate fonts, fonts is a textures.
 	mgTexture*(*createTexture)(mgImage*);
 
-	/* Destroy texture.For fonts. */
+	// Destroy texture.For fonts.
 	void(*destroyTexture)(mgTexture*);
 
-	void(*beginDraw)(); /*prepare for drawing, set shaders and other things*/
+	struct mgSystemWindowOSData* (*setCurrentWindow)(struct mgSystemWindowOSData*);
+	// update buffer for current window
+	void (*updateBackBuffer)();
+
+	void(*beginDraw)(int reason); // prepare for drawing, set shaders and other things
 	void(*endDraw)();
 
 	void(*drawRectangle)(
 		int reason,
-		void* object,  /*depends on reason*/
+		void* object,  // depends on reason
 		mgRect* rect,
 		mgColor* color1, 
 		mgColor* color2, 
-		mgTexture* texture, /*optional*/
-		mgVec4* UVRegion); /*optional*/
+		mgTexture* texture, // optional
+		mgVec4* UVRegion); // optional
 
 	void(*drawText)( 
 		int reason, 
@@ -364,10 +370,10 @@ extern PFNMGDOCKADDWINDOWPROC mgDockAddWindow;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API struct mgPopup_s* MG_C_DECL mgCreatePopup_f(struct mgPopupItemInfo_s* arr, int arrSize, mgFont*);
+MG_API struct mgPopup_s* MG_C_DECL mgCreatePopup_f(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, mgFont*, int flags);
 #define mgCreatePopup mgCreatePopup_f
 #else
-typedef struct mgPopup_s* (*PFNMGCREATEPOPUPPROC)(struct mgPopupItemInfo_s* arr, int arrSize, mgFont*);
+typedef struct mgPopup_s* (*PFNMGCREATEPOPUPPROC)(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, mgFont*, int flags);
 extern PFNMGCREATEPOPUPPROC mgCreatePopup;
 #endif
 
@@ -564,6 +570,7 @@ typedef struct mgContext_s {
 	mgWindow* firstWindow;
 	mgWindow* windowUnderCursor;
 
+	struct mgSystemWindowOSData systemWindowData;
 
 	mgCursor* defaultCursors[mgCursorType__count];
 	mgCursor* currentCursors[mgCursorType__count];

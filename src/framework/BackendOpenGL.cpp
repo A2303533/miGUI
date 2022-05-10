@@ -67,9 +67,9 @@ void BackendOpenGL_destroyTexture(mgTexture* t)
 	g_backend->DestroyTexture(t);
 }
 
-void BackendOpenGL_beginDraw()
+void BackendOpenGL_beginDraw(int reason)
 {
-	g_backend->BeginDraw();
+	g_backend->BeginDraw(reason);
 }
 
 void BackendOpenGL_endDraw()
@@ -179,7 +179,7 @@ void* BackendOpenGL::GetVideoDriverAPI()
 	return m_gpu;
 }
 
-void BackendOpenGL::BeginDraw()
+void BackendOpenGL::BeginDraw(int reason)
 {
 	if (m_params.withClearColorAndDepth)
 	{

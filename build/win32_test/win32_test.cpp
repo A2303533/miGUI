@@ -35,13 +35,25 @@ mgWindow* test_guiWindow5 = 0;
 #define WindowID_4 4
 #define WindowID_5 5
 
-HDC g_dc = 0;
-HWND g_hwnd = 0;
-RECT g_windowRect;
+mgSystemWindowOSData* g_mainSystemWindowOSData = 0; // mgContext has this.
+
+mgSystemWindowOSData* g_currSystemWindowOSData = 0;
+mgSystemWindowOSData* gui_setCurrentWindow(mgSystemWindowOSData* data)
+{
+    mgSystemWindowOSData* prev = g_currSystemWindowOSData;
+    g_currSystemWindowOSData = data;
+
+    return prev;
+}
+
+//HDC g_dc = 0; // now I have g_currSystemWindowOSData
+//HWND g_hwnd = 0;
+
 HKL KEYBOARD_INPUT_HKL = 0;
 unsigned int KEYBOARD_INPUT_CODEPAGE = 0;
 
 mgPoint borderSize;
+mgPoint borderSizeMainWindow;
 
 int g_fps = 0;
 int g_run = 1;
@@ -64,72 +76,84 @@ public:
 //MyImage g_iconsImage;
 mgTexture* g_iconsImage = 0;
 
-
 /*double buffering*/
-HDC hdcMem = 0;
-HBITMAP hbmMem = 0, hbmOld = 0;
-void DeleteBackBuffer() {
-    if (hdcMem)
-        DeleteDC(hdcMem);
-    if (hbmMem)
-        DeleteObject(hbmMem);
+//HDC hdcMem = 0;
+//HBITMAP hbmMem = 0, hbmOld = 0;
+void DeleteBackBuffer(mgSystemWindowOSData* data) {
+    if (data)
+    {
+        if (data->hdcMem)
+            DeleteDC((HDC)data->hdcMem);
+        if (data->hbmMem)
+            DeleteObject(data->hbmMem);
+    }
 }
 void UpdateBackBuffer() {
-    DeleteBackBuffer();
-    g_dc = GetWindowDC(g_hwnd);
-    hdcMem = CreateCompatibleDC(g_dc);
+    if (!g_currSystemWindowOSData)
+        return;
 
-    GetWindowRect(g_hwnd, &g_windowRect);
-    hbmMem = CreateCompatibleBitmap(g_dc,
-        g_windowRect.right - g_windowRect.left,
-        g_windowRect.bottom - g_windowRect.top);
-    ReleaseDC(g_hwnd, g_dc);
+    DeleteBackBuffer(g_currSystemWindowOSData);
+
+    HWND hWnd = (HWND)g_currSystemWindowOSData->hWnd;
+
+    HDC dc = GetWindowDC(hWnd);
+    g_currSystemWindowOSData->hdcMem = CreateCompatibleDC(dc);
+
+    RECT windowRect;
+    GetWindowRect(hWnd, &windowRect);
+
+    g_currSystemWindowOSData->position.x = windowRect.left;
+    g_currSystemWindowOSData->position.y = windowRect.top;
+    g_currSystemWindowOSData->size.x = windowRect.right - windowRect.left;
+    g_currSystemWindowOSData->size.y = windowRect.bottom - windowRect.top;
+
+    g_currSystemWindowOSData->hbmMem = CreateCompatibleBitmap(dc,
+        g_currSystemWindowOSData->size.x,
+        g_currSystemWindowOSData->size.y);
+
+    ReleaseDC(hWnd, dc);
 }
 
 
-void gui_beginDraw()
+void gui_beginDraw(int reason)
 {
-    hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
-    hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+    g_currSystemWindowOSData->hbmOld = (HBITMAP)SelectObject((HDC)g_currSystemWindowOSData->hdcMem, g_currSystemWindowOSData->hbmMem);
     RECT r;
     r.left = 0;
     r.top = 0;
-    r.right = g_windowRect.right - g_windowRect.left;
-    r.bottom =  g_windowRect.bottom - g_windowRect.top;
-    FillRect(hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
-
+    r.right = g_currSystemWindowOSData->size.x;
+    r.bottom = g_currSystemWindowOSData->size.y;
 
     int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
-    borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
-    borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
+
+    switch (reason)
+    {
+    default:
+        borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
+        borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
+        borderSizeMainWindow = borderSize;
+        FillRect((HDC)g_currSystemWindowOSData->hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 1));
+        break;
+    case mgBeginDrawReason_popupWindow:
+        borderSize.x = 0;
+        borderSize.y = 0;
+        FillRect((HDC)g_currSystemWindowOSData->hdcMem, &r, (HBRUSH)(COLOR_WINDOW + 3));
+        break;
+    }
 }
-struct stacktrace {
-    char* exe;  /* Name of executable file */
-    char* maps; /* Process memory map for this snapshot */
 
-    size_t frames_size;
-    size_t frames_len;
-    struct stacktrace_frame* frames;
-
-    size_t files_len;
-    struct file_map* files;
-
-    unsigned skip;
-};
 void gui_endDraw()
 {
-    /*Gdiplus::Graphics graphics(hdcMem);
-    Gdiplus::Pen      pen(Gdiplus::Color(255, 0, 0, 255));
-    graphics.DrawLine(&pen, 0, 0, 200, 100);*/
-    
-    g_dc = GetWindowDC(g_hwnd);
-    BitBlt(g_dc,
+    HWND hWnd = (HWND)g_currSystemWindowOSData->hWnd;
+    HDC dc = GetWindowDC(hWnd);
+    BitBlt(dc,
         0, 0,
-        g_windowRect.right - g_windowRect.left, g_windowRect.bottom - g_windowRect.top,
-        hdcMem,
+        g_currSystemWindowOSData->size.x, 
+        g_currSystemWindowOSData->size.y,
+        (HDC)g_currSystemWindowOSData->hdcMem,
         0, 0,
         SRCCOPY);
-    ReleaseDC(g_hwnd, g_dc);
+    ReleaseDC(hWnd, dc);
 }
 
 mgTexture* gui_createTexture(mgImage* img)
@@ -164,6 +188,8 @@ void gui_drawRectangle(
     mgTexture* texture, /*optional*/
     mgVec4* UVRegion)
 {
+    HDC hdcMem = (HDC)g_currSystemWindowOSData->hdcMem;
+
     if (texture)
     {
         if (reason == mgDrawRectangleReason_windowCloseButton
@@ -231,6 +257,11 @@ void gui_drawRectangle(
         if (reason == mgDrawRectangleReason_popupBG
             || reason == mgDrawRectangleReason_tooltip)
         {
+            r.left += 1;
+            r.top += 1;
+            r.right -= 1;
+            r.bottom -= 1;
+
             // BORDER for popup and tooltip
             int sz = 1;
             RECT r2 = r;
@@ -317,6 +348,8 @@ void gui_drawText(
     mgColor* color,
     mgFont* font)
 {
+    HDC hdcMem = (HDC)g_currSystemWindowOSData->hdcMem;
+    
     SelectObject(hdcMem, font->implementation);
     SetTextColor(hdcMem, mgColorGetAsIntegerBGR(color));
     SetBkMode(hdcMem, TRANSPARENT);
@@ -330,6 +363,8 @@ void gui_drawText(
 
 void gui_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 {
+    HDC hdcMem = (HDC)g_currSystemWindowOSData->hdcMem;
+    
     SelectObject(hdcMem, font->implementation);
     int c = wcslen(text);
     if (!c)
@@ -342,10 +377,12 @@ void gui_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 
 mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
 {
+    HWND hWnd = (HWND)g_mainSystemWindowOSData->hWnd;
+    
     mgFont* f = (mgFont*)malloc(sizeof(mgFont));
-    g_dc = GetWindowDC(g_hwnd);
+    HDC dc = GetWindowDC(hWnd);
     f->implementation = CreateFontA(
-        -MulDiv(size, GetDeviceCaps(g_dc, LOGPIXELSY), 72),
+        -MulDiv(size, GetDeviceCaps(dc, LOGPIXELSY), 72),
         0, 0, 0,
         (flags & MG_FNTFL_BOLD) ? FW_BOLD : FW_NORMAL,
         (flags & MG_FNTFL_ITALIC) ? 1 : 0,
@@ -357,7 +394,7 @@ mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
         CLEARTYPE_QUALITY,
         VARIABLE_PITCH,
         fn);
-    ReleaseDC(g_hwnd, g_dc);
+    ReleaseDC(hWnd, dc);
     return f;
 }
 
@@ -377,10 +414,12 @@ void draw_gui()
     if (!g_gui_context)
         return;
 
-    g_gui_context->gpu->beginDraw();
+    g_gui_context->gpu->beginDraw(mgBeginDrawReason_systemWindow);
 
     /*draw elements*/
     mgDraw(g_gui_context);
+
+    borderSize = borderSizeMainWindow;
 
     static int drawSomeInfo = 1;
     if (mgIsKeyHit(g_gui_context->input, MG_KEY_F1))
@@ -497,12 +536,12 @@ void saveDock(struct mgElement_s* e)
     int* saveData = mgDockGetSaveData(g_gui_context, &saveDataSize);
     if (saveData)
     {
-        //HANDLE f = CreateFile(L"dock.data", GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
+        //hWnd f = CreateFile(L"dock.data", GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
         FILE* f = fopen("dock.data", "wb");
         if (f)
         {
             //WriteFile(f, (void*)saveData, saveDataSize * sizeof(int), 0, 0);
-            //CloseHandle(f);
+            //ClosehWnd(f);
             fwrite(saveData, saveDataSize * sizeof(int), 1, f);
             fclose(f);
         }
@@ -557,6 +596,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lpCmdLine, int       nCmdShow)
 {
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    
+    AllocConsole();
+    freopen("CONOUT$", "wb", stdout);
 
     WNDCLASSEXW wcex;
     wcex.cbSize = sizeof(WNDCLASSEX);
@@ -573,13 +615,13 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
     RegisterClassExW(&wcex);
 
-    g_hwnd = CreateWindowExW(0, wcex.lpszClassName, L"migui", WS_OVERLAPPEDWINDOW,
+    HWND hwnd = CreateWindowExW(0, wcex.lpszClassName, L"migui", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, 0, 0, hInstance, 0);
-    if (!g_hwnd)
+    if (!hwnd)
         return FALSE;
     
-    ShowWindow(g_hwnd, nCmdShow);
-    UpdateWindow(g_hwnd);
+    ShowWindow(hwnd, nCmdShow);
+    UpdateWindow(hwnd);
 
     RAWINPUTDEVICE device;
     device.usUsagePage = 0x01;
@@ -605,14 +647,22 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
     gui_gpu.drawText = gui_drawText;
     gui_gpu.drawLine = gui_drawLine;
     gui_gpu.setClipRect = gui_setClipRect;
+    gui_gpu.setCurrentWindow = gui_setCurrentWindow;
+    gui_gpu.updateBackBuffer = UpdateBackBuffer;
 
     memset(&g_input, 0, sizeof(g_input));
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
     g_gui_context->getTextSize = gui_getTextSize;
-    
+
+    g_mainSystemWindowOSData = &g_gui_context->systemWindowData;
+
+    g_mainSystemWindowOSData->hWnd = hwnd; // for multiple windows. save main window
+    g_currSystemWindowOSData = g_mainSystemWindowOSData; // for multiple windows. set current
+    UpdateBackBuffer(); // need to create hdcMem and hbmMem before font creation
+
     {
         RECT rc;
-        GetClientRect(g_hwnd, &rc);
+        GetClientRect(hwnd, &rc);
         g_gui_context->needRebuild = 1;
         g_gui_context->windowSize.x = rc.right - rc.left;
         g_gui_context->windowSize.y = rc.bottom - rc.top;
@@ -740,6 +790,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
             mgElement* btn = mgCreateButton(test_guiWindow5, &pos, &sz, L"Button", g_win32font);
         }
         
+        int popupFlags = 0;
+        popupFlags |= mgPopupFlags_systemWindow;
+
         {
             mgPopupItemInfo items_file_popup[] =
             {
@@ -751,7 +804,16 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
                 {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
                 {0, L"Exit", 0, 0, mgPopupItemType_default, 0, L"Alt+F4", 1},
             };
-            mgPopup* file_popup = mgCreatePopup(items_file_popup, 7, g_win32font);
+            mgPopup* file_popup = mgCreatePopup(g_gui_context, items_file_popup, 7, g_win32font, popupFlags);
+
+            mgPopupItemInfo items_submenu1_popup[] =
+            {
+                {0, L"Item1", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O", 1},
+                {0, L"Item2", 0, 0, mgPopupItemType_default, 0, 0, 1},
+                {0, L"Item3", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S", 1},
+                {0, L"Sub menu2", 0, 0, mgPopupItemType_default, 0, 0, 1},
+            };
+            mgPopup* submenu1_popup = mgCreatePopup(g_gui_context, items_submenu1_popup, 4, g_win32font, popupFlags);
 
             mgPopupItemInfo items_edit_popup[] =
             {
@@ -759,8 +821,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
                 {0, L"Paste", 0, 0, mgPopupItemType_default, 0, 0, 1},
                 {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
                 {0, L"Cut", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S", 1},
+                {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+                {0, L"Sub menu1", submenu1_popup, 0, mgPopupItemType_default, 0, 0, 1},
             };
-            mgPopup* edit_popup = mgCreatePopup(items_edit_popup, 4, g_win32font);
+            mgPopup* edit_popup = mgCreatePopup(g_gui_context, items_edit_popup, 6, g_win32font, popupFlags);
 
             mgMenuItemInfo menu_items[] =
             {
@@ -838,7 +902,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
     DeleteObject(g_win32font->implementation);
     free(g_win32font);
 
-    DeleteBackBuffer();
+    DeleteBackBuffer(g_mainSystemWindowOSData);
 
     mgDestroyContext(g_gui_context);
     mgUnload(gui_lib);
@@ -864,16 +928,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_SIZE:
     {
-        UpdateBackBuffer();
         if (g_gui_context)
         {
             RECT rc;
             GetClientRect(hWnd, &rc);
             mgOnWindowSize(g_gui_context, rc.right - rc.left, rc.bottom - rc.top);
+            g_mainSystemWindowOSData->size.x = rc.right - rc.left;
+            g_mainSystemWindowOSData->size.y = rc.bottom - rc.top;
             /*g_gui_context->needRebuild = 1;
             g_gui_context->windowSize.x = rc.right - rc.left;
             g_gui_context->windowSize.y = rc.bottom - rc.top;*/
         }
+        UpdateBackBuffer();
     }return DefWindowProc(hWnd, message, wParam, lParam);
     case WM_COMMAND:
         {
@@ -915,7 +981,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         const RAWINPUT* raw = (const RAWINPUT*)dataBuf;
         if (raw->header.dwType == RIM_TYPEMOUSE)
         {
-            HANDLE deviceHandle = raw->header.hDevice;
+            HANDLE devicehWnd = raw->header.hDevice;
 
             const RAWMOUSE& mouseData = raw->data.mouse;
 
@@ -925,7 +991,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             /*wprintf(
                 L"Mouse: Device=0x%08X, Flags=%04x, WheelDelta=%d, X=%d, Y=%d\n",
-                deviceHandle, flags, wheelDelta, x, y);*/
+                devicehWnd, flags, wheelDelta, x, y);*/
 
             //g_input.mouseMoveDelta.x = x;
             //g_input.mouseMoveDelta.y = y;

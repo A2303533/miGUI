@@ -49,18 +49,18 @@ namespace mgf
 		friend class Table;
 
 	protected:
-		mgWindow_s* m_window;
+		mgWindow_s* m_window = 0;
 		std::basic_string<wchar_t> m_title;
 		std::vector<Element*> m_elements;
 
-		mgMenu_s* m_menu;
+		mgMenu_s* m_menu = 0;
 		/*struct _menuItem
 		{
 			StringW m_title;
 		};
 		std::vector<_menuItem> m_menuItems;
 		_menuItem m_menu_currItem;*/
-		Font* m_menuFont;
+		Font* m_menuFont = 0;
 
 		struct _menuPopupItemInfo
 		{
@@ -107,7 +107,7 @@ namespace mgf
 			_menuTreeNode* m_root;
 		}
 		m_menuTree;
-		_menuTreeNode* m_menuNodeCurr;
+		_menuTreeNode* m_menuNodeCurr = 0;
 		std::stack<_menuTreeNode*> m_menuNodeCurrPrev;
 
 		_menuTreeNode* _menu_getLastSibling(_menuTreeNode*, int* num);
@@ -115,7 +115,8 @@ namespace mgf
 		mgPopup_s* _menu_rebuild_createPopup(_menuTreeNode*);
 		void _menu_addMenuItem(bool isSub, const wchar_t* title, uint32_t id, const wchar_t* shortcut_text, bool enabled);
 
-		bool m_isVisible;
+		bool m_isVisible = true;
+		bool m_useSystemWindowForPopup = false;
 	public:
 		Window(Context*);
 		virtual ~Window();
@@ -145,7 +146,7 @@ namespace mgf
 		mgRect* GetMenuRect();
 		const mgRect& GetRect();
 
-		void UseMenu(bool, Font*);
+		void UseMenu(bool useornot, bool useSystemWindowForPopup, Font*);
 		void RebuildMenu();
 		void DeleteMenu();
 		void BeginMenu(const wchar_t* title, uint32_t id = 0);
