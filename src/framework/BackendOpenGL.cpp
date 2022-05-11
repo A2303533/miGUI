@@ -196,16 +196,16 @@ void BackendOpenGL::BeginDraw(int reason)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0, m_window->m_size.x, m_window->m_size.y, 0);
+	gluOrtho2D(0, m_currWindow->m_size.x, m_currWindow->m_size.y, 0);
 }
 
 void BackendOpenGL::EndDraw()
 {
 	if (m_params.withSwapBuffers)
 	{
-		HDC dc = GetWindowDC(m_window->m_hWnd);
+		HDC dc = GetWindowDC(m_currWindow->m_OSData->hWnd);
 		SwapBuffers(dc);
-		ReleaseDC(m_window->m_hWnd, dc);
+		ReleaseDC(m_currWindow->m_OSData->hWnd, dc);
 	}
 }
 
@@ -347,7 +347,7 @@ void BackendOpenGL::DrawRectangle(int reason, void* object, mgRect* rct, mgColor
 		}
 		break;
 	}
-	glScissor(0, 0, m_window->m_size.x, m_window->m_size.y);
+	glScissor(0, 0, m_currWindow->m_size.x, m_currWindow->m_size.y);
 }
 
 void BackendOpenGL::DrawText(int reason, void* object, mgPoint* position, const wchar_t* text, int textLen,
@@ -412,25 +412,25 @@ void BackendOpenGL::DrawText(int reason, void* object, mgPoint* position, const 
 	}*/
 
 	
-	/*SelectObject(m_window->m_hdcMem, font->implementation);
-	SetTextColor(m_window->m_hdcMem, mgColorGetAsIntegerBGR(color));
-	SetBkMode(m_window->m_hdcMem, TRANSPARENT);
+	/*SelectObject(m_currWindow->m_hdcMem, font->implementation);
+	SetTextColor(m_currWindow->m_hdcMem, mgColorGetAsIntegerBGR(color));
+	SetBkMode(m_currWindow->m_hdcMem, TRANSPARENT);
 
 	HRGN rgn = CreateRectRgn(
-		m_clipRect.left + m_window->m_borderSize.x,
-		m_clipRect.top + m_window->m_borderSize.y,
-		m_clipRect.right + m_window->m_borderSize.x,
-		m_clipRect.bottom + m_window->m_borderSize.y);
+		m_clipRect.left + m_currWindow->m_borderSize.x,
+		m_clipRect.top + m_currWindow->m_borderSize.y,
+		m_clipRect.right + m_currWindow->m_borderSize.x,
+		m_clipRect.bottom + m_currWindow->m_borderSize.y);
 
-	SelectClipRgn(m_window->m_hdcMem, rgn);
-	TextOutW(m_window->m_hdcMem, 
-		position->x + m_window->m_borderSize.x, 
-		position->y + m_window->m_borderSize.y, 
+	SelectClipRgn(m_currWindow->m_hdcMem, rgn);
+	TextOutW(m_currWindow->m_hdcMem, 
+		position->x + m_currWindow->m_borderSize.x, 
+		position->y + m_currWindow->m_borderSize.y, 
 		text, textLen);
 	DeleteObject(rgn);
-	SelectClipRgn(m_window->m_hdcMem, 0);*/
+	SelectClipRgn(m_currWindow->m_hdcMem, 0);*/
 
-	glScissor(0,0,m_window->m_size.x,m_window->m_size.y);
+	glScissor(0,0,m_currWindow->m_size.x,m_currWindow->m_size.y);
 }
 
 void BackendOpenGL::DrawLine(
@@ -441,7 +441,7 @@ void BackendOpenGL::DrawLine(
 	mgColor* color,
 	int size)
 {
-	/*Gdiplus::Graphics graphics(m_window->m_hdcMem);
+	/*Gdiplus::Graphics graphics(m_currWindow->m_hdcMem);
 	Gdiplus::Pen      pen(Gdiplus::Color(255, 0, 0, 255));
 	graphics.DrawLine(&pen, 0, 0, 200, 100);*/
 }
@@ -450,7 +450,7 @@ mgRect BackendOpenGL::SetClipRect(mgRect* r)
 {
 	mgRect old = m_clipRect;
 	m_clipRect = *r;
-	int y = m_window->m_size.y - m_clipRect.top;
+	int y = m_currWindow->m_size.y - m_clipRect.top;
 	int w = m_clipRect.bottom - m_clipRect.top;
 	glScissor(
 		m_clipRect.left, 
@@ -467,18 +467,9 @@ void BackendOpenGL::_createBackbuffer(mgf::SystemWindow* impl)
 
 void BackendOpenGL::InitWindow(mgf::SystemWindow* w)
 {
-	if (m_window->m_hdcMem)
-		return;
-	_createBackbuffer(m_window);
-}
-
-void BackendOpenGL::SetActiveWindow(mgf::SystemWindow* w)
-{
-	m_window = w;
-
-	if (m_params.withInit && !m_params.hglrc)
+	if (m_params.withInit)
 	{
-		HDC dc = GetDC(m_window->m_hWnd);
+		HDC dc = GetDC(m_currWindow->m_OSData->hWnd);
 		PIXELFORMATDESCRIPTOR pfd = {
 			sizeof(PIXELFORMATDESCRIPTOR),   // size of this pfd  
 			1,                     // version number  
@@ -501,19 +492,31 @@ void BackendOpenGL::SetActiveWindow(mgf::SystemWindow* w)
 		};
 		int iPixelFormat = ChoosePixelFormat(dc, &pfd);
 		BOOL r = SetPixelFormat(dc, iPixelFormat, &pfd);
+		ReleaseDC(m_currWindow->m_OSData->hWnd, dc);
+	}
 
+	if (m_params.withInit && !m_params.hglrc)
+	{
+		HDC dc = GetDC(m_currWindow->m_OSData->hWnd);
 		m_params.hglrc = wglCreateContext(dc);
 		wglMakeCurrent(dc, m_params.hglrc);
 
 		/*oldgl_wglGetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC)wglGetProcAddress("wglGetExtensionsStringEXT");
 		oldgl_wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
 		oldgl_wglSwapIntervalEXT(1);*/
-
-		ReleaseDC(m_window->m_hWnd, dc);
-
+		ReleaseDC(m_currWindow->m_OSData->hWnd, dc);
 		glClearColor(1.f, 1.f, 1.f, 1.f);
 		glEnable(GL_TEXTURE_2D);
 	}
+
+	_createBackbuffer(m_currWindow);
+}
+
+mgf::SystemWindow* BackendOpenGL::SetCurrentWindow(mgf::SystemWindow* w)
+{
+	mgf::SystemWindow* prev = m_currWindow;
+	m_currWindow = w;
+	return prev;
 }
 
 void BackendOpenGL::SetActiveContext(mgf::Context* c)
@@ -521,16 +524,21 @@ void BackendOpenGL::SetActiveContext(mgf::Context* c)
 	m_context = c;
 }
 
-void BackendOpenGL::UpdateBackbuffer()
+void BackendOpenGL::UpdateBackBuffer()
 {
-	if (m_window->m_hdcMem)
-		DeleteDC(m_window->m_hdcMem);
-	if (m_window->m_hbmMem)
-		DeleteObject(m_window->m_hbmMem);
+	/*if (m_currWindow->m_hdcMem)
+		DeleteDC(m_currWindow->m_hdcMem);
+	if (m_currWindow->m_hbmMem)
+		DeleteObject(m_currWindow->m_hbmMem);*/
 	
-	glViewport(0, 0, m_window->m_size.x, m_window->m_size.y);
+	glViewport(0, 0, m_currWindow->m_size.x, m_currWindow->m_size.y);
 
-	_createBackbuffer(m_window);
+	_createBackbuffer(m_currWindow);
+}
+
+void BackendOpenGL::DeleteBackBuffer()
+{
+
 }
 
 void BackendOpenGL::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)

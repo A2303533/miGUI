@@ -48,6 +48,8 @@ namespace mgf
 		friend class ListBox;
 		friend class Table;
 
+		mgContext_s* m_gui_context = 0;
+
 	protected:
 		mgWindow_s* m_window = 0;
 		std::basic_string<wchar_t> m_title;

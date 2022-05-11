@@ -133,7 +133,8 @@ namespace mgf
 		virtual mgf::SystemWindow* SetCurrentWindow(mgf::SystemWindow*) override;
 		virtual void SetActiveContext(mgf::Context*) override;
 
-		virtual void UpdateBackbuffer() override;
+		virtual void UpdateBackBuffer() override;
+		virtual void DeleteBackBuffer() override;
 
 		virtual void BeginDraw(int reason) override;
 		virtual void EndDraw() override;

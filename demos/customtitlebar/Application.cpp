@@ -100,6 +100,7 @@ bool Application::Init()
 	m_backend = new MyBackend();
 	m_GUIContext = m_framework->CreateContext(m_windowMain, m_backend);
 
+
 	m_menuFont = m_backend->CreateFontPrivate(L"..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf", 11, false, false, L"LT Internet");
 
 	m_windowBG = new mgf::Window(m_GUIContext);
@@ -127,7 +128,7 @@ bool Application::Init()
 
 	//m_mainMenuWindow->Hide();
 	{
-		m_mainMenuWindow->UseMenu(true, m_menuFont);
+		m_mainMenuWindow->UseMenu(true, true, m_menuFont);
 
 		m_mainMenuWindow->BeginMenu(L"File");
 		{

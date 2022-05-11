@@ -68,13 +68,6 @@ namespace mgf
 		virtual mgf::SystemWindow* SetCurrentWindow(mgf::SystemWindow*) = 0;
 		virtual void SetActiveContext(mgf::Context*) = 0;
 
-		/*
-		* free memory for screen buffer and allocate new.
-		* for active window.
-		*/
-		virtual void UpdateBackbuffer() = 0;
-
-
 		virtual void BeginDraw(int reason) = 0;
 		virtual void EndDraw() = 0;
 
@@ -135,6 +128,12 @@ namespace mgf
 		/// <param name="t">- texture</param>
 		/// <param name="i">- image</param>
 		virtual void UpdateTexture(mgTexture* t, mgImage* i) {}
+
+		/// <summary>
+		/// Delete old buffers and create new
+		/// </summary>
+		virtual void UpdateBackBuffer() = 0;
+		virtual void DeleteBackBuffer() = 0;
 	};
 }
 

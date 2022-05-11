@@ -54,6 +54,13 @@ struct mgPopupSystemWindow
 void
 mgPopupDestroySystemWindow(mgPopup* p)
 {
+	struct mgPopupSystemWindow* ptr = p->systemWindowImplementation;
+#ifdef MG_PLATFORM_WINDOWS
+	if (ptr->systemWindowData.hdcMem)
+		DeleteDC(ptr->systemWindowData.hdcMem);
+	if (ptr->systemWindowData.hbmMem)
+		DeleteObject(ptr->systemWindowData.hbmMem);
+#endif
 	free(p->systemWindowImplementation);
 }
 
@@ -61,7 +68,7 @@ void
 mgPopupInitSystemWindow(struct mgContext_s* c, mgPopup* p)
 {
 	int success = 0;
-	struct mgPopupSystemWindow* systemWindow = malloc(sizeof(struct mgPopupSystemWindow));
+	struct mgPopupSystemWindow* systemWindow = calloc(1, sizeof(struct mgPopupSystemWindow));
 
 #ifdef MG_PLATFORM_WINDOWS
 	static int isClassnameRegistered = 0;
@@ -93,6 +100,8 @@ mgPopupInitSystemWindow(struct mgContext_s* c, mgPopup* p)
 
 	if (success)
 	{
+		//if (c->onCreateWindow) c->onCreateWindow(&systemWindow->systemWindowData);
+
 		p->systemWindowImplementation = systemWindow;
 	}
 }
@@ -593,7 +602,6 @@ _mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 								struct mgPopupSystemWindow* ptr = p->items[i].info.subMenu->systemWindowImplementation;
 								ShowWindow(ptr->systemWindowData.hWnd, SW_SHOWNOACTIVATE);
 							}
-						//	mgShowPopup_f(c, p->items[i].info.subMenu, &pt2);
 						}
 						else
 						{
@@ -759,34 +767,6 @@ mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 
 	if (p->flags & mgPopupFlags_systemWindow)
 	{
-		if (p->flags & mgPopupFlags_systemWindow)
-		{
-			/*if (!p->systemWindowImplementation)
-			{
-				mgPopupInitSystemWindow(c, p);
-				for (int i = 0; i < p->itemsSize; ++i)
-				{
-					if (p->items[i].info.subMenu && p->systemWindowImplementation)
-						mgPopupInitSystemWindow(c, p->items[i].info.subMenu);
-				}
-			}*/
-
-			for (int i = 0; i < p->itemsSize; ++i)
-			{
-				// If mgPopup with system window popup:
-				// p->items[i].info.subMenu is child for p
-				if (p->items[i].info.subMenu && p->systemWindowImplementation)
-				{
-#ifdef MG_PLATFORM_WINDOWS
-					struct mgPopupSystemWindow* parent_ptr = p->systemWindowImplementation;
-					struct mgPopupSystemWindow* child_ptr = p->items[i].info.subMenu->systemWindowImplementation;
-
-					//SetParent(child_ptr->systemWindowData.hWnd, parent_ptr->systemWindowData.hWnd);
-#endif
-				}
-			}
-		}
-
 #ifdef MG_PLATFORM_WINDOWS
 		struct mgPopupSystemWindow* ptr = p->systemWindowImplementation;
 		ShowWindow(ptr->systemWindowData.hWnd, SW_SHOWNOACTIVATE);

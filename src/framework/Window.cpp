@@ -42,6 +42,7 @@
 using namespace mgf;
 
 Window::Window(Context* ctx)
+	:m_gui_context(ctx->m_gui_context)
 {
 	m_window = mgCreateWindow(ctx->m_gui_context, 0, 0, 300, 200);
 	m_window->titlebarFont = ((mgf::FontImpl*)ctx->GetBackend()->GetDefaultFont())->m_font;
@@ -402,7 +403,7 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 			flags |= mgPopupFlags_systemWindow;
 		}
 
-		newPopup = mgCreatePopup(popupItems.data(), (int)popupItems.size(), ((FontImpl*)m_menuFont)->m_font, flags);
+		newPopup = mgCreatePopup(m_gui_context, popupItems.data(), (int)popupItems.size(), ((FontImpl*)m_menuFont)->m_font, flags);
 		newPopup->onIsItemEnabled = Window_onIsItemEnabled;
 		newPopup->onIsItemChecked = Window_onIsItemChecked;
 		newPopup->onIsItemRadio = Window_onIsItemRadio;

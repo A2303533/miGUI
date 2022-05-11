@@ -76,8 +76,6 @@ namespace mgf
 		virtual mgf::SystemWindow* SetCurrentWindow(mgf::SystemWindow*) override;
 		virtual void SetActiveContext(mgf::Context*) override;
 
-		virtual void UpdateBackbuffer() override;
-
 		virtual void BeginDraw(int reason) override;
 		virtual void EndDraw() override;
 
@@ -98,6 +96,9 @@ namespace mgf
 		virtual void SetIcon(mgf::Icons*, int id) override;
 		virtual Font* CreateFontPrivate(const wchar_t* file, int size, bool bold, bool italic, const wchar_t* name) override;
 		virtual void UpdateTexture(mgTexture* t, mgImage* i) override;
+
+		virtual void UpdateBackBuffer() override;
+		virtual void DeleteBackBuffer() override;
 	};
 
 }

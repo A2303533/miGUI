@@ -71,8 +71,9 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     wcex.hIconSm = 0;// LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
     RegisterClassExW(&wcex);
 
-    m_OSData.userData = this;
-    m_OSData.handle = CreateWindowExW(
+    m_OSData = new struct mgSystemWindowOSData;
+    m_OSData->userData = this;
+    m_OSData->hWnd = CreateWindowExW(
         WS_EX_ACCEPTFILES,
         m_className,
         L"mgf",
@@ -94,6 +95,7 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
     m_borderSize.x = GetSystemMetrics(SM_CXFRAME) + padding;
     m_borderSize.y = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + padding);
+    m_borderSizeCurrent = m_borderSize;
 
     RAWINPUTDEVICE device;
     device.usUsagePage = 0x01;
@@ -113,23 +115,31 @@ SystemWindow::~SystemWindow()
 {
     m_context = 0;
 #ifdef MG_PLATFORM_WINDOWS
-    if (m_OSData.handle)
+    if (m_OSData->hWnd)
     {
-        if (m_OSData.m_hdcMem)
-            DeleteDC((HDC)m_OSData.m_hdcMem);
-        if (m_OSData.m_hbmMem)
-            DeleteObject((HGDIOBJ)m_OSData.m_hbmMem);
+        if (m_OSData->hdcMem)
+            DeleteDC((HDC)m_OSData->hdcMem);
+        if (m_OSData->hbmMem)
+            DeleteObject((HGDIOBJ)m_OSData->hbmMem);
 
         //ReleaseDC(m_hWnd, m_dc);
-        DestroyWindow((HWND)m_OSData.handle);
+        DestroyWindow((HWND)m_OSData->hWnd);
         UnregisterClass(m_className, GetModuleHandle(0));
     }
 #endif
+
+    if (m_OSData)
+        delete m_OSData;
+}
+
+void SystemWindow::SetOSData(mgSystemWindowOSData* data)
+{
+    m_OSData = data;
 }
 
 mgSystemWindowOSData* SystemWindow::GetOSData()
 {
-	return &m_OSData;
+	return m_OSData;
 }
 
 void SystemWindow::SetUserData(void* ud)
@@ -150,7 +160,7 @@ const mgPoint& SystemWindow::GetBorderSize()
 void SystemWindow::SetTitle(const wchar_t* t)
 {
 #ifdef MG_PLATFORM_WINDOWS
-    SetWindowTextW((HWND)m_OSData.handle, t);
+    SetWindowTextW((HWND)m_OSData->hWnd, t);
 #endif
 }
 
@@ -158,7 +168,7 @@ void SystemWindow::SetVisible(bool v)
 {
     m_isVisible = v;
 #ifdef MG_PLATFORM_WINDOWS
-    ShowWindow((HWND)m_OSData.handle, v ? SW_SHOW : SW_HIDE);
+    ShowWindow((HWND)m_OSData->hWnd, v ? SW_SHOW : SW_HIDE);
 #endif
 }
 
@@ -181,7 +191,7 @@ void SystemWindow::SetSize(int x, int y)
 void SystemWindow::UpdateBackbuffer()
 {
     if (m_context)
-        m_context->m_backend->UpdateBackbuffer();
+        m_context->m_backend->UpdateBackBuffer();
 }
 
 void SystemWindow::OnSize()
@@ -191,9 +201,11 @@ void SystemWindow::OnSize()
         m_context->m_input->mouseButtonFlags1 = 0;
 
     RECT rc;
-    GetClientRect((HWND)m_OSData.handle, &rc);
+    GetClientRect((HWND)m_OSData->hWnd, &rc);
     m_size.x = rc.right - rc.left;
     m_size.y = rc.bottom - rc.top;
+
+    m_OSData->size = m_size;
 
     m_clientRect.left = 0;
     m_clientRect.top = 0;
@@ -297,21 +309,21 @@ mgPoint* SystemWindow::GetSizeMinimum()
 void SystemWindow::Maximize()
 {
 #ifdef MG_PLATFORM_WINDOWS
-    ShowWindow((HWND)m_OSData.handle, SW_MAXIMIZE);
+    ShowWindow((HWND)m_OSData->hWnd, SW_MAXIMIZE);
 #endif
 }
 
 void SystemWindow::Minimize()
 {
 #ifdef MG_PLATFORM_WINDOWS
-    ShowWindow((HWND)m_OSData.handle, SW_MINIMIZE);
+    ShowWindow((HWND)m_OSData->hWnd, SW_MINIMIZE);
 #endif
 }
 
 void SystemWindow::Restore()
 {
 #ifdef MG_PLATFORM_WINDOWS
-    ShowWindow((HWND)m_OSData.handle, SW_RESTORE);
+    ShowWindow((HWND)m_OSData->hWnd, SW_RESTORE);
 #endif
 }
 
@@ -319,9 +331,9 @@ void SystemWindow::Rebuild()
 {
 #ifdef MG_PLATFORM_WINDOWS
     RECT size_rect;
-    GetWindowRect((HWND)m_OSData.handle, &size_rect);
+    GetWindowRect((HWND)m_OSData->hWnd, &size_rect);
     SetWindowPos(
-        (HWND)m_OSData.handle, NULL,
+        (HWND)m_OSData->hWnd, NULL,
         size_rect.left, size_rect.top,
         size_rect.right - size_rect.left, size_rect.bottom - size_rect.top,
         SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE
@@ -620,6 +632,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (pW)
         {
             pW->OnSize();
+            
             int wmId = LOWORD(wParam);
             switch (wmId)
             {

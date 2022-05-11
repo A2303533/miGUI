@@ -95,7 +95,7 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 
 	mgPoint windowSize = window->GetSize();
 
-	HWND hWnd = (HWND)window->GetOSData()->handle;
+	HWND hWnd = window->GetOSData()->hWnd;
 
 	m_activeWindow = window;
 	m_mainTargetSize.x = (float)windowSize.x;

@@ -91,7 +91,7 @@ namespace mgf
 		friend class Context;
 		friend class Framework;
 
-		struct mgSystemWindowOSData m_OSData;
+		struct mgSystemWindowOSData* m_OSData = 0;
 #ifdef MG_PLATFORM_WINDOWS
 		wchar_t m_className[20];
 		//HWND m_hWnd = 0;
@@ -108,6 +108,7 @@ namespace mgf
 		mgRect m_clientRect;
 		mgPoint m_size;
 		mgPoint m_borderSize;
+		mgPoint m_borderSizeCurrent;
 		mgPoint m_sizeMinimum;
 
 		bool m_isCustomTitlebar = false;
@@ -124,6 +125,7 @@ namespace mgf
 		virtual ~SystemWindow();
 
 		mgSystemWindowOSData* GetOSData();
+		void SetOSData(mgSystemWindowOSData*);
 
 		void SetUserData(void*);
 		void* GetUserData();

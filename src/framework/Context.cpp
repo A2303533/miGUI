@@ -40,12 +40,6 @@
 using namespace mgf;
 
 Context::Context(mgf::SystemWindow* sysWnd, Backend* backend)
-:
-m_window(0),
-m_backend(0),
-m_onDraw(0),
-m_gui_context(0),
-m_input(0)
 {
 	//m_window = new mgf::SystemWindowImpl(windowFlags, windowPosition, windowSize);
 	m_window = (SystemWindow*)sysWnd;
@@ -55,14 +49,16 @@ m_input(0)
 	memset(m_input, 0, sizeof(mgInputContext));
 
 	m_backend = backend;
-	m_backend->SetActiveWindow(m_window);
+	m_backend->SetCurrentWindow(m_window);
 	m_backend->SetActiveContext(this);
 	m_backend->InitWindow(m_window);
-	m_backend->UpdateBackbuffer();
+	m_backend->UpdateBackBuffer();
 
 	mgVideoDriverAPI* gpu = (mgVideoDriverAPI*)backend->GetVideoDriverAPI();
 	m_gui_context = mgCreateContext(gpu, m_input);
 	m_gui_context->getTextSize = m_backend->m_getTextSize;
+
+	m_gui_context->systemWindowData = *sysWnd->GetOSData();
 
 	m_backend->GetDefaultFont();
 
@@ -70,7 +66,7 @@ m_input(0)
 
 	{
 		RECT rc;
-		GetClientRect(this->m_window->m_hWnd, &rc);
+		GetClientRect(this->m_window->m_OSData->hWnd, &rc);
 		m_gui_context->needRebuild = 1;
 		m_gui_context->windowSize.x = rc.right - rc.left;
 		m_gui_context->windowSize.y = rc.bottom - rc.top;
@@ -143,8 +139,10 @@ void Context::DrawAll()
 	if (!m_gui_context)
 		return;
 
-#pragma message("Here must be `set active window`")
+	m_backend->SetCurrentWindow(m_window);
+
 	m_gui_context->gpu->beginDraw(mgBeginDrawReason_systemWindow);
+
 	mgDraw(m_gui_context);
 	if (m_onDraw)
 		m_onDraw(this, this->m_backend);
@@ -189,7 +187,7 @@ Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize)
 	FontImpl* fontImpl = (FontImpl*)f;
 
 	Popup* newPopup = new Popup(this);
-	newPopup->m_implementation = mgCreatePopup(arr, arrSize, fontImpl->m_font, 0);
+	newPopup->m_implementation = mgCreatePopup(m_gui_context, arr, arrSize, fontImpl->m_font, 0);
 
 	return newPopup;
 }

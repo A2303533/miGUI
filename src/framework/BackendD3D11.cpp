@@ -736,7 +736,7 @@ void BackendD3D11::_createBackbuffer(mgf::SystemWindow* impl)
 
 void BackendD3D11::InitWindow(mgf::SystemWindow* w)
 {
-	if (m_currWindow->m_OSData.hdcMem)
+	if (m_currWindow->m_OSData->hdcMem)
 		return;
 //	_createBackbuffer(m_window);
 }
@@ -753,7 +753,7 @@ void BackendD3D11::SetActiveContext(mgf::Context* c)
 	m_context = c;
 }
 
-void BackendD3D11::UpdateBackbuffer()
+void BackendD3D11::UpdateBackBuffer()
 {
 	/*if (m_window->m_hdcMem)
 		DeleteDC(m_window->m_hdcMem);
@@ -767,6 +767,11 @@ void BackendD3D11::UpdateBackbuffer()
 	m_cbVertex_impl.m_ProjMtx.m_data[2] = mgf::v4f(0.0f, 0.0f, 0.5f, 0.0f);
 	m_cbVertex_impl.m_ProjMtx.m_data[3] = mgf::v4f(-1.f, 1.f, 0.5f, 1.0f);
 	//_createBackbuffer(m_window);
+}
+
+void BackendD3D11::DeleteBackBuffer()
+{
+
 }
 
 void BackendD3D11::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)

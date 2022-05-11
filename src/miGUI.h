@@ -575,11 +575,13 @@ typedef struct mgContext_s {
 	mgCursor* defaultCursors[mgCursorType__count];
 	mgCursor* currentCursors[mgCursorType__count];
 
-	/* Get text size in pixels
-	* optional
-	* need to know text size.
-	*/
+	// Get text size in pixels
+	// need to know text size.
 	void(*getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
+
+	// mgPopup with systemWindow flag will create new window.
+	// you can/backends will use this for some initialization
+	//void(*onCreateWindow)(struct mgSystemWindowOSData*);
 
 	struct mgFunctions_s functions;
 

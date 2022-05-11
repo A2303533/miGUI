@@ -46,7 +46,7 @@ WindowMain::WindowMain(int windowFlags, const mgPoint& windowPosition, const mgP
 bool WindowMain::OnClose()
 {
 	return MessageBoxA(
-		(HWND)GetOSData()->handle,
+		GetOSData()->hWnd,
 		"Close app",
 		"Are you sure?",
 		MB_ICONQUESTION | MB_YESNO)
