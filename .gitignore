@@ -60,9 +60,8 @@ libs/
 build/mgf/x64/Debug
 
 build/mgf/x64/Release
-*.data
 Tools/resconv/Debug
 
-*.data
+
 Tools/resconv/Release
 
