@@ -174,5 +174,17 @@
     <ClCompile Include="..\..\src\DirectXTK\Src\DDSTextureLoader.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\GSD3D11ShaderLine.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Camera.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\fastlz.c">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Archive.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

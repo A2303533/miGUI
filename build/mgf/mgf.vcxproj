@@ -163,13 +163,16 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\DirectXTK\Src\DDSTextureLoader.cpp" />
     <ClCompile Include="..\..\src\framework\Aabb.cpp" />
+    <ClCompile Include="..\..\src\framework\Archive.cpp" />
     <ClCompile Include="..\..\src\framework\AudioEngine.cpp" />
     <ClCompile Include="..\..\src\framework\BackendD3D11.cpp" />
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp" />
     <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp" />
     <ClCompile Include="..\..\src\framework\Button.cpp" />
+    <ClCompile Include="..\..\src\framework\Camera.cpp" />
     <ClCompile Include="..\..\src\framework\Context.cpp" />
     <ClCompile Include="..\..\src\framework\Element.cpp" />
+    <ClCompile Include="..\..\src\framework\fastlz.c" />
     <ClCompile Include="..\..\src\framework\Filesystem.cpp" />
     <ClCompile Include="..\..\src\framework\FontImpl.cpp" />
     <ClCompile Include="..\..\src\framework\Framework.cpp" />
@@ -177,6 +180,7 @@
     <ClCompile Include="..\..\src\framework\GSD3D11.cpp" />
     <ClCompile Include="..\..\src\framework\GSD3D11Mesh.cpp" />
     <ClCompile Include="..\..\src\framework\GSD3D11Shader.cpp" />
+    <ClCompile Include="..\..\src\framework\GSD3D11ShaderLine.cpp" />
     <ClCompile Include="..\..\src\framework\GSD3D11ShaderScreenQuad.cpp" />
     <ClCompile Include="..\..\src\framework\GSD3D11Texture.cpp" />
     <ClCompile Include="..\..\src\framework\Icons.cpp" />

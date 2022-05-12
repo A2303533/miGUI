@@ -24,8 +24,8 @@ namespace mgf
 			};
 
 	protected:
-		DriverType m_videoDriverType;
-		SystemWindow* m_activeWindow;
+		DriverType m_videoDriverType = DriverType_Unknown;
+		SystemWindow* m_activeWindow = 0;
 	public:
 		GS();
 		virtual ~GS();
@@ -70,6 +70,16 @@ namespace mgf
 		virtual void SetTexture(uint32_t slot, GSTexture*) = 0;
 		virtual void SetMesh(GSMesh*) = 0;
 		virtual void Draw() = 0;
+
+		/// <summary>
+		/// Before using need to set matrix: MatrixType_GUIProjection
+		/// </summary>
+		virtual void DrawLine2D(const v3f& p1, const v3f& p2, const mgColor& c) = 0;
+
+		/// <summary>
+		/// Before using need to set matrix: MatrixType_ViewProjection
+		/// </summary>
+		virtual void DrawLine3D(const v4f& p1, const v4f& p2, const mgColor& c) = 0;
 
 		/// <summary>
 		/// Copy GPU texture data to mgf::Image.

@@ -39,6 +39,8 @@ namespace mgf
 	class GSD3D11Mesh;
 	class GSD3D11Shader;
 	class GSD3D11ShaderScreenQuad;
+	class GSD3D11ShaderLine;
+
 	struct BackendD3D11Params;
 
 	constexpr uint32_t GSVideoDriverMaxTextures = 16;
@@ -80,6 +82,7 @@ namespace mgf
 		GSD3D11Texture* m_whiteTexture = 0;
 		GSD3D11Shader* m_activeShader = 0;
 		GSD3D11ShaderScreenQuad* m_shaderScreenQuad = 0;
+		GSD3D11ShaderLine* m_shaderLine = 0;
 
 		v4f m_old_viewport;
 		v4f m_old_scissor;
@@ -117,6 +120,9 @@ namespace mgf
 		virtual void SetTexture(uint32_t slot, GSTexture*) override;
 		virtual void SetMesh(GSMesh*) override;
 		virtual void Draw() override;
+
+		virtual void DrawLine2D(const v3f& p1, const v3f& p2, const mgColor& c) override;
+		virtual void DrawLine3D(const v4f& p1, const v4f& p2, const mgColor& c) override;
 
 		virtual void GetTextureCopyForImage(GSTexture* t, Image* i) override;
 

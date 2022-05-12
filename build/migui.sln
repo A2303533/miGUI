@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32421.90
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32428.217
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "migui", "migui.vcxproj", "{2B38ADE4-3BED-47FC-ACD5-E40E20ABC606}"
 EndProject
@@ -12,6 +12,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ap", "..\apps\ap\ap.vcxproj", "{0704375E-91DB-4E4A-9D76-4ED5AD0F41B5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mgf", "mgf\mgf.vcxproj", "{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{C591578A-3517-4282-886E-14FB2437C70E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resconv", "..\Tools\resconv\resconv.vcxproj", "{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,9 +65,20 @@ Global
 		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Release|x64.Build.0 = Release|x64
 		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Release|x86.ActiveCfg = Release|Win32
 		{68CB463B-A35A-43F3-AEA7-FD22A30E47B6}.Release|x86.Build.0 = Release|Win32
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}.Debug|x64.ActiveCfg = Debug|x64
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}.Debug|x64.Build.0 = Debug|x64
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}.Debug|x86.ActiveCfg = Debug|Win32
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}.Debug|x86.Build.0 = Debug|Win32
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}.Release|x64.ActiveCfg = Release|x64
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}.Release|x64.Build.0 = Release|x64
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}.Release|x86.ActiveCfg = Release|Win32
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B8A7AEA4-EAA0-42E3-8D66-5326F1EC6F35} = {C591578A-3517-4282-886E-14FB2437C70E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39107F34-AFC7-413B-837E-706586072D74}

@@ -11,7 +11,7 @@ extern PFND3DCOMPILEPROC g_D3DCompile;
 
 using namespace mgf;
 
-bool GSD3D11_createConstantBuffer(ID3D11Device* d, uint32_t byteSize, ID3D11Buffer** cb)
+bool mgf::GSD3D11_createConstantBuffer(ID3D11Device* d, uint32_t byteSize, ID3D11Buffer** cb)
 {
 	D3D11_BUFFER_DESC mbd;
 	memset(&mbd, 0, sizeof(mbd));
@@ -31,7 +31,7 @@ bool GSD3D11_createConstantBuffer(ID3D11Device* d, uint32_t byteSize, ID3D11Buff
 	return true;
 }
 
-bool GSD3D11_createGeometryShaders(
+bool mgf::GSD3D11_createGeometryShaders(
 	ID3D11Device* d,
 	const char* target,
 	const char* shaderText,

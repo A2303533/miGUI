@@ -9,6 +9,7 @@
 #include "framework/Window.h"
 #include "framework/Font.h"
 #include "framework/Icons.h"
+#include "framework/Archive.h"
 
 #include "WindowMain.h"
 #include "WindowMainMenu.h"
@@ -92,6 +93,57 @@ bool Application::Init()
 
 	m_windowMain->SetUseCustomTitleBar(true);
 	m_windowMain->SetCustomTitleBarSize(22);
+
+	const char* big_buffer = "Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA \
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGB1IGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data B5iBigBIGBIGBIG DATA\
+Big Data BiBigBIGwBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BigBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIxGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
+Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
+
+	mgf::ArchiveSystem archive;
+	mgf::CompressionInfo cmpInf;
+	cmpInf.m_dataUncompressed = (void*)big_buffer;
+	cmpInf.m_sizeUncompressed = strlen(big_buffer);
+	if (archive.Compress(&cmpInf))
+	{
+		FILE * f = fopen("compressed.data", "wb");
+		if (f)
+		{
+			fwrite(cmpInf.m_dataCompressed, cmpInf.m_sizeCompressed, 1, f);
+			fclose(f);
+			
+			mgf::CompressionInfo dcmpInf;
+
+			dcmpInf.m_sizeUncompressed = cmpInf.m_sizeUncompressed;
+			dcmpInf.m_dataUncompressed = (char*)malloc(dcmpInf.m_sizeUncompressed);
+			dcmpInf.m_dataCompressed = cmpInf.m_dataCompressed;
+			dcmpInf.m_sizeCompressed = cmpInf.m_sizeCompressed;
+			if (archive.Decompress(&dcmpInf))
+			{
+				FILE* f = fopen("decompressed.data", "wb");
+				if (f)
+				{
+					fwrite(dcmpInf.m_dataUncompressed, cmpInf.m_sizeUncompressed, 1, f);
+					fclose(f);
+				}
+			}
+
+			free(dcmpInf.m_dataUncompressed);
+		}
+
+		free(cmpInf.m_dataCompressed);
+	}
 
 	_InitThemes();
 	SetTheme(&m_themeDark);

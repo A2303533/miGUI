@@ -8,6 +8,7 @@
 #include "GSD3D11Mesh.h"
 #include "GSD3D11Shader.h"
 #include "GSD3D11ShaderScreenQuad.h"
+#include "GSD3D11ShaderLine.h"
 
 #include "framework/Image.h"
 #include "framework/BackendD3D11.h"
@@ -318,7 +319,12 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 	}
 
 	m_shaderScreenQuad = new GSD3D11ShaderScreenQuad(m_d3d11Device);
-	m_shaderScreenQuad->init();
+	if (!m_shaderScreenQuad->init())
+		return false;
+
+	m_shaderLine = new GSD3D11ShaderLine(m_d3d11Device, m_d3d11DevCon);
+	if (!m_shaderLine->init())
+		return false;
 
 	m_mainTargetSize.set((float)windowSize.x, (float)windowSize.y);
 	_updateMainTarget();
@@ -567,6 +573,32 @@ void GSD3D11::Draw()
 {
 	if (!m_currentMesh)
 		return;
+}
+
+void GSD3D11::DrawLine2D(const v3f& _p1, const v3f& _p2, const mgColor& c)
+{
+	v4f p1 = _p1;
+	v4f p2 = _p2;
+	m_d3d11DevCon->IASetInputLayout(NULL);
+	m_d3d11DevCon->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+
+	SetActiveShader(m_shaderLine);
+	m_shaderLine->SetData(p1, p2, c, &m_matrices[MatrixType_GUIProjection]);
+	m_shaderLine->SetConstants(0);
+
+	m_d3d11DevCon->Draw(2, 0);
+}
+
+void GSD3D11::DrawLine3D(const v4f& p1, const v4f& p2, const mgColor& c)
+{
+	m_d3d11DevCon->IASetInputLayout(NULL);
+	m_d3d11DevCon->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+	
+	SetActiveShader(m_shaderLine);
+	m_shaderLine->SetData(p1, p2, c, &m_matrices[MatrixType_ViewProjection]);
+	m_shaderLine->SetConstants(0);
+
+	m_d3d11DevCon->Draw(2, 0);
 }
 
 bool GSD3D11::_updateMainTarget()

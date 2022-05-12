@@ -795,30 +795,6 @@ void BackendGDI::UpdateTexture(mgTexture* t, mgImage* img)
 		++pixelRGBA8_src;
 		++pixelRGBA8_dst;
 	}
-	
-	/*Gdiplus::Rect gdirect;
-	gdirect.X = 0;
-	gdirect.Y = 0;
-	gdirect.Width = img->width;
-	gdirect.Height = img->height;
-
-	Gdiplus::BitmapData bitmapData;
-	Gdiplus::Status s = gdiImage->LockBits(&gdirect, Gdiplus::ImageLockModeWrite, gdiImage->GetPixelFormat(), &bitmapData);
-
-	if (s == Gdiplus::Status::Ok)
-	{
-		uint8_t* dst = (uint8_t*)bitmapData.Scan0;
-		uint8_t* src = img->data;
-		
-		for (uint32_t i = 0; i < img->height; ++i)
-		{
-			memcpy(dst, src, img->pitch);
-			dst += img->pitch;
-			src += img->pitch;
-		}
-
-		gdiImage->UnlockBits(&bitmapData);
-	}*/
 }
 
 #endif

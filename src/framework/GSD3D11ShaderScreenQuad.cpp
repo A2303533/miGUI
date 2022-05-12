@@ -60,6 +60,7 @@ bool GSD3D11ShaderScreenQuad::init()
 		&this->m_pShader,
 		&this->m_vLayout))
 	{
+		mgf::LogWriteError("%s\n", "D3D11: Can't create shader Screen Quad");
 		return false;
 	}
 
