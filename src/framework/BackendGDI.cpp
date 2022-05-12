@@ -37,6 +37,7 @@
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 #include "framework/Icons.h"
+#include "framework/Image.h"
 
 #ifdef MG_PLATFORM_WINDOWS
 
@@ -439,7 +440,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 				m_clipRect.top,
 				m_clipRect.right,
 				m_clipRect.bottom);
-			SelectClipRgn(m_currWindow->m_OSData->hdcMem, rgn);
+		SelectClipRgn(m_currWindow->m_OSData->hdcMem, rgn);
 		FillRect(m_currWindow->m_OSData->hdcMem, &r, brsh);
 
 		if (reason == mgDrawRectangleReason_popupBG)
@@ -514,6 +515,13 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			gdirct.Height = rct->bottom - rct->top;
 
 			Gdiplus::Graphics graphics(m_currWindow->m_OSData->hdcMem);
+
+			rgn = CreateRectRgn(
+				m_clipRect.left,
+				m_clipRect.top,
+				m_clipRect.right,
+				m_clipRect.bottom);
+			graphics.SetClip(rgn);
 
 			{
 				Gdiplus::Bitmap* bmp = (Gdiplus::Bitmap*)texture->implementation;
@@ -772,7 +780,21 @@ void BackendGDI::SetIcon(mgf::Icons* ic, int id)
 void BackendGDI::UpdateTexture(mgTexture* t, mgImage* img)
 {
 	Gdiplus::Bitmap* gdiImage = (Gdiplus::Bitmap*)t->implementation;
-	memcpy(t->sourceCopy->data, img->data, img->dataSize);
+	//memcpy(t->sourceCopy->data, img->data, img->dataSize);
+
+	ImagePixelFormat_RGBA8* pixelRGBA8_dst = (ImagePixelFormat_RGBA8*)t->sourceCopy->data;
+	ImagePixelFormat_RGBA8* pixelRGBA8_src = (ImagePixelFormat_RGBA8*)img->data;
+
+	uint32_t wh = img->height * img->width;
+	for (uint32_t i = 0; i < wh; ++i)
+	{
+		pixelRGBA8_dst->r = pixelRGBA8_src->b;
+		pixelRGBA8_dst->g = pixelRGBA8_src->g;
+		pixelRGBA8_dst->b = pixelRGBA8_src->r;
+		pixelRGBA8_dst->a = pixelRGBA8_src->a;
+		++pixelRGBA8_src;
+		++pixelRGBA8_dst;
+	}
 	
 	/*Gdiplus::Rect gdirect;
 	gdirect.X = 0;

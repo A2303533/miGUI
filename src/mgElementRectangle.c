@@ -360,6 +360,7 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgCo
 	newElement->creationRect = newElement->transformLocal.buildArea;
 
 	newElement->window = w;
+	w->flagsInternal |= mgWindowFlag_internal_updateContentHeight;
 
 	mgElementDefaultInit(newElement);
 	newElement->onDraw = miGUI_onDraw_rectangle;

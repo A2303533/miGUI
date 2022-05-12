@@ -146,6 +146,10 @@ void Window::SetSize(int x, int y)
 {
 	m_window->size.x = x;
 	m_window->size.y = y;
+	//m_window->clientHeight = y;
+	//m_window->contentHeight = 0;
+	m_window->flagsInternal |= mgWindowFlag_internal_updateContentHeight;
+
 	UpdateRect();
 }
 

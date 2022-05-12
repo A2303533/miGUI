@@ -33,6 +33,16 @@
 
 namespace mgf
 {
+	struct ImagePixelFormat_RGBA8
+	{
+		uint8_t r, g, b, a;
+	};
+
+	struct ImagePixelFormat_RGB8
+	{
+		uint8_t r, g, b;
+	};
+
 	class Image : public BaseClass
 	{
 		friend class Framework;

@@ -124,6 +124,7 @@ namespace mgf
 		
 		/// <summary>
 		/// Copy image to texture. Must be same size and same other parameters.
+		/// Everything must be RGBA8
 		/// </summary>
 		/// <param name="t">- texture</param>
 		/// <param name="i">- image</param>
