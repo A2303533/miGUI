@@ -186,5 +186,8 @@
     <ClCompile Include="..\..\src\framework\Archive.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\FileBuffer.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

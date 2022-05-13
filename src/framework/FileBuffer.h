@@ -5,14 +5,14 @@
   modification, are permitted provided that the following conditions
   are met:
   1. Redistributions of source code must retain the above copyright
-	 notice, this list of conditions and the following disclaimer.
+     notice, this list of conditions and the following disclaimer.
   2. Redistributions in binary form must reproduce the above copyright
-	 notice, this list of conditions and the following disclaimer in
-	 the documentation and/or other materials provided with the
-	 distribution.
+     notice, this list of conditions and the following disclaimer in
+     the documentation and/or other materials provided with the
+     distribution.
   3. The names of the authors may not be used to endorse or promote
-	 products derived from this software without specific prior
-	 written permission.
+     products derived from this software without specific prior
+     written permission.
   THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS
   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,52 +27,36 @@
 */
 
 #pragma once
-#ifndef _MGF_FMWK_H_
-#define _MGF_FMWK_H_
-
-#include "Image.h"
-#include "String.h"
-
-#include <vector>
-
-#ifdef LoadImage
-#undef LoadImage
-#endif
+#ifndef _MGF_FILEBUFFER_H_
+#define _MGF_FILEBUFFER_H_
 
 namespace mgf
 {
-	class Framework : public BaseClass
-	{
-		std::vector<Context*> m_contexts;
-		StringW m_appDirectory;
-	public:
-		Framework();
-		virtual ~Framework();
-		
-		bool m_run;
 
-		Context* CreateContext(mgf::SystemWindow*, Backend* backend);
+    /// <summary>
+    /// This class works like FILE but with buffer.
+    /// If you use just FILE, you can use function like setbuf, but ftell will give you 0.
+    /// This class is for reading.
+    /// This class not allocate memory.
+    /// </summary>
+    class FileBuffer
+    {
+        uint8_t* m_buffer = 0;
+        uint32_t m_size = 0;
+        uint32_t m_cursor = 0;
+    public:
+        FileBuffer(const uint8_t* buffer, uint32_t size);
+        ~FileBuffer();
 
-		Icons* CreateIcons(const char* imageFile, Backend* backend);
-		Icons* CreateIcons(const wchar_t* imageFile, Backend* backend);
+        /// <summary>
+        /// Use SEEK_SET and other macros for second parameter
+        /// </summary>
+        void seek(uint32_t offset, int);
 
-		Image* LoadImage(const uint8_t* buffer, uint32_t bufferSize, ImageLoader);
-		Image* LoadImage(const char* imageFile);
-		Image* LoadImage(const wchar_t* imageFile);
-
-		mgStyle_s GetNewStyle(int isLightTheme);
-		/*
-		* Call every frame.
-		* Return true if system work
-		*/
-		bool Run();
-		void DrawAll();
-
-		StringW* GetAppDir();
-	};
-
-	Framework* InitFramework(); // init or return
-	Framework* GetFramework();  // only return
+        uint32_t tell();
+        uint32_t read(void* buffer, uint32_t size);
+    };
 }
+
 
 #endif

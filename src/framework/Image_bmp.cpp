@@ -31,6 +31,7 @@
 
 #include "framework/mgf.h"
 #include "framework/Image.h"
+#include "framework/FileBuffer.h"
 
 using namespace mgf;
 
@@ -77,35 +78,24 @@ struct BitmapInfoHeader_v5 {
 	uint32_t			bV5Reserved;
 };
 
-
-Image* mgf::Image_bmp(const char* fn)
+Image* mgf::Image_bmp_buf(const uint8_t* buffer, uint32_t bufferSize)
 {
-	Image* img = 0;
-
-	FILE* file = fopen(fn, "rb");
-	if (!file)
-		return 0;
-
 	BitmapHeader header;
 	BitmapInfoHeader_v5 info;
-	if (fread(&header, 1, sizeof(BitmapHeader), file) != sizeof(BitmapHeader))
-	{
-		fclose(file);
-		return 0;
-	}
+	
+	mgf::FileBuffer fileBuf(buffer, bufferSize);
 
-	fread(&info, 1, sizeof(BitmapInfoHeader_v5), file);
-	if (info.bV5Size < 40U)
-	{
-		fclose(file);
+	//if (fread(&header, 1, sizeof(BitmapHeader), file) != sizeof(BitmapHeader))
+	if(fileBuf.read(&header, sizeof(BitmapHeader)) != sizeof(BitmapHeader))
 		return 0;
-	}
+
+	//fread(&info, 1, sizeof(BitmapInfoHeader_v5), file);
+	fileBuf.read(&info, sizeof(BitmapInfoHeader_v5));
+	if (info.bV5Size < 40U)
+		return 0;
 
 	if (header.bfType != 19778)
-	{
-		fclose(file);
 		return 0;
-	}
 
 	int width = info.bV5Width;
 	int height = info.bV5Height;
@@ -113,7 +103,7 @@ Image* mgf::Image_bmp(const char* fn)
 	int pitch = 0;
 	int dataSize = 0;
 	unsigned char* data = 0;
-	
+
 	int type = mgImageType_unknown;
 
 	if (bits == 24)
@@ -122,11 +112,14 @@ Image* mgf::Image_bmp(const char* fn)
 		pitch = width * 3;
 		dataSize = pitch * height;
 		data = (unsigned char*)malloc(dataSize);
-		
-		unsigned char * tmpData = (unsigned char*)malloc(dataSize);
 
-		fseek(file, 54, SEEK_SET);
-		fread(tmpData, 1, dataSize, file);
+		unsigned char* tmpData = (unsigned char*)malloc(dataSize);
+
+		//fseek(file, 54, SEEK_SET);
+		fileBuf.seek(54, SEEK_SET);
+
+		//fread(tmpData, 1, dataSize, file);
+		fileBuf.read(tmpData, dataSize);
 
 		unsigned char* rowSrc = tmpData + dataSize - pitch;
 		unsigned char* rowDst = data;
@@ -146,12 +139,15 @@ Image* mgf::Image_bmp(const char* fn)
 
 		if (info.bV5Compression == 3) // BI_BITFIELDS
 		{
-			fseek(file, offset, SEEK_SET);
+			//fseek(file, offset, SEEK_SET);
+			fileBuf.seek(offset, SEEK_SET);
+
 			dataSize = pitch * height;
 			data = (unsigned char*)malloc(dataSize);
 			unsigned char* tmpData = (unsigned char*)malloc(dataSize);
 
-			fread(tmpData, 1, dataSize, file);
+			//fread(tmpData, 1, dataSize, file);
+			fileBuf.read(tmpData, dataSize);
 
 			unsigned char* rowSrc = tmpData + dataSize - pitch;
 			unsigned char* rowDst = data;
@@ -166,14 +162,11 @@ Image* mgf::Image_bmp(const char* fn)
 		}
 		else
 		{
-			fclose(file);
 			return 0;
 		}
 	}
 
-	fclose(file);
-
-	img = new Image;
+	Image* img = new Image;
 	img->m_image = (mgImage_s*)calloc(1, sizeof(mgImage_s));
 	img->m_image->data = data;
 	img->m_image->dataSize = dataSize;
@@ -182,6 +175,26 @@ Image* mgf::Image_bmp(const char* fn)
 	img->m_image->bits = bits;
 	img->m_image->pitch = pitch;
 	img->m_image->type = type;
+	return img;
+}
+
+Image* mgf::Image_bmp(const char* fn)
+{
+	FILE* file = fopen(fn, "rb");
+	if (!file)
+		return 0;
+
+	fseek(file, 0, SEEK_END);
+	size_t fileSize = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	uint8_t* buffer = (uint8_t*)malloc(fileSize);
+	fread(buffer, fileSize, 1, file);
+	fclose(file);
+
+	Image* img = Image_bmp_buf(buffer, fileSize);
+
+	free(buffer);
 
 	return img;
 }

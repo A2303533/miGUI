@@ -173,6 +173,7 @@
     <ClCompile Include="..\..\src\framework\Context.cpp" />
     <ClCompile Include="..\..\src\framework\Element.cpp" />
     <ClCompile Include="..\..\src\framework\fastlz.c" />
+    <ClCompile Include="..\..\src\framework\FileBuffer.cpp" />
     <ClCompile Include="..\..\src\framework\Filesystem.cpp" />
     <ClCompile Include="..\..\src\framework\FontImpl.cpp" />
     <ClCompile Include="..\..\src\framework\Framework.cpp" />

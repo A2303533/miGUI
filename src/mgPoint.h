@@ -30,6 +30,9 @@
 #ifndef _MG_POINT_H_
 #define _MG_POINT_H_
 
+/// <summary>
+/// Structure for storing 2D coordinate in screen pixels.
+/// </summary>
 typedef struct mgPoint_s {
 	int x;
 	int y;

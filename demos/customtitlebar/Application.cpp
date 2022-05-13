@@ -113,7 +113,7 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 
 	mgf::ArchiveSystem archive;
 	mgf::CompressionInfo cmpInf;
-	cmpInf.m_dataUncompressed = (void*)big_buffer;
+	cmpInf.m_dataUncompressed = (uint8_t*)big_buffer;
 	cmpInf.m_sizeUncompressed = strlen(big_buffer);
 	if (archive.Compress(&cmpInf))
 	{
@@ -126,7 +126,7 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 			mgf::CompressionInfo dcmpInf;
 
 			dcmpInf.m_sizeUncompressed = cmpInf.m_sizeUncompressed;
-			dcmpInf.m_dataUncompressed = (char*)malloc(dcmpInf.m_sizeUncompressed);
+			dcmpInf.m_dataUncompressed = (uint8_t*)malloc(dcmpInf.m_sizeUncompressed);
 			dcmpInf.m_dataCompressed = cmpInf.m_dataCompressed;
 			dcmpInf.m_sizeCompressed = cmpInf.m_sizeCompressed;
 			if (archive.Decompress(&dcmpInf))
@@ -166,6 +166,9 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 	m_windowBG->SetDrawBG(true);
 	m_windowBG->SetPosition(0, 0);
 	m_windowBG->SetUserStyle(&m_windowBGStyle);
+	
+	auto wn = new mgf::Window(m_GUIContext);
+	wn->SetPosition(100, 100);
 
 	m_mainMenuWindow = new WindowMainMenu(this);// 
 	m_mainMenuWindow->SetNoMenuBG(true);

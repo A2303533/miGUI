@@ -32,6 +32,16 @@
 
 namespace mgf
 {
+    /// <summary>
+    /// This is not algorithm.
+    /// This is library. If some library will have many algorithms,
+    /// here will be more options like:
+    ///     megalib_deflate,
+    ///     megalib_lz77,
+    ///     megalib_lzma,
+    /// We have:
+    ///     -   fastlz (LZ77)
+    /// </summary>
     enum class CompressorType : uint32_t
     {
         // m_level:
@@ -40,23 +50,41 @@ namespace mgf
         fastlz
     };
 
+    /// <summary>
+    /// Minimum iformation for data compression.
+    /// </summary>
     struct CompressionInfo
     {
         CompressorType m_compressorType = CompressorType::fastlz;
 
+        /// <summary>
+        /// Read the comments below in Compress\Decomress
+        /// </summary>
         uint32_t m_sizeUncompressed = 0;
-        void* m_dataUncompressed = 0;
+        uint8_t* m_dataUncompressed = 0;
 
         uint32_t m_sizeCompressed = 0;
-        void* m_dataCompressed = 0;
+        uint8_t* m_dataCompressed = 0;
 
-        uint32_t m_level = 2; // see CompressorType
+        /// <summary>
+        /// See CompressorType. If the value is wrong, the 
+        /// default value will be used.
+        /// </summary>
+        uint32_t m_level = 2;
     };
 
+    /// <summary>
+    /// Not super mega abstract class.
+    /// Just simple wrapper class without some initializations
+    /// or memory allocations.
+    /// In future here must be a std::vector that will have pointers
+    /// to class for `zip` and other archive files.
+    /// </summary>
     class ArchiveSystem : public BaseClass
     {
         bool _compress_fastlz(CompressionInfo* info);
         bool _decompress_fastlz(CompressionInfo* info);
+       // bool _decompress_fastlz(CompressionInfo* info, std::vector<uint8_t>& toVector);
     public:
         ArchiveSystem();
         ~ArchiveSystem();
@@ -66,6 +94,7 @@ namespace mgf
         /// and m_dataCompressed will have address.
         /// You need to call free(m_dataCompressed) for deallocation.
         /// </summary>
+        /// <returns>true - if success</returns>
         bool Compress(CompressionInfo* info);
 
         /// <summary>
@@ -73,7 +102,19 @@ namespace mgf
         /// Allocate memory m_dataUncompressed by yourself.
         /// You must know m_sizeUncompressed.
         /// </summary>
+        /// <returns>true - if success</returns>
         bool Decompress(CompressionInfo* info);
+        
+        /// <summary>
+        /// Decompress and store data in std::vector.
+        /// if info.m_dataCompressed is NULL (or !info.m_sizeCompressed)
+        /// then function will try to copy data from info.m_dataUncompressed
+        /// Function will allocate memory, put all data to std::vector and then
+        /// will free memory.
+        /// info.m_dataUncompressed and info.m_sizeUncompressed will be ignored
+        /// </summary>
+        /// <returns>true - if success</returns>
+        bool Decompress(CompressionInfo* info, std::vector<uint8_t>& toVector);
     };
 }
 

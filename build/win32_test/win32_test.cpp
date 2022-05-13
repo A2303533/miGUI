@@ -595,6 +595,12 @@ static unsigned int LocaleIdToCodepage(unsigned int lcid);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lpCmdLine, int       nCmdShow)
 {
+    //char buf[1024];
+    //memset(buf, 0, 1024);
+    //FILE * myf = fopen("data1", "wb");
+    //setvbuf(myf, buf, _IOFBF, 1024);
+    //fprintf(myf, "hello world!");
+
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
     
     AllocConsole();

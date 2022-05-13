@@ -19,12 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\framework\Archive.cpp" />
     <ClCompile Include="..\..\src\framework\AudioEngine.cpp" />
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp" />
     <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp" />
     <ClCompile Include="..\..\src\framework\Button.cpp" />
     <ClCompile Include="..\..\src\framework\Context.cpp" />
     <ClCompile Include="..\..\src\framework\Element.cpp" />
+    <ClCompile Include="..\..\src\framework\fastlz.c" />
+    <ClCompile Include="..\..\src\framework\FileBuffer.cpp" />
     <ClCompile Include="..\..\src\framework\Filesystem.cpp" />
     <ClCompile Include="..\..\src\framework\FontImpl.cpp" />
     <ClCompile Include="..\..\src\framework\Framework.cpp" />
@@ -34,6 +37,7 @@
     <ClCompile Include="..\..\src\framework\Image_png.cpp" />
     <ClCompile Include="..\..\src\framework\ListBox.cpp" />
     <ClCompile Include="..\..\src\framework\lodepng.cpp" />
+    <ClCompile Include="..\..\src\framework\Log.cpp" />
     <ClCompile Include="..\..\src\framework\Popup.cpp" />
     <ClCompile Include="..\..\src\framework\Rectangle.cpp" />
     <ClCompile Include="..\..\src\framework\SystemWindow.cpp" />

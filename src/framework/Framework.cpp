@@ -167,6 +167,18 @@ Image* Framework::LoadImage(const wchar_t* imageFile)
 	return LoadImage(stra.data());
 }
 
+Image* Framework::LoadImage(const uint8_t* buffer, uint32_t bufferSize, ImageLoader il)
+{
+	switch (il)
+	{
+	case mgf::ImageLoader::bmp:
+		return Image_bmp_buf(buffer, bufferSize);
+	case mgf::ImageLoader::png:
+		return Image_png_buf(buffer, bufferSize);
+	}
+	return NULL;
+}
+
 Image* Framework::LoadImage(const char* imageFile)
 {
 	assert(imageFile);

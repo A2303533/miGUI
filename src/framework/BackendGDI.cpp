@@ -38,6 +38,9 @@
 #include "framework/FontImpl.h"
 #include "framework/Icons.h"
 #include "framework/Image.h"
+#include "framework/Archive.h"
+
+#include "data/icons.h"
 
 #ifdef MG_PLATFORM_WINDOWS
 
@@ -226,7 +229,15 @@ mgTexture_s* BackendGDI::GetDefaultIcons()
 
 	//m_defaultIcons = new mgTexture_s;
 	//m_defaultIcons->implementation = new Gdiplus::Bitmap(L"../data/icons.png");
-	Image* image = g_mgf->LoadImage("../data/icons.png");
+	
+	//g_mgf->LoadImage("../data/icons.png");
+	Image* image = 0;// g_mgf->LoadImage("../data/icons.png");
+
+	mgf::ArchiveSystem archive;
+	CompressionInfo cmpInf = _data_icons_cmpInf;
+	std::vector<uint8_t> uncompressedData;
+	if (archive.Decompress(&cmpInf, uncompressedData))
+		image = g_mgf->LoadImage(uncompressedData.data(), uncompressedData.size(), ImageLoader::png);
 
 	if (image)
 	{

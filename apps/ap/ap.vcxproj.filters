@@ -75,6 +75,18 @@
     <ClCompile Include="..\..\src\framework\Filesystem.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\Archive.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\fastlz.c">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Log.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\FileBuffer.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">

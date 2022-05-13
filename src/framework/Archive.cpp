@@ -31,6 +31,8 @@
 #include "fastlz.h"
 #include "Log.h"
 
+#include <iterator>
+
 using namespace mgf;
 
 ArchiveSystem::ArchiveSystem()
@@ -49,6 +51,9 @@ bool ArchiveSystem::Compress(CompressionInfo* info)
 	assert(info->m_dataUncompressed);
 	assert(info->m_sizeUncompressed);
 
+	info->m_dataCompressed = 0;
+	info->m_sizeCompressed = 0;
+
 	switch (info->m_compressorType)
 	{
 	case CompressorType::fastlz:
@@ -62,11 +67,52 @@ bool ArchiveSystem::Decompress(CompressionInfo* info)
 	assert(info);
 	assert(info->m_dataCompressed);
 	assert(info->m_sizeCompressed);
+	assert(info->m_dataUncompressed);
+	assert(info->m_sizeUncompressed);
 
 	switch (info->m_compressorType)
 	{
 	case CompressorType::fastlz:
 		return _decompress_fastlz(info);
+	}
+	return false;
+}
+
+bool ArchiveSystem::Decompress(CompressionInfo* info, std::vector<uint8_t>& toVector)
+{
+	assert(info);
+
+	toVector.clear();
+	toVector.reserve(info->m_sizeUncompressed);
+	if (!info->m_dataCompressed || !info->m_sizeCompressed)
+	{
+		if (info->m_dataUncompressed && info->m_sizeUncompressed)
+		{
+			std::copy(info->m_dataUncompressed, 
+				info->m_dataUncompressed + info->m_sizeUncompressed,
+				std::back_inserter(toVector));
+
+			return true;
+		}
+		return false;
+	}
+
+	switch (info->m_compressorType)
+	{
+	case CompressorType::fastlz:
+	{
+		CompressionInfo cmpInf = *info;
+		cmpInf.m_dataUncompressed = (uint8_t*)malloc(cmpInf.m_sizeUncompressed);
+		bool result = _decompress_fastlz(&cmpInf);
+		if (result)
+		{
+			std::copy(cmpInf.m_dataUncompressed,
+				cmpInf.m_dataUncompressed + cmpInf.m_sizeUncompressed,
+				std::back_inserter(toVector));
+		}
+		free(cmpInf.m_dataUncompressed);
+		return result;
+	}break;
 	}
 	return false;
 }
@@ -120,3 +166,9 @@ bool ArchiveSystem::_decompress_fastlz(CompressionInfo* info)
 	}
 	return true;
 }
+
+//bool ArchiveSystem::_decompress_fastlz(CompressionInfo* info, std::vector<uint8_t>& toVector)
+//{
+//	
+//	return true;
+//}

@@ -177,6 +177,8 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->windowMenuTextDisabled, 0x343434);
 	mgColorSetAsIntegerRGB(&s->popupIconCheck, 0xFFFFFF);
 	mgColorSetAsIntegerRGB(&s->popupIconNext, 0xFF0000);
+	mgColorSetAsIntegerRGB(&s->windowIconClose, 0x0);
+	mgColorSetAsIntegerRGB(&s->windowIconExpand, 0x0);
 	
 }
 

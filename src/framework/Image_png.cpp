@@ -31,11 +31,64 @@
 
 #include "framework/mgf.h"
 #include "framework/Image.h"
+//#include "framework/FileBuffer.h"
 
 
 using namespace mgf;
 
 #include "lodepng.h"
+#include <iterator>
+
+Image* mgf::Image_png_buf(const uint8_t* buf, uint32_t bufSize)
+{
+	//mgf::FileBuffer fileBuf(buffer, bufferSize);
+
+	//fseek(f, 0, SEEK_END);
+	//size_t fileSize = ftell(f);
+	//fseek(f, 0, SEEK_SET);
+
+	std::vector<unsigned char> buffer;
+	buffer.reserve(bufSize);
+	std::copy(buf,
+		buf + bufSize,
+		std::back_inserter(buffer));
+
+	//fread(&buffer[0], fileSize, 1, f);
+
+	std::vector<unsigned char> image;
+	unsigned int width = 0;
+	unsigned int height = 0;
+
+	unsigned error = lodepng::decode(image, width, height, buffer, LCT_RGBA, 8);
+
+	if (error)
+		return 0;
+
+	int pitch = 0;
+	pitch = width * 4;
+	size_t dataSize = 0;
+	dataSize = image.size();
+
+	unsigned char* data = 0;
+	data = (unsigned char*)malloc(dataSize);
+	memcpy(data, &image.front(), dataSize);
+	
+	int bits = 32;
+	int type = mgImageType_r8g8b8a8;
+
+	Image* img = 0;
+	img = new Image;
+	img->m_image = (mgImage_s*)calloc(1, sizeof(mgImage_s));
+	img->m_image->data = data;
+	img->m_image->dataSize = (uint32_t)dataSize;
+	img->m_image->width = width;
+	img->m_image->height = height;
+	img->m_image->bits = bits;
+	img->m_image->pitch = pitch;
+	img->m_image->type = type;
+
+	return img;
+}
 
 Image* mgf::Image_png(const char* fn)
 {
@@ -63,21 +116,6 @@ Image* mgf::Image_png(const char* fn)
 
 	data = (unsigned char*)malloc(dataSize);
 	memcpy(data, &image.front(), dataSize);
-
-	/*struct pixel
-	{
-		char c[4];
-	};
-	pixel* p = (pixel*)data;
-	for (int i = 0, sz = width * height; i < sz; ++i)
-	{
-		pixel p2 = *p;
-		p->c[0] = p2.c[2];
-		p->c[1] = p2.c[1];
-		p->c[2] = p2.c[0];
-		p->c[3] = p2.c[3];
-		++p;
-	}*/
 
 	img = new Image;
 	img->m_image = (mgImage_s*)calloc(1, sizeof(mgImage_s));

@@ -26,78 +26,60 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MGF_IMAGE_H_
-#define _MGF_IMAGE_H_
+#include "mgf.h"
+#include "FileBuffer.h"
 
-#include <stdio.h>
+using namespace mgf;
 
-namespace mgf
+FileBuffer::FileBuffer(const uint8_t* buffer, uint32_t size)
+	:
+	m_buffer((uint8_t*)buffer),
+	m_size(size)
 {
-	enum class ImageLoader
-	{
-		bmp,
-		png
-	};
-
-	struct ImagePixelFormat_RGBA8
-	{
-		uint8_t r, g, b, a;
-	};
-
-	struct ImagePixelFormat_RGB8
-	{
-		uint8_t r, g, b;
-	};
-
-	class Image : public BaseClass
-	{
-		friend class Framework;
-		friend Image* Image_bmp(const char* fn);
-		friend Image* Image_png(const char* fn);
-		friend Image* Image_bmp_buf(const uint8_t*, uint32_t);
-		friend Image* Image_png_buf(const uint8_t*, uint32_t);
-
-		mgImage_s* m_image;
-
-		void _convert_r8g8b8_to_r8g8b8a8();
-		void _convert_r8g8b8_to_a8r8g8b8();
-
-		void _convert_r8g8b8a8_to_r8g8b8();
-		void _convert_r8g8b8a8_to_a8r8g8b8();
-
-		void _convert_a8r8g8b8_to_r8g8b8();
-		void _convert_a8r8g8b8_to_r8g8b8a8();
-	public:
-		Image();
-		Image(mgImage_s*); //only pointer, not copy!
-		virtual ~Image();
-
-		//m_image = 0;
-		void Drop();
-
-		void Create(uint32_t x, uint32_t y, const mgColor&);
-		void Free();
-
-		void Fill(const mgColor&);
-
-		// mgImageType from mgImage.h
-		void Convert(uint32_t);
-
-		uint32_t GetPitch();
-		uint32_t GetWidth();
-		uint32_t GetHeight();
-		uint8_t* GetData();
-		uint32_t GetDataSize();
-
-		mgImage_s* GetMGImage();
-	};
-	
-	Image* Image_bmp(const char* fn);
-	Image* Image_png(const char* fn);
-	Image* Image_bmp_buf(const uint8_t*, uint32_t);
-	Image* Image_png_buf(const uint8_t*, uint32_t);
 }
 
+FileBuffer::~FileBuffer()
+{
+}
 
-#endif
+void FileBuffer::seek(uint32_t offset, int where)
+{
+	switch (where)
+	{
+	default:
+	case SEEK_CUR:
+	{
+		m_cursor += offset;
+		if (m_cursor > m_size)
+			m_cursor = m_size;
+	}break;
+	case SEEK_END:
+		m_cursor = m_size;
+		break;
+	case SEEK_SET:
+		m_cursor = offset;
+		break;
+	}
+}
+
+uint32_t FileBuffer::tell()
+{
+	return m_cursor;
+}
+
+uint32_t FileBuffer::read(void* buffer, uint32_t size)
+{
+	uint8_t* bytes = (uint8_t*)buffer;
+
+	uint32_t numRead = 0;
+	for (numRead = 0; numRead < size; ++numRead)
+	{
+		if (m_cursor == m_size)
+			return numRead;
+
+		bytes[numRead] = m_buffer[m_cursor];
+		++m_cursor;
+	}
+	return numRead;
+}
+
