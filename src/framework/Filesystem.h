@@ -127,12 +127,15 @@ namespace mgf
                 return m_string;
             }
 
+            std::string string() const;
+
         private:
             string_type m_string;
         };
 
         bool exists(const path& p);
         bool is_regular_file(const path& p);
+        std::uintmax_t file_size(const path& p);
     }
 }
 

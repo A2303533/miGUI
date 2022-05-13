@@ -64,6 +64,18 @@ bool filesystem::exists(const filesystem::path& p)
     return false;
 }
 
+std::string filesystem::path::string() const
+{
+	const wchar_t* old = m_string.c_str();
+	std::basic_string<char> output;
+	std::mbstate_t state = std::mbstate_t();
+	std::size_t len = 1 + std::wcsrtombs(0, (const wchar_t**)&old, 0, &state);
+	std::vector<char> mbstr(len);
+	std::wcsrtombs(&mbstr[0], (const wchar_t**)&old, mbstr.size(), &state);
+	output.append(&mbstr[0]);
+	return output;
+}
+
 bool filesystem::is_regular_file(const path& p)
 {
 #ifdef _WIN32
@@ -82,4 +94,24 @@ bool filesystem::is_regular_file(const path& p)
 #endif
 
 	return false;
+}
+
+std::uintmax_t filesystem::file_size(const filesystem::path& p)
+{
+	std::uintmax_t sz = 0;
+
+	std::string stra = p.string();
+	FILE* f = fopen(stra.c_str(), "rb");
+	if (!f)
+		return 0;
+
+#ifdef _MSC_VER
+	_fseeki64(f, 0, SEEK_END);
+	sz = _ftelli64(f);
+#else
+#endif
+
+	fclose(f);
+
+	return sz;
 }
