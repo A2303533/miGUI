@@ -151,7 +151,8 @@ void Camera::Reset()
 		break;
 	}
 
-	EditorRotate(0.f, 0.f, 1.f);
+	mgPoint rp;
+	EditorRotate(&rp, 1.f);
 }
 
 void Camera::EditorPanMove(mgPoint* mouseDelta, float timeDelta)
@@ -170,11 +171,11 @@ void Camera::EditorPanMove(mgPoint* mouseDelta, float timeDelta)
 	m_positionPlatform += vec;
 }
 
-void Camera::EditorRotate(float x, float y, float timeDelta)
+void Camera::EditorRotate(mgPoint* mouseDelta, float timeDelta)
 {
 	const float speed = 0.69f * timeDelta;
-	m_rotationPlatform.x += y * speed;
-	m_rotationPlatform.y += x * speed;
+	m_rotationPlatform.x += mouseDelta->y * speed;
+	m_rotationPlatform.y += mouseDelta->x * speed;
 
 	if (m_rotationPlatform.y < 0.f) m_rotationPlatform.y = m_rotationPlatform.y + math::PIPI;
 

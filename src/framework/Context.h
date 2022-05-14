@@ -58,6 +58,8 @@ namespace mgf
 		mgContext_s* m_gui_context = 0;
 		mgInputContext_s* m_input = 0;
 
+		float* GetDeltaTime();
+
 		mgContext_s* GetGUIContext();
 		mgf::SystemWindow* GetSystemWindow();
 		mgf::Backend* GetBackend();

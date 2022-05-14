@@ -92,6 +92,11 @@ Context::~Context()
 		delete m_input;
 }
 
+float* Context::GetDeltaTime()
+{
+	return &m_gui_context->deltaTime;
+}
+
 void Context::OnWindowSize()
 {
 	m_gui_context->needRebuild = 1;

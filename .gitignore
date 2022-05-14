@@ -64,4 +64,5 @@ Tools/resconv/Debug
 
 
 Tools/resconv/Release
-
+demos/gdi_d3d11/Debug
+demos/gdi_d3d11/Release

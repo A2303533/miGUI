@@ -272,7 +272,7 @@ namespace mgf
 
 		void EditorUpdate();
 		void EditorPanMove(mgPoint* mouseDelta, float timeDelta);
-		void EditorRotate(float x, float y, float timeDelta);
+		void EditorRotate(mgPoint* mouseDelta, float timeDelta);
 		void EditorZoom(int wheelDelta);
 		void EditorChangeFOV(mgPoint* mouseDelta, float timeDelta);
 		void EditorRotateZ(mgPoint* mouseDelta, float timeDelta);
