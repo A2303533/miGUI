@@ -34,25 +34,52 @@
 
 using namespace mgf;
 
+extern Framework* g_mgf;
+
+namespace mgf
+{
+	mgColor* Rectangle_onColor1(mgElement_s* e)
+	{
+		mgf::Rectangle* rectangle = static_cast<mgf::Rectangle*>(e->userData);
+		return &rectangle->m_color1;
+	}
+
+	mgColor* Rectangle_onColor2(mgElement_s* e)
+	{
+		mgf::Rectangle* rectangle = static_cast<mgf::Rectangle*>(e->userData);
+		return &rectangle->m_color2;
+	}
+
+	mgTexture* Rectangle_onTexture(mgElement_s* e)
+	{
+		mgf::Rectangle* rectangle = static_cast<mgf::Rectangle*>(e->userData);
+		return rectangle->m_texture;
+	}
+}
+
 Rectangle::Rectangle()
 	:
-	Element(),
-	m_elementRectangle(0)
+	Element()
 {
-
 }
 
 Rectangle::Rectangle(Window* w)
 	: 
-	Element(),
-	m_elementRectangle(0)
+	Element()
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
-	mgColor c;
-	mgColorSet(&c, 1.f, 1.f, 1.f, 1.f);
-	m_element = mgCreateRectangle(w->m_window, &p, &p, &c, &c);
+	m_element = mgCreateRectangle(w->m_window, &p, &p);
+	m_element->userData = this;
+	
 	m_elementRectangle = (mgElementRectangle*)m_element->implementation;
+	m_elementRectangle->onColor1 = Rectangle_onColor1;
+	m_elementRectangle->onColor2 = Rectangle_onColor2;
+	m_elementRectangle->onTexture = Rectangle_onTexture;
+
+	m_color1 = g_mgf->GetColor(mgf::ColorName::Black);
+	m_color2 = g_mgf->GetColor(mgf::ColorName::Black);
+
 	Element::PostInit();
 }
 
@@ -64,24 +91,24 @@ Rectangle::~Rectangle()
 
 void Rectangle::SetColor(mgColor* c1, mgColor* c2)
 {
-	m_elementRectangle->color1 = *c1;
-	m_elementRectangle->color2 = *c2;
+	m_color1 = *c1;
+	m_color2 = *c2;
 }
 
 void Rectangle::SetColor(int c1, int c2)
 {
-	mgColorSetAsIntegerARGB(&m_elementRectangle->color1, c1);
-	mgColorSetAsIntegerARGB(&m_elementRectangle->color2, c2);
+	mgColorSetAsIntegerARGB(&m_color1, c1);
+	mgColorSetAsIntegerARGB(&m_color2, c2);
 }
 
 void Rectangle::SetColor(int c)
 {
-	mgColorSetAsIntegerARGB(&m_elementRectangle->color1, c);
-	mgColorSetAsIntegerARGB(&m_elementRectangle->color2, c);
+	mgColorSetAsIntegerARGB(&m_color1, c);
+	mgColorSetAsIntegerARGB(&m_color2, c);
 }
 
 void Rectangle::SetTexture(mgTexture* t)
 {
-	m_elementRectangle->texture = t;
+	m_texture = t;
 }
 

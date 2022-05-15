@@ -37,8 +37,6 @@
 using namespace mgf;
 
 Text::Text(Window* w, const wchar_t* t, Font* f)
-	:
-	m_elementText(0)
 {
 	assert(t);
 	assert(f);

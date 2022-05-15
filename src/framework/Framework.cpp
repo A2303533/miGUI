@@ -74,6 +74,7 @@ Framework::Framework()
 	:
 	m_run(true)
 {
+	_initColors();
 #ifdef MG_PLATFORM_WINDOWS
 	wchar_t wcharBuffer[0xfff];
 	GetCurrentDirectory(0xfff, wcharBuffer);
@@ -236,4 +237,12 @@ Icons* Framework::CreateIcons(const char* imageFile, Backend* backend)
 	return icons;
 }
 
+mgColor Framework::GetColor(ColorName cn)
+{
+	return m_colors[static_cast<uint32_t>(cn)];
+}
 
+mgColor* Framework::GetColorPtr(ColorName cn)
+{
+	return &m_colors[static_cast<uint32_t>(cn)];
+}

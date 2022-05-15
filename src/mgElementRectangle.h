@@ -31,11 +31,14 @@
 #define _MG_ELEMENTRECTANGLE_H_
 
 typedef struct mgElementRectangle_s {
-	mgColor color1;
-	mgColor color2;
-	
-	mgTexture* texture; // opt
+	//mgColor color1;
+	//mgColor color2;	
+	//mgTexture* texture; // opt
 
+	// All callbacks MUST BE implemented
+	mgColor* (*onColor1)(struct mgElement_s*);
+	mgColor* (*onColor2)(struct mgElement_s*);
+	mgTexture* (*onTexture)(struct mgElement_s*);
 } mgElementRectangle;
 
 

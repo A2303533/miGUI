@@ -39,7 +39,7 @@ namespace mgf
 	class Text : public Element
 	{
 		std::wstring m_text;
-		mgElementText_s* m_elementText;
+		mgElementText_s* m_elementText = 0;
 	public:
 		Text(Window* w, const wchar_t* t, Font* f);
 		virtual ~Text();

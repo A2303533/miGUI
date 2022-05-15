@@ -170,6 +170,7 @@
     <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp" />
     <ClCompile Include="..\..\src\framework\Button.cpp" />
     <ClCompile Include="..\..\src\framework\Camera.cpp" />
+    <ClCompile Include="..\..\src\framework\Color.cpp" />
     <ClCompile Include="..\..\src\framework\Context.cpp" />
     <ClCompile Include="..\..\src\framework\Element.cpp" />
     <ClCompile Include="..\..\src\framework\fastlz.c" />

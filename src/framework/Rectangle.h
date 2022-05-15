@@ -39,8 +39,15 @@ namespace mgf
 	class Rectangle : public Element
 	{
 	protected:
-		mgElementRectangle_s* m_elementRectangle;
+		mgElementRectangle_s* m_elementRectangle = 0;
 		Rectangle();
+
+		mgColor m_color1, m_color2;
+		mgTexture* m_texture = 0;
+
+		friend mgColor* Rectangle_onColor1(mgElement_s* e);
+		friend mgColor* Rectangle_onColor2(mgElement_s* e);
+		friend mgTexture* Rectangle_onTexture(mgElement_s* e);
 	public:
 		Rectangle(Window* w);
 		virtual  ~Rectangle();

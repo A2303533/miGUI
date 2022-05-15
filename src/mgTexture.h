@@ -33,6 +33,11 @@
 typedef struct mgTexture_s {
 	void* implementation;
 	struct mgImage_s* sourceCopy; /*for GDI*/
+
+#ifdef __cplusplus
+	mgTexture_s() :implementation(0), sourceCopy(0) {}
+#endif
+
 } mgTexture;
 
 

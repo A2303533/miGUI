@@ -32,6 +32,7 @@
 
 #include "Image.h"
 #include "String.h"
+#include "Color.h"
 
 #include <vector>
 
@@ -45,6 +46,7 @@ namespace mgf
 	{
 		std::vector<Context*> m_contexts;
 		StringW m_appDirectory;
+		void _initColors();
 	public:
 		Framework();
 		virtual ~Framework();
@@ -67,6 +69,10 @@ namespace mgf
 		*/
 		bool Run();
 		void DrawAll();
+		
+		mgColor m_colors[static_cast<uint32_t>(ColorName::__count)];
+		mgColor GetColor(ColorName);
+		mgColor* GetColorPtr(ColorName);
 
 		StringW* GetAppDir();
 	};
