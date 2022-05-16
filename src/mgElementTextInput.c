@@ -1094,14 +1094,14 @@ miGUI_onDraw_textinput(mgElement* e)
 
 void
 miGUI_onRebuild_textinput(mgElement* e) {
-	mgElementText* impl = (mgElementText*)e->implementation;
-	if (impl->text && e->window->context->getTextSize)
-	{
+	//mgElementText* impl = (mgElementText*)e->implementation;
+	//if (impl->text && e->window->context->getTextSize)
+	//{
 		/*mgPoint p;
 		e->window->context->getTextSize(impl->text, impl->font, &p);
 		e->transformLocal.sz = p;
 		miGUI_onUpdateTransform_rectangle(e);*/
-	}
+	//}
 }
 
 MG_API

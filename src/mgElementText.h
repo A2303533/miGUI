@@ -30,11 +30,20 @@
 #ifndef _MG_ELEMENTTEXT_H_
 #define _MG_ELEMENTTEXT_H_
 
+typedef mgFont* (*mgElementTextOnGetData)(struct mgElement_s*, const wchar_t**, size_t* textLen, mgColor**);
+
 typedef struct mgElementText_s {
-	mgColor color;
+	/*mgColor color;
 	mgFont* font;
 	const wchar_t* text;
-	int textLen;
+	int textLen;*/
+
+	// All callbacks MUST BE implemented
+	//mgColor* (*onColor)(struct mgElement_s*);
+	//mgFont* (*onFont)(struct mgElement_s*);
+	//const wchar_t* (*onText)(struct mgElement_s*, size_t* textLen);
+	mgElementTextOnGetData onGetData;
+
 } mgElementText;
 
 

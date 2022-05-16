@@ -61,22 +61,33 @@ miGUI_onDraw_text(mgElement* e)
 
 	mgElementText* impl = (mgElementText*)e->implementation;
 
-	if (impl->text && impl->textLen)
+	const wchar_t* text = 0;
+	size_t textLen = 0;
+	mgColor* c = 0;
+	mgFont* font = impl->onGetData(e, &text, &textLen, &c);
+	if (text && textLen)
 	{
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-		e->window->context->gpu->drawText(mgDrawTextReason_text, impl, &pos, 
-			impl->text, impl->textLen, 
-			&impl->color, impl->font);
+		e->window->context->gpu->drawText(mgDrawTextReason_text, impl, &pos,
+			text, textLen,
+			c,
+			font);
 	}
 }
 
 void
 miGUI_onRebuild_text(mgElement* e) {
 	mgElementText* impl = (mgElementText*)e->implementation;
-	if (impl->text && e->window->context->getTextSize)
+
+	const wchar_t* text = 0;
+	size_t textLen = 0;
+	mgColor* c = 0;
+	mgFont* font = impl->onGetData(e, &text, &textLen, &c);
+
+	if (text && e->window->context->getTextSize)
 	{
 		mgPoint p;
-		e->window->context->getTextSize(impl->text, impl->font, &p);
+		e->window->context->getTextSize(text, font, &p);
 		e->transformLocal.sz = p;
 
 		miGUI_onUpdateTransform_rectangle(e);
@@ -85,12 +96,10 @@ miGUI_onRebuild_text(mgElement* e) {
 
 MG_API
 mgElement* MG_C_DECL
-mgCreateText_f(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgFont* font)
+mgCreateText_f(struct mgWindow_s* w, mgPoint* position, mgElementTextOnGetData onGetData)
 {
 	assert(w);
 	assert(position);
-	assert(text);
-	assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
 	newElement->type = MG_TYPE_TEXT;
 	
@@ -110,14 +119,7 @@ mgCreateText_f(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgF
 
 	newElement->implementation = calloc(1, sizeof(mgElementText));
 	mgElementText* impl = (mgElementText*)newElement->implementation;
-	impl->color.r = 0.f;
-	impl->color.g = 0.f;
-	impl->color.b = 0.f;
-	impl->color.a = 1.f;
-	impl->font = font;
-	impl->text = text;
-	impl->textLen = (int)wcslen(text);
-
+	impl->onGetData = onGetData;
 	mgSetParent_f(newElement, 0);
 	miGUI_onRebuild_text(newElement);
 

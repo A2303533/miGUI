@@ -40,6 +40,9 @@ namespace mgf
 	{
 		std::wstring m_text;
 		mgElementText_s* m_elementText = 0;
+		mgFont* m_font = 0;
+		mgColor m_color;
+		friend mgFont* Text_onGetData(struct mgElement_s*, const wchar_t**, size_t* textLen, mgColor**);
 	public:
 		Text(Window* w, const wchar_t* t, Font* f);
 		virtual ~Text();

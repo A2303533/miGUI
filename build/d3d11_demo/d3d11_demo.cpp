@@ -979,28 +979,6 @@ void draw_gui()
     g_gui_context->gpu->endDraw();
 }
 
-
-void rect_onMouseEnter(struct mgElement_s* e){
-    mgElementText* text = (mgElementText*)e->userData;
-    text->text = L"Mouse enter";
-    text->textLen = wcslen(text->text);
-    mgSetCursor(g_gui_context, g_gui_context->defaultCursors[mgCursorType_Hand], mgCursorType_Arrow);
-}
-void rect_onMouseLeave(struct mgElement_s* e){
-    mgElementText* text = (mgElementText*)e->userData;
-    text->text = L"Mouse leave";
-    text->textLen = wcslen(text->text);
-    mgSetCursor(g_gui_context, g_gui_context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
-}
-void rect_onClickLMB(struct mgElement_s* e) {
-    mgElementText* text = (mgElementText*)e->userData;
-    text->color.setAsIntegerBGR(0xFF0000);
-}
-void rect_onReleaseLMB(struct mgElement_s* e) {
-    mgElementText* text = (mgElementText*)e->userData;
-    text->color.setAsIntegerBGR(0xFFFFFF);
-}
-
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
 
 int g_run = 1;

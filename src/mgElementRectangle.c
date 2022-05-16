@@ -324,15 +324,16 @@ miGUI_onDraw_rectangle(mgElement* e)
 {
 	mgElementRectangle* impl = (mgElementRectangle*)e->implementation;
 
-	struct mgTexture_s* texture = impl->onTexture(e);
+	mgColor* c1, *c2;
+	struct mgTexture_s* texture = impl->onGetData(e, &c1, &c2);
 
 	e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 	e->window->context->gpu->drawRectangle(
 		texture ? mgDrawRectangleReason_rectangleWithTexture : mgDrawRectangleReason_rectangle,
 		impl,
 		&e->transformWorld.buildArea, 
-		impl->onColor1(e), 
-		impl->onColor2(e),
+		c1, 
+		c2,
 		texture,
 		0
 	);
@@ -344,7 +345,7 @@ miGUI_onRebuild_rectangle(mgElement* e)
 
 MG_API
 mgElement* MG_C_DECL
-mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size)
+mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgElementRectangleOnGetData onGetData)
 {
 	assert(w);
 	assert(position);
@@ -372,6 +373,7 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size)
 
 	newElement->implementation = calloc(1, sizeof(mgElementRectangle));
 	mgElementRectangle* impl = (mgElementRectangle*)newElement->implementation;
+	impl->onGetData = onGetData;
 
 	mgSetParent_f(newElement, 0);
 

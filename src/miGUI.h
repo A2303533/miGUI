@@ -224,18 +224,18 @@ extern PFNMGSETPARENTPROC mgSetParent;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
+MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgElementRectangleOnGetData onGetData);
 #define mgCreateRectangle mgCreateRectangle_f
 #else
-typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
+typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgElementRectangleOnGetData onGetData);
 extern PFNMGCREATERECTANGLEPROC mgCreateRectangle;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgFont* font);
+MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* w, mgPoint* position, mgElementTextOnGetData onGetData);
 #define mgCreateText mgCreateText_f
 #else
-typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgWindow_s* w, mgPoint* position, const wchar_t* text, mgFont* font);
+typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgWindow_s* w, mgPoint* position, mgElementTextOnGetData onGetData);
 extern PFNMGCREATETEXTPROC mgCreateText;
 #endif
 

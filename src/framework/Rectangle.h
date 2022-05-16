@@ -45,9 +45,7 @@ namespace mgf
 		mgColor m_color1, m_color2;
 		mgTexture* m_texture = 0;
 
-		friend mgColor* Rectangle_onColor1(mgElement_s* e);
-		friend mgColor* Rectangle_onColor2(mgElement_s* e);
-		friend mgTexture* Rectangle_onTexture(mgElement_s* e);
+		friend mgTexture* Rectangle_onGetData(mgElement_s* e, mgColor** color1, mgColor** color2);
 	public:
 		Rectangle(Window* w);
 		virtual  ~Rectangle();

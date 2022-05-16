@@ -24,6 +24,10 @@ HRAWINPUT g_rawInputData[0xff];
 mgFont* g_win32font = 0;
 mgIcons* g_icons = 0;
 
+const wchar_t* g_textText = L"Text";
+size_t g_textLen = 4;
+mgColor g_textColor;
+
 mgWindow* test_guiWindow1 = 0;
 mgWindow* test_guiWindow2 = 0;
 mgWindow* test_guiWindow3 = 0;
@@ -508,26 +512,32 @@ void draw_gui()
     g_gui_context->gpu->endDraw();
 }
 
-
+mgFont* text_onGetData(struct mgElement_s* e, const wchar_t** text, size_t* textLen, mgColor** color)
+{
+    *text = g_textText;
+    *textLen = g_textLen;
+    *color = &g_textColor;
+    return g_win32font;
+}
 void rect_onMouseEnter(struct mgElement_s* e){
     mgElementText* text = (mgElementText*)e->userData;
-    text->text = L"Mouse enter";
-    text->textLen = wcslen(text->text);
+    g_textText = L"Mouse enter";
+    g_textLen = wcslen(g_textText);
     mgSetCursor(g_gui_context, g_gui_context->defaultCursors[mgCursorType_Hand], mgCursorType_Arrow);
 }
 void rect_onMouseLeave(struct mgElement_s* e){
     mgElementText* text = (mgElementText*)e->userData;
-    text->text = L"Mouse leave";
-    text->textLen = wcslen(text->text);
+    g_textText = L"Mouse leave";
+    g_textLen = wcslen(g_textText);
     mgSetCursor(g_gui_context, g_gui_context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 }
 void rect_onClickLMB(struct mgElement_s* e) {
     mgElementText* text = (mgElementText*)e->userData;
-    text->color.setAsIntegerBGR(0xFF0000);
+    g_textColor.setAsIntegerBGR(0xFF0000);
 }
 void rect_onReleaseLMB(struct mgElement_s* e) {
     mgElementText* text = (mgElementText*)e->userData;
-    text->color.setAsIntegerBGR(0xFFFFFF);
+    g_textColor.setAsIntegerBGR(0xFFFFFF);
 }
 
 void saveDock(struct mgElement_s* e)
@@ -737,7 +747,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
         eb->onReleaseLMB = loadDock;
 
         mgPointSet(&pos, 100, 100);
-        mgElement* et = mgCreateText(test_guiWindow1, &pos, L"Text", g_win32font);
+        mgElement* et = mgCreateText(test_guiWindow1, &pos, text_onGetData);// , L"Text", g_win32font);
         et->align = mgAlignment_rightBottom;
 
         test_guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
