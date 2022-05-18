@@ -48,6 +48,7 @@
     <ClCompile Include="..\..\src\framework\TextInput.cpp" />
     <ClCompile Include="..\..\src\framework\Window.cpp" />
     <ClCompile Include="..\..\src\miGUILoader.c" />
+    <ClCompile Include="ap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="playlist.cpp" />
   </ItemGroup>

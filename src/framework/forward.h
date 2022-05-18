@@ -50,6 +50,7 @@ namespace mgf
 	class ListBox;
 	class Table;
 	class Popup;
+	class AudioEngine;
 }
 
 #endif

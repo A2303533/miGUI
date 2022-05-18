@@ -90,6 +90,7 @@
     <ClCompile Include="..\..\src\framework\Color.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="ap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">

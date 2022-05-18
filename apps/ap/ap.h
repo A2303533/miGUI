@@ -7,27 +7,49 @@ class PlayListManager;
 
 #define testTable_buttonsSize 50
 
-// for callbacks
-struct AP_global_data
+enum class backend_type
 {
-	mgf::Framework* framework = 0;
-	mgf::Context* context = 0;
-	mgf::Window* mainWindow = 0;
-	mgf::Rectangle* playlistArea = 0;
-	mgf::Rectangle* controlArea = 0;
-	mgf::Rectangle* tracklistArea = 0;
-	mgf::Button* buttonNewPlaylist = 0;
-	mgf::ListBox* listboxPlaylist = 0;
-	mgf::Table* tableTracklist = 0;
+	Gdi,
+	OpenGLOld,
+};
+
+class AP_application
+{
+public:
+	AP_application() {}
+	~AP_application();
+
+	bool Init(backend_type);
+	void Run();
+
+	mgf::Framework* m_framework = 0;
+	mgf::SystemWindow* m_sysWindow = 0;
+	mgf::AudioEngine* m_audio = 0;
+	mgf::Backend* m_backend = 0;
+
+	mgf::Context* m_context = 0;
+	mgf::Window* m_mainWindow = 0;
+	mgf::Rectangle* m_playlistArea = 0;
+	mgf::Rectangle* m_controlArea = 0;
+	mgf::Rectangle* m_tracklistArea = 0;
+	mgf::Button* m_buttonNewPlaylist = 0;
+	mgf::ListBox* m_listboxPlaylist = 0;
+	mgf::Table* m_tableTracklist = 0;
 	
-	mgf::Button* tableTracklist_testButton[testTable_buttonsSize];
-	int testTable_testButton_currBtn = 0;
+	mgf::Button* m_tableTracklist_testButton[testTable_buttonsSize];
+	int m_testTable_testButton_currBtn = 0;
 
-	mgf::Font* popupFont = 0;
+	mgf::Font* m_popupFont = 0;
+	mgf::Font* m_fontImpact = 0;
+	mgf::Font* m_listboxFont = 0;
 
-	mgStyle_s style;
+	mgf::Window* m_guiWindow = 0;
 
-	PlayListManager* playlistMgr = 0;
+	mgf::Icons* m_icons = 0;
+
+	mgStyle_s m_style;
+
+	PlayListManager* m_playlistMgr = 0;
 };
 
 #endif // !AP_H

@@ -12,7 +12,7 @@
 
 #include <ShlObj.h>
 
-extern AP_global_data g_data;
+extern AP_application* g_app;
 
 int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, void* editItem);
 wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c);
@@ -101,7 +101,7 @@ void PlayList::RenameFile()
 	if (m_filePath == newFilePath)
 		return;
 
-	newFilePath = g_data.playlistMgr->CheckPLName(&newFilePath);
+	newFilePath = g_app->m_playlistMgr->CheckPLName(&newFilePath);
 	{
 		std::filesystem::path p = newFilePath.data();
 		std::filesystem::path fn = p.filename();
@@ -120,21 +120,27 @@ void PlayList::RenameFile()
 
 PlayListManager::PlayListManager()
 {
-	g_data.listboxPlaylist->onIsItemSelected = Playlist_LB_onIsItemSelected;
-	g_data.listboxPlaylist->onItemClick = Playlist_LB_onItemClick;
-	g_data.listboxPlaylist->onDrawItem = Playlist_LB_onDrawItem;
+	if (g_app->m_listboxPlaylist)
+	{
+		g_app->m_listboxPlaylist->onIsItemSelected = Playlist_LB_onIsItemSelected;
+		g_app->m_listboxPlaylist->onItemClick = Playlist_LB_onItemClick;
+		g_app->m_listboxPlaylist->onDrawItem = Playlist_LB_onDrawItem;
+	}
 
-	g_data.tableTracklist->GetColSizes()[0] = 45;
-	g_data.tableTracklist->GetColSizes()[1] = 320;
-	g_data.tableTracklist->GetColSizes()[2] = 20;
-	g_data.tableTracklist->GetColSizes()[3] = 170;
-	g_data.tableTracklist->GetColSizes()[4] = 50;
-	g_data.tableTracklist->SetScrollSpeed(50.f);
-	g_data.tableTracklist->SetRowHeight(20);
-	g_data.tableTracklist->onColTitleText = Playlist_onColTitleText;
-	g_data.tableTracklist->onDrawRow = Playlist_onDrawRow;
-	g_data.tableTracklist->onRowClick = Playlist_onRowClick;
-	g_data.tableTracklist->onIsRowSelected = Playlist_onIsRowSelected;
+	if (g_app->m_tableTracklist)
+	{
+		g_app->m_tableTracklist->GetColSizes()[0] = 45;
+		g_app->m_tableTracklist->GetColSizes()[1] = 320;
+		g_app->m_tableTracklist->GetColSizes()[2] = 20;
+		g_app->m_tableTracklist->GetColSizes()[3] = 170;
+		g_app->m_tableTracklist->GetColSizes()[4] = 50;
+		g_app->m_tableTracklist->SetScrollSpeed(50.f);
+		g_app->m_tableTracklist->SetRowHeight(20);
+		g_app->m_tableTracklist->onColTitleText = Playlist_onColTitleText;
+		g_app->m_tableTracklist->onDrawRow = Playlist_onDrawRow;
+		g_app->m_tableTracklist->onRowClick = Playlist_onRowClick;
+		g_app->m_tableTracklist->onIsRowSelected = Playlist_onIsRowSelected;
+	}
 
 	mgPopupItemInfo_s listboxPopupItems[] =
 	{
@@ -145,7 +151,7 @@ PlayListManager::PlayListManager()
 		{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
 		{0, L"Show in explorer", 0, Playlist_popupCb_showexpl, mgPopupItemType_default, 0, 0, 1},
 	};
-	m_listBoxPopup = g_data.context->CreatePopup(g_data.popupFont, listboxPopupItems, 6);
+	m_listBoxPopup = g_app->m_context->CreatePopup(g_app->m_popupFont, listboxPopupItems, 6);
 
 
 	IKnownFolderManager* pManager;
@@ -197,7 +203,7 @@ PlayListManager::PlayListManager()
 	if (!std::filesystem::exists(m_playlistDir.data()))
 		std::filesystem::create_directory(m_playlistDir.data());
 
-	m_stateFilePath = g_data.framework->GetAppDir()->data();
+	m_stateFilePath = g_app->m_framework->GetAppDir()->data();
 	m_stateFilePath += L"ap.state";
 	if (std::filesystem::exists(m_stateFilePath.data()))
 	{
@@ -394,15 +400,17 @@ void PlayListManager::AddNew()
 
 void PlayListManager::_updateGUIListbox()
 {
-	g_data.listboxPlaylist->SetData((void**)m_playlists.data(), m_playlists.size());
+	if(g_app->m_listboxPlaylist)
+		g_app->m_listboxPlaylist->SetData((void**)m_playlists.data(), m_playlists.size());
 }
 void PlayListManager::_updateGUITable()
 {
-	g_data.tableTracklist->SetData(0,0);
+	if(g_app->m_tableTracklist)
+		g_app->m_tableTracklist->SetData(0,0);
 	if (m_editPlaylist)
 	{
 		if(m_editPlaylist->m_nodes.size())
-			g_data.tableTracklist->SetData((void**)m_editPlaylist->m_nodes.data(), m_editPlaylist->m_nodes.size());
+			g_app->m_tableTracklist->SetData((void**)m_editPlaylist->m_nodes.data(), m_editPlaylist->m_nodes.size());
 	}
 }
 
@@ -486,8 +494,8 @@ int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, 
 
 void Playlist_BTN_newPL_onRelease(mgf::Element* e)
 {
-	if (g_data.playlistMgr)
-		g_data.playlistMgr->AddNew();
+	if (g_app->m_playlistMgr)
+		g_app->m_playlistMgr->AddNew();
 }
 
 int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item)
@@ -602,27 +610,27 @@ void PlayListManager::SelectPlaylist(PlayList* pl)
 void PlayListManager::ShowListboxPopup(PlayList* pl)
 {
 	m_playlistOnPopup = pl;
-	m_listBoxPopup->Show(g_data.context->m_input->mousePosition.x, g_data.context->m_input->mousePosition.y);
+	m_listBoxPopup->Show(g_app->m_context->m_input->mousePosition.x, g_app->m_context->m_input->mousePosition.y);
 }
 
 void Playlist_popupCb_open(int id, struct mgPopupItem_s*)
 {
-	g_data.playlistMgr->PopupOpenPlaylist();
+	g_app->m_playlistMgr->PopupOpenPlaylist();
 }
 
 void Playlist_popupCb_play(int id, struct mgPopupItem_s*)
 {
-	g_data.playlistMgr->PopupPlayPlaylist();
+	g_app->m_playlistMgr->PopupPlayPlaylist();
 }
 
 void Playlist_popupCb_delete(int id, struct mgPopupItem_s*)
 {
-	g_data.playlistMgr->PopupDeletePlaylist();
+	g_app->m_playlistMgr->PopupDeletePlaylist();
 }
 
 void Playlist_popupCb_showexpl(int id, struct mgPopupItem_s*)
 {
-	g_data.playlistMgr->PopupShowPlaylistInExplorer();
+	g_app->m_playlistMgr->PopupShowPlaylistInExplorer();
 }
 
 void PlayListManager::PopupOpenPlaylist()
@@ -646,7 +654,7 @@ void PlayListManager::PopupDeletePlaylist()
 	if (!m_playlistOnPopup)
 		return;
 
-	int res = MessageBox(g_data.context->GetSystemWindow()->GetOSData()->hWnd, 
+	int res = MessageBox(g_app->m_context->GetSystemWindow()->GetOSData()->hWnd,
 		L"Are you sure?", 
 		L"Delete playlist", 
 		MB_YESNO | MB_ICONQUESTION);
@@ -839,7 +847,7 @@ void Playlist_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t 
 	{
 		if (oldNd == nd)
 		{
-			g_data.playlistMgr->PlayTrack(nd);
+			g_app->m_playlistMgr->PlayTrack(nd);
 		}
 	}
 
