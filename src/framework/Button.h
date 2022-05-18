@@ -60,6 +60,8 @@ namespace mgf
 			int id4  //disabled
 		);
 
+		virtual void OnPushOn(); /*only when pushButton */
+		virtual void OnPushOff();
 	};
 }
 

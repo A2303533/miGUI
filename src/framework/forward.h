@@ -48,6 +48,7 @@ namespace mgf
 	class Image;
 	class TextInput;
 	class ListBox;
+	class Button;
 	class Table;
 	class Popup;
 	class AudioEngine;

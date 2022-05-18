@@ -26,6 +26,18 @@ AP_application* g_app = 0;
 #define AP_PLAYLISTAREASIZE 180
 #define AP_CONTROLAREASIZE 70
 
+class ButtonNewPlaylist : public mgf::Button
+{
+public:
+	ButtonNewPlaylist(mgf::Window* w):mgf::Button(w){}
+	virtual ~ButtonNewPlaylist() {}
+	virtual void OnReleaseLMB() override 
+	{
+		if (g_app->m_playlistMgr)
+			g_app->m_playlistMgr->AddNew();
+	}
+};
+
 class WindowMain : public mgf::SystemWindow
 {
 public:
@@ -136,25 +148,27 @@ bool AP_application::Init(backend_type bt)
 	m_guiWindow->SetSize(
 		m_context->GetSystemWindow()->GetSize().x,
 		m_context->GetSystemWindow()->GetSize().y);
-	/*g_data.playlistArea = guiWindow.m_data->AddRectangle();
-	g_data.playlistArea->SetColor(0xFF77ADFF);
+	
+	m_playlistArea = new mgf::Rectangle(m_guiWindow);
+	m_playlistArea->SetColor(0xFF77ADFF);
 
-	g_data.controlArea = guiWindow.m_data->AddRectangle();
-	g_data.controlArea->SetColor(0xFFBAC5C6);
+	m_controlArea = new mgf::Rectangle(m_guiWindow);
+	m_controlArea->SetColor(0xFFBAC5C6);
 		
-	g_data.tracklistArea = guiWindow.m_data->AddRectangle();
-	g_data.tracklistArea->SetColor(0xFFE1EEEF);*/
-	//g_data.buttonNewPlaylist = guiWindow.m_data->AddButton();
-	//g_data.buttonNewPlaylist->SetPositionAndSize(0, 5, 180, 18); //SetPositionAndSize is more comfortable
-	//g_data.buttonNewPlaylist->SetDrawBG(false);
-	//g_data.buttonNewPlaylist->onReleaseLMB = Playlist_BTN_newPL_onRelease;
+	m_tracklistArea = new mgf::Rectangle(m_guiWindow);
+	m_tracklistArea->SetColor(0xFFE1EEEF);
+
+	m_buttonNewPlaylist = new ButtonNewPlaylist(m_guiWindow);
+	m_buttonNewPlaylist->SetPositionAndSize(0, 5, 180, 18); //SetPositionAndSize is more comfortable
+	m_buttonNewPlaylist->SetDrawBG(false);
+	//m_buttonNewPlaylist->onReleaseLMB = Playlist_BTN_newPL_onRelease;
 	
 	m_icons = m_framework->CreateIcons("../data/ap/icons.png", m_context->GetBackend());
 	if (m_icons)
 	{
 		int iconID1 = m_icons->Add(0, 0, 180, 17);
 		int iconID2 = m_icons->Add(0, 19, 180, 17);
-		//g_data.buttonNewPlaylist->SetIcons(icons.m_data, iconID1, iconID2, iconID1, iconID1);
+		m_buttonNewPlaylist->SetIcons(m_icons, iconID1, iconID2, iconID1, iconID1);
 	}
 	
 	//auto window2 = context.m_data->CreateWindow();

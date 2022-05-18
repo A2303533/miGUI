@@ -19,7 +19,7 @@ wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c);
 int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item);
 void Playlist_LB_onItemClick(mgf::ListBox* lb, void* item, uint32_t itemIndex, uint32_t mouseButton);
 int Playlist_LB_onDrawItem(mgf::ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
-void Playlist_BTN_newPL_onRelease(mgf::Element* e);
+//void Playlist_BTN_newPL_onRelease(mgf::Element* e);
 void Playlist_popupCb_open(int id, struct mgPopupItem_s*);
 void Playlist_popupCb_play(int id, struct mgPopupItem_s*);
 void Playlist_popupCb_delete(int id, struct mgPopupItem_s*);
@@ -492,11 +492,11 @@ int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, 
 	return i;
 }
 
-void Playlist_BTN_newPL_onRelease(mgf::Element* e)
-{
-	if (g_app->m_playlistMgr)
-		g_app->m_playlistMgr->AddNew();
-}
+//void Playlist_BTN_newPL_onRelease(mgf::Element* e)
+//{
+//	if (g_app->m_playlistMgr)
+//		g_app->m_playlistMgr->AddNew();
+//}
 
 int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item)
 {

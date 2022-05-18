@@ -13,6 +13,8 @@ enum class backend_type
 	OpenGLOld,
 };
 
+class ButtonNewPlaylist;
+
 class AP_application
 {
 public:
@@ -32,7 +34,7 @@ public:
 	mgf::Rectangle* m_playlistArea = 0;
 	mgf::Rectangle* m_controlArea = 0;
 	mgf::Rectangle* m_tracklistArea = 0;
-	mgf::Button* m_buttonNewPlaylist = 0;
+	ButtonNewPlaylist* m_buttonNewPlaylist = 0;
 	mgf::ListBox* m_listboxPlaylist = 0;
 	mgf::Table* m_tableTracklist = 0;
 	

@@ -116,5 +116,6 @@ void Button::SetFont(Font* f)
 	m_font = fi->m_font;
 }
 
-
+void Button::OnPushOn() {}
+void Button::OnPushOff() {}
 
