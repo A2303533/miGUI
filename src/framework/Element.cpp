@@ -34,10 +34,6 @@
 using namespace mgf;
 
 Element::Element()
-:
-m_element(0),
-m_userData(0),
-m_alignment(LeftTop)
 {
 }
 
@@ -334,3 +330,9 @@ void Element::OnReleaseX2MB()
 {
 
 }
+
+void Element::ToTop()
+{
+	mgSetParent(m_element, 0);
+}
+

@@ -52,6 +52,9 @@ namespace mgf
 		virtual ~Text();
 
 		void SetText(const wchar_t*);
+		void SetText(const char*);
+		void SetTextF(const wchar_t*, ...);
+		void SetTextF(const char*, ...);
 		void SetFont(Font*);
 		void SetPosition(mgPoint*);
 		void SetPosition(int x, int y);

@@ -66,47 +66,29 @@ namespace mgf
 
 		struct _menuPopupItemInfo
 		{
-			_menuPopupItemInfo()
-				:
-				id(0),
-				enabled(true),
-				icon(0),
-				icon_index(0),
-				popup(0)
-			{}
 			StringW title;
-			uint32_t id;
+			uint32_t id = 0;
 			StringW shortcut_text;
-			bool enabled;
-			Icons* icon;
-			uint32_t icon_index;
+			bool enabled = true;
+			Icons* icon = 0;
+			uint32_t icon_index = 0;
 
-			mgPopup_s* popup;
+			mgPopup_s* popup = 0;
 		};
 		/*std::vector<_menuPopupItemInfo> m_menuPopupItems[5];
 		int m_menuPopupItemsIndices[5];
 		int m_menuPopupItemsCurr = 0;*/
 		struct _menuTreeNode
 		{
-			_menuTreeNode()
-				:
-				children(0),
-				siblings(0),
-				parent(0)
-			{}
-			_menuTreeNode* children;
-			_menuTreeNode* siblings;
-			_menuTreeNode* parent;
+			_menuTreeNode* children = 0;
+			_menuTreeNode* siblings = 0;
+			_menuTreeNode* parent = 0;
 
 			_menuPopupItemInfo itemInfo;
 		};
 		struct _menuTree
 		{
-			_menuTree()
-				:
-				m_root(0)
-			{}
-			_menuTreeNode* m_root;
+			_menuTreeNode* m_root = 0;
 		}
 		m_menuTree;
 		_menuTreeNode* m_menuNodeCurr = 0;

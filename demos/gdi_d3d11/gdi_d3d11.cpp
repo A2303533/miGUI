@@ -4,6 +4,8 @@
 #include "framework/GSD3D11.h"
 #include "framework/Window.h"
 #include "framework/Rectangle.h"
+#include "framework/Text.h"
+#include "framework/Button.h"
 #include "framework/Camera.h"
 #include "framework/Filesystem.h"
 
@@ -18,6 +20,8 @@
 // comment all for 3
 //#define DEMO_NATIVE_WIN32MENU
 #define DEMO_SYSTEM_POPUP_MENU
+
+// + some demo about Text and Button
 
 // And also 2 types of how to draw Graphics API things:
 //  1 - native Windows window
@@ -114,6 +118,7 @@ public:
 	mgf::Image* m_GDIRenderTextureImage = 0;
 	mgTexture* m_GDIRenderTexture = 0;
 	mgf::GSTexture* m_renderTexture = 0;
+	mgf::Text* m_textFPS = 0;
 
 	mgColor m_colorRed;
 	mgColor m_colorGreen;
@@ -177,24 +182,22 @@ WindowMainMenu::WindowMainMenu(ModelEditor* app)
 	useSystemWindowMenu = true;
 #endif
 
+#ifndef DEMO_NATIVE_WIN32MENU
 	UseMenu(true, useSystemWindowMenu, app->m_menuFont);
 	BeginMenu(L"File");
 	{
-#ifndef DEMO_NATIVE_WIN32MENU
 		AddMenuItem(0, 0);
 		AddMenuItem(L"Exit", WindowMainMenu::MenuItemID_File_Exit);
-#endif
 		EndMenu();
 	}
 	BeginMenu(L"View");
 	{
-#ifndef DEMO_NATIVE_WIN32MENU
 		AddMenuItem(0, 0);
 		AddMenuItem(L"Reset camera", 0);
-#endif
 		EndMenu();
 	}
 	RebuildMenu();
+#endif
 }
 
 WindowMainMenu::~WindowMainMenu()
@@ -254,13 +257,19 @@ bool ModelEditor::Init()
 	mgf::GSD3D11* gsd3d11 = new mgf::GSD3D11();
 	m_gs = gsd3d11;
 
+	m_windowMenu = new WindowMainMenu(this);
+	m_textFPS = new mgf::Text(m_windowMenu, L"FPS:", m_menuFont);
+	m_textFPS->SetPosition(0, 0);
+
 #ifdef DEMO_NATIVE_WIN32MENU
+	m_textFPS->SetPosition(0, 400);
+
 	m_backend->SetEndDrawIndent(0, 20);
 
 	WNDCLASSEXW wcex;
 	memset(&wcex, 0, sizeof(WNDCLASSEXW));
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DROPSHADOW;
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc = PopupWndProc;
 	wcex.hInstance = GetModuleHandle(0);
 	wcex.hCursor = LoadCursor(0, IDC_ARROW);
@@ -297,10 +306,11 @@ bool ModelEditor::Init()
 		return false;
 	}
 #else
-	m_windowMenu = new WindowMainMenu(this);
 	m_renderRect = new mgf::Rectangle(m_windowMenu);
 	m_renderRect->SetPositionAndSize(0, 0,
 		m_renderRectSize.x, m_renderRectSize.y);
+
+	m_textFPS->ToTop();
 
 	if (!gsd3d11->Init(m_windowMain, 0))
 	{
@@ -321,6 +331,7 @@ bool ModelEditor::Init()
 	
 	m_GDIRenderTexture = m_backend->CreateTexture(m_GDIRenderTextureImage->GetMGImage());
 	m_renderRect->SetTexture(m_GDIRenderTexture);
+
 #endif
 
 	gsd3d11->SetViewport(0, 0, m_renderRectSize.x, m_renderRectSize.y, 0, 0);
@@ -328,6 +339,7 @@ bool ModelEditor::Init()
 	float cclr[4] = { 1.f, 0.40f, 0.4f, 1.f };
 	m_gs->SetClearColor(cclr);
 	m_gs->ClearAll();
+	m_gs->UseVSync(false);
 
 	m_windowMain->OnSize();
 
@@ -349,8 +361,21 @@ void ModelEditor::Run()
 	mgPoint cameraRotation(1, 0);
 	float* dt = m_GUIContext->GetDeltaTime();
 
+	float fpsTime = 0.f;
+	int fpsCounter = 0;
+	int fpsCurrent = 0;
 	while (m_framework->Run())
 	{
+		++fpsCounter;
+		fpsTime += *dt;
+		if (fpsTime > 1.f)
+		{
+			fpsTime = 0.f;
+			fpsCurrent = fpsCounter;
+			fpsCounter = 0;
+			m_textFPS->SetTextF(L"FPS: %i", fpsCurrent);
+		}
+
 		m_framework->DrawAll();
 
 #ifdef DEMO_NATIVE_WIN32MENU

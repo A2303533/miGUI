@@ -113,10 +113,18 @@ namespace mgf
 		ElementCallback onReleaseX1MB = 0;
 		ElementCallback onReleaseX2MB = 0;*/
 
+
+		/// <summary>
+		/// Make this element last for drawing, first for input.
+		/// It will be like on top of all other elements.
+		/// It's just changing the order.
+		/// </summary>
+		virtual void ToTop();
+
 	protected:
-		mgElement_s* m_element;
-		void* m_userData;
-		Alignment m_alignment;
+		mgElement_s* m_element = 0;
+		void* m_userData = 0;
+		Alignment m_alignment = LeftTop;
 
 		void PostInit();
 	};

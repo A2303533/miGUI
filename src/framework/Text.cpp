@@ -34,6 +34,9 @@
 #include "framework/FontImpl.h"
 #include "framework/Text.h"
 
+#include <stdarg.h>
+#include <wchar.h>
+
 using namespace mgf;
 
 namespace mgf
@@ -87,6 +90,37 @@ Text::~Text()
 void Text::SetText(const wchar_t* t)
 {
 	m_text.assign(t);
+	m_element->onRebuild(m_element);
+}
+
+void Text::SetText(const char* t)
+{
+	StringA stra = t;
+	StringW str = stra.to_utf16();
+	SetText(str.data());
+	m_element->onRebuild(m_element);
+}
+
+void Text::SetTextF(const wchar_t* f, ...)
+{
+	va_list ap;
+	va_start(ap, f);
+	wchar_t buffer[500];
+	buffer[0] = 0;
+	vswprintf(buffer, 500, f, ap);
+	va_end(ap);
+	SetText(buffer);
+}
+
+void Text::SetTextF(const char* f, ...)
+{
+	va_list ap;
+	va_start(ap, f);
+	char buffer[500];
+	buffer[0] = 0;
+	vsprintf(buffer, f, ap);
+	va_end(ap);
+	SetText(buffer);
 }
 
 void Text::SetFont(Font* f)
