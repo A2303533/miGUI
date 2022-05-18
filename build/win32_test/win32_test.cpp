@@ -24,20 +24,21 @@ HRAWINPUT g_rawInputData[0xff];
 mgFont* g_win32font = 0;
 mgIcons* g_icons = 0;
 
-const wchar_t* g_textText = L"Text";
-size_t g_textLen = 4;
-mgColor g_textColor;
-
 mgWindow* test_guiWindow1 = 0;
 mgWindow* test_guiWindow2 = 0;
 mgWindow* test_guiWindow3 = 0;
 mgWindow* test_guiWindow4 = 0;
 mgWindow* test_guiWindow5 = 0;
+
 #define WindowID_1 1
 #define WindowID_2 2
 #define WindowID_3 3
 #define WindowID_4 4
 #define WindowID_5 5
+
+#define ButtonID_Button 1
+#define ButtonID_SaveDock 2
+#define ButtonID_LoadDock 3
 
 mgSystemWindowOSData* g_mainSystemWindowOSData = 0; // mgContext has this.
 
@@ -512,34 +513,6 @@ void draw_gui()
     g_gui_context->gpu->endDraw();
 }
 
-mgFont* text_onGetData(struct mgElement_s* e, const wchar_t** text, size_t* textLen, mgColor** color)
-{
-    *text = g_textText;
-    *textLen = g_textLen;
-    *color = &g_textColor;
-    return g_win32font;
-}
-void rect_onMouseEnter(struct mgElement_s* e){
-    mgElementText* text = (mgElementText*)e->userData;
-    g_textText = L"Mouse enter";
-    g_textLen = wcslen(g_textText);
-    mgSetCursor(g_gui_context, g_gui_context->defaultCursors[mgCursorType_Hand], mgCursorType_Arrow);
-}
-void rect_onMouseLeave(struct mgElement_s* e){
-    mgElementText* text = (mgElementText*)e->userData;
-    g_textText = L"Mouse leave";
-    g_textLen = wcslen(g_textText);
-    mgSetCursor(g_gui_context, g_gui_context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
-}
-void rect_onClickLMB(struct mgElement_s* e) {
-    mgElementText* text = (mgElementText*)e->userData;
-    g_textColor.setAsIntegerBGR(0xFF0000);
-}
-void rect_onReleaseLMB(struct mgElement_s* e) {
-    mgElementText* text = (mgElementText*)e->userData;
-    g_textColor.setAsIntegerBGR(0xFFFFFF);
-}
-
 void saveDock(struct mgElement_s* e)
 {
     int saveDataSize = 0;
@@ -598,6 +571,50 @@ void loadDock(struct mgElement_s* e)
         if (data)
             free(data);
     }
+}
+
+mgFont* Button_onFont(struct mgElement_s* e)
+{
+    return g_win32font;
+}
+
+const wchar_t* Button_onText(struct mgElement_s* e, size_t* textLen)
+{
+    mgElementButton* btn = (mgElementButton*)e->implementation;
+
+    switch (e->id)
+    {
+    case ButtonID_Button:
+        *textLen = 6;
+        return L"Button";
+    case ButtonID_SaveDock:
+        *textLen = 10;
+        return L"Save dock";
+    case ButtonID_LoadDock:
+        *textLen = 10;
+        return L"Load dock";
+    }
+
+    *textLen = 0;
+    return 0;
+}
+
+mgColor* Text_onColor(struct mgElement_s* e)
+{
+    static mgColor c;
+    c.setAsIntegerRGB(0xFF1144);
+    return &c;
+}
+
+mgFont* Text_onFont(struct mgElement_s*)
+{
+    return g_win32font;
+}
+
+const wchar_t* Text_onText(struct mgElement_s*, size_t* textLen)
+{
+    *textLen = 4;
+    return L"Text";
 }
 
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
@@ -733,22 +750,34 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
 
         mgPointSet(&sz, 100, 40);
         mgPointSet(&pos, 100, 60);
-        mgElement* eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Button", g_win32font);
+        mgElement* eb = mgCreateButton(test_guiWindow1, &pos, &sz);
+        eb->id = ButtonID_Button;
         eb->align = mgAlignment_rightBottom;
         ((mgElementButton*)eb->implementation)->pushButton = 1;
+        ((mgElementButton*)eb->implementation)->onFont = Button_onFont;
+        ((mgElementButton*)eb->implementation)->onText = Button_onText;
 
         mgPointSet(&pos, 100, 120);
-        eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Save dock", g_win32font);
+        eb = mgCreateButton(test_guiWindow1, &pos, &sz);
+        eb->id = ButtonID_SaveDock;
         eb->onReleaseLMB = saveDock;
         eb->enabled = 1;
+        ((mgElementButton*)eb->implementation)->onFont = Button_onFont;
+        ((mgElementButton*)eb->implementation)->onText = Button_onText;
 
         mgPointSet(&pos, 100, 160);
-        eb = mgCreateButton(test_guiWindow1, &pos, &sz, L"Load dock", g_win32font);
+        eb = mgCreateButton(test_guiWindow1, &pos, &sz);
+        eb->id = ButtonID_LoadDock;
         eb->onReleaseLMB = loadDock;
+        ((mgElementButton*)eb->implementation)->onFont = Button_onFont;
+        ((mgElementButton*)eb->implementation)->onText = Button_onText;
 
         mgPointSet(&pos, 100, 100);
-        mgElement* et = mgCreateText(test_guiWindow1, &pos, text_onGetData);// , L"Text", g_win32font);
+        mgElement* et = mgCreateText(test_guiWindow1, &pos);
         et->align = mgAlignment_rightBottom;
+        ((mgElementText*)et->implementation)->onColor = Text_onColor;
+        ((mgElementText*)et->implementation)->onFont = Text_onFont;
+        ((mgElementText*)et->implementation)->onText = Text_onText;
 
         test_guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
         test_guiWindow2->titlebarFont = g_win32font;
@@ -761,7 +790,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
-            mgElement* btn = mgCreateButton(test_guiWindow2, &pos, &sz, L"Button", g_win32font);
+            mgElement* btn = mgCreateButton(test_guiWindow2, &pos, &sz);
+            btn->id = ButtonID_Button;
+            ((mgElementButton*)btn->implementation)->onFont = Button_onFont;
+            ((mgElementButton*)btn->implementation)->onText = Button_onText;
         }
 
         test_guiWindow3 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
@@ -775,7 +807,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
-            mgElement* btn = mgCreateButton(test_guiWindow3, &pos, &sz, L"Button", g_win32font);
+            mgElement* btn = mgCreateButton(test_guiWindow3, &pos, &sz);
+            btn->id = ButtonID_Button;
+            ((mgElementButton*)btn->implementation)->onFont = Button_onFont;
+            ((mgElementButton*)btn->implementation)->onText = Button_onText;
         }
 
         test_guiWindow4 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
@@ -789,7 +824,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
-            mgElement* btn = mgCreateButton(test_guiWindow4, &pos, &sz, L"Button", g_win32font);
+            mgElement* btn = mgCreateButton(test_guiWindow4, &pos, &sz);
+            btn->id = ButtonID_Button;
+            ((mgElementButton*)btn->implementation)->onFont = Button_onFont;
+            ((mgElementButton*)btn->implementation)->onText = Button_onText;
         }
 
         test_guiWindow5 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
@@ -803,7 +841,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
-            mgElement* btn = mgCreateButton(test_guiWindow5, &pos, &sz, L"Button", g_win32font);
+            mgElement* btn = mgCreateButton(test_guiWindow5, &pos, &sz);
+            btn->id = ButtonID_Button;
+            ((mgElementButton*)btn->implementation)->onFont = Button_onFont;
+            ((mgElementButton*)btn->implementation)->onText = Button_onText;
         }
         
         int popupFlags = 0;
@@ -853,30 +894,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
             mgMenu* menu = mgCreateMenu(g_gui_context, menu_items, 5, g_win32font);
             test_guiWindow1->menu = menu;
         }
-
-        //guiWindow2->flags ^= mgWindowFlag_withTitlebar;
-        //guiWindow2->flags ^= mgWindowFlag_canMove;
-
-        /*mgPoint pos, sz;
-        mgColor c1, c2;
-        pos.x = 300;
-        pos.y = 0;
-        sz.x = 100;
-        sz.y = 20;
-        c1.setAsIntegerRGB(0xFF0000);
-        c2.setAsIntegerRGB(0x0000FF);
-        mgElement* rectangle = mgCreateRectangle(g_gui_context, &pos, &sz, &c1, &c2);
-        mgElement* text = mgCreateText(g_gui_context, &pos, L"Text", g_win32font);
-        ((mgElementText*)text->implementation)->color.setAsIntegerBGR(0xFFFFFF);
-        rectangle->userData = text->implementation;
-        rectangle->onMouseEnter = rect_onMouseEnter;
-        rectangle->onMouseLeave = rect_onMouseLeave;
-        rectangle->onClickLMB = rect_onClickLMB;
-        rectangle->onReleaseLMB = rect_onReleaseLMB;
-     
-        pos.y += 30;
-        mgElement* button = mgCreateButton(g_gui_context, &pos, &sz, L"Button", g_win32font);*/
     }
+
+    g_gui_context->needRebuild = 1; //
 
     UpdateBackBuffer();
     MSG msg;

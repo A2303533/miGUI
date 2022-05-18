@@ -30,21 +30,15 @@
 #ifndef _MG_ELEMENTRECTANGLE_H_
 #define _MG_ELEMENTRECTANGLE_H_
 
-typedef mgTexture* (*mgElementRectangleOnGetData)(struct mgElement_s*, mgColor** color1, mgColor** color2);
-
 typedef struct mgElementRectangle_s {
 	//mgColor color1;
 	//mgColor color2;	
 	//mgTexture* texture; // opt
 
 	// All callbacks MUST BE implemented
-	//mgColor* (*onColor1)(struct mgElement_s*);
-	//mgColor* (*onColor2)(struct mgElement_s*);
-	//mgTexture* (*onTexture)(struct mgElement_s*);
-
-	// I'll try to use only 1 callback
-	mgElementRectangleOnGetData onGetData;
-
+	mgColor* (*onColor1)(struct mgElement_s*);
+	mgColor* (*onColor2)(struct mgElement_s*);
+	mgTexture* (*onTexture)(struct mgElement_s*);
 } mgElementRectangle;
 
 

@@ -38,11 +38,21 @@ extern Framework* g_mgf;
 
 namespace mgf
 {
-	mgTexture* Rectangle_onGetData(mgElement_s* e, mgColor** color1, mgColor** color2)
+	mgColor* Rectangle_onColor1(mgElement_s* e)
 	{
 		mgf::Rectangle* rectangle = static_cast<mgf::Rectangle*>(e->userData);
-		*color1 = &rectangle->m_color1;
-		*color2 = &rectangle->m_color2;
+		return &rectangle->m_color1;
+	}
+
+	mgColor* Rectangle_onColor2(mgElement_s* e)
+	{
+		mgf::Rectangle* rectangle = static_cast<mgf::Rectangle*>(e->userData);
+		return &rectangle->m_color2;
+	}
+
+	mgTexture* Rectangle_onTexture(mgElement_s* e)
+	{
+		mgf::Rectangle* rectangle = static_cast<mgf::Rectangle*>(e->userData);
 		return rectangle->m_texture;
 	}
 }
@@ -59,10 +69,13 @@ Rectangle::Rectangle(Window* w)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
-	m_element = mgCreateRectangle(w->m_window, &p, &p, Rectangle_onGetData);
+	m_element = mgCreateRectangle(w->m_window, &p, &p);
 	m_element->userData = this;
 	
 	m_elementRectangle = (mgElementRectangle*)m_element->implementation;
+	m_elementRectangle->onColor1 = Rectangle_onColor1;
+	m_elementRectangle->onColor2 = Rectangle_onColor2;
+	m_elementRectangle->onTexture = Rectangle_onTexture;
 
 	m_color1 = g_mgf->GetColor(mgf::ColorName::Black);
 	m_color2 = g_mgf->GetColor(mgf::ColorName::Black);

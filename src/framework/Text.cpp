@@ -35,17 +35,26 @@
 #include "framework/Text.h"
 
 using namespace mgf;
-extern Framework* g_mgf;
 
 namespace mgf
 {
-	mgFont* Text_onGetData(struct mgElement_s* e, const wchar_t** text, size_t* textLen, mgColor** color)
+	mgColor* Text_onColor(mgElement_s* e)
 	{
-		mgf::Text* textElement = static_cast<mgf::Text*>(e->userData);
-		*text = textElement->m_text.c_str();
-		*textLen = textElement->m_text.size();
-		*color = &textElement->m_color;
-		return textElement->m_font;
+		mgf::Text* text = static_cast<mgf::Text*>(e->userData);
+		return &text->m_color;
+	}
+
+	mgFont* Text_onFont(struct mgElement_s* e)
+	{
+		mgf::Text* text = static_cast<mgf::Text*>(e->userData);
+		return text->m_font;
+	}
+
+	const wchar_t* Text_onText(struct mgElement_s* e, size_t* textLen)
+	{
+		mgf::Text* text = static_cast<mgf::Text*>(e->userData);
+		*textLen = text->m_text.size();
+		return text->m_text.c_str();
 	}
 }
 
@@ -56,12 +65,16 @@ Text::Text(Window* w, const wchar_t* t, Font* f)
 
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
-	m_color = g_mgf->GetColor(mgf::ColorName::Black);
+
+	m_color.setAsIntegerRGB(0);
 	m_text.assign(t);
-	m_element = mgCreateText(w->m_window, &p, Text_onGetData);
-	m_elementText = (mgElementText*)m_element->implementation;
 	m_font = ((FontImpl*)f)->m_font;
 
+	m_element = mgCreateText(w->m_window, &p);
+	m_elementText = (mgElementText*)m_element->implementation;
+	m_elementText->onColor = Text_onColor;
+	m_elementText->onFont = Text_onFont;
+	m_elementText->onText = Text_onText;
 	Element::PostInit();
 }
 

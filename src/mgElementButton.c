@@ -164,7 +164,10 @@ miGUI_onDraw_button(mgElement* e)
 			impl->icons->texture, &impl->icons->iconNodes[iconID].uv);
 	}
 
-	if (impl->text && impl->textLen)
+	size_t textLen = 0;
+	const wchar_t* text = impl->onText(e, &textLen);
+
+	if (text && textLen)
 	{
 		if (e->enabled)
 		{
@@ -188,7 +191,7 @@ miGUI_onDraw_button(mgElement* e)
 		pos.y += impl->textIndentInternal.y;
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 		e->window->context->gpu->drawText(mgDrawTextReason_buttonText, impl, 
-			&pos, impl->text, impl->textLen, &impl->textColorFinal, impl->font);
+			&pos, text, textLen, &impl->textColorFinal, impl->onFont(e));
 	}
 }
 
@@ -200,10 +203,13 @@ miGUI_onRebuild_button(mgElement* e)
 	impl->textIndentInternal.x = 0;
 	impl->textIndentInternal.y = 0;
 
-	if (impl->text && e->window->context->getTextSize)
+	size_t textLen = 0;
+	const wchar_t* text = impl->onText(e, &textLen);
+
+	if (text && e->window->context->getTextSize)
 	{
 		mgPoint p;
-		e->window->context->getTextSize(impl->text, impl->font, &p);
+		e->window->context->getTextSize(text, impl->onFont(e), &p);
 
 		mgPoint buttonCenter;
 		buttonCenter.x = (int)((float)(e->transformLocal.buildArea.right - e->transformLocal.buildArea.left) * 0.5f);
@@ -220,12 +226,10 @@ miGUI_onRebuild_button(mgElement* e)
 
 MG_API
 mgElement* MG_C_DECL
-mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font)
+mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size)
 {
 	assert(w);
 	assert(position);
-	assert(text);
-	assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
 	newElement->type = MG_TYPE_BUTTON;
 
@@ -247,13 +251,10 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const w
 	newElement->implementation = calloc(1, sizeof(mgElementButton));
 	mgElementButton* impl = (mgElementButton*)newElement->implementation;
 	
-	impl->font = font;
-	impl->text = text;
-	impl->textLen = (int)wcslen(text);
-	
 	mgSetParent_f(newElement, 0);
 
-	miGUI_onRebuild_button(newElement);
+	// now user must call rebuild function (or just context->needRebuild = 1;) 
+	//miGUI_onRebuild_button(newElement);
 
 	return newElement;
 }

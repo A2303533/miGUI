@@ -39,18 +39,36 @@ using namespace mgf;
 
 extern Backend* g_backend;
 
+namespace mgf
+{
+	mgFont* Button_onFont(struct mgElement_s* e)
+	{
+		mgf::Button* btn = static_cast<mgf::Button*>(e->userData);
+		return btn->m_font;
+	}
+
+	const wchar_t* Button_onText(struct mgElement_s* e, size_t* textLen)
+	{
+		mgf::Button* btn = static_cast<mgf::Button*>(e->userData);
+		*textLen = btn->m_text.size();
+		return btn->m_text.c_str();
+	}
+}
+
 Button::Button(Window* w)
-	:
-	m_elementButton(0),
-	m_icons(0)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 	
 	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
 	m_text.assign(L" ");
-	m_element = mgCreateButton(w->m_window, &p, &p, m_text.data(), fi->m_font );
+	m_font = fi->m_font;
+
+	m_element = mgCreateButton(w->m_window, &p, &p);
+	m_element->userData = this;
 	m_elementButton = (mgElementButton*)m_element->implementation;
+	m_elementButton->onFont = Button_onFont;
+	m_elementButton->onText = Button_onText;
 	Element::PostInit();
 }
 
@@ -63,17 +81,12 @@ Button::~Button()
 void Button::SetText(const wchar_t* t)
 {
 	m_text.clear();
-	m_elementButton->text = 0;
 	int slen = 0;
 	if (t)
 		slen = (int)wcslen(t);
 
 	if (slen)
-	{
 		m_text.assign(t);
-		m_elementButton->text = m_text.data();
-		m_elementButton->textLen = slen;
-	}
 }
 
 void Button::SetAsPush(bool v)
@@ -100,7 +113,7 @@ void Button::SetIcons(
 void Button::SetFont(Font* f)
 {
 	FontImpl* fi = (FontImpl*)f;
-	m_elementButton->font = fi->m_font;
+	m_font = fi->m_font;
 }
 
 

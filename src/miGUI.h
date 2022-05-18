@@ -224,26 +224,26 @@ extern PFNMGSETPARENTPROC mgSetParent;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgElementRectangleOnGetData onGetData);
+MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
 #define mgCreateRectangle mgCreateRectangle_f
 #else
-typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgElementRectangleOnGetData onGetData);
+typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
 extern PFNMGCREATERECTANGLEPROC mgCreateRectangle;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* w, mgPoint* position, mgElementTextOnGetData onGetData);
+MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* w, mgPoint* position);
 #define mgCreateText mgCreateText_f
 #else
-typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgWindow_s* w, mgPoint* position, mgElementTextOnGetData onGetData);
+typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgWindow_s* w, mgPoint* position);
 extern PFNMGCREATETEXTPROC mgCreateText;
 #endif
 
 #ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
+MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
 #define mgCreateButton mgCreateButton_f
 #else
-typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, const wchar_t* text, mgFont* font);
+typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
 extern PFNMGCREATEBUTTONPROC mgCreateButton;
 #endif
 

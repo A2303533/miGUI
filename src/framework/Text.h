@@ -42,7 +42,11 @@ namespace mgf
 		mgElementText_s* m_elementText = 0;
 		mgFont* m_font = 0;
 		mgColor m_color;
-		friend mgFont* Text_onGetData(struct mgElement_s*, const wchar_t**, size_t* textLen, mgColor**);
+
+		friend mgColor* Text_onColor(mgElement_s* e);
+		friend mgFont* Text_onFont(struct mgElement_s* e);
+		friend const wchar_t* Text_onText(struct mgElement_s* e, size_t* textLen);
+
 	public:
 		Text(Window* w, const wchar_t* t, Font* f);
 		virtual ~Text();
