@@ -18,15 +18,119 @@ void Playlist_popupCb_open(int id, struct mgPopupItem_s*);
 void Playlist_popupCb_play(int id, struct mgPopupItem_s*);
 void Playlist_popupCb_delete(int id, struct mgPopupItem_s*);
 void Playlist_popupCb_showexpl(int id, struct mgPopupItem_s*);
-const wchar_t* Playlist_onColTitleText(mgf::Table*, uint32_t* textLen, uint32_t colIndex);
-int Playlist_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
-void Playlist_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input);
 int Playlist_onIsRowSelected(mgf::Table* tb, void* row);
 
-ListboxPlaylist::ListboxPlaylist(mgf::Window* w) :mgf::ListBox(w) {}
-	
+TableTracklist::TableTracklist(mgf::Window* w, uint32_t colNum)	:mgf::Table(w, colNum){}
+TableTracklist::~TableTracklist() {}
+const wchar_t* TableTracklist::OnColTitleText(Table*, uint32_t* textLen, uint32_t colIndex)
+{
+	switch (colIndex)
+	{
+	case 0:
+		*textLen = 7;
+		return L"Playing";
+	case 1:
+		*textLen = 4;
+		return L"File";
+	case 2:
+		*textLen = 1;
+		return L"#";
+	case 3:
+		*textLen = 5;
+		return L"Title";
+	case 4:
+		*textLen = 8;
+		return L"Duration";
+	}
+	return 0;
+}
+int TableTracklist::OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
+{
+	if (row)
+	{
+		static mgf::StringW playingText = L"*";
+
+		PlaylistNode* nd = (PlaylistNode*)row;
+		static mgf::StringW textBuffer;
+		// col is where you want to show text for current row
+		switch (col)
+		{
+		case 0:
+		{
+			if (nd->m_isPlaying)
+			{
+				textBuffer.clear();
+				textBuffer += playingText.data();
+				*text = textBuffer.data();
+				*textlen = textBuffer.size();
+			}
+			else
+			{
+				*text = 0;
+				*textlen = 0;
+			}
+		}break;
+		case 1:
+			*text = nd->m_audioFilePath.data();
+			*textlen = nd->m_audioFilePath.size();
+			break;
+		case 2:
+			textBuffer.clear();
+			textBuffer += nd->m_info_number.data();
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		case 3:
+			textBuffer.clear();
+			textBuffer += nd->m_info_title.data();
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		case 4:
+			textBuffer.clear();
+			textBuffer += nd->m_info_duration.data();
+			*text = textBuffer.data();
+			*textlen = textBuffer.size();
+			break;
+		}
+
+		return 1;
+	}
+	return 0;
+}
+void TableTracklist::OnRowClick(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input)
+{
+	if (mouseButton != 1)
+		return;
+
+	static PlaylistNode* oldNd = 0;
+
+	PlaylistNode* nd = (PlaylistNode*)row;
+
+	if (input->LMBClickCount == 2)
+	{
+		if (oldNd == nd)
+		{
+			g_app->m_playlistMgr->PlayTrack(nd);
+		}
+	}
+
+	for (size_t i = 0, sz = nd->m_playlist->m_nodes.size(); i < sz; ++i)
+	{
+		nd->m_playlist->m_nodes[i]->m_isSelected = false;
+	}
+	nd->m_isSelected = true;
+
+	oldNd = nd;
+}
+int TableTracklist::OnIsRowSelected(Table*, void* row)
+{
+	PlaylistNode* nd = (PlaylistNode*)row;
+	return (int)nd->m_isSelected;
+}
+
+ListboxPlaylist::ListboxPlaylist(mgf::Window* w) :mgf::ListBox(w) {}	
 ListboxPlaylist::~ListboxPlaylist() {}
-	
 wchar_t ListboxPlaylist::OnTextInputCharEnter(ListBox*, wchar_t c)
 {
 	bool good = false;
@@ -198,10 +302,6 @@ PlayListManager::PlayListManager()
 		g_app->m_tableTracklist->GetColSizes()[4] = 50;
 		g_app->m_tableTracklist->SetScrollSpeed(50.f);
 		g_app->m_tableTracklist->SetRowHeight(20);
-		g_app->m_tableTracklist->onColTitleText = Playlist_onColTitleText;
-		g_app->m_tableTracklist->onDrawRow = Playlist_onDrawRow;
-		g_app->m_tableTracklist->onRowClick = Playlist_onRowClick;
-		g_app->m_tableTracklist->onIsRowSelected = Playlist_onIsRowSelected;
 	}
 
 	mgPopupItemInfo_s listboxPopupItems[] =
@@ -739,115 +839,6 @@ void PlayListManager::SaveEditPlaylist()
 	if (!m_editPlaylist)
 		return;
 	m_editPlaylist->Save();
-}
-
-const wchar_t* Playlist_onColTitleText(mgf::Table*, uint32_t* textLen, uint32_t colIndex)
-{
-	switch (colIndex)
-	{
-	case 0:
-		*textLen = 7;
-		return L"Playing";
-	case 1:
-		*textLen = 4;
-		return L"File";
-	case 2:
-		*textLen = 1;
-		return L"#";
-	case 3:
-		*textLen = 5;
-		return L"Title";
-	case 4:
-		*textLen = 8;
-		return L"Duration";
-	}
-	return 0;
-}
-
-int Playlist_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
-{
-	if (row)
-	{
-		static mgf::StringW playingText = L"*";
-
-		PlaylistNode* nd = (PlaylistNode*)row;
-		static mgf::StringW textBuffer;
-		// col is where you want to show text for current row
-		switch (col)
-		{
-		case 0:
-		{
-			if (nd->m_isPlaying)
-			{
-				textBuffer.clear();
-				textBuffer += playingText.data();
-				*text = textBuffer.data();
-				*textlen = textBuffer.size();
-			}
-			else
-			{
-				*text = 0;
-				*textlen = 0;
-			}
-		}break;
-		case 1:
-			*text = nd->m_audioFilePath.data();
-			*textlen = nd->m_audioFilePath.size();
-			break;
-		case 2:
-			textBuffer.clear();
-			textBuffer += nd->m_info_number.data();
-			*text = textBuffer.data();
-			*textlen = textBuffer.size();
-			break;
-		case 3:
-			textBuffer.clear();
-			textBuffer += nd->m_info_title.data();
-			*text = textBuffer.data();
-			*textlen = textBuffer.size();
-			break;
-		case 4:
-			textBuffer.clear();
-			textBuffer += nd->m_info_duration.data();
-			*text = textBuffer.data();
-			*textlen = textBuffer.size();
-			break;
-		}
-
-		return 1;
-	}
-	return 0;
-}
-
-void Playlist_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input)
-{
-	if (mouseButton != 1)
-		return;
-	
-	static PlaylistNode* oldNd = 0;
-
-	PlaylistNode* nd = (PlaylistNode*)row;
-
-	if (input->LMBClickCount == 2)
-	{
-		if (oldNd == nd)
-		{
-			g_app->m_playlistMgr->PlayTrack(nd);
-		}
-	}
-
-	for (size_t i = 0, sz = nd->m_playlist->m_nodes.size(); i < sz; ++i)
-	{
-		nd->m_playlist->m_nodes[i]->m_isSelected = false;
-	}
-	nd->m_isSelected = true;
-
-	oldNd = nd;
-}
-int Playlist_onIsRowSelected(mgf::Table* tb, void* row)
-{
-	PlaylistNode* nd = (PlaylistNode*)row;
-	return (int)nd->m_isSelected;
 }
 
 void PlayListManager::PlayTrack(PlaylistNode* nd)

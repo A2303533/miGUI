@@ -136,7 +136,7 @@ int LB_onDrawItem(struct mgElement_s* e, void* item, uint32_t itemIndex, wchar_t
 	return lb->OnDrawItem(lb, item, itemIndex, text, textlen);
 }
 
-wchar_t ListBox::OnTextInputCharEnter(ListBox*, wchar_t) { return 0; }
+wchar_t ListBox::OnTextInputCharEnter(ListBox*, wchar_t c) { return c; }
 int ListBox::OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, void* editItem) { return 0; }
 int ListBox::OnIsItemSelected(ListBox* e, void* item) { return 0; }
 void ListBox::OnItemClick(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton) {}

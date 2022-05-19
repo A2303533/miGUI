@@ -185,8 +185,7 @@ bool AP_application::Init(backend_type bt)
 	m_listboxPlaylist->SetTextInputCharLimit(100);
 		//g_data.listboxPlaylist->SetData(listboxData, 10);
 		
-	//	g_data.tableTracklist = guiWindow.m_data->AddTable(5, listboxFont.m_data);// initialization in PlayListManager
-	
+	m_tableTracklist = new TableTracklist(m_guiWindow, 5);// initialization in PlayListManager
 	m_playlistMgr = new PlayListManager();
 	
 	if(m_listboxPlaylist)

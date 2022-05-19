@@ -78,14 +78,14 @@ namespace mgf
 
 	class Table : public Element
 	{
-		mgElementTable_s* m_elementTable;
+		mgElementTable_s* m_elementTable = 0;
 
 		// size must be equal `column number`
 		std::vector<int> m_colSizes;
 		
 		/*std::vector<mgTableRow_s*> m_rows;*/
 	public:
-		Table(Window* w, uint32_t colNum, Font*);
+		Table(Window* w, uint32_t colNum);
 		virtual ~Table();
 		virtual void SetRect(int left, int top, int right, int bottom) override;
 
@@ -107,57 +107,86 @@ namespace mgf
 		uint32_t GetRowHeight();
 		void SetRowHeight(uint32_t);
 
-		wchar_t(*onTextInputCharEnter)(Table*, wchar_t);
-		/*
-		* i:
-		*	1 - Enter
-		*   2 - click somewhere
-		*   3 - Escape
-		* str: new text
-		* editItem: first byte for edited item
-		*/
-		int(*onTextInputEndEdit)(Table*, int i, const wchar_t* str, uint8_t* editItem);
+		/// <summary>
+		/// Filter for textInput. Return 0 to skip this char
+		/// </summary>
+		//virtual wchar_t OnTextInputCharEnter(Table*, wchar_t);
+
+		/// <summary>
+		/// You can edit some information.
+		/// </summary>
+		/// <param name="i"> - 1 when pressed Enter, 2 when clicked somewhere, 3 whenpressed Escape</param>
+		/// <param name="str"> - new text</param>
+		/// <param name="editItem"> - first byte for edited item</param>
+		/// <returns></returns>
+		//virtual int OnTextInputEndEdit(Table*, int i, const wchar_t* str, uint8_t* editItem);
 
 		/*
 	* Return 0 - no draw
 	*        1 - this is wchar_t* (you must set `text` and `textlen`)
 	*
 	*/
-		int(*onDrawRow)(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
 
-		// If you want selection you must add this callbacks:
-		//Return 1 if this row selected
-		int(*onIsRowSelected)(Table*, void* row);
-		// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
-		void(*onRowClick)(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input);
-		
-		// return 1 if need to enable textinput
-		int(*onCellClick)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton, mgInputContext_s* input);
-		
-		// when onCellClick return 1, will be activated textInput, and need to put some text in it.
-		// return text that will be placed in textInput
-		const wchar_t* (*onCellTextInputActivate)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex);
-		
-		// return that character that you want to put in textInput. return 0 for skip.
-		wchar_t(*onCellTextInputCharEnter)(Table*, wchar_t c);
-		
-		// will be called when Escape or Enter or click somewhere (type: see onEndEdit in mgElementTextInput.h)
-		// return 1 if need to deactivate input
-		int(*onCellTextInputEndEdit)(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
+		/// <summary>
+		/// To get text.
+		/// Return 1 if need to draw this row.
+		/// </summary>
+		virtual int OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
 
-		/*
-		* set this for column title, that can change column width.
-		* return text for current column, set also textLen.
-		*
-		*/
-		const wchar_t* (*onColTitleText)(Table*, uint32_t* textLen, uint32_t colIndex);
-		void(*onColTitleClick)(Table*, uint32_t colIndex, uint32_t mouseButton);
+
+		/// <summary>
+		/// If you want selection you must add this callbacks: 
+		/// Return 1 if this row selected
+		/// </summary>
+		virtual int OnIsRowSelected(Table*, void* row);
+
+		/// <summary>
+		/// If you want selection you must add this callbacks: 
+		/// Select here row here.
+		/// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
+		/// </summary>
+		virtual void OnRowClick(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input);
+		
+		/// <summary>
+		/// Return 1 if need to enable textinput
+		/// </summary>
+		virtual int OnCellClick(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton, mgInputContext_s* input);
+		
+		/// <summary>
+		/// When OnCellClick return 1, will be activated textInput, and need to put some text in it.
+		/// Return text that will be placed in textInput.
+		/// </summary>
+		virtual const wchar_t* OnCellTextInputActivate(Table*, void* row, uint32_t rowIndex, uint32_t colIndex);
+		
+		/// <summary>
+		/// Return that character that you want to put in textInput. return 0 for skip.
+		/// </summary>
+		virtual wchar_t OnCellTextInputCharEnter(Table*, wchar_t c);
+		
+		/// <summary>
+		/// Will be called when Escape or Enter or click somewhere (type: see onEndEdit in mgElementTextInput.h)
+		/// Return 1 if need to deactivate input
+		/// </summary>
+		virtual int OnCellTextInputEndEdit(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
+
+		/// <summary>
+		/// Set this for column title, that can change column width.
+		/// Return text for current column, set also textLen.
+		/// </summary>
+		virtual const wchar_t* OnColTitleText(Table*, uint32_t* textLen, uint32_t colIndex);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		virtual void OnColTitleClick(Table*, uint32_t colIndex, uint32_t mouseButton);
+
+
 		void SetActiveColTitle(uint32_t col);
 		void SetColTitleHeight(uint32_t h);
 
-		int(*onGetUserElementNum)(Table*, void* row, uint32_t rowIndex, uint32_t colIndex);
-		Element*(*onGetUserElement)(Table*, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex);
-		void (*onBeginGetUserElement)(Table*);
+		virtual int OnGetUserElementNum(Table*, void* row, uint32_t rowIndex, uint32_t colIndex);
+		virtual Element* OnGetUserElement(Table*, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex);
+		virtual void OnBeginGetUserElement(Table*);
 	};
 }
 

@@ -15,6 +15,7 @@ enum class backend_type
 
 class ButtonNewPlaylist;
 class ListboxPlaylist;
+class TableTracklist;
 
 class AP_application
 {
@@ -37,7 +38,7 @@ public:
 	mgf::Rectangle* m_tracklistArea = 0;
 	ButtonNewPlaylist* m_buttonNewPlaylist = 0;
 	ListboxPlaylist* m_listboxPlaylist = 0;
-	mgf::Table* m_tableTracklist = 0;
+	TableTracklist* m_tableTracklist = 0;
 	
 	mgf::Button* m_tableTracklist_testButton[testTable_buttonsSize];
 	int m_testTable_testButton_currBtn = 0;

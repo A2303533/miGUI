@@ -18,6 +18,17 @@ public:
 	virtual int OnDrawItem(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen) override;
 };
 
+class TableTracklist : public mgf::Table
+{
+public:
+	TableTracklist(mgf::Window* w, uint32_t colNum);
+	virtual ~TableTracklist();
+	virtual const wchar_t* OnColTitleText(Table*, uint32_t* textLen, uint32_t colIndex) override;
+	virtual int OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen) override;
+	virtual void OnRowClick(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input) override;
+	virtual int OnIsRowSelected(Table*, void* row) override;
+};
+
 class PlayList;
 class PlayListManager;
 

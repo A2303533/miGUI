@@ -38,8 +38,6 @@ using namespace mgf;
 
 extern Backend* g_backend;
 
-wchar_t Table_onTextInputCharEnter(struct mgElement_s* e, wchar_t c);
-int Table_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, uint8_t* editItem);
 int Table_onDrawRow(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
 int Table_onIsRowSelected(struct mgElement_s*, void* row);
 void Table_onRowClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t mouseButton);
@@ -54,29 +52,13 @@ struct mgElement_s* Table_onGetUserElement(struct mgElement_s*, uint32_t index, 
 void Table_onBeginGetUserElement(struct mgElement_s*);
 
 
-Table::Table(Window* w, uint32_t colNum, Font* f)
-	:
-	m_elementTable(0),
-	onTextInputCharEnter(0),
-	onTextInputEndEdit(0),
-	onDrawRow(0),
-	onIsRowSelected(0),
-	onRowClick(0),
-	onCellClick(0),
-	onCellTextInputActivate(0),
-	onCellTextInputCharEnter(0),
-	onCellTextInputEndEdit(0),
-	onColTitleText(0),
-	onColTitleClick(0),
-	onGetUserElementNum(0),
-	onGetUserElement(0),
-	onBeginGetUserElement(0)
+Table::Table(Window* w, uint32_t colNum)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 	
 	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
-	m_element = mgCreateTable(w->m_window, &p, &p, 0, 0, colNum, ((FontImpl*)f)->m_font);
+	m_element = mgCreateTable(w->m_window, &p, &p, 0, 0, colNum, fi->m_font);
 	m_element->userData = this;
 	m_elementTable = (mgElementTable*)m_element->implementation;
 	m_elementTable->onDrawRow = Table_onDrawRow;
@@ -97,10 +79,6 @@ Table::Table(Window* w, uint32_t colNum, Font* f)
 		m_colSizes.push_back(100);
 	}
 	m_elementTable->colsSizes = &m_colSizes.front();
-
-	/*m_elementTable->onTextInputCharEnter = LB_onTextInputCharEnter;
-	m_elementTable->onTextInputEndEdit = LB_onEndEdit;
-	m_elementTable->onSelect = LB_onSelect;*/
 	Element::PostInit();
 }
 
@@ -141,25 +119,6 @@ void Table::SetFont(Font* f)
 	m_elementTable->font = ((FontImpl*)f)->m_font;
 }
 
-wchar_t Table_onTextInputCharEnter(struct mgElement_s* e, wchar_t c)
-{
-	/*ListBox* lb = (ListBox*)e->userData;
-	if (lb->onTextInputCharEnter)
-		return lb->onTextInputCharEnter(lb, c);*/
-
-	return c;
-}
-
-int Table_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, uint8_t* editItem)
-{
-	/*ListBox* lb = (ListBox*)e->userData;
-
-	if (lb->onTextInputEndEdit)
-		return lb->onTextInputEndEdit(lb, type, str, editItem);*/
-
-	return type;
-}
-
 void Table::SetDrawItemBG(bool v)
 {
 	m_elementTable->drawItemBG = (int)v;
@@ -176,64 +135,43 @@ int Table_onDrawRow(struct mgElement_s* e, void* row, uint32_t col, wchar_t** te
 {
 	Table* tb = (Table*)e->userData;
 
-	if (tb->onDrawRow)
-		return tb->onDrawRow(tb, row, col, text, textlen);
-
-	return 0;
+	return tb->OnDrawRow(tb, row, col, text, textlen);
 }
 
 int Table_onIsRowSelected(struct mgElement_s* e, void* row)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onIsRowSelected)
-		return tb->onIsRowSelected(tb, row);
-
-	return 0;
+	return tb->OnIsRowSelected(tb, row);
 }
 
 void Table_onRowClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t mouseButton)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onRowClick)
-		tb->onRowClick(tb, row, rowIndex, mouseButton, e->window->context->input);
+	tb->OnRowClick(tb, row, rowIndex, mouseButton, e->window->context->input);
 }
 
 int Table_onCellClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onCellClick)
-		return tb->onCellClick(tb, row, rowIndex, colIndex, mouseButton, e->window->context->input);
-	return 0;
+	return tb->OnCellClick(tb, row, rowIndex, colIndex, mouseButton, e->window->context->input);
 }
 
 const wchar_t* Table_onCellTextInputActivate(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onCellTextInputActivate)
-		return tb->onCellTextInputActivate(tb, row, rowIndex, colIndex);
-	return 0;
+	return tb->OnCellTextInputActivate(tb, row, rowIndex, colIndex);
 }
 
 wchar_t Table_onCellTextInputCharEnter(struct mgElement_s* e, wchar_t c)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onCellTextInputCharEnter)
-		return tb->onCellTextInputCharEnter(tb, c);
-	return c;
+	return tb->OnCellTextInputCharEnter(tb, c);
 }
 
 int Table_onCellTextInputEndEdit(struct mgElement_s* e, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onCellTextInputEndEdit)
-		return tb->onCellTextInputEndEdit(tb, type, textinputText, row, rowIndex, colIndex);
-	return 1;
+	return tb->OnCellTextInputEndEdit(tb, type, textinputText, row, rowIndex, colIndex);
 }
 
 uint32_t Table::GetRowHeight()
@@ -251,18 +189,13 @@ void Table::SetRowHeight(uint32_t i)
 const wchar_t* Table_onColTitleText(struct mgElement_s* e, uint32_t* textLen, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onColTitleText)
-		return tb->onColTitleText(tb, textLen, colIndex);
-	return 0;
+	return tb->OnColTitleText(tb, textLen, colIndex);
 }
 
 void Table_onColTitleClick(struct mgElement_s* e, uint32_t colIndex, uint32_t mouseButton)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onColTitleClick)
-		tb->onColTitleClick(tb, colIndex, mouseButton);
+	tb->OnColTitleClick(tb, colIndex, mouseButton);
 }
 
 void Table::SetActiveColTitle(uint32_t i)
@@ -280,32 +213,82 @@ void Table::SetColTitleHeight(uint32_t h)
 int Table_onGetUserElementNum(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onGetUserElementNum)
-		return tb->onGetUserElementNum(tb, row, rowIndex, colIndex);
-	return 0;
+	return tb->OnGetUserElementNum(tb, row, rowIndex, colIndex);
 }
 
 struct mgElement_s* Table_onGetUserElement(struct mgElement_s* e, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
-
-	if (tb->onGetUserElement)
-	{
-		Element* mgfElement = tb->onGetUserElement(tb, index, row, rowIndex, colIndex);
+	Element* mgfElement = tb->OnGetUserElement(tb, index, row, rowIndex, colIndex);
+	if(mgfElement)
 		return mgfElement->GetElement();
-	}
 	return 0;
 }
 
 void Table_onBeginGetUserElement(struct mgElement_s* e)
 {
 	Table* tb = (Table*)e->userData;
-	if (tb->onBeginGetUserElement)
-		tb->onBeginGetUserElement(tb);
+	tb->OnBeginGetUserElement(tb);
 }
 
 int* Table::GetColSizes()
 {
 	return m_elementTable->colsSizes;
+}
+
+int Table::OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
+{
+	return 1;
+}
+
+int Table::OnIsRowSelected(Table*, void* row)
+{
+	return 0;
+}
+
+void Table::OnRowClick(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input)
+{
+}
+
+int Table::OnCellClick(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton, mgInputContext_s* input)
+{
+	return 0;
+}
+
+const wchar_t* Table::OnCellTextInputActivate(Table*, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	return 0;
+}
+
+wchar_t Table::OnCellTextInputCharEnter(Table*, wchar_t c)
+{
+	return c;
+}
+
+int Table::OnCellTextInputEndEdit(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	return 1;
+}
+
+const wchar_t* Table::OnColTitleText(Table*, uint32_t* textLen, uint32_t colIndex)
+{
+	return 0;
+}
+
+void Table::OnColTitleClick(Table*, uint32_t colIndex, uint32_t mouseButton)
+{
+}
+
+int Table::OnGetUserElementNum(Table*, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	return 0;
+}
+
+Element* Table::OnGetUserElement(Table*, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex)
+{
+	return 0;
+}
+
+void Table::OnBeginGetUserElement(Table*)
+{
 }
