@@ -159,8 +159,8 @@ miGUI_onDraw_button(mgElement* e)
 		e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonIcon,
 			e->window,
 			&e->transformWorld.buildArea, 
-			&e->window->context->whiteColor, 
-			&e->window->context->whiteColor,
+			&style->buttonIcon,
+			&style->buttonIcon,
 			impl->icons->texture, &impl->icons->iconNodes[iconID].uv);
 	}
 

@@ -95,7 +95,7 @@ bool Application::Init()
 	m_windowMain->SetUseCustomTitleBar(true);
 	m_windowMain->SetCustomTitleBarSize(22);
 
-	const char* big_buffer = "Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA \
+	/*const char* big_buffer = "Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA \
 Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
 Big Data BiBigBIGB1IGBIG DATABig Data BiBigBIGBIGBIG DATA\
 Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\
@@ -144,7 +144,7 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 		}
 
 		free(cmpInf.m_dataCompressed);
-	}
+	}*/
 
 	_InitThemes();
 	SetTheme(&m_themeDark);

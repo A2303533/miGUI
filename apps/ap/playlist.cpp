@@ -14,12 +14,6 @@
 
 extern AP_application* g_app;
 
-int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, void* editItem);
-wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c);
-int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item);
-void Playlist_LB_onItemClick(mgf::ListBox* lb, void* item, uint32_t itemIndex, uint32_t mouseButton);
-int Playlist_LB_onDrawItem(mgf::ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
-//void Playlist_BTN_newPL_onRelease(mgf::Element* e);
 void Playlist_popupCb_open(int id, struct mgPopupItem_s*);
 void Playlist_popupCb_play(int id, struct mgPopupItem_s*);
 void Playlist_popupCb_delete(int id, struct mgPopupItem_s*);
@@ -28,6 +22,81 @@ const wchar_t* Playlist_onColTitleText(mgf::Table*, uint32_t* textLen, uint32_t 
 int Playlist_onDrawRow(mgf::Table* tb, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
 void Playlist_onRowClick(mgf::Table* tb, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input);
 int Playlist_onIsRowSelected(mgf::Table* tb, void* row);
+
+ListboxPlaylist::ListboxPlaylist(mgf::Window* w) :mgf::ListBox(w) {}
+	
+ListboxPlaylist::~ListboxPlaylist() {}
+	
+wchar_t ListboxPlaylist::OnTextInputCharEnter(ListBox*, wchar_t c)
+{
+	bool good = false;
+
+	if (iswalnum(c))
+		good = true;
+
+	if (!good)
+	{
+		if (c == L'_')
+			good = true;
+	}
+
+	return good ? c : 0;
+}
+
+int ListboxPlaylist::OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, void* item)
+{
+	/*
+	* i:
+	*	1 - Enter
+	*   2 - click somewhere
+	*   3 - Escape
+	*/
+	PlayList* pl = (PlayList*)item;
+
+	if (str)
+	{
+		if (i == 1)
+		{
+			uint32_t len = wcslen(str);
+			if (len)
+			{
+				pl->m_name = str;
+				pl->RenameFile();
+			}
+		}
+	}
+
+	return i;
+}
+
+int ListboxPlaylist::OnIsItemSelected(ListBox* e, void* item)
+{
+	PlayList* pl = (PlayList*)item;
+	return (int)pl->m_isSelected;
+}
+
+void ListboxPlaylist::OnItemClick(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton)
+{
+	PlayList* pl = (PlayList*)item;
+	if (mouseButton == 1)
+	{
+		pl->m_mgr->SelectPlaylist(pl);
+	}
+	else if (mouseButton == 2)
+	{
+		pl->m_mgr->ShowListboxPopup(pl);
+	}
+}
+
+int ListboxPlaylist::OnDrawItem(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen)
+{
+	PlayList* pl = (PlayList*)item;
+
+	*text = pl->m_name.data();
+	*textlen = pl->m_name.size();
+
+	return 1;
+}
 
 PlayList::PlayList()
 {
@@ -120,13 +189,6 @@ void PlayList::RenameFile()
 
 PlayListManager::PlayListManager()
 {
-	if (g_app->m_listboxPlaylist)
-	{
-		g_app->m_listboxPlaylist->onIsItemSelected = Playlist_LB_onIsItemSelected;
-		g_app->m_listboxPlaylist->onItemClick = Playlist_LB_onItemClick;
-		g_app->m_listboxPlaylist->onDrawItem = Playlist_LB_onDrawItem;
-	}
-
 	if (g_app->m_tableTracklist)
 	{
 		g_app->m_tableTracklist->GetColSizes()[0] = 45;
@@ -151,7 +213,7 @@ PlayListManager::PlayListManager()
 		{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
 		{0, L"Show in explorer", 0, Playlist_popupCb_showexpl, mgPopupItemType_default, 0, 0, 1},
 	};
-	m_listBoxPopup = g_app->m_context->CreatePopup(g_app->m_popupFont, listboxPopupItems, 6);
+	m_listBoxPopup = g_app->m_context->CreatePopup(g_app->m_popupFont, listboxPopupItems, 6, true);
 
 
 	IKnownFolderManager* pManager;
@@ -448,83 +510,6 @@ void PlayListManager::SaveStateFile()
 
 		fclose(f);
 	}
-}
-
-wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c)
-{
-	bool good = false;
-
-	if (iswalnum(c))
-		good = true;
-
-	if (!good)
-	{
-		if (c == L'_')
-			good = true;
-	}
-
-	return good ? c : 0;
-}
-
-int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, void* item)
-{
-	/*
-	* i:
-	*	1 - Enter
-	*   2 - click somewhere
-	*   3 - Escape
-	*/
-	PlayList* pl = (PlayList*)item;
-
-	if (str)
-	{
-		if (i == 1)
-		{
-			uint32_t len = wcslen(str);
-			if (len)
-			{
-				pl->m_name = str;
-				pl->RenameFile();
-			}
-		}
-	}
-
-	return i;
-}
-
-//void Playlist_BTN_newPL_onRelease(mgf::Element* e)
-//{
-//	if (g_app->m_playlistMgr)
-//		g_app->m_playlistMgr->AddNew();
-//}
-
-int Playlist_LB_onIsItemSelected(mgf::ListBox* lb, void* item)
-{
-	PlayList* pl = (PlayList*)item;
-	return (int)pl->m_isSelected;
-}
-
-void Playlist_LB_onItemClick(mgf::ListBox* lb, void* item, uint32_t itemIndex, uint32_t mouseButton)
-{
-	PlayList* pl = (PlayList*)item;
-	if (mouseButton == 1)
-	{
-		pl->m_mgr->SelectPlaylist(pl);
-	}
-	else if (mouseButton == 2)
-	{
-		pl->m_mgr->ShowListboxPopup(pl);
-	}
-}
-
-int Playlist_LB_onDrawItem(mgf::ListBox* lb, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen)
-{
-	PlayList* pl = (PlayList*)item;
-
-	*text = pl->m_name.data();
-	*textlen = pl->m_name.size();
-
-	return 1;
 }
 
 void PlayListManager::SetEditPlaylist(PlayList* p)

@@ -179,7 +179,7 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->popupIconNext, 0xFF0000);
 	mgColorSetAsIntegerRGB(&s->windowIconClose, 0x0);
 	mgColorSetAsIntegerRGB(&s->windowIconExpand, 0x0);
-	
+	mgColorSetAsIntegerRGB(&s->buttonIcon, 0x0);
 }
 
 MG_API 

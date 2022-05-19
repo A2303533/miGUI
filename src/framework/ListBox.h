@@ -43,9 +43,9 @@ namespace mgf
 
 	class ListBox : public Element
 	{
-		mgElementList_s* m_elementList;
+		mgElementList_s* m_elementList = 0;
 	public:
-		ListBox(Window* w, Font*);
+		ListBox(Window* w);
 		virtual ~ListBox();
 
 		void SetDrawItemBG(bool);
@@ -60,32 +60,34 @@ namespace mgf
 		// 0 - no limit;
 		void SetTextInputCharLimit(uint32_t);
 		
-		wchar_t(*onTextInputCharEnter)(ListBox*, wchar_t);
-		/*
-		* i:
-		*	1 - Enter
-		*   2 - click somewhere
-		*   3 - Escape
-		* str: new text
-		* editItem: first byte for edited item
-		*/
-		int(*onTextInputEndEdit)(ListBox*, int i, const wchar_t* str, void* editItem);
+		//wchar_t(*onTextInputCharEnter)(ListBox*, wchar_t);
+		virtual wchar_t OnTextInputCharEnter(ListBox*, wchar_t);
 
-		/*
-		* If you need selection
-		* return 1 if this item selected
-		*/
-		int(*onIsItemSelected)(ListBox* e, void* item);
-		/*
-		* select or deselect here
-		* mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
-		*/
-		void(*onItemClick)(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton);
-		/*
-		* Return 0 - no draw
-		*        1 - draw (you must set `text` and `textlen`)
-		*/
-		int(*onDrawItem)(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
+		// i:
+		//	1 - Enter
+		//  2 - click somewhere
+		//  3 - Escape
+		// str: new text
+		// editItem: first byte for edited item
+		//int(*onTextInputEndEdit)(ListBox*, int i, const wchar_t* str, void* editItem);
+		virtual int OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, void* editItem);
+
+		// If you need selection
+		// return 1 if this item selected
+		//int(*onIsItemSelected)(ListBox* e, void* item);
+		virtual int OnIsItemSelected(ListBox* e, void* item);
+
+		// select or deselect here
+		// mouseButton: 1 - lmb, 2 - rmb, 3 - mmb
+		//void(*onItemClick)(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton);
+		virtual void OnItemClick(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton);
+
+
+		// Return 0 - no draw
+		//       1 - draw (you must set `text` and `textlen`)
+		//int(*onDrawItem)(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
+		virtual int OnDrawItem(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
+
 	};
 }
 

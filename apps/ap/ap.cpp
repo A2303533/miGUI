@@ -141,7 +141,7 @@ bool AP_application::Init(backend_type bt)
 	m_guiWindow->SetWithCloseButton(false);
 	m_guiWindow->SetWithCollapseButton(false);
 	m_guiWindow->SetWithTitlebar(false);
-	//m_guiWindow->SetDrawBG(false);
+	m_guiWindow->SetDrawBG(false);
 	m_guiWindow->SetCanMove(false);
 	m_guiWindow->SetCanResize(false);
 	m_guiWindow->SetCanToTop(false);
@@ -176,15 +176,13 @@ bool AP_application::Init(backend_type bt)
 	textInput->SetRect(50, 200, 500, 250);
 	textInput->SetText(L"Hello world");*/
 	
-	///*	g_data.listboxPlaylist = guiWindow.m_data->AddListBox(listboxFont.m_data);
-	//	g_data.listboxPlaylist->SetRect(50, 200, 200, 300);
-	//	g_data.listboxPlaylist->SetItemHeight(listboxFont.m_data->GetMaxSize().y);
-	//	g_data.listboxPlaylist->SetDrawBG(false);
-	//	g_data.listboxPlaylist->CanEdit(true);
-	//	g_data.listboxPlaylist->SetDrawItemBG(true);
-	//	g_data.listboxPlaylist->onTextInputCharEnter = Playlist_LB_onTextInputCharEnter;
-	//	g_data.listboxPlaylist->onTextInputEndEdit = Playlist_LB_onTextInputEndEdit;
-	//	g_data.listboxPlaylist->SetTextInputCharLimit(100);*/
+	m_listboxPlaylist = new ListboxPlaylist(m_guiWindow);// guiWindow.m_data->AddListBox(listboxFont.m_data);
+	m_listboxPlaylist->SetRect(50, 200, 200, 300);
+	m_listboxPlaylist->SetItemHeight(m_listboxFont->GetMaxSize().y);
+	m_listboxPlaylist->SetDrawBG(false);
+	m_listboxPlaylist->CanEdit(true);
+	m_listboxPlaylist->SetDrawItemBG(true);
+	m_listboxPlaylist->SetTextInputCharLimit(100);
 		//g_data.listboxPlaylist->SetData(listboxData, 10);
 		
 	//	g_data.tableTracklist = guiWindow.m_data->AddTable(5, listboxFont.m_data);// initialization in PlayListManager

@@ -187,12 +187,18 @@ void Context::SetDefaultPopupFont(Font* f)
 	m_gui_context->defaultPopupFont = ((mgf::FontImpl*)f)->m_font;
 }
 
-Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize)
+Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize, bool useSystemWindow)
 {
 	FontImpl* fontImpl = (FontImpl*)f;
 
 	Popup* newPopup = new Popup(this);
-	newPopup->m_implementation = mgCreatePopup(m_gui_context, arr, arrSize, fontImpl->m_font, 0);
+
+	int flags = 0;
+
+	if (useSystemWindow)
+		flags |= mgPopupFlags_systemWindow;
+
+	newPopup->m_implementation = mgCreatePopup(m_gui_context, arr, arrSize, fontImpl->m_font, flags);
 
 	return newPopup;
 }

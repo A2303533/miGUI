@@ -6,9 +6,17 @@
 
 #include <vector>
 
-int Playlist_LB_onTextInputEndEdit(mgf::ListBox* lb, int i, const wchar_t* str, void* editItem);
-wchar_t Playlist_LB_onTextInputCharEnter(mgf::ListBox* lb, wchar_t c);
-void Playlist_BTN_newPL_onRelease(mgf::Element* e);
+class ListboxPlaylist : public mgf::ListBox
+{
+public:
+	ListboxPlaylist(mgf::Window* w);
+	virtual ~ListboxPlaylist();
+	virtual wchar_t OnTextInputCharEnter(ListBox*, wchar_t) override;
+	virtual int OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, void* editItem) override;
+	virtual int OnIsItemSelected(ListBox* e, void* item) override;
+	virtual void OnItemClick(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton) override;
+	virtual int OnDrawItem(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen) override;
+};
 
 class PlayList;
 class PlayListManager;

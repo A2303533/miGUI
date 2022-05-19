@@ -44,17 +44,14 @@ int LB_onIsItemSelected(struct mgElement_s* e, void* item);
 void LB_onItemClick(struct mgElement_s* e, void* item, uint32_t itemIndex, uint32_t mouseButton);
 int LB_onDrawItem(struct mgElement_s*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
 
-ListBox::ListBox(Window* w, Font* f)
-	:
-	m_elementList(0),
-	onTextInputCharEnter(0),
-	onTextInputEndEdit(0)
+ListBox::ListBox(Window* w)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 	
 	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
-	m_element = mgCreateListBox(w->m_window, &p, &p, 0, 0, ((FontImpl*)f)->m_font);
+
+	m_element = mgCreateListBox(w->m_window, &p, &p, 0, 0, fi->m_font);
 	m_element->userData = this;
 	m_elementList = (mgElementList*)m_element->implementation;
 	m_elementList->onTextInputCharEnter = LB_onTextInputCharEnter;
@@ -100,20 +97,13 @@ void ListBox::CanEdit(bool v)
 wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c)
 {
 	ListBox* lb = (ListBox*)e->userData;
-	if (lb->onTextInputCharEnter)
-		return lb->onTextInputCharEnter(lb, c);
-
-	return c;
+	return lb->OnTextInputCharEnter(lb, c);
 }
 
 int LB_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, void* editItem)
 {
 	ListBox* lb = (ListBox*)e->userData;
-
-	if (lb->onTextInputEndEdit)
-		return lb->onTextInputEndEdit(lb, type, str, editItem);
-
-	return type;
+	return lb->OnTextInputEndEdit(lb, type, str, editItem);
 }
 
 void ListBox::SetDrawItemBG(bool v)
@@ -131,22 +121,24 @@ void ListBox::SetTextInputCharLimit(uint32_t i)
 int LB_onIsItemSelected(struct mgElement_s* e, void* item)
 {
 	ListBox* lb = (ListBox*)e->userData;
-	if (lb->onIsItemSelected)
-		return lb->onIsItemSelected(lb, item);
-	return 0;
+	return lb->OnIsItemSelected(lb, item);
 }
 
 void LB_onItemClick(struct mgElement_s* e, void* item, uint32_t itemIndex, uint32_t mouseButton)
 {
 	ListBox* lb = (ListBox*)e->userData;
-	if (lb->onItemClick)
-		return lb->onItemClick(lb, item, itemIndex, mouseButton);
+	return lb->OnItemClick(lb, item, itemIndex, mouseButton);
 }
 
 int LB_onDrawItem(struct mgElement_s* e, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen)
 {
 	ListBox* lb = (ListBox*)e->userData;
-	if (lb->onDrawItem)
-		return lb->onDrawItem(lb, item, itemIndex, text, textlen);
-	return 0;
+	return lb->OnDrawItem(lb, item, itemIndex, text, textlen);
 }
+
+wchar_t ListBox::OnTextInputCharEnter(ListBox*, wchar_t) { return 0; }
+int ListBox::OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, void* editItem) { return 0; }
+int ListBox::OnIsItemSelected(ListBox* e, void* item) { return 0; }
+void ListBox::OnItemClick(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton) {}
+int ListBox::OnDrawItem(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen) { return 0; }
+

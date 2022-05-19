@@ -75,6 +75,7 @@ typedef struct mgStyle_s {
 	mgColor buttonPress2;
 	mgColor buttonDisabled1;
 	mgColor buttonDisabled2;
+	mgColor buttonIcon;
 
 	mgColor buttonText;
 	mgColor buttonTextHover;
