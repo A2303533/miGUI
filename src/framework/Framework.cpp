@@ -82,7 +82,8 @@ Framework::Framework()
 	m_appDirectory.flip_slash();
 	m_appDirectory += L"/";
 
-	g_CoInitializeResult = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	//g_CoInitializeResult = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	g_CoInitializeResult = OleInitialize(0);
 	if (FAILED(g_CoInitializeResult))
 		throw "Unable to initialize COM";
 #endif
@@ -93,7 +94,8 @@ Framework::~Framework()
 #ifdef MG_PLATFORM_WINDOWS
 	if(g_CoInitializeResult == S_OK
 		|| g_CoInitializeResult == S_FALSE)
-		CoUninitialize();
+		OleUninitialize();
+		//CoUninitialize();
 #endif
 
 #ifndef MG_NO_DLL

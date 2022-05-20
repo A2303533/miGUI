@@ -91,6 +91,9 @@
       <Filter>migui</Filter>
     </ClCompile>
     <ClCompile Include="ap.cpp" />
+    <ClCompile Include="..\..\src\framework\DND.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">

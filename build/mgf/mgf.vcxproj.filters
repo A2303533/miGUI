@@ -192,5 +192,8 @@
     <ClCompile Include="..\..\src\framework\Color.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\DND.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
