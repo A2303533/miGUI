@@ -117,17 +117,15 @@ namespace mgf
                 return *this;
             }
 
-            const value_type* c_str() const MGF_NOEXCEPT
-            {
-                return m_string.c_str();
-            }
-
-            const string_type& native() const MGF_NOEXCEPT
-            {
-                return m_string;
-            }
-
+            const value_type* c_str() const MGF_NOEXCEPT { return m_string.c_str(); }
+            const string_type& native() const MGF_NOEXCEPT { return m_string; }
+            operator string_type() const { return m_string; }
+            
             std::string string() const;
+            std::wstring wstring() const;
+
+            path filename() const;
+            path extension() const;
 
         private:
             string_type m_string;

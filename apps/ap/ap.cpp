@@ -20,7 +20,9 @@
 #include "playlist.h"
 
 #include <list>
-#include <filesystem>
+#include <iostream>
+//#include <filesystem>
+#include "framework/Filesystem.h"
 
 AP_application* g_app = 0;
 
@@ -44,6 +46,13 @@ public:
 		{
 			for (int i = 0; i < nature->_f.fileListSize; ++i)
 			{
+				mgf::filesystem::path pth = nature->_f.fileList[i];
+				mgf::filesystem::path ext = pth.extension();
+				if (ext.native() != L".wav" && ext.native() != L".mp3")
+				{
+					m_dragState = false;
+					return false;
+				}
 		//		printf("FILE: %s\n", nature->_f.fileList[i]);
 			}
 		}break;
@@ -71,7 +80,12 @@ public:
 		{
 			for (int i = 0; i < nature->_f.fileListSize; ++i)
 			{
-				printf("DROP FILE: %s\n", nature->_f.fileList[i]);
+				mgf::filesystem::path pth = nature->_f.fileList[i];
+				mgf::filesystem::path ext = pth.extension();
+				if (ext.native() == L".wav" || ext.native() == L".mp3")
+				{
+					g_app->m_playlistMgr->AddTrackToEditPlaylist(pth.c_str());
+				}
 			}
 		}break;
 		}
@@ -156,7 +170,6 @@ AP_application::~AP_application()
 bool AP_application::Init(backend_type bt)
 {
 	g_app = this;
-
 	m_framework = mgf::InitFramework();
 	m_sysWindow = new WindowMain(MGWS_OVERLAPPEDWINDOW,
 		mgPoint(MGCW_USEDEFAULT, 0),

@@ -76,6 +76,97 @@ std::string filesystem::path::string() const
 	return output;
 }
 
+std::wstring filesystem::path::wstring() const
+{
+	return m_string;
+}
+
+filesystem::path filesystem::path::filename() const 
+{
+	const wchar_t* str = m_string.c_str();
+	filesystem::path p;
+	if (m_string.size())
+	{
+		size_t slashIndex = 0;
+		for (size_t i = 0, sz = m_string.size(); i < sz; ++i)
+		{
+			if (str[i] == L'/' || str[i] == L'\\')
+				slashIndex = i;
+		}
+
+		str = m_string.c_str();
+		size_t startIndex = slashIndex;
+
+		if (slashIndex)
+		{
+			++startIndex;
+		}
+		else
+		{
+			if(str[0] == L'/' || str[0] == L'\\')
+				++startIndex;
+		}
+
+		while (true)
+		{
+			if (str[startIndex] == 0)
+				break;
+
+			p.m_string += str[startIndex];
+			++startIndex;
+		}
+	}
+	return p;
+}
+
+filesystem::path filesystem::path::extension() const
+{
+	const wchar_t* str = m_string.c_str();
+	filesystem::path p;
+	if (m_string.size()){
+		size_t dotIndex = 0;
+		for (size_t i = 0, sz = m_string.size(); i < sz; ++i){
+			if (str[i] == L'.')
+				dotIndex = i;
+			if (str[i] == L'/' || str[i] == L'\\')
+				dotIndex = 0;
+		}
+		str = m_string.c_str();
+		if (dotIndex)
+		{
+			if (str[dotIndex] == L'.')
+			{
+				if ((str[dotIndex - 1] != L'/') && (str[dotIndex - 1] != L'\\'))
+				{
+					if (isgraph(str[dotIndex + 1]))
+					{
+						size_t startIndex = dotIndex;
+						while (true) {
+							if (str[startIndex] == 0)
+								break;
+							p.m_string += str[startIndex];
+							++startIndex;
+						}
+					}
+					else
+					{
+						if (dotIndex > 1)
+						{
+							if (str[dotIndex - 1] == L'.' && str[dotIndex - 2] == L'/')
+								return p;
+							if (str[dotIndex - 1] == L'.' && str[dotIndex - 2] == L'\\')
+								return p;
+							p.m_string += L'.';
+						}
+					}
+				}
+			}
+		}
+	}
+	return p;
+}
+
+
 bool filesystem::is_regular_file(const path& p)
 {
 #ifdef _WIN32
