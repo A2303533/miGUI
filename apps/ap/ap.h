@@ -17,6 +17,8 @@ class ButtonNewPlaylist;
 class ListboxPlaylist;
 class TableTracklist;
 
+class AP_DNDCallback;
+
 class AP_application
 {
 public:
@@ -30,6 +32,8 @@ public:
 	mgf::SystemWindow* m_sysWindow = 0;
 	mgf::AudioEngine* m_audio = 0;
 	mgf::Backend* m_backend = 0;
+	mgf::DND* m_dnd = 0;
+	AP_DNDCallback* m_dndCallback = 0;
 
 	mgf::Context* m_context = 0;
 	mgf::Window* m_mainWindow = 0;

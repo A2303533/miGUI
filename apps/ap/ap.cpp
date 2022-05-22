@@ -1,4 +1,5 @@
 ﻿#include "framework/mgf.h"
+#include "framework/DND.h"
 #include "framework/BackendGDI.h"
 #include "framework/BackendOpenGL.h"
 #include "framework/SystemWindow.h"
@@ -25,6 +26,57 @@ AP_application* g_app = 0;
 
 #define AP_PLAYLISTAREASIZE 180
 #define AP_CONTROLAREASIZE 70
+
+class AP_DNDCallback : public mgf::DNDCallback
+{
+	bool m_dragState = false;
+public:
+	AP_DNDCallback() {}
+	virtual ~AP_DNDCallback() {}
+	virtual bool OnDragEnter(int x, int y, Nature* nature)
+	{
+		m_dragState = true;
+		switch (nature->m_type)
+		{
+		default:
+			break;
+		case NatureType::NatureType_file:
+		{
+			for (int i = 0; i < nature->_f.fileListSize; ++i)
+			{
+		//		printf("FILE: %s\n", nature->_f.fileList[i]);
+			}
+		}break;
+		}
+
+		return true;
+	}
+	virtual bool OnDragOver(int x, int y) 
+	{
+		if (m_dragState)
+		{
+			return true;
+		}
+
+		return false;
+	};
+	
+	virtual void OnDrop(Nature* nature)
+	{
+		switch (nature->m_type)
+		{
+		default:
+			break;
+		case NatureType::NatureType_file:
+		{
+			for (int i = 0; i < nature->_f.fileListSize; ++i)
+			{
+				printf("DROP FILE: %s\n", nature->_f.fileList[i]);
+			}
+		}break;
+		}
+	}
+};
 
 class ButtonNewPlaylist : public mgf::Button
 {
@@ -95,6 +147,10 @@ void WindowMain::OnSize()
 
 AP_application::~AP_application()
 {
+	if (m_dndCallback)
+		delete m_dndCallback;
+	if (m_dnd)
+		delete m_dnd;
 }
 
 bool AP_application::Init(backend_type bt)
@@ -135,6 +191,9 @@ bool AP_application::Init(backend_type bt)
 	m_context->SetDefaultPopupFont(m_popupFont);
 
 	m_sysWindow->SetVisible(true);
+
+	m_dndCallback = new AP_DNDCallback;
+	m_dnd = new mgf::DNDWin32(m_dndCallback, m_sysWindow->GetOSData()->hWnd);
 	
 	m_guiWindow = new mgf::Window(m_context);
 	m_guiWindow->SetTitle(L"Window", 0);

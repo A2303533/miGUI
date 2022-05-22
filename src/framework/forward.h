@@ -52,6 +52,7 @@ namespace mgf
 	class Table;
 	class Popup;
 	class AudioEngine;
+	class DND;
 }
 
 #endif

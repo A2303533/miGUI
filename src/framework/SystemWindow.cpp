@@ -74,7 +74,7 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     m_OSData = new struct mgSystemWindowOSData;
     m_OSData->userData = this;
     m_OSData->hWnd = CreateWindowExW(
-        WS_EX_ACCEPTFILES,
+        0,
         m_className,
         L"mgf",
         windowFlags,
