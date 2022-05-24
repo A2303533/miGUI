@@ -45,9 +45,6 @@
     <ClCompile Include="..\..\src\framework\Aabb.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\AudioEngine.cpp">
-      <Filter>Source Files\mgf</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\framework\BackendD3D11.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
@@ -193,6 +190,15 @@
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\framework\DND.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\AudioEngine_waveOut.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\AudioEngine.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Audio_Wav.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
   </ItemGroup>

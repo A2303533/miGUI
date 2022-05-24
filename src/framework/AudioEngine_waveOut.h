@@ -26,9 +26,34 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mgf.h"
-
 #include "AudioEngine.h"
 
-using namespace mgf;
+#ifdef MG_PLATFORM_WINDOWS
+
+namespace mgf
+{
+	class AudioSource_waveOut : public AudioSource
+	{
+		friend class AudioEngine_waveOut;
+		WAVEFORMATEX m_waveformatex;
+		HWAVEOUT m_waveOut = 0;
+		WAVEHDR  m_waveHdr;
+	public:
+		AudioSource_waveOut();
+		virtual ~AudioSource_waveOut();
+	};
+
+	class AudioEngine_waveOut : public AudioEngine
+	{
+	public:
+		AudioEngine_waveOut();
+		virtual ~AudioEngine_waveOut();
+
+		virtual AudioSource* Load(const char*) override;
+		virtual void Play(AudioSource*) override;
+	};
+
+}
+
+#endif
 

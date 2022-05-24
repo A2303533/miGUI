@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\framework\Archive.cpp" />
     <ClCompile Include="..\..\src\framework\AudioEngine.cpp" />
+    <ClCompile Include="..\..\src\framework\AudioEngine_waveOut.cpp" />
+    <ClCompile Include="..\..\src\framework\Audio_Wav.cpp" />
     <ClCompile Include="..\..\src\framework\BackendGDI.cpp" />
     <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp" />
     <ClCompile Include="..\..\src\framework\Button.cpp" />

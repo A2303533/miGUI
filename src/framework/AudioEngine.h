@@ -30,16 +30,56 @@
 #ifndef _MGF_AUDIOENGINE_H_
 #define _MGF_AUDIOENGINE_H_
 
+#include <stdlib.h>
+#include <stdint.h>
+
 namespace mgf
 {
+	/// <summary>
+	/// Raw data.
+	/// </summary>
+	class AudioSourceData
+	{
+	public:
+		AudioSourceData() {}
+		~AudioSourceData() 
+		{
+			if (m_data)
+				free(m_data);
+		}
+
+		uint8_t* m_data = 0;
+		uint32_t m_dataSize = 0;
+
+		uint32_t m_channels = 0;
+		uint32_t m_samplesPerSec = 0;
+		uint32_t m_avgBytesPerSec = 0;
+		uint32_t m_bitsPerSample = 0;
+	};
+
+	class AudioSource : public BaseClass
+	{
+	public:
+		AudioSource() {}
+		virtual ~AudioSource() 
+		{
+			if (m_data)
+				delete m_data;
+		}
+
+		AudioSourceData* m_data = 0;
+	};
+
 	class AudioEngine : public BaseClass
 	{
-		void* m_implementationData;
+		//void* m_implementationData;
 	public:
-		AudioEngine();
-		virtual ~AudioEngine();
 
+		virtual AudioSource* Load(const char*) = 0;
+		virtual void Play(AudioSource*) = 0;
 	};
+
+	AudioSourceData* Audio_Wav(const char*);
 }
 
 #endif

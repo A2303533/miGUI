@@ -14,7 +14,8 @@
 #include "framework/Table.h"
 #include "framework/TextBuffer.h"
 #include "framework/Popup.h"
-#include "framework/AudioEngine.h"
+
+#include "framework/AudioEngine_waveOut.h"
 
 #include "ap.h"
 #include "playlist.h"
@@ -181,7 +182,8 @@ bool AP_application::Init(backend_type bt)
 	m_style.listItemBG2.setAsIntegerARGB(0xFFBFDDFF);
 	m_style.listItemHoverBG.setAsIntegerARGB(0xFFA8D2FF);
 
-	m_audio = new mgf::AudioEngine;
+	m_audio = new mgf::AudioEngine_waveOut;
+
 	m_backend = 0;
 	switch (bt)
 	{
@@ -272,10 +274,18 @@ void AP_application::Run()
 {
 	bool sleep = true;
 
+	mgf::AudioSource* sound = m_audio->Load("D:/1_16bit_mono.wav");
+
 	while (m_framework->Run())
 	{
 		if (sleep)
 			Sleep(1);
+	
+		if (mgIsKeyHit(m_context->m_input, MG_KEY_Q))
+		{
+			if (sound)
+				m_audio->Play(sound);
+		}
 
 		/*if (context.m_data->m_input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
 		{
