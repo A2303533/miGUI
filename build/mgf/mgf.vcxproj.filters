@@ -201,5 +201,26 @@
     <ClCompile Include="..\..\src\framework\Audio_Wav.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\Mesh_OBJ.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Vertex.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Trianlge.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Math.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Polygon.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\PolygonMesh.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\MeshBuilder.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

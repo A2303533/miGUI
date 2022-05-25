@@ -42,6 +42,11 @@
     <ClCompile Include="..\..\src\framework\ListBox.cpp" />
     <ClCompile Include="..\..\src\framework\lodepng.cpp" />
     <ClCompile Include="..\..\src\framework\Log.cpp" />
+    <ClCompile Include="..\..\src\framework\Math.cpp" />
+    <ClCompile Include="..\..\src\framework\MeshBuilder.cpp" />
+    <ClCompile Include="..\..\src\framework\Mesh_OBJ.cpp" />
+    <ClCompile Include="..\..\src\framework\Polygon.cpp" />
+    <ClCompile Include="..\..\src\framework\PolygonMesh.cpp" />
     <ClCompile Include="..\..\src\framework\Popup.cpp" />
     <ClCompile Include="..\..\src\framework\Rectangle.cpp" />
     <ClCompile Include="..\..\src\framework\SystemWindow.cpp" />
@@ -49,6 +54,8 @@
     <ClCompile Include="..\..\src\framework\Text.cpp" />
     <ClCompile Include="..\..\src\framework\TextBuffer.cpp" />
     <ClCompile Include="..\..\src\framework\TextInput.cpp" />
+    <ClCompile Include="..\..\src\framework\Trianlge.cpp" />
+    <ClCompile Include="..\..\src\framework\Vertex.cpp" />
     <ClCompile Include="..\..\src\framework\Window.cpp" />
     <ClCompile Include="..\..\src\miGUILoader.c" />
     <ClCompile Include="ap.cpp" />

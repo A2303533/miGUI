@@ -196,7 +196,12 @@
     <ClCompile Include="..\..\src\framework\lodepng.cpp" />
     <ClCompile Include="..\..\src\framework\Log.cpp" />
     <ClCompile Include="..\..\src\framework\Mat.cpp" />
+    <ClCompile Include="..\..\src\framework\Math.cpp" />
     <ClCompile Include="..\..\src\framework\Mesh.cpp" />
+    <ClCompile Include="..\..\src\framework\MeshBuilder.cpp" />
+    <ClCompile Include="..\..\src\framework\Mesh_OBJ.cpp" />
+    <ClCompile Include="..\..\src\framework\Polygon.cpp" />
+    <ClCompile Include="..\..\src\framework\PolygonMesh.cpp" />
     <ClCompile Include="..\..\src\framework\Popup.cpp" />
     <ClCompile Include="..\..\src\framework\Quat.cpp" />
     <ClCompile Include="..\..\src\framework\Ray.cpp" />
@@ -206,7 +211,9 @@
     <ClCompile Include="..\..\src\framework\Text.cpp" />
     <ClCompile Include="..\..\src\framework\TextBuffer.cpp" />
     <ClCompile Include="..\..\src\framework\TextInput.cpp" />
+    <ClCompile Include="..\..\src\framework\Trianlge.cpp" />
     <ClCompile Include="..\..\src\framework\Vec.cpp" />
+    <ClCompile Include="..\..\src\framework\Vertex.cpp" />
     <ClCompile Include="..\..\src\framework\Window.cpp" />
     <ClCompile Include="..\..\src\mgCursor.c" />
     <ClCompile Include="..\..\src\mgDockPanel.c" />

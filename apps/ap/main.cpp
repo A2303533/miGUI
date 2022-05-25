@@ -1,8 +1,11 @@
 ﻿#include "framework/mgf.h"
 #include "framework/BackendGDI.h"
 #include "framework/BackendOpenGL.h"
+#include "framework/Array.h"
 
 #include "ap.h"
+
+#include <vector>
 
 int main(int argc, char* argv[])
 {
