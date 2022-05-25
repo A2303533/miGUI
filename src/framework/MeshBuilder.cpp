@@ -65,7 +65,85 @@ void MeshBuilder::_set_hash(v3f* position)
 	m_vertsMapHash = bytes;
 }
 
-void MeshBuilder::DeleteMesh()
+Mesh* MeshBuilder::CreateMesh(uint32_t flags)
+{
+	if (!m_mesh)
+		return 0;
+	if (!m_mesh->m_first_polygon)
+		return 0;
+
+	v4f color(1.f);
+
+	Mesh* newMesh = new Mesh;
+	newMesh->m_indexType = Mesh::MeshIndexType::MeshIndexType_u32;
+	newMesh->m_vertexType = Mesh::MeshVertexType::MeshVertexType_Triangle;
+	newMesh->m_stride = sizeof(VertexTriangle);
+	newMesh->m_vertices = (uint8_t*)malloc(newMesh->m_stride * 3);
+	newMesh->m_indices = (uint8_t*)malloc(sizeof(uint32_t) * 3);
+
+	VertexTriangle* vertexModel_ptr = (VertexTriangle*)newMesh->m_vertices;
+	uint32_t* inds_ptr = (uint32_t*)newMesh->m_indices;
+	uint32_t index = 0;
+
+	auto current_polygon = m_mesh->m_first_polygon;
+	auto last_polygon = current_polygon->m_left;
+	while (true)
+	{
+
+		auto vertex_1 = current_polygon->m_verts.m_head;
+		auto vertex_3 = vertex_1->m_right;
+		auto vertex_2 = vertex_3->m_right;
+		while (true)
+		{
+			vertexModel_ptr->Color = color;
+			vertexModel_ptr->Position = vertex_1->m_data.m_vertex->m_position;
+			vertexModel_ptr->UV = vertex_1->m_data.m_uv;
+			vertexModel_ptr->Normal = vertex_1->m_data.m_normal;
+			++vertexModel_ptr;
+
+			*inds_ptr = index;
+			++index;
+			++inds_ptr;
+
+			vertexModel_ptr->Color = color;
+			vertexModel_ptr->Position = vertex_2->m_data.m_vertex->m_position;
+			vertexModel_ptr->UV = vertex_2->m_data.m_uv;
+			vertexModel_ptr->Normal = vertex_2->m_data.m_normal;
+			++vertexModel_ptr;
+
+			*inds_ptr = index;
+			++index;
+			++inds_ptr;
+
+			vertexModel_ptr->Color = color;
+			vertexModel_ptr->Position = vertex_3->m_data.m_vertex->m_position;
+			vertexModel_ptr->UV = vertex_3->m_data.m_uv;
+			vertexModel_ptr->Normal = vertex_3->m_data.m_normal;
+			++vertexModel_ptr;
+
+			*inds_ptr = index;
+			++index;
+			++inds_ptr;
+
+			newMesh->m_vCount += 3;
+			newMesh->m_iCount += 3;
+
+			vertex_2 = vertex_2->m_right;
+			vertex_3 = vertex_3->m_right;
+
+			if (vertex_2 == vertex_1)
+				break;
+		}				
+
+		if (current_polygon == last_polygon)
+			break;
+		current_polygon = current_polygon->m_right;
+	}
+
+	return newMesh;
+}
+
+void MeshBuilder::Clear()
 {
 	if (!m_mesh)
 		return;

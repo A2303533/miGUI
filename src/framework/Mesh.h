@@ -147,6 +147,14 @@ namespace mgf
 		mgf::StringA m_name;
 	};
 
-	Mesh* Mesh_OBJ(const char* fn);
+	class Material;
+	class MeshBuilder;
+
+	/// <summary>
+	/// One file can contain many objects.
+	/// </summary>
+	typedef void(*MeshLoaderCallback)(MeshBuilder*, Material*);
+
+	void Mesh_OBJ(const char* fn, MeshLoaderCallback);
 }
 #endif

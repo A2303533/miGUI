@@ -32,6 +32,7 @@
 
 #include <map>
 #include <string>
+#include "Mesh.h"
 #include "Polygon.h"
 #include "PolygonMesh.h"
 #include "Aabb.h"
@@ -40,15 +41,16 @@ namespace mgf
 {
 	class PolygonCreator;
 
-	struct MeshBuilder
+	class MeshBuilder
 	{
+	public:
 		MeshBuilder() {}
 		~MeshBuilder()
 		{
-			DeleteMesh();
+			Clear();
 		}
 
-		void DeleteMesh();
+		void Clear();
 
 		PolygonMesh* m_mesh;
 
@@ -78,6 +80,14 @@ namespace mgf
 		{
 			m_mesh->CreateEdges();
 		}
+
+		enum
+		{
+			// If not many indices.
+			flag_use16bit = 0x1
+		};
+
+		Mesh* CreateMesh(uint32_t flags);
 	private:
 		void _set_hash(v3f* position);
 	};

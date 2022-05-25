@@ -32,6 +32,10 @@
 #include <math.h>
 #include <float.h>
 
+#include "Vec.h"
+#include "Quat.h"
+#include "Mat.h"
+
 namespace mgf
 {
 	namespace math

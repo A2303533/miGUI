@@ -121,6 +121,21 @@
     <ClCompile Include="..\..\src\framework\MeshBuilder.cpp">
       <Filter>migui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\Aabb.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Vec.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Ray.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Mat.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Mesh.cpp">
+      <Filter>migui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="migui">

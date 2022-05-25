@@ -28,9 +28,10 @@
 
 #include "mgf.h"
 
-#include "Math.h"
 #include <stdlib.h>
 #include <float.h>
+
+#include "Math.h"
 
 namespace mgf
 {

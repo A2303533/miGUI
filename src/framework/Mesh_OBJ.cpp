@@ -253,9 +253,8 @@ unsigned char* OBJReadFace(unsigned char* ptr, OBJFace& f, char* s);
 unsigned char* OBJReadWord(unsigned char* ptr, StringW& str);
 unsigned char* OBJReadLastWord(unsigned char* ptr, StringW& str);
 
-Mesh* mgf::Mesh_OBJ(const char* fn)
+void mgf::Mesh_OBJ(const char* fn, MeshLoaderCallback cb)
 {
-	Mesh* newMesh = 0;
 	auto mbStr = fn;
 
 	Array<OBJMaterial*> obj_materials;
@@ -512,9 +511,10 @@ Mesh* mgf::Mesh_OBJ(const char* fn)
 							m->m_maps[m->mapSlot_Diffuse].m_texturePath = currMaterial->m_map_diffuse;
 					}*/
 
+					cb(&meshBuilder, 0);
 					//g_sdk->CreateSceneObjectFromHelper(&importerHelper, prev_word.data(), m);
 
-					meshBuilder.DeleteMesh();
+					meshBuilder.Clear();
 					meshBuilder.Begin();
 				}
 			}
@@ -538,6 +538,7 @@ Mesh* mgf::Mesh_OBJ(const char* fn)
 				m->m_maps[m->mapSlot_Diffuse].m_texturePath = currMaterial->m_map_diffuse;
 		}*/
 
+		cb(&meshBuilder, 0);
 		//g_sdk->CreateSceneObjectFromHelper(&importerHelper, curr_word.data(), m);
 	}
 
@@ -546,7 +547,6 @@ Mesh* mgf::Mesh_OBJ(const char* fn)
 	{
 		delete obj_materials.m_data[i];
 	}*/
-	return newMesh;
 }
 
 unsigned char* OBJNextLine(unsigned char* ptr)
