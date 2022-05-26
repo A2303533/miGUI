@@ -29,6 +29,7 @@
 #include "mgf.h"
 #include "MeshBuilder.h"
 #include "PolygonCreator.h"
+#include "Array.h"
 
 using namespace mgf;
 
@@ -78,11 +79,20 @@ Mesh* MeshBuilder::CreateMesh(uint32_t flags)
 	newMesh->m_indexType = Mesh::MeshIndexType::MeshIndexType_u32;
 	newMesh->m_vertexType = Mesh::MeshVertexType::MeshVertexType_Triangle;
 	newMesh->m_stride = sizeof(VertexTriangle);
-	newMesh->m_vertices = (uint8_t*)malloc(newMesh->m_stride * 3);
-	newMesh->m_indices = (uint8_t*)malloc(sizeof(uint32_t) * 3);
 
-	VertexTriangle* vertexModel_ptr = (VertexTriangle*)newMesh->m_vertices;
-	uint32_t* inds_ptr = (uint32_t*)newMesh->m_indices;
+	//newMesh->m_vertices = (uint8_t*)malloc(newMesh->m_stride * 3);
+	//newMesh->m_indices = (uint8_t*)malloc(sizeof(uint32_t) * 3);
+
+	//VertexTriangle* vertexModel_ptr = (VertexTriangle*)newMesh->m_vertices;
+	//uint32_t* inds_ptr = (uint32_t*)newMesh->m_indices;
+	mgf::Array<VertexTriangle> vertArr;
+	mgf::Array<uint32_t> indsArr;
+
+	vertArr.reserve(5000);
+	indsArr.reserve(5000);
+
+	VertexTriangle currVert;
+
 	uint32_t index = 0;
 
 	auto current_polygon = m_mesh->m_first_polygon;
@@ -95,35 +105,41 @@ Mesh* MeshBuilder::CreateMesh(uint32_t flags)
 		auto vertex_2 = vertex_3->m_right;
 		while (true)
 		{
-			vertexModel_ptr->Color = color;
-			vertexModel_ptr->Position = vertex_1->m_data.m_vertex->m_position;
-			vertexModel_ptr->UV = vertex_1->m_data.m_uv;
-			vertexModel_ptr->Normal = vertex_1->m_data.m_normal;
-			++vertexModel_ptr;
+			currVert.Color = color;
+			currVert.Position = vertex_1->m_data.m_vertex->m_position;
+			currVert.UV = vertex_1->m_data.m_uv;
+			currVert.Normal = vertex_1->m_data.m_normal;
+			//++vertexModel_ptr;
+			vertArr.push_back(currVert);
+			indsArr.push_back(index);
 
-			*inds_ptr = index;
+			//*inds_ptr = index;
 			++index;
-			++inds_ptr;
+			//++inds_ptr;
 
-			vertexModel_ptr->Color = color;
-			vertexModel_ptr->Position = vertex_2->m_data.m_vertex->m_position;
-			vertexModel_ptr->UV = vertex_2->m_data.m_uv;
-			vertexModel_ptr->Normal = vertex_2->m_data.m_normal;
-			++vertexModel_ptr;
+			currVert.Color = color;
+			currVert.Position = vertex_2->m_data.m_vertex->m_position;
+			currVert.UV = vertex_2->m_data.m_uv;
+			currVert.Normal = vertex_2->m_data.m_normal;
+			//++vertexModel_ptr;
+			vertArr.push_back(currVert);
+			indsArr.push_back(index);
 
-			*inds_ptr = index;
+			//*inds_ptr = index;
 			++index;
-			++inds_ptr;
+			//++inds_ptr;
 
-			vertexModel_ptr->Color = color;
-			vertexModel_ptr->Position = vertex_3->m_data.m_vertex->m_position;
-			vertexModel_ptr->UV = vertex_3->m_data.m_uv;
-			vertexModel_ptr->Normal = vertex_3->m_data.m_normal;
-			++vertexModel_ptr;
+			currVert.Color = color;
+			currVert.Position = vertex_3->m_data.m_vertex->m_position;
+			currVert.UV = vertex_3->m_data.m_uv;
+			currVert.Normal = vertex_3->m_data.m_normal;
+			//++vertexModel_ptr;
+			vertArr.push_back(currVert);
+			indsArr.push_back(index);
 
-			*inds_ptr = index;
+			//*inds_ptr = index;
 			++index;
-			++inds_ptr;
+			//++inds_ptr;
 
 			newMesh->m_vCount += 3;
 			newMesh->m_iCount += 3;
@@ -139,6 +155,12 @@ Mesh* MeshBuilder::CreateMesh(uint32_t flags)
 			break;
 		current_polygon = current_polygon->m_right;
 	}
+
+	newMesh->m_vertices = (uint8_t*)vertArr.m_data;
+	newMesh->m_indices = (uint8_t*)indsArr.m_data;
+
+	vertArr.m_data = 0;
+	indsArr.m_data = 0;
 
 	return newMesh;
 }

@@ -27,38 +27,52 @@
 */
 
 #pragma once
-#ifndef MGF_D3D11_SHADER_LINE_H__
-#define MGF_D3D11_SHADER_LINE_H__
+#ifndef _MGF_MATERIAL_H_
+#define _MGF_MATERIAL_H_
 
-#include "GSD3D11Shader.h"
+#define MaterialMapCount 8
 
 namespace mgf
 {
+	
+	class GSTexture;
 
-	class GSD3D11ShaderLine : public GSD3D11Shader
+	class MaterialMap
 	{
-		ID3D11Device* m_device = 0;
-		ID3D11DeviceContext* m_deviceCotext = 0;
 	public:
-		GSD3D11ShaderLine(ID3D11Device*, ID3D11DeviceContext*);
-		virtual ~GSD3D11ShaderLine();
+		MaterialMap() {}
+		~MaterialMap() {}
 
-		ID3D11Buffer* m_cb;
-
-		struct cb
-		{
-			Mat4 VP;
-			v4f  P1;
-			v4f  P2;
-			mgColor  Color;
-		}m_cbData;
-
-		bool init();
-		virtual void SetConstants(void*) override;
-
-		void SetData(const v4f& p1, const v4f& p2, const mgColor& c, Mat4*);
+		GSTexture* m_texture = 0;
+		StringW m_filename;
 	};
 
+	class Material
+	{
+	public:
+		Material() {}
+		~Material() {}
+
+		StringW m_name; // newmtl
+		v3f m_ambient;   // Ka
+		v3f m_diffuse;   // Kd
+		v3f m_specular;  // Ks
+		float m_specularExponent = 10.f; // Ns
+		float m_opacity = 1.f;    // d
+		float m_transparency = 0.f; // Tr
+		float m_refraction = 1.f;  // Ni
+
+		//StringW m_map_diffuse; // map_Kd  
+		//StringW m_map_ambient; // map_Ka 
+		//StringW m_map_specular; // map_Ks   
+		//StringW m_map_specularHighlight; // map_Ns    
+		//StringW m_map_alpha; // map_d     
+		//StringW m_map_bump; // map_bump bump 
+		//StringW m_map_displacement; // disp 
+		//StringW m_map_reflection; // refl  
+
+		MaterialMap m_maps[MaterialMapCount];
+	};
 }
 
 #endif

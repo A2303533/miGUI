@@ -1,5 +1,5 @@
 #include "framework/mgf.h"
-#include "framework/Filesystem.h"
+#include <filesystem>
 #include "framework/Archive.h"
 
 #ifdef MG_DEBUG
@@ -15,7 +15,7 @@ void compress_file(const char* inFile, const char* outFile, const char* name)
 	FILE* f = fopen(inFile, "rb");
 	if (f)
 	{
-		std::uintmax_t inFileSz = mgf::filesystem::file_size(inFile);
+		std::uintmax_t inFileSz = std::filesystem::file_size(inFile);
 		if (inFileSz)
 		{
 			uint8_t* fileData = (uint8_t*)malloc((size_t)inFileSz);

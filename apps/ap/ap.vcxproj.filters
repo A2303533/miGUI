@@ -72,9 +72,6 @@
     <ClCompile Include="..\..\src\framework\SystemWindow.cpp">
       <Filter>migui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\Filesystem.cpp">
-      <Filter>migui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\framework\Archive.cpp">
       <Filter>migui</Filter>
     </ClCompile>

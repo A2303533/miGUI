@@ -27,12 +27,14 @@
 */
 
 #include "framework/mgf.h"
-#include "Filesystem.h"
+#include <filesystem>
 #include "String.h"
 #include "Array.h"
 #include "Mesh.h"
 #include "PolygonCreator.h"
 #include "MeshBuilder.h"
+#include "Material.h"
+#include "Log.h"
 
 #include <unordered_map>
 
@@ -78,34 +80,6 @@ struct OBJFace
 	}
 };
 
-struct OBJMaterial
-{
-	OBJMaterial() {
-		m_specularExponent = 10.f;
-		m_opacity = 1.f;
-		m_transparency = 0.f;
-		m_refraction = 1.f;
-	}
-
-	StringW m_name; // newmtl
-	v3f m_ambient;   // Ka
-	v3f m_diffuse;   // Kd
-	v3f m_specular;  // Ks
-	float m_specularExponent; // Ns
-	float m_opacity;    // d
-	float m_transparency; // Tr
-	float m_refraction;  // Ni
-
-	StringW m_map_diffuse; // map_Kd  
-	StringW m_map_ambient; // map_Ka 
-	StringW m_map_specular; // map_Ks   
-	StringW m_map_specularHighlight; // map_Ns    
-	StringW m_map_alpha; // map_d     
-	StringW m_map_bump; // map_bump bump 
-	StringW m_map_displacement; // disp 
-	StringW m_map_reflection; // refl  
-};
-
 bool OBJStringEqual(const StringW& str, const char* c_Str)
 {
 	auto c_str_len = std::strlen(c_Str);
@@ -121,129 +95,6 @@ bool OBJStringEqual(const StringW& str, const char* c_Str)
 	return true;
 }
 
-//void miplStd_ImportOBJ_MTL(
-//	miArray<OBJMaterial*>& materials,
-//	const char* obj_fileName,
-//	const char* mtl_fileName
-//)
-//{
-//	auto relPath = g_sdk->FileGetRelativePath(obj_fileName);
-//
-//	for (u32 i = 0, sz = relPath.size(); i < sz; ++i)
-//	{
-//		auto c = relPath.pop_back_return();
-//		if (c == L'/' || c == L'\\')
-//		{
-//			relPath += c;
-//			break;
-//		}
-//	}
-//
-//	miString mtlPath = relPath;
-//	mtlPath += mtl_fileName;
-//
-//	if (g_sdk->FileExist(mtlPath.data()))
-//	{
-//		auto mbStr = g_sdk->StringWideToMultiByte(mtlPath.data());
-//
-//		FILE* file = fopen(mbStr.data(), "rb");
-//		auto file_size = (size_t)g_sdk->FileSize(mbStr.data());
-//
-//		std::vector<unsigned char> file_byte_array((unsigned int)file_size + 2);
-//		unsigned char* ptr = file_byte_array.data();
-//
-//		fread(ptr, 1, file_size, file);
-//		fclose(file);
-//
-//		ptr[(unsigned int)file_size] = ' ';
-//		ptr[(unsigned int)file_size + 1] = 0;
-//
-//		OBJMaterial* curMaterial = 0;
-//
-//		while (*ptr)
-//		{
-//			switch (*ptr)
-//			{
-//			case '#':
-//			case 'd':
-//			case 'T':
-//			case 'i':
-//			case 'K':
-//				ptr = OBJNextLine(ptr);
-//				break;
-//			case 'n':
-//			{
-//				miString mtlWord;
-//				ptr = OBJReadWord(ptr, mtlWord);
-//
-//				if (OBJStringEqual(mtlWord, "newmtl"))
-//				{
-//					curMaterial = new OBJMaterial;
-//					materials.push_back(curMaterial);
-//
-//					ptr = OBJReadWord(ptr, curMaterial->m_name);
-//				}
-//			}break;
-//			case 'N':
-//			{
-//				miString word;
-//				ptr = OBJReadWord(ptr, word);
-//				if (OBJStringEqual(word, "Ns"))
-//				{
-//					ptr = OBJSkipSpaces(ptr);
-//					ptr = OBJReadFloat(ptr, curMaterial->m_specularExponent);
-//				}
-//				else if (OBJStringEqual(word, "Ni"))
-//				{
-//					ptr = OBJSkipSpaces(ptr);
-//					ptr = OBJReadFloat(ptr, curMaterial->m_refraction);
-//				}
-//				else
-//					ptr = OBJNextLine(ptr);
-//
-//			}break;
-//			case 'm':
-//			{
-//				miString word;
-//				ptr = OBJReadWord(ptr, word);
-//				if (OBJStringEqual(word, "map_Kd"))
-//				{
-//					ptr = OBJReadLastWord(ptr, word);
-//
-//					miString mapPath = word;
-//
-//					if (!g_sdk->FileExist(mapPath.data()))
-//					{
-//						mapPath = relPath;
-//						mapPath += word.data();
-//					}
-//
-//					curMaterial->m_map_diffuse = mapPath;
-//				}
-//				else
-//					ptr = OBJNextLine(ptr);
-//			}break;
-//			default:
-//				++ptr;
-//				break;
-//			}
-//		}
-//	}
-//}
-//
-//OBJMaterial* OBJGetMaterial(
-//	miArray<OBJMaterial*>& materials,
-//	const miString& name
-//)
-//{
-//	for (u32 i = 0; i < materials.m_size; ++i)
-//	{
-//		if (materials.m_data[i]->m_name == name)
-//			return materials.m_data[i];
-//	}
-//	return 0;
-//}
-
 unsigned char* OBJNextLine(unsigned char* ptr);
 unsigned char* OBJSkipSpaces(unsigned char* ptr);
 unsigned char* OBJReadVec2(unsigned char* ptr, v2f& vec2);
@@ -253,14 +104,149 @@ unsigned char* OBJReadFace(unsigned char* ptr, OBJFace& f, char* s);
 unsigned char* OBJReadWord(unsigned char* ptr, StringW& str);
 unsigned char* OBJReadLastWord(unsigned char* ptr, StringW& str);
 
-void mgf::Mesh_OBJ(const char* fn, MeshLoaderCallback cb)
+void OBJMTL(
+	Array<Material*>& materials,
+	const char* obj_fileName,
+	const char* mtl_fileName
+)
+{
+	auto relPath = std::filesystem::relative(obj_fileName);
+
+	{
+		StringW mtlPath = relPath.c_str();
+		for (size_t i = 0, sz = relPath.native().size(); i < sz; ++i)
+		{
+			auto c = mtlPath.pop_back_return();
+			if (c == L'/' || c == L'\\')
+			{
+				relPath += c;
+				break;
+			}
+		}
+	}
+
+	StringW mtlPath = relPath.c_str();
+	mtlPath += mtl_fileName;
+
+	if (std::filesystem::exists(mtlPath.data()))
+	{
+		auto mbStr = mtlPath.to_utf8();
+
+		FILE* file = fopen(mbStr.data(), "rb");
+		auto file_size = (size_t)std::filesystem::file_size(mbStr.data());
+
+		std::vector<unsigned char> file_byte_array((unsigned int)file_size + 2);
+		unsigned char* ptr = file_byte_array.data();
+
+		fread(ptr, 1, file_size, file);
+		fclose(file);
+
+		ptr[(unsigned int)file_size] = ' ';
+		ptr[(unsigned int)file_size + 1] = 0;
+
+		Material* curMaterial = 0;
+
+		while (*ptr)
+		{
+			switch (*ptr)
+			{
+			case '#':
+			case 'd':
+			case 'T':
+			case 'i':
+			case 'K':
+				ptr = OBJNextLine(ptr);
+				break;
+			case 'n':
+			{
+				StringW mtlWord;
+				ptr = OBJReadWord(ptr, mtlWord);
+
+				if (OBJStringEqual(mtlWord, "newmtl"))
+				{
+					curMaterial = new Material;
+					materials.push_back(curMaterial);
+
+					ptr = OBJReadWord(ptr, curMaterial->m_name);
+				}
+			}break;
+			case 'N':
+			{
+				StringW word;
+				ptr = OBJReadWord(ptr, word);
+				if (OBJStringEqual(word, "Ns"))
+				{
+					ptr = OBJSkipSpaces(ptr);
+					ptr = OBJReadFloat(ptr, curMaterial->m_specularExponent);
+				}
+				else if (OBJStringEqual(word, "Ni"))
+				{
+					ptr = OBJSkipSpaces(ptr);
+					ptr = OBJReadFloat(ptr, curMaterial->m_refraction);
+				}
+				else
+					ptr = OBJNextLine(ptr);
+
+			}break;
+			case 'm':
+			{
+				StringW word;
+				ptr = OBJReadWord(ptr, word);
+				if (OBJStringEqual(word, "map_Kd"))
+				{
+					ptr = OBJReadLastWord(ptr, word);
+
+					StringW mapPath = word;
+
+					if (!std::filesystem::exists(mapPath.data()))
+					{
+						mapPath = relPath.c_str();
+						mapPath += word.data();
+					}
+
+					curMaterial->m_maps[0].m_filename = mapPath;
+				}
+				else
+					ptr = OBJNextLine(ptr);
+			}break;
+			default:
+				++ptr;
+				break;
+			}
+		}
+	}
+}
+
+Material* OBJGetMaterial(
+	Array<Material*>& materials,
+	const StringW& name
+)
+{
+	for (uint32_t i = 0; i < materials.m_size; ++i)
+	{
+		if (materials.m_data[i]->m_name == name)
+			return materials.m_data[i];
+	}
+	return 0;
+}
+
+void mgf::Mesh_OBJ(const char* fn, MeshLoader* loader)
 {
 	auto mbStr = fn;
 
-	Array<OBJMaterial*> obj_materials;
-
 	FILE* file = fopen(mbStr, "rb");
-	auto file_size = (size_t)mgf::filesystem::file_size(mbStr);
+	if (!file)
+	{
+		mgf::LogWriteError("%s: can't open file [%s]", MGF_FUNCTION, fn);
+		return;
+	}
+
+	auto file_size = (size_t)std::filesystem::file_size(mbStr);
+	if (!file_size)
+	{
+		mgf::LogWriteError("%s: file size [%s] is 0", MGF_FUNCTION, fn);
+		return;
+	}
 
 	std::vector<unsigned char> file_byte_array((unsigned int)file_size + 2);
 
@@ -308,8 +294,8 @@ void mgf::Mesh_OBJ(const char* fn, MeshLoaderCallback cb)
 	mgf::PolygonCreator triangulationPolygonCreator;
 	mgf::MeshBuilder meshBuilder;
 
-
-	OBJMaterial* currMaterial = 0;
+	Array<Material*> obj_materials;
+	Material* currMaterial = 0;
 
 	while (*ptr)
 	{
@@ -326,7 +312,7 @@ void mgf::Mesh_OBJ(const char* fn, MeshLoaderCallback cb)
 				//wprintf(L"MTL: %s\n", mtlWord.data());
 				StringA stra;
 				stra = word.data();
-				//miplStd_ImportOBJ_MTL(obj_materials, mbStr.data(), stra.data());
+				OBJMTL(obj_materials, mbStr, stra.data());
 			}
 		}break;
 		case 'u'://usemtl
@@ -337,7 +323,7 @@ void mgf::Mesh_OBJ(const char* fn, MeshLoaderCallback cb)
 			if (OBJStringEqual(word, "usemtl"))
 			{
 				ptr = OBJReadWord(ptr, word);
-				//currMaterial = OBJGetMaterial(obj_materials, word);
+				currMaterial = OBJGetMaterial(obj_materials, word);
 			}
 		}break;
 		case 's':
@@ -511,7 +497,7 @@ void mgf::Mesh_OBJ(const char* fn, MeshLoaderCallback cb)
 							m->m_maps[m->mapSlot_Diffuse].m_texturePath = currMaterial->m_map_diffuse;
 					}*/
 
-					cb(&meshBuilder, 0);
+					loader->OnLoad(&meshBuilder, currMaterial);
 					//g_sdk->CreateSceneObjectFromHelper(&importerHelper, prev_word.data(), m);
 
 					meshBuilder.Clear();
@@ -538,15 +524,15 @@ void mgf::Mesh_OBJ(const char* fn, MeshLoaderCallback cb)
 				m->m_maps[m->mapSlot_Diffuse].m_texturePath = currMaterial->m_map_diffuse;
 		}*/
 
-		cb(&meshBuilder, 0);
+		loader->OnLoad(&meshBuilder, currMaterial);
 		//g_sdk->CreateSceneObjectFromHelper(&importerHelper, curr_word.data(), m);
 	}
 
 
-	/*for (u32 i = 0; i < obj_materials.m_size; ++i)
+	for (uint32_t i = 0; i < obj_materials.m_size; ++i)
 	{
 		delete obj_materials.m_data[i];
-	}*/
+	}
 }
 
 unsigned char* OBJNextLine(unsigned char* ptr)

@@ -16,7 +16,7 @@ namespace mgf
 
 
 		bool init();
-		virtual void SetConstants(void* material) {}
+		virtual void SetConstants(void*) override {}
 	};
 
 }

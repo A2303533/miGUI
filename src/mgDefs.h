@@ -75,4 +75,10 @@
 #else
 #endif
 
+#ifdef _MSC_VER
+#define MGF_FUNCTION __FUNCTION__
+#else
+#define MGF_FUNCTION "functionname"
+#endif
+
 #endif

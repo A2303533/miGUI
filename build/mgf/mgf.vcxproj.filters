@@ -63,9 +63,6 @@
     <ClCompile Include="..\..\src\framework\Element.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\Filesystem.cpp">
-      <Filter>Source Files\mgf</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\framework\FontImpl.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>

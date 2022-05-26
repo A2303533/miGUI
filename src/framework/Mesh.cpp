@@ -1,6 +1,8 @@
 ﻿#include "framework/mgf.h"
 #include "Mesh.h"
 
+#include <filesystem>
+
 using namespace mgf;
 
 Mesh::Mesh() 
@@ -156,7 +158,14 @@ void Mesh::GenerateTangents()
 		GenerateTangents_u32();
 		break;
 	}
-
-
 }
 
+void MeshLoader::LoadMesh(const char* filename, uint32_t uid)
+{
+	m_currUID = uid;
+	std::filesystem::path p = filename;
+	std::filesystem::path ext = p.extension();
+	
+	if(ext == ".obj")
+		Mesh_OBJ(filename, this);
+}

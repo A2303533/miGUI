@@ -22,8 +22,7 @@
 
 #include <list>
 #include <iostream>
-//#include <filesystem>
-#include "framework/Filesystem.h"
+#include <filesystem>
 
 AP_application* g_app = 0;
 
@@ -47,8 +46,8 @@ public:
 		{
 			for (int i = 0; i < nature->_f.fileListSize; ++i)
 			{
-				mgf::filesystem::path pth = nature->_f.fileList[i];
-				mgf::filesystem::path ext = pth.extension();
+				std::filesystem::path pth = nature->_f.fileList[i];
+				std::filesystem::path ext = pth.extension();
 				if (ext.native() != L".wav" && ext.native() != L".mp3")
 				{
 					m_dragState = false;
@@ -81,8 +80,8 @@ public:
 		{
 			for (int i = 0; i < nature->_f.fileListSize; ++i)
 			{
-				mgf::filesystem::path pth = nature->_f.fileList[i];
-				mgf::filesystem::path ext = pth.extension();
+				std::filesystem::path pth = nature->_f.fileList[i];
+				std::filesystem::path ext = pth.extension();
 				if (ext.native() == L".wav" || ext.native() == L".mp3")
 				{
 					g_app->m_playlistMgr->AddTrackToEditPlaylist(pth.c_str());

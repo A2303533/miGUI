@@ -22,6 +22,13 @@ namespace mgf
 		{}
 		~GSTextureInfo() {}
 
+		void SetImage(Image* img)
+		{
+			m_imagePtr = img->GetMGImage();
+			m_width = img->GetWidth();
+			m_height = img->GetHeight();
+		}
+
 		enum Type
 		{
 			Type_Texture2D,

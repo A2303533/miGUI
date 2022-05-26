@@ -30,7 +30,7 @@
 
 #include "AudioEngine.h"
 
-#include "Filesystem.h"
+#include <filesystem>
 
 //struct Wav_header
 //{
@@ -54,7 +54,7 @@
 mgf::AudioSourceData* mgf::Audio_Wav(const char* fn)
 {
 	mgf::AudioSourceData* rawData = 0;
-	if (mgf::filesystem::exists(fn) && (mgf::filesystem::file_size(fn) > 0x30))
+	if (std::filesystem::exists(fn) && (std::filesystem::file_size(fn) > 0x30))
 	{
 		FILE* f = fopen(fn, "rb");
 		if (f)

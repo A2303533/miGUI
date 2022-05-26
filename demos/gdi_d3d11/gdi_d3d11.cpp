@@ -7,7 +7,8 @@
 #include "framework/Text.h"
 #include "framework/Button.h"
 #include "framework/Camera.h"
-#include "framework/Filesystem.h"
+#include "framework/Mesh.h"
+#include <filesystem>
 
 #ifdef MG_DEBUG
 #pragma comment(lib, "mgfd.lib")
@@ -28,6 +29,10 @@
 //  2 - using render target texture. This type is more complex because
 //       this app use GDI. We need to get image from GPU texture, then
 //       put this data in BackendGDI texture.
+
+// And also :
+//  - how to load mesh
+//  - how to create (not load) image and texture
 
 #ifdef DEMO_NATIVE_WIN32MENU
 #include <Windows.h>
@@ -71,7 +76,6 @@ WindowMain::WindowMain(
 	mgf::SystemWindow(windowFlags, windowPosition, windowSize)
 {
 	m_app = app;
-
 }
 
 WindowMain::~WindowMain()
@@ -99,6 +103,17 @@ public:
 	};
 };
 
+class MyMeshLoader : public mgf::MeshLoader
+{
+public:
+	MyMeshLoader(ModelEditor* app) : m_app(app) {}
+	virtual ~MyMeshLoader() {}
+	
+	virtual void OnLoad(mgf::MeshBuilder* meshBuilder, mgf::Material* mat) override;
+
+	ModelEditor* m_app = 0;
+};
+
 class ModelEditor
 {
 public:
@@ -108,6 +123,11 @@ public:
 	mgf::Framework* m_framework = 0;
 	WindowMain* m_windowMain = 0;
 	WindowMainMenu* m_windowMenu = 0;
+
+	MyMeshLoader* m_meshLoader = 0;
+	mgf::Mesh* m_justMesh = 0;
+	mgf::GSMesh* m_justMeshGS = 0;
+	mgf::GSTexture* m_generatedTexture = 0;
 
 	mgf::GS* m_gs = 0;
 	mgf::Backend* m_backend = 0;
@@ -140,7 +160,13 @@ ModelEditor::ModelEditor()
 
 ModelEditor::~ModelEditor()
 {
+	if (m_meshLoader) m_meshLoader->Release();
+	
+	// Destroy GS objects before destroying GS
+	if (m_justMeshGS) m_justMeshGS->Release(); 
+	if (m_generatedTexture) m_generatedTexture->Release();
 	if (m_renderTexture) m_renderTexture->Release();
+
 	if (m_gs) m_gs->Release();
 	if (m_windowMenu) m_windowMenu->Release();
 
@@ -240,7 +266,7 @@ bool ModelEditor::Init()
 	
 	m_backend = new mgf::BackendGDI();
 	m_GUIContext = m_framework->CreateContext(m_windowMain, m_backend);
-	if (mgf::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))
+	if (std::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))
 		m_menuFont = m_backend->CreateFontPrivate(L"..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf", 11, false, false, L"LT Internet");
 	else
 		m_menuFont = m_backend->CreateFont(L"Arial", 11, false, false);
@@ -349,6 +375,25 @@ bool ModelEditor::Init()
 		m_camera.EditorZoom(1); // zoom for mouse wheel, so simulate it
 	m_camera.EditorUpdate(); // and first update. next update only when move\rotate camera
 
+	m_meshLoader = new MyMeshLoader(this);
+	m_meshLoader->LoadMesh("D:/3d/1/1.obj", 1);
+	if (m_justMesh) // will load in callback MyMeshLoader::OnLoad
+	{
+		mgf::GSMeshInfo mi;
+		mi.m_meshPtr = m_justMesh;
+		m_justMeshGS = m_gs->CreateMesh(&mi);
+		delete m_justMesh; // no need anymore
+		m_justMesh = 0;
+	}
+
+	{
+		mgf::Image img;
+		img.Create(32, 32, m_framework->GetColor(mgf::ColorName::Red));
+		mgf::GSTextureInfo ti;
+		ti.SetImage(&img);
+		m_generatedTexture = m_gs->CreateTexture(&ti);
+	}
+
 	return true;
 }
 
@@ -392,6 +437,13 @@ void ModelEditor::Run()
 		m_gs->DrawLine3D(mgf::v4f(0.f, -1.f, 0.f, 0.f), mgf::v4f(0.f, 1.f, 0.f, 0.f), m_colorGreen);
 		m_gs->DrawLine3D(mgf::v4f(0.f, 0.f, -1.f, 0.f), mgf::v4f(0.f, 0.f, 1.f, 0.f), m_colorBlue);
 		
+		if (m_justMeshGS)
+		{
+			m_gs->SetTexture(0, m_generatedTexture);
+			m_gs->SetMesh(m_justMeshGS);
+			
+			m_gs->Draw(0);
+		}
 
 		m_gs->GetTextureCopyForImage(m_renderTexture, m_GDIRenderTextureImage);
 		m_backend->UpdateTexture(m_GDIRenderTexture, m_GDIRenderTextureImage->GetMGImage());
@@ -457,3 +509,13 @@ LRESULT CALLBACK PopupWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 }
 #endif
 
+void MyMeshLoader::OnLoad(mgf::MeshBuilder* meshBuilder, mgf::Material* mat)
+{
+	switch (m_currUID)
+	{
+	case 1:
+	{
+		m_app->m_justMesh = meshBuilder->CreateMesh(0);
+	}break;
+	}
+}

@@ -10,7 +10,8 @@
 #include "framework/Font.h"
 #include "framework/Icons.h"
 #include "framework/Archive.h"
-#include "framework/Filesystem.h"
+
+#include <filesystem>
 
 #include "WindowMain.h"
 #include "WindowMainMenu.h"
@@ -154,7 +155,7 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 	m_GUIContext = m_framework->CreateContext(m_windowMain, m_backend);
 
 
-	if(mgf::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))
+	if(std::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))
 		m_menuFont = m_backend->CreateFontPrivate(L"..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf", 11, false, false, L"LT Internet");
 	else
 		m_menuFont = m_backend->CreateFont(L"Arial", 11, false, false);

@@ -49,8 +49,7 @@
 #include <gdiplus.h>
 #include "framework/OS/UndefWindows.h"
 
-//#include <filesystem>
-#include "framework/Filesystem.h"
+#include <filesystem>
 #include "framework/String.h"
 
 using namespace mgf;
@@ -700,8 +699,8 @@ Font* BackendGDI::CreateFontPrivate(const wchar_t* file, int size, bool bold, bo
 	StringW strw = file;
 	StringA stra = strw.to_utf8();
 
-	mgf::filesystem::path filePath = file;
-	if (mgf::filesystem::is_regular_file(filePath))
+	std::filesystem::path filePath = file;
+	if (std::filesystem::is_regular_file(filePath))
 	{
 		int result = AddFontResourceExW(file, FR_PRIVATE, 0);
 		if (result)

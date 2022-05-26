@@ -34,6 +34,8 @@
 #include "framework/String.h"
 #include "framework/Aabb.h"
 
+#include "framework/MeshBuilder.h"
+
 namespace mgf
 {
 	struct VertexGUI
@@ -151,10 +153,32 @@ namespace mgf
 	class MeshBuilder;
 
 	/// <summary>
-	/// One file can contain many objects.
+	/// Interface for loading 3D files.
+	/// Implement OnLoad, call LoadMesh and catch mesh in meshBuilder.
 	/// </summary>
-	typedef void(*MeshLoaderCallback)(MeshBuilder*, Material*);
+	class MeshLoader : public BaseClass
+	{
+	protected:
+		uint32_t m_currUID = 0;
+	public:
+		MeshLoader() {}
+		virtual ~MeshLoader() {}
 
-	void Mesh_OBJ(const char* fn, MeshLoaderCallback);
+		/// <summary>
+		/// One file can contain many objects.
+		/// mat will be deleted!
+		/// </summary>
+		virtual void OnLoad(mgf::MeshBuilder* meshBuilder, mgf::Material* mat) = 0;
+
+		/// <summary>
+		/// Loading 3D object in this way is hard, but I don't want to load many
+		/// objects as one. One Mesh object contain only one buffer.
+		/// uid is to know what file i load.
+		/// For user much better to create class like MyMesh with std::vector<Mesh*>
+		/// </summary>
+		virtual void LoadMesh(const char* filename, uint32_t uid);
+	};
+
+	void Mesh_OBJ(const char* fn, MeshLoader*);
 }
 #endif

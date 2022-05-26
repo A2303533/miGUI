@@ -40,7 +40,13 @@
 namespace mgf
 {
 	class PolygonCreator;
+	class Mesh;
 
+	/// <summary>
+	/// Creating 3D meshes using polygons.
+	/// Much more easy to load 3D, but not too fast.
+	/// Easy to create mesh using code.
+	/// </summary>
 	class MeshBuilder
 	{
 	public:
