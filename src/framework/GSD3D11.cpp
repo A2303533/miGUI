@@ -357,8 +357,9 @@ bool GSD3D11::Init(SystemWindow* window, BackendD3D11Params* outParams)
 	m_mainTargetSize.set((float)windowSize.x, (float)windowSize.y);
 	_updateMainTarget();
 
-	m_GSData.con = m_d3d11DevCon;
-	m_GSData.dev = m_d3d11Device;
+	m_GSData.m_gs = this;
+	m_GSData.m_d3d11DevCon = m_d3d11DevCon;
+	m_GSData.m_d3d11Device = m_d3d11Device;
 
 	return true;
 }
@@ -600,9 +601,18 @@ void GSD3D11::SetMesh(GSMesh*  res)
 		m_currentMesh = nullptr;
 }
 
+void GSD3D11::SetShader(GSShader* res)
+{
+	if (res)
+		SetActiveShader((GSD3D11Shader*)res);
+	else
+		SetActiveShader(nullptr);
+}
+
+
 void GSD3D11::Draw(uint32_t flags)
 {
-	if (!m_currentMesh)
+	if (!m_currentMesh || !m_activeShader)
 		return;
 
 	if (flags & drawFlag_wireframe)
@@ -618,6 +628,44 @@ void GSD3D11::Draw(uint32_t flags)
 			m_d3d11DevCon->RSSetState(m_RasterizerSolid);
 		else
 			m_d3d11DevCon->RSSetState(m_RasterizerSolidNoBackFaceCulling);
+	}
+
+	/*m_d3d11DevCon->IASetInputLayout(m_currentShader->m_vLayout);
+	m_d3d11DevCon->VSSetShader(m_currentShader->m_vShader, 0, 0);
+	m_d3d11DevCon->GSSetShader(m_currentShader->m_gShader, 0, 0);
+	m_d3d11DevCon->PSSetShader(m_currentShader->m_pShader, 0, 0);*/
+	m_activeShader->SetConstants(&m_GSData);
+
+	GSD3D11Mesh* currMesh = (GSD3D11Mesh*)m_currentMesh;
+
+	uint32_t offset = 0u;
+	//	m_d3d11DevCon->RSSetState(m_RasterizerWireframeNoBackFaceCulling);
+	switch (currMesh->m_vertexType)
+	{
+	default:
+		m_d3d11DevCon->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		break;
+	case mgf::Mesh::MeshVertexType_AnimatedPoint:
+	case mgf::Mesh::MeshVertexType_Point:
+		m_d3d11DevCon->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+		break;
+	case mgf::Mesh::MeshVertexType_Line:
+	case mgf::Mesh::MeshVertexType_AnimatedLine:
+		m_d3d11DevCon->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+		break;
+	}
+
+	m_d3d11DevCon->IASetVertexBuffers(0, 1, &currMesh->m_vBuffer, &currMesh->m_stride, &offset);
+	switch (currMesh->m_vertexType)
+	{
+	default:
+		m_d3d11DevCon->IASetIndexBuffer(currMesh->m_iBuffer, currMesh->m_indexType, 0);
+		m_d3d11DevCon->DrawIndexed(currMesh->m_iCount, 0, 0);
+		break;
+	case mgf::Mesh::MeshVertexType_AnimatedPoint:
+	case mgf::Mesh::MeshVertexType_Point:
+		m_d3d11DevCon->Draw(currMesh->m_iCount, 0);
+		break;
 	}
 }
 
@@ -825,6 +873,44 @@ void GSD3D11::GetTextureCopyForImage(GSTexture* t, Image* i)
 	m_d3d11DevCon->Unmap(staging, 0);
 	staging->Release();
 	return;
+}
+
+bool GSD3D11::CreateShader(GSShader* shd, GSShaderInfo* si)
+{
+	GSD3D11Shader* d3dshd = (GSD3D11Shader*)shd;
+	bool result = GSD3D11_createShaders(m_d3d11Device, "vs_5_0", "ps_5_0",
+		si->vsText, si->psText,
+		si->vsEntry, si->psEntry,
+		mgf::Mesh::MeshVertexType_Triangle,
+		&d3dshd->m_vShader,
+		&d3dshd->m_pShader,
+		&d3dshd->m_vLayout);
+
+	if (!result)
+	{
+		mgf::LogWriteError("%s: can't create shader\n", MGF_FUNCTION);
+		return result;
+	}
+
+	if (si->gsText && si->gsEntry)
+	{
+		result = GSD3D11_createGeometryShaders(m_d3d11Device, "gs_5_0",
+			si->gsText,
+			si->gsEntry,
+			&d3dshd->m_gShader);
+		if (!result)
+		{
+			mgf::LogWriteError("%s: can't create geometry shader\n", MGF_FUNCTION);
+
+			d3dshd->m_vShader->Release();
+			d3dshd->m_pShader->Release();
+			d3dshd->m_vLayout->Release();
+
+			return result;
+		}
+	}
+
+	return d3dshd->OnCreate(&m_GSData);
 }
 
 #endif

@@ -55,6 +55,7 @@ namespace mgf
 
 		bool init();
 		virtual void SetConstants(void*) override;
+		virtual bool OnCreate(void*) override { return true; }
 
 		void SetData(const v4f& p1, const v4f& p2, const mgColor& c, Mat4*);
 	};

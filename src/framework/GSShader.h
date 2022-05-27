@@ -32,9 +32,29 @@
 
 namespace mgf
 {
+	class GSShaderInfo
+	{
+	public:
+		GSShaderInfo(){}
+		~GSShaderInfo() {}
+
+		const char* vsEntry = 0;
+		const char* gsEntry = 0;
+		const char* psEntry = 0;
+
+		const char* vsText = 0;
+		const char* gsText = 0;
+		const char* psText = 0;
+	};
+
 	class GSShader : public BaseClass
 	{
 	public:
+
+		/// <summary>
+		/// parameter is struct GSData
+		/// </summary>
+		virtual bool OnCreate(void*) = 0;
 
 		/// <summary>
 		/// parameter is struct GSData

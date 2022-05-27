@@ -62,6 +62,14 @@ typedef struct mgColor_s {
 		a(float(unsigned char(argb >> 24u)) * 0.00392156862745f)
 	{}
 
+	void set(float _r, float _g, float _b, float _a = 1.f)
+	{
+		r = _r;
+		g = _g;
+		b = _b;
+		a = _a;
+	}
+
 	void setAsIntegerARGB(unsigned int argb)
 	{
 		r = float(unsigned char(argb >> 16u)) * 0.00392156862745f;
@@ -104,6 +112,14 @@ typedef struct mgColor_s {
 #endif
 
 } mgColor;
+
+#if defined(__cplusplus)
+namespace mgf
+{
+	using Color = mgColor;
+}
+#endif
+
 
 inline
 void mgColorSet(mgColor* c, float R, float G, float B, float A)

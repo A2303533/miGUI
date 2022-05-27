@@ -31,11 +31,22 @@
 
 #ifdef MGF_BACKEND_GDI
 
+#include <windows.h>
 #include <objidl.h>
 #define GDIPVER 0x0110
+
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
+
 #include <gdiplus.h>
 #pragma comment (lib,"Gdiplus.lib")
 #pragma comment (lib,"Msimg32.lib")
+
 
 #include "framework/OS/UndefWindows.h"
 

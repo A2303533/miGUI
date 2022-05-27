@@ -73,21 +73,61 @@ void Image::Free()
 	}
 }
 
-void Image::Fill(const mgColor& c)
+void Image::Fill(fillType ft, const mgColor& c1, const mgColor& c2)
 {
 	struct rgba
 	{
 		uint8_t r, g, b, a;
 	};
 	rgba* ptr = (rgba*)m_image->data;
-	for (uint32_t i = 0, sz = m_image->width * m_image->height; i < sz; ++i)
+
+	switch (ft)
 	{
-		ptr->a = c.getAsByteAlpha();
-		ptr->r = c.getAsByteRed();
-		ptr->g = c.getAsByteGreen();
-		ptr->b = c.getAsByteBlue();
-		++ptr;
+	case mgf::Image::fillType_solid:
+		for (uint32_t i = 0, sz = m_image->width * m_image->height; i < sz; ++i)
+		{
+			ptr->a = c1.getAsByteAlpha();
+			ptr->r = c1.getAsByteRed();
+			ptr->g = c1.getAsByteGreen();
+			ptr->b = c1.getAsByteBlue();
+			++ptr;
+		}
+		break;
+	case mgf::Image::fillType_checkers:
+	{
+		bool a = true;
+		for (uint32_t i = 0, sz = m_image->height; i < sz; ++i)
+		{
+			bool b = a;
+			for (uint32_t i2 = 0, sz2 = m_image->width; i2 < sz2; ++i2)
+			{
+				if (b)
+				{
+					ptr->a = c1.getAsByteAlpha();
+					ptr->r = c1.getAsByteRed();
+					ptr->g = c1.getAsByteGreen();
+					ptr->b = c1.getAsByteBlue();
+					b = false;
+				}
+				else
+				{
+					ptr->a = c2.getAsByteAlpha();
+					ptr->r = c2.getAsByteRed();
+					ptr->g = c2.getAsByteGreen();
+					ptr->b = c2.getAsByteBlue();
+					b = true;
+				}
+
+				++ptr;
+			}
+
+			a = a ? false : true;
+		}
+	}break;
+	default:
+		break;
 	}
+
 }
 
 void Image::Create(uint32_t x, uint32_t y, const mgColor& c)
@@ -101,7 +141,7 @@ void Image::Create(uint32_t x, uint32_t y, const mgColor& c)
 	m_image->type = mgImageType_r8g8b8a8;
 	m_image->dataSize = m_image->pitch * m_image->height;
 	m_image->data = (unsigned char*)malloc(m_image->dataSize);
-	Fill(c);
+	Fill(fillType::fillType_solid, c, c);
 }
 
 uint32_t Image::GetPitch()

@@ -34,6 +34,16 @@
 
 #include "framework/GS.h"
 #include <d3d11.h>
+#include "framework/GSD3D11Shader.h"
+#include "framework/GSD3D11Texture.h"
+
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
 
 typedef HRESULT(WINAPI*PFND3DCOMPILEPROC)(
 	LPCVOID pSrcData,
@@ -71,7 +81,12 @@ namespace mgf
 
 	struct BackendD3D11Params;
 
-	constexpr uint32_t GSVideoDriverMaxTextures = 16;
+	struct GSData_D3D11
+	{
+		GS* m_gs = 0;
+		ID3D11Device* m_d3d11Device = 0;
+		ID3D11DeviceContext* m_d3d11DevCon = 0;
+	};
 
 	class GSD3D11 : public GS
 	{
@@ -116,9 +131,6 @@ namespace mgf
 
 		v4f m_old_viewport;
 		v4f m_old_scissor;
-
-		GSD3D11Texture* m_currentTextures[GSVideoDriverMaxTextures];
-		GSD3D11Mesh* m_currentMesh = nullptr;
 	public:
 		GSD3D11();
 		virtual ~GSD3D11();
@@ -142,6 +154,7 @@ namespace mgf
 		virtual GSTexture* CreateTexture(GSTextureInfo*) override;
 		virtual GSTexture* CreateRenderTargetTexture(uint32_t w, uint32_t h, GSTextureInfo* optional) override;
 		virtual GSMesh* CreateMesh(GSMeshInfo*) override;
+		virtual bool CreateShader(GSShader*, GSShaderInfo*) override;
 		virtual void SetRenderTarget(GSTexture*) override;
 		virtual void SetViewport(float x, float y, float width, float height, SystemWindow* window, v4f* old) override;
 		virtual void SetScissorRect(const v4f& rect, SystemWindow* window, v4f* old) override;
@@ -149,6 +162,7 @@ namespace mgf
 
 		virtual void SetTexture(uint32_t slot, GSTexture*) override;
 		virtual void SetMesh(GSMesh*) override;
+		virtual void SetShader(GSShader*) override;
 		virtual void Draw(uint32_t flags) override;
 
 		virtual void DrawLine2D(const v3f& p1, const v3f& p2, const mgColor& c) override;

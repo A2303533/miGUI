@@ -8,6 +8,9 @@
 #include "framework/Button.h"
 #include "framework/Camera.h"
 #include "framework/Mesh.h"
+#include "framework/Log.h"
+#include "framework/Mat.h"
+#include "framework/Color.h"
 #include <filesystem>
 
 #ifdef MG_DEBUG
@@ -33,6 +36,7 @@
 // And also :
 //  - how to load mesh
 //  - how to create (not load) image and texture
+//  - how to create shader for D3D11
 
 #ifdef DEMO_NATIVE_WIN32MENU
 #include <Windows.h>
@@ -114,6 +118,81 @@ public:
 	ModelEditor* m_app = 0;
 };
 
+class MyShader : public mgf::GSD3D11Shader
+{
+public:
+	MyShader() {}
+	virtual ~MyShader() 
+	{
+		if (m_cbVertex) m_cbVertex->Release();
+		if (m_cbPixel) m_cbPixel->Release();
+	}
+
+	ID3D11Buffer* m_cbVertex = 0;
+	ID3D11Buffer* m_cbPixel = 0;
+
+	struct cbVertex
+	{
+		mgf::Mat4 WVP;
+		mgf::Mat4 W;
+	}m_cbVertexData;
+
+	struct cbPixel
+	{
+		mgf::Color BaseColor;
+		mgf::v4f SunPosition;
+	}m_cbPixelData;
+
+	virtual bool OnCreate(void* _data) override
+	{
+		mgf::GSData_D3D11* data = (mgf::GSData_D3D11*)_data;
+
+		if (!mgf::GSD3D11_createConstantBuffer(data->m_d3d11Device, sizeof(cbVertex), &m_cbVertex))
+		{
+			mgf::LogWriteError("%s: cant create constant buffer\n", MGF_FUNCTION);
+			return false;
+		}
+
+		if (!mgf::GSD3D11_createConstantBuffer(data->m_d3d11Device, sizeof(cbPixel), &m_cbPixel))
+		{
+			mgf::LogWriteError("%s: cant create constant buffer\n", MGF_FUNCTION);
+			return false;
+		}
+		return true;
+	}
+
+	virtual void SetConstants(void* _data) override
+	{
+		mgf::GSData_D3D11* data = (mgf::GSData_D3D11*)_data;
+
+		m_cbVertexData.WVP = data->m_gs->m_matrices[mgf::GS::MatrixType_WorldViewProjection];
+		m_cbVertexData.W = data->m_gs->m_matrices[mgf::GS::MatrixType_World];
+		m_cbPixelData.BaseColor.set(1.f,1.f,1.f);
+		m_cbPixelData.SunPosition.set(1.f, 1.f, 1.f, 1.f);
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		D3D11_BUFFER_DESC d;
+		data->m_d3d11DevCon->Map(m_cbVertex, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		m_cbVertex->GetDesc(&d);
+		memcpy(mappedResource.pData, &m_cbVertexData, d.ByteWidth);
+		data->m_d3d11DevCon->Unmap(m_cbVertex, 0);
+		data->m_d3d11DevCon->VSSetConstantBuffers(0, 1, &m_cbVertex);
+
+		data->m_d3d11DevCon->Map(m_cbPixel, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		m_cbPixel->GetDesc(&d);
+		memcpy(mappedResource.pData, &m_cbPixelData, d.ByteWidth);
+		data->m_d3d11DevCon->Unmap(m_cbPixel, 0);
+		data->m_d3d11DevCon->PSSetConstantBuffers(0, 1, &m_cbPixel);
+
+		if (data->m_gs->m_currentTextures[0])
+		{
+			mgf::GSD3D11Texture* currTex = (mgf::GSD3D11Texture*)data->m_gs->m_currentTextures[0];
+			data->m_d3d11DevCon->PSSetShaderResources(0, 1, &currTex->m_textureResView);
+			data->m_d3d11DevCon->PSSetSamplers(0, 1, &currTex->m_samplerState);
+		}
+	}
+};
+
 class ModelEditor
 {
 public:
@@ -128,6 +207,7 @@ public:
 	mgf::Mesh* m_justMesh = 0;
 	mgf::GSMesh* m_justMeshGS = 0;
 	mgf::GSTexture* m_generatedTexture = 0;
+	MyShader* m_myShader = 0;
 
 	mgf::GS* m_gs = 0;
 	mgf::Backend* m_backend = 0;
@@ -371,7 +451,7 @@ bool ModelEditor::Init()
 
 	m_camera.Reset(); // make default rotations for EditorCamera
 	m_camera.m_aspect = m_renderRectSize.x / m_renderRectSize.y; // set by hands
-	for(int i = 0; i < 20; ++i)
+	for(int i = 0; i < 10; ++i)
 		m_camera.EditorZoom(1); // zoom for mouse wheel, so simulate it
 	m_camera.EditorUpdate(); // and first update. next update only when move\rotate camera
 
@@ -389,11 +469,68 @@ bool ModelEditor::Init()
 	{
 		mgf::Image img;
 		img.Create(32, 32, m_framework->GetColor(mgf::ColorName::Red));
+		img.Fill(img.fillType_checkers, m_framework->GetColor(mgf::ColorName::Red), m_framework->GetColor(mgf::ColorName::Blue));
 		mgf::GSTextureInfo ti;
 		ti.SetImage(&img);
 		m_generatedTexture = m_gs->CreateTexture(&ti);
 	}
 
+	{
+		m_myShader = new MyShader;
+		mgf::GSShaderInfo si;
+		si.vsEntry = "VSMain";
+		si.psEntry = "PSMain";
+		si.vsText = "Texture2D tex2d_1;\n"
+					"SamplerState tex2D_sampler_1;\n"
+					"struct VSIn{\n"
+					"   float3 position : POSITION;\n"
+					"	float2 uv : TEXCOORD;\n"
+					"   float3 normal : NORMAL;\n"
+					"   float3 binormal : BINORMAL;\n"
+					"   float3 tangent : TANGENT;\n"
+					"   float4 color : COLOR;\n"
+					"};\n"
+					"cbuffer cbVertex{\n"
+					"	float4x4 WVP;\n"
+					"	float4x4 W;\n"
+					"};\n"
+					"cbuffer cbPixel{\n"
+					"	float4 BaseColor;\n"
+					"	float4 SunPosition;\n"
+					"};\n"
+					"struct VSOut{\n"
+					"   float4 pos : SV_POSITION;\n"
+					"	float2 uv : TEXCOORD0;\n"
+					"	float4 vColor : COLOR0;\n"
+					"	float3 normal : NORMAL0;\n"
+					"	float4 fragPos : NORMAL1;\n"
+					"};\n"
+					"struct PSOut{\n"
+					"    float4 color : SV_Target;\n"
+					"};\n"
+					"VSOut VSMain(VSIn input){\n"
+					"   VSOut output;\n"
+					"	output.pos   = mul(WVP, float4(input.position.x, input.position.y, input.position.z, 1.f));\n"
+					"	output.uv.x    = input.uv.x;\n"
+					"	output.uv.y    = input.uv.y;\n"
+					"	output.vColor    = input.color;\n"
+					"	output.normal    = normalize(mul((float3x3)W, input.normal));\n"
+					"	output.fragPos    = mul(W, float4(input.position.x, input.position.y, input.position.z, 1.f));\n"
+					"	return output;\n"
+					"}\n"
+					"PSOut PSMain(VSOut input){\n"
+					"	float3 lightDir = normalize(SunPosition.xyz - input.fragPos.xyz);\n"
+					"	float diff = max(dot(input.normal, lightDir), 0.0);\n"
+
+					"   PSOut output;\n"
+					"   output.color = tex2d_1.Sample(tex2D_sampler_1, input.uv) * BaseColor;\n"
+					"	if(diff>1.f) diff = 1.f;\n"
+					"	output.color.xyz *= diff;\n"
+					"    return output;\n"
+						"}\n";
+		si.psText = si.vsText;
+		m_gs->CreateShader(m_myShader, &si);
+	}
 	return true;
 }
 
@@ -441,7 +578,10 @@ void ModelEditor::Run()
 		{
 			m_gs->SetTexture(0, m_generatedTexture);
 			m_gs->SetMesh(m_justMeshGS);
-			
+			m_gs->SetShader(m_myShader);			
+			mgf::Mat4 World;
+			m_gs->m_matrices[mgf::GS::MatrixType_World] = World;
+			m_gs->m_matrices[mgf::GS::MatrixType_WorldViewProjection] = m_camera.m_projectionMatrix * m_camera.m_viewMatrix * World;
 			m_gs->Draw(0);
 		}
 

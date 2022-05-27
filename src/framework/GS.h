@@ -39,11 +39,7 @@
 
 namespace mgf
 {
-	struct GSData_D3D11
-	{
-		void* dev;
-		void* con;
-	};
+	constexpr uint32_t GSVideoDriverMaxTextures = 16;
 
 	class GS : public BaseClass
 	{
@@ -77,6 +73,9 @@ namespace mgf
 
 		Mat4 m_matrices[MatrixType__count];
 
+		GSTexture* m_currentTextures[GSVideoDriverMaxTextures];
+		GSMesh* m_currentMesh = nullptr;
+
 		DriverType GetVideoDriverType();
 		SystemWindow* GetActiveWindow();
 
@@ -95,6 +94,7 @@ namespace mgf
 		virtual GSTexture* CreateTexture(GSTextureInfo*) = 0;
 		virtual GSTexture* CreateRenderTargetTexture(uint32_t w, uint32_t h, GSTextureInfo* optional) = 0;
 		virtual GSMesh* CreateMesh(GSMeshInfo*) = 0;
+		virtual bool CreateShader(GSShader*, GSShaderInfo*) = 0;
 		virtual void SetRenderTarget(GSTexture*) = 0;
 		virtual void SetViewport(float x, float y, float width, float height, SystemWindow* window, v4f* old) = 0;
 		virtual void SetScissorRect(const v4f& rect, SystemWindow* window, v4f* old) = 0;
@@ -102,6 +102,7 @@ namespace mgf
 
 		virtual void SetTexture(uint32_t slot, GSTexture*) = 0;
 		virtual void SetMesh(GSMesh*) = 0;
+		virtual void SetShader(GSShader*) = 0;
 
 		enum
 		{

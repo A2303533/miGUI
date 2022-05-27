@@ -17,6 +17,7 @@ namespace mgf
 
 		bool init();
 		virtual void SetConstants(void*) override {}
+		virtual bool OnCreate(void*) override { return true; }
 	};
 
 }

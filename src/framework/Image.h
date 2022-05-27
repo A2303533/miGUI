@@ -79,7 +79,13 @@ namespace mgf
 		void Create(uint32_t x, uint32_t y, const mgColor&);
 		void Free();
 
-		void Fill(const mgColor&);
+		enum fillType
+		{
+			fillType_solid,
+			fillType_checkers,
+		};
+
+		void Fill(fillType, const mgColor& c1, const mgColor& c2);
 
 		// mgImageType from mgImage.h
 		void Convert(uint32_t);
