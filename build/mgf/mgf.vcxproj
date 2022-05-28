@@ -92,9 +92,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;..\..\src\curl\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -111,9 +111,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;..\..\src\curl\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -130,9 +130,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;..\..\src\curl\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -149,9 +149,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;..\..\src\curl\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
@@ -165,6 +165,119 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\curl\lib\altsvc.c" />
+    <ClCompile Include="..\..\src\curl\lib\asyn-thread.c" />
+    <ClCompile Include="..\..\src\curl\lib\base64.c" />
+    <ClCompile Include="..\..\src\curl\lib\bufref.c" />
+    <ClCompile Include="..\..\src\curl\lib\conncache.c" />
+    <ClCompile Include="..\..\src\curl\lib\connect.c" />
+    <ClCompile Include="..\..\src\curl\lib\content_encoding.c" />
+    <ClCompile Include="..\..\src\curl\lib\cookie.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_addrinfo.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_ctype.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_des.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_endian.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_fnmatch.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_gethostname.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_get_line.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_memrchr.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_multibyte.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_ntlm_core.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_ntlm_wb.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_path.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_range.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_sasl.c" />
+    <ClCompile Include="..\..\src\curl\lib\curl_threads.c" />
+    <ClCompile Include="..\..\src\curl\lib\dict.c" />
+    <ClCompile Include="..\..\src\curl\lib\doh.c" />
+    <ClCompile Include="..\..\src\curl\lib\dotdot.c" />
+    <ClCompile Include="..\..\src\curl\lib\dynbuf.c" />
+    <ClCompile Include="..\..\src\curl\lib\easy.c" />
+    <ClCompile Include="..\..\src\curl\lib\easygetopt.c" />
+    <ClCompile Include="..\..\src\curl\lib\easyoptions.c" />
+    <ClCompile Include="..\..\src\curl\lib\escape.c" />
+    <ClCompile Include="..\..\src\curl\lib\file.c" />
+    <ClCompile Include="..\..\src\curl\lib\fileinfo.c" />
+    <ClCompile Include="..\..\src\curl\lib\formdata.c" />
+    <ClCompile Include="..\..\src\curl\lib\ftp.c" />
+    <ClCompile Include="..\..\src\curl\lib\ftplistparser.c" />
+    <ClCompile Include="..\..\src\curl\lib\getenv.c" />
+    <ClCompile Include="..\..\src\curl\lib\getinfo.c" />
+    <ClCompile Include="..\..\src\curl\lib\gopher.c" />
+    <ClCompile Include="..\..\src\curl\lib\hash.c" />
+    <ClCompile Include="..\..\src\curl\lib\headers.c" />
+    <ClCompile Include="..\..\src\curl\lib\hmac.c" />
+    <ClCompile Include="..\..\src\curl\lib\hostasyn.c" />
+    <ClCompile Include="..\..\src\curl\lib\hostip.c" />
+    <ClCompile Include="..\..\src\curl\lib\hostip4.c" />
+    <ClCompile Include="..\..\src\curl\lib\hostip6.c" />
+    <ClCompile Include="..\..\src\curl\lib\hostsyn.c" />
+    <ClCompile Include="..\..\src\curl\lib\hsts.c" />
+    <ClCompile Include="..\..\src\curl\lib\http.c" />
+    <ClCompile Include="..\..\src\curl\lib\http2.c" />
+    <ClCompile Include="..\..\src\curl\lib\http_aws_sigv4.c" />
+    <ClCompile Include="..\..\src\curl\lib\http_chunks.c" />
+    <ClCompile Include="..\..\src\curl\lib\http_digest.c" />
+    <ClCompile Include="..\..\src\curl\lib\http_negotiate.c" />
+    <ClCompile Include="..\..\src\curl\lib\http_ntlm.c" />
+    <ClCompile Include="..\..\src\curl\lib\http_proxy.c" />
+    <ClCompile Include="..\..\src\curl\lib\if2ip.c" />
+    <ClCompile Include="..\..\src\curl\lib\imap.c" />
+    <ClCompile Include="..\..\src\curl\lib\inet_ntop.c" />
+    <ClCompile Include="..\..\src\curl\lib\inet_pton.c" />
+    <ClCompile Include="..\..\src\curl\lib\ldap.c" />
+    <ClCompile Include="..\..\src\curl\lib\llist.c" />
+    <ClCompile Include="..\..\src\curl\lib\md4.c" />
+    <ClCompile Include="..\..\src\curl\lib\md5.c" />
+    <ClCompile Include="..\..\src\curl\lib\mime.c" />
+    <ClCompile Include="..\..\src\curl\lib\mprintf.c" />
+    <ClCompile Include="..\..\src\curl\lib\mqtt.c" />
+    <ClCompile Include="..\..\src\curl\lib\multi.c" />
+    <ClCompile Include="..\..\src\curl\lib\netrc.c" />
+    <ClCompile Include="..\..\src\curl\lib\nonblock.c" />
+    <ClCompile Include="..\..\src\curl\lib\parsedate.c" />
+    <ClCompile Include="..\..\src\curl\lib\pingpong.c" />
+    <ClCompile Include="..\..\src\curl\lib\pop3.c" />
+    <ClCompile Include="..\..\src\curl\lib\progress.c" />
+    <ClCompile Include="..\..\src\curl\lib\rand.c" />
+    <ClCompile Include="..\..\src\curl\lib\rename.c" />
+    <ClCompile Include="..\..\src\curl\lib\rtsp.c" />
+    <ClCompile Include="..\..\src\curl\lib\select.c" />
+    <ClCompile Include="..\..\src\curl\lib\sendf.c" />
+    <ClCompile Include="..\..\src\curl\lib\setopt.c" />
+    <ClCompile Include="..\..\src\curl\lib\sha256.c" />
+    <ClCompile Include="..\..\src\curl\lib\share.c" />
+    <ClCompile Include="..\..\src\curl\lib\slist.c" />
+    <ClCompile Include="..\..\src\curl\lib\smb.c" />
+    <ClCompile Include="..\..\src\curl\lib\smtp.c" />
+    <ClCompile Include="..\..\src\curl\lib\socketpair.c" />
+    <ClCompile Include="..\..\src\curl\lib\socks.c" />
+    <ClCompile Include="..\..\src\curl\lib\speedcheck.c" />
+    <ClCompile Include="..\..\src\curl\lib\splay.c" />
+    <ClCompile Include="..\..\src\curl\lib\strcase.c" />
+    <ClCompile Include="..\..\src\curl\lib\strdup.c" />
+    <ClCompile Include="..\..\src\curl\lib\strerror.c" />
+    <ClCompile Include="..\..\src\curl\lib\strtok.c" />
+    <ClCompile Include="..\..\src\curl\lib\strtoofft.c" />
+    <ClCompile Include="..\..\src\curl\lib\system_win32.c" />
+    <ClCompile Include="..\..\src\curl\lib\telnet.c" />
+    <ClCompile Include="..\..\src\curl\lib\tftp.c" />
+    <ClCompile Include="..\..\src\curl\lib\timediff.c" />
+    <ClCompile Include="..\..\src\curl\lib\timeval.c" />
+    <ClCompile Include="..\..\src\curl\lib\transfer.c" />
+    <ClCompile Include="..\..\src\curl\lib\url.c" />
+    <ClCompile Include="..\..\src\curl\lib\urlapi.c" />
+    <ClCompile Include="..\..\src\curl\lib\vauth\cleartext.c" />
+    <ClCompile Include="..\..\src\curl\lib\vauth\cram.c" />
+    <ClCompile Include="..\..\src\curl\lib\vauth\digest.c" />
+    <ClCompile Include="..\..\src\curl\lib\vauth\ntlm.c" />
+    <ClCompile Include="..\..\src\curl\lib\vauth\oauth2.c" />
+    <ClCompile Include="..\..\src\curl\lib\vauth\vauth.c" />
+    <ClCompile Include="..\..\src\curl\lib\version.c" />
+    <ClCompile Include="..\..\src\curl\lib\version_win32.c" />
+    <ClCompile Include="..\..\src\curl\lib\vtls\vtls.c" />
+    <ClCompile Include="..\..\src\curl\lib\warnless.c" />
+    <ClCompile Include="..\..\src\curl\lib\wildcard.c" />
     <ClCompile Include="..\..\src\DirectXTK\Src\DDSTextureLoader.cpp" />
     <ClCompile Include="..\..\src\framework\Aabb.cpp" />
     <ClCompile Include="..\..\src\framework\Archive.cpp" />
@@ -178,6 +291,7 @@
     <ClCompile Include="..\..\src\framework\Camera.cpp" />
     <ClCompile Include="..\..\src\framework\Color.cpp" />
     <ClCompile Include="..\..\src\framework\Context.cpp" />
+    <ClCompile Include="..\..\src\framework\CURL.cpp" />
     <ClCompile Include="..\..\src\framework\DND.cpp" />
     <ClCompile Include="..\..\src\framework\Element.cpp" />
     <ClCompile Include="..\..\src\framework\fastlz.c" />

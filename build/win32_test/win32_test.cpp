@@ -13,6 +13,8 @@
 #include <objidl.h>
 #include <gdiplus.h>
 
+#include <filesystem>
+
 #pragma comment (lib,"Gdiplus.lib")
 Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 ULONG_PTR           gdiplusToken;
@@ -47,7 +49,7 @@ mgSystemWindowOSData* gui_setCurrentWindow(mgSystemWindowOSData* data)
 {
     mgSystemWindowOSData* prev = g_currSystemWindowOSData;
     g_currSystemWindowOSData = data;
-
+   
     return prev;
 }
 

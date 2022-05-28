@@ -47,10 +47,19 @@ namespace mgf
 		std::vector<Context*> m_contexts;
 		StringW m_appDirectory;
 		void _initColors();
+
 	public:
 		Framework();
 		virtual ~Framework();
-		
+
+#ifdef MGF_CURL
+	private:
+	//	CURL* m_curl = 0;
+		int m_isCURLReady = 0;
+	public:
+		void InitCURL();
+#endif
+
 		bool m_run;
 
 		Context* CreateContext(mgf::SystemWindow*, Backend* backend);

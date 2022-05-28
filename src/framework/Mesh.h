@@ -174,9 +174,10 @@ namespace mgf
 		/// Loading 3D object in this way is hard, but I don't want to load many
 		/// objects as one. One Mesh object contain only one buffer.
 		/// uid is to know what file i load.
-		/// For user much better to create class like MyMesh with std::vector<Mesh*>
+		/// For user may be better to create class like MyMesh with std::vector<Mesh*>
 		/// </summary>
 		virtual void LoadMesh(const char* filename, uint32_t uid);
+		virtual void LoadMesh(const wchar_t* filename, uint32_t uid);
 	};
 
 	void Mesh_OBJ(const char* fn, MeshLoader*);

@@ -34,7 +34,7 @@
 #include "framework/Mat.h"
 
 #ifdef MG_PLATFORM_WINDOWS
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN // add in project parameters
 #include <Windows.h>
 #include <d3d11.h>
 #endif

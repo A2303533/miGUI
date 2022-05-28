@@ -26,6 +26,9 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// windows.h include winsock.h that can conflict with filesystem
+//#define WIN32_LEAN_AND_MEAN // add in project parameters
+
 #include "mgf.h"
 
 #include "AudioEngine.h"
@@ -56,6 +59,7 @@ mgf::AudioSourceData* mgf::Audio_Wav(const char* fn)
 	mgf::AudioSourceData* rawData = 0;
 	if (std::filesystem::exists(fn) && (std::filesystem::file_size(fn) > 0x30))
 	{
+		
 		FILE* f = fopen(fn, "rb");
 		if (f)
 		{

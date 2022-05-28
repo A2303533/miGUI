@@ -168,7 +168,7 @@ public:
 		m_cbVertexData.WVP = data->m_gs->m_matrices[mgf::GS::MatrixType_WorldViewProjection];
 		m_cbVertexData.W = data->m_gs->m_matrices[mgf::GS::MatrixType_World];
 		m_cbPixelData.BaseColor.set(1.f,1.f,1.f);
-		m_cbPixelData.SunPosition.set(1.f, 1.f, 1.f, 1.f);
+		m_cbPixelData.SunPosition.set(3.f, 10.f, 0.1f, 1.f);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		D3D11_BUFFER_DESC d;
@@ -243,6 +243,7 @@ ModelEditor::~ModelEditor()
 	if (m_meshLoader) m_meshLoader->Release();
 	
 	// Destroy GS objects before destroying GS
+	if (m_myShader) m_myShader->Release();
 	if (m_justMeshGS) m_justMeshGS->Release(); 
 	if (m_generatedTexture) m_generatedTexture->Release();
 	if (m_renderTexture) m_renderTexture->Release();

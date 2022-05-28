@@ -32,7 +32,7 @@
 #ifdef MGF_BACKEND_OPENGL
 
 #ifdef MG_PLATFORM_WINDOWS
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN // add in project parameters
 #include <Windows.h>
 #include <gl/GL.h>
 #include <gl/GLU.h>

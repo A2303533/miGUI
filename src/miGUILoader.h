@@ -30,7 +30,7 @@
 #define _MI_GUI_LOADER_H_
 
 #if defined(MG_PLATFORM_WINDOWS)
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN // add in project parameters
 #include <windows.h>
 #define MG_LOAD_LIB LoadLibraryA
 #define MG_FREE_LIB FreeLibrary

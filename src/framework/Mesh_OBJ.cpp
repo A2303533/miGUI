@@ -26,6 +26,9 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+// windows.h include winsock.h that can conflict with filesystem
+//#define WIN32_LEAN_AND_MEAN // add in project parameters
+
 #include "framework/mgf.h"
 #include <filesystem>
 #include "String.h"

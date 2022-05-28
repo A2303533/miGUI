@@ -30,6 +30,8 @@
 
 #ifdef MG_PLATFORM_WINDOWS
 
+#include <mmeapi.h>
+
 namespace mgf
 {
 	class AudioSource_waveOut : public AudioSource

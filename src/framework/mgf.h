@@ -30,7 +30,7 @@
 #ifndef _MG_FRAMEWORK_H_
 #define _MG_FRAMEWORK_H_
 
-#include "config.h"
+#include "mgfConfig.h"
 
 // VS: Zc:__cplusplus compiler option
 #if __cplusplus > 199711L
@@ -61,6 +61,7 @@
 #include "mgStyle.h"
 #include "mgInputContex.h"
 #include "mgSystemWindowData.h"
+
 
 #include "framework/forward.h"
 #include "framework/BaseClass.h"
