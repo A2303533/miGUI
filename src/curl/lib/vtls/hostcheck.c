@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #if defined(USE_OPENSSL)                                \
   || defined(USE_GSKIT)                                 \
@@ -33,15 +33,15 @@
 #ifdef HAVE_NETINET_IN6_H
 #include <netinet/in6.h>
 #endif
-#include "curl_memrchr.h"
+#include "../curl_memrchr.h"
 
 #include "hostcheck.h"
-#include "strcase.h"
-#include "hostip.h"
+#include "../strcase.h"
+#include "../hostip.h"
 
-#include "curl_memory.h"
+#include "../curl_memory.h"
 /* The last #include file should be: */
-#include "memdebug.h"
+#include "../memdebug.h"
 
 /* check the two input strings with given length, but do not
    assume they end in nul-bytes */

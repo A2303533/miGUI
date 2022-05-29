@@ -36,7 +36,7 @@
    https://httpd.apache.org/docs/2.0/ssl/ssl_intro.html
 */
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -48,26 +48,26 @@
 #include <fcntl.h>
 #endif
 
-#include "urldata.h"
+#include "../urldata.h"
 
 #include "vtls.h" /* generic SSL protos etc */
-#include "slist.h"
-#include "sendf.h"
-#include "strcase.h"
-#include "url.h"
-#include "progress.h"
-#include "share.h"
-#include "multiif.h"
-#include "timeval.h"
-#include "curl_md5.h"
-#include "warnless.h"
-#include "curl_base64.h"
-#include "curl_printf.h"
-#include "strdup.h"
+#include "../slist.h"
+#include "../sendf.h"
+#include "../strcase.h"
+#include "../url.h"
+#include "../progress.h"
+#include "../share.h"
+#include "../multiif.h"
+#include "../timeval.h"
+#include "../curl_md5.h"
+#include "../warnless.h"
+#include "../curl_base64.h"
+#include "../curl_printf.h"
+#include "../strdup.h"
 
 /* The last #include files should be: */
-#include "curl_memory.h"
-#include "memdebug.h"
+#include "../curl_memory.h"
+#include "../memdebug.h"
 
 /* convenience macro to check if this handle is using a shared SSL session */
 #define SSLSESSION_SHARED(data) (data->share &&                        \

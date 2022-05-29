@@ -21,7 +21,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 /*
  * Opens the TLS key log file if requested by the user. The SSLKEYLOGFILE

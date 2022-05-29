@@ -46,6 +46,7 @@
 #include <Windows.h>
 #include <Objbase.h>
 HRESULT g_CoInitializeResult = 0;
+#pragma comment(lib, "Crypt32.lib")
 #endif
 
 using namespace mgf;
@@ -59,6 +60,8 @@ MG_LIB_HANDLE g_migui_dll = 0;
 
 Framework* mgf::InitFramework()
 {
+	mgf::LogWriteInfo("%s: init framework\n", MGF_FUNCTION);
+
 #ifndef MG_NO_DLL
 	g_migui_dll = mgLoad();
 	if (!g_migui_dll)
@@ -90,7 +93,9 @@ Framework::Framework()
 	//g_CoInitializeResult = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	g_CoInitializeResult = OleInitialize(0);
 	if (FAILED(g_CoInitializeResult))
-		throw "Unable to initialize COM";
+	{
+		mgf::LogWriteError("%s: unable to initialize COM\n", MGF_FUNCTION);
+	}
 #endif
 }
 
@@ -99,6 +104,7 @@ Framework::~Framework()
 #ifdef MGF_CURL
 	if (m_isCURLReady)
 	{
+		mgf::LogWriteInfo("%s: shutdown curl\n", MGF_FUNCTION);
 		curl_global_cleanup();
 	}
 	/*if (m_curl)
@@ -129,8 +135,18 @@ void Framework::InitCURL()
 {
 	if (!m_isCURLReady)
 	{
+		mgf::LogWriteInfo("%s: ...\n", MGF_FUNCTION);
 		if (curl_global_init(CURL_GLOBAL_ALL) == CURLE_OK)
+		{
 			m_isCURLReady = 1;
+			curl_version_info_data* vi = curl_version_info(CURLVERSION_FIRST);
+			mgf::LogWriteInfo("%s: curl version %s (%u)\n", MGF_FUNCTION, vi->version, vi->version_num);
+			
+			if(vi->libssh_version)
+				mgf::LogWriteInfo("%s: libssh version %s\n", MGF_FUNCTION, vi->libssh_version);
+
+			mgf::LogWriteInfo("%s: OpenSSL version %s (%u)\n", MGF_FUNCTION, vi->ssl_version, vi->ssl_version_num);
+		}
 		else
 			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);
 	}

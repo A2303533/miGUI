@@ -267,6 +267,9 @@ bool AP_application::Init(backend_type bt)
 	
 	// also rebuild all gui
 	m_context->GetSystemWindow()->OnSize();
+
+	mgf::CURL c;
+
 	return true;
 }
 
