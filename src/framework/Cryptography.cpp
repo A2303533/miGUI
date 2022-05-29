@@ -26,19 +26,36 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mgf.h"
-#include "CURL.h"
+#include "miGUI.h"
 
-#pragma comment(lib, "Ws2_32.lib")
+#include "framework/mgf.h"
+#include "framework/Framework.h"
+#include "framework/Cryptography.h"
+
+#include "OpenSSL/md5.h"
 
 using namespace mgf;
 
+CryptographyMD5::CryptographyMD5(){}
+CryptographyMD5::~CryptographyMD5(){}
 
-CURL::CURL()
+void CryptographyMD5::Generate(const void* buf, size_t len)
 {
+	MD5_CTX ctx;
+	MD5_Init(&ctx);
+	MD5_Update(&ctx, buf, len);
+	MD5_Final(m_result, &ctx);
 }
 
-CURL::~CURL()
-{}
-
+void CryptographyMD5::Print(FILE* f, const char* prefix, const char* suffix)
+{
+	if (prefix)
+		fprintf(f, "%s", prefix);
+	for (int i = 0; i < 16; ++i)
+	{
+		fprintf(f, "%x", (unsigned char)m_result[i]);
+	}
+	if (suffix)
+		fprintf(f, "%s", suffix);
+}
 

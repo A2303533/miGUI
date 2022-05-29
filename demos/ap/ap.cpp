@@ -15,6 +15,7 @@
 #include "framework/TextBuffer.h"
 #include "framework/Popup.h"
 #include "framework/CURL.h"
+#include "framework/Cryptography.h"
 
 #include "framework/AudioEngine_waveOut.h"
 
@@ -176,6 +177,14 @@ bool AP_application::Init(backend_type bt)
 		mgPoint(MGCW_USEDEFAULT, 0),
 		mgPoint(MGCW_USEDEFAULT, 0));
 	m_sysWindow->SetUserData(this);
+
+	{
+		mgf::CryptographyMD5 a;
+		a.Generate("TestMD5", 7);
+		a.Print(stdout, "MD5:[", "]\n");
+		a.Generate("TestMD5x", 8);
+		a.Print(stdout, "MD5:[", "]\n");
+	}
 	
 	m_style = m_framework->GetNewStyle(1);
 	m_style.listItemBG1.setAsIntegerARGB(0xFFBFDDFF);

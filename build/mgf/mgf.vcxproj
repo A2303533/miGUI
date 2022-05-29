@@ -295,6 +295,7 @@
     <ClCompile Include="..\..\src\framework\Camera.cpp" />
     <ClCompile Include="..\..\src\framework\Color.cpp" />
     <ClCompile Include="..\..\src\framework\Context.cpp" />
+    <ClCompile Include="..\..\src\framework\Cryptography.cpp" />
     <ClCompile Include="..\..\src\framework\CURL.cpp" />
     <ClCompile Include="..\..\src\framework\DND.cpp" />
     <ClCompile Include="..\..\src\framework\Element.cpp" />

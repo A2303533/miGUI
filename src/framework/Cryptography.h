@@ -26,19 +26,23 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mgf.h"
-#include "CURL.h"
+#pragma once
+#ifndef _MGF_CRYPTOGRAPHY_H_
+#define _MGF_CRYPTOGRAPHY_H_
 
-#pragma comment(lib, "Ws2_32.lib")
-
-using namespace mgf;
-
-
-CURL::CURL()
+namespace mgf
 {
+	class CryptographyMD5 : public BaseClass
+	{
+	public:
+		CryptographyMD5();
+		virtual ~CryptographyMD5();
+
+		void Generate(const void* buf, size_t len);
+		void Print(FILE*, const char* prefix, const char* suffix);
+
+		unsigned char m_result[16];
+	};
 }
 
-CURL::~CURL()
-{}
-
-
+#endif

@@ -38,9 +38,7 @@
 #include "framework/FontImpl.h"
 #include "framework/Log.h"
 
-#ifdef MGF_CURL
 #include "curl/curl.h"
-#endif
 
 #ifdef MG_PLATFORM_WINDOWS
 #include <Windows.h>
@@ -97,21 +95,18 @@ Framework::Framework()
 		mgf::LogWriteError("%s: unable to initialize COM\n", MGF_FUNCTION);
 	}
 #endif
+
+	InitCURL();
 }
 
 Framework::~Framework()
 {
-#ifdef MGF_CURL
 	if (m_isCURLReady)
 	{
 		mgf::LogWriteInfo("%s: shutdown curl\n", MGF_FUNCTION);
 		curl_global_cleanup();
 	}
-	/*if (m_curl)
-	{
-		curl_easy_cleanup(m_curl);
-	}*/
-#endif
+
 #ifdef MG_PLATFORM_WINDOWS
 	if(g_CoInitializeResult == S_OK
 		|| g_CoInitializeResult == S_FALSE)
@@ -130,7 +125,6 @@ StringW* Framework::GetAppDir()
 	return &m_appDirectory;
 }
 
-#ifdef MGF_CURL
 void Framework::InitCURL()
 {
 	if (!m_isCURLReady)
@@ -151,7 +145,6 @@ void Framework::InitCURL()
 			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);
 	}
 }
-#endif
 
 bool Framework::Run()
 {

@@ -29,8 +29,6 @@
 #ifndef _MG_BCK_CURL_H_
 #define _MG_BCK_CURL_H_
 
-#ifdef MGF_CURL
-
 namespace mgf
 {
 	/// <summary>
@@ -43,7 +41,5 @@ namespace mgf
 		virtual ~CURL();
 	};
 }
-
-#endif //MGF_CURL
 
 #endif

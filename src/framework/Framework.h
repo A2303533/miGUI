@@ -52,13 +52,10 @@ namespace mgf
 		Framework();
 		virtual ~Framework();
 
-#ifdef MGF_CURL
 	private:
-	//	CURL* m_curl = 0;
 		int m_isCURLReady = 0;
 	public:
 		void InitCURL();
-#endif
 
 		bool m_run;
 

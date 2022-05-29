@@ -36,7 +36,6 @@
 //#define MGF_NO_BACKEND_OPENGL
 //#define MGF_NO_BACKEND_D3D11
 //#define MGF_NO_GS_D3D11
-//#define MGF_NO_CURL
 
 #ifndef MGF_NO_GS_D3D11
 #define MGF_GS_D3D11
@@ -55,10 +54,7 @@
 #define MGF_BACKEND_D3D11
 #endif
 
-#ifndef MGF_NO_CURL
-#define MGF_CURL
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Wldap32.lib")
-#endif
 
 #endif
