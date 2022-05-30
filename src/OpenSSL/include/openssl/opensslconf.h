@@ -17,9 +17,9 @@ extern "C" {
 #endif
 
 #ifdef _WIN64
-#define OPENSSLDIR "Program Files\OenSSL"
+#define OPENSSLDIR "Program Files\OpenSSL"
 #else
-#define OPENSSLDIR "Program Files (x86)\OenSSL"
+#define OPENSSLDIR "Program Files (x86)\OpenSSL"
 #endif
 #define ENGINESDIR OPENSSLDIR "\engines"
 
@@ -35,9 +35,9 @@ extern "C" {
 #ifndef OPENSSL_SYS_WIN32
 # define OPENSSL_SYS_WIN32 1
 #endif
-#ifndef OPENSSL_NO_MD2
-# define OPENSSL_NO_MD2
-#endif
+//#ifndef OPENSSL_NO_MD2
+//# define OPENSSL_NO_MD2
+//#endif
 #ifndef OPENSSL_NO_RC5
 # define OPENSSL_NO_RC5
 #endif

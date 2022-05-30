@@ -229,6 +229,9 @@
     <Filter Include="Source Files\OpenSSL\crypto\ts">
       <UniqueIdentifier>{8bf8191f-ae1f-4d5e-907e-4c3faf79a98a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\OpenSSL\crypto\MD2">
+      <UniqueIdentifier>{9ae8e7f3-cabf-4962-b5ed-f968489b104c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\framework\SystemWindow.cpp">
@@ -2906,6 +2909,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\framework\Cryptography.cpp">
       <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenSSL\crypto\md2\md2_dgst.c">
+      <Filter>Source Files\OpenSSL\crypto\MD2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenSSL\crypto\md2\md2_one.c">
+      <Filter>Source Files\OpenSSL\crypto\MD2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

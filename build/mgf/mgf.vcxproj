@@ -771,6 +771,8 @@
     <ClCompile Include="..\..\src\OpenSSL\crypto\kdf\tls1_prf.c" />
     <ClCompile Include="..\..\src\OpenSSL\crypto\lhash\lhash.c" />
     <ClCompile Include="..\..\src\OpenSSL\crypto\lhash\lh_stats.c" />
+    <ClCompile Include="..\..\src\OpenSSL\crypto\md2\md2_dgst.c" />
+    <ClCompile Include="..\..\src\OpenSSL\crypto\md2\md2_one.c" />
     <ClCompile Include="..\..\src\OpenSSL\crypto\md4\md4_dgst.c" />
     <ClCompile Include="..\..\src\OpenSSL\crypto\md4\md4_one.c" />
     <ClCompile Include="..\..\src\OpenSSL\crypto\md5\md5_dgst.c" />

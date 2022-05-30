@@ -33,13 +33,16 @@
 #include "framework/Cryptography.h"
 
 #include "OpenSSL/md5.h"
+#include "OpenSSL/md4.h"
+#include "OpenSSL/md2.h"
+#include "OpenSSL/mdc2.h"
 
 using namespace mgf;
 
-CryptographyMD5::CryptographyMD5(){}
-CryptographyMD5::~CryptographyMD5(){}
+CryptographyMD::CryptographyMD(){}
+CryptographyMD::~CryptographyMD(){}
 
-void CryptographyMD5::Generate(const void* buf, size_t len)
+void CryptographyMD::GenerateMD5(const void* buf, size_t len)
 {
 	MD5_CTX ctx;
 	MD5_Init(&ctx);
@@ -47,7 +50,31 @@ void CryptographyMD5::Generate(const void* buf, size_t len)
 	MD5_Final(m_result, &ctx);
 }
 
-void CryptographyMD5::Print(FILE* f, const char* prefix, const char* suffix)
+void CryptographyMD::GenerateMD4(const void* buf, size_t len)
+{
+	MD4_CTX ctx;
+	MD4_Init(&ctx);
+	MD4_Update(&ctx, buf, len);
+	MD4_Final(m_result, &ctx);
+}
+
+void CryptographyMD::GenerateMD2(const void* buf, size_t len)
+{
+	MD2_CTX ctx;
+	MD2_Init(&ctx);
+	MD2_Update(&ctx, (const unsigned char*)buf, len);
+	MD2_Final(m_result, &ctx);
+}
+
+void CryptographyMD::GenerateMDC2(const void* buf, size_t len)
+{
+	MDC2_CTX ctx;
+	MDC2_Init(&ctx);
+	MDC2_Update(&ctx, (const unsigned char*)buf, len);
+	MDC2_Final(m_result, &ctx);
+}
+
+void CryptographyMD::Print(FILE* f, const char* prefix, const char* suffix)
 {
 	if (prefix)
 		fprintf(f, "%s", prefix);

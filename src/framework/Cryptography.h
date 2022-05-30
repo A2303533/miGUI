@@ -32,13 +32,16 @@
 
 namespace mgf
 {
-	class CryptographyMD5 : public BaseClass
+	class CryptographyMD : public BaseClass
 	{
 	public:
-		CryptographyMD5();
-		virtual ~CryptographyMD5();
+		CryptographyMD();
+		virtual ~CryptographyMD();
 
-		void Generate(const void* buf, size_t len);
+		void GenerateMD5(const void* buf, size_t len);
+		void GenerateMD4(const void* buf, size_t len);
+		void GenerateMD2(const void* buf, size_t len);
+		void GenerateMDC2(const void* buf, size_t len);
 		void Print(FILE*, const char* prefix, const char* suffix);
 
 		unsigned char m_result[16];

@@ -179,11 +179,15 @@ bool AP_application::Init(backend_type bt)
 	m_sysWindow->SetUserData(this);
 
 	{
-		mgf::CryptographyMD5 a;
-		a.Generate("TestMD5", 7);
+		mgf::CryptographyMD a;
+		a.GenerateMD5("Test", 4);
 		a.Print(stdout, "MD5:[", "]\n");
-		a.Generate("TestMD5x", 8);
-		a.Print(stdout, "MD5:[", "]\n");
+		a.GenerateMD4("Test", 4);
+		a.Print(stdout, "MD4:[", "]\n");
+		a.GenerateMD2("Test", 4);
+		a.Print(stdout, "MD2:[", "]\n");
+		a.GenerateMDC2("Test", 4);
+		a.Print(stdout, "MDC2:[", "]\n");
 	}
 	
 	m_style = m_framework->GetNewStyle(1);
