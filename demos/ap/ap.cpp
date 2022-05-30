@@ -178,16 +178,39 @@ bool AP_application::Init(backend_type bt)
 		mgPoint(MGCW_USEDEFAULT, 0));
 	m_sysWindow->SetUserData(this);
 
+
 	{
-		mgf::CryptographyMD a;
-		a.GenerateMD5("Test", 4);
-		a.Print(stdout, "MD5:[", "]\n");
-		a.GenerateMD4("Test", 4);
-		a.Print(stdout, "MD4:[", "]\n");
-		a.GenerateMD2("Test", 4);
-		a.Print(stdout, "MD2:[", "]\n");
-		a.GenerateMDC2("Test", 4);
-		a.Print(stdout, "MDC2:[", "]\n");
+		const char* testString = "HelloWorld";
+		printf("Test string: %s\n", testString);
+		mgf::CryptographyMD md;
+		md.GenerateMD5(testString, strlen(testString));
+		md.Print(stdout, "MD5:[", "]\n");
+		md.GenerateMD4(testString, strlen(testString));
+		md.Print(stdout, "MD4:[", "]\n");
+		md.GenerateMD2(testString, strlen(testString));
+		md.Print(stdout, "MD2:[", "]\n");
+		md.GenerateMDC2(testString, strlen(testString));
+		md.Print(stdout, "MDC2:[", "]\n");
+	
+		mgf::CryptographySHA1 sha1;
+		sha1.Generate(testString, strlen(testString));
+		sha1.Print(stdout, "SHA1:[", "]\n");
+
+		mgf::CryptographySHA224 sha224;
+		sha224.Generate(testString, strlen(testString));
+		sha224.Print(stdout, "SHA224:[", "]\n");
+
+		mgf::CryptographySHA256 sha256;
+		sha256.Generate(testString, strlen(testString));
+		sha256.Print(stdout, "SHA256:[", "]\n");
+
+		mgf::CryptographySHA384 sha384;
+		sha384.Generate(testString, strlen(testString));
+		sha384.Print(stdout, "SHA384:[", "]\n");
+
+		mgf::CryptographySHA512 sha512;
+		sha512.Generate(testString, strlen(testString));
+		sha512.Print(stdout, "SHA512:[", "]\n");
 	}
 	
 	m_style = m_framework->GetNewStyle(1);

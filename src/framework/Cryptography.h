@@ -32,6 +32,14 @@
 
 namespace mgf
 {
+
+#define CryptographyDigestLengthMD 16
+#define CryptographyDigestLengthSHA1 20
+#define CryptographyDigestLengthSHA224 28
+#define CryptographyDigestLengthSHA256 32
+#define CryptographyDigestLengthSHA384 48
+#define CryptographyDigestLengthSHA512 64
+
 	class CryptographyMD : public BaseClass
 	{
 	public:
@@ -44,7 +52,57 @@ namespace mgf
 		void GenerateMDC2(const void* buf, size_t len);
 		void Print(FILE*, const char* prefix, const char* suffix);
 
-		unsigned char m_result[16];
+		unsigned char m_result[CryptographyDigestLengthMD];
+	};
+
+	class CryptographySHA1 : public BaseClass
+	{
+	public:
+		CryptographySHA1();
+		virtual ~CryptographySHA1();
+		void Generate(const void* buf, size_t len);
+		void Print(FILE*, const char* prefix, const char* suffix);
+		unsigned char m_result[CryptographyDigestLengthSHA1];
+	};
+
+	class CryptographySHA224 : public BaseClass
+	{
+	public:
+		CryptographySHA224();
+		virtual ~CryptographySHA224();
+		void Generate(const void* buf, size_t len);
+		void Print(FILE*, const char* prefix, const char* suffix);
+		unsigned char m_result[CryptographyDigestLengthSHA224];
+	};
+
+	class CryptographySHA256 : public BaseClass
+	{
+	public:
+		CryptographySHA256();
+		virtual ~CryptographySHA256();
+		void Generate(const void* buf, size_t len);
+		void Print(FILE*, const char* prefix, const char* suffix);
+		unsigned char m_result[CryptographyDigestLengthSHA256];
+	};
+
+	class CryptographySHA384 : public BaseClass
+	{
+	public:
+		CryptographySHA384();
+		virtual ~CryptographySHA384();
+		void Generate(const void* buf, size_t len);
+		void Print(FILE*, const char* prefix, const char* suffix);
+		unsigned char m_result[CryptographyDigestLengthSHA384];
+	};
+
+	class CryptographySHA512 : public BaseClass
+	{
+	public:
+		CryptographySHA512();
+		virtual ~CryptographySHA512();
+		void Generate(const void* buf, size_t len);
+		void Print(FILE*, const char* prefix, const char* suffix);
+		unsigned char m_result[CryptographyDigestLengthSHA512];
 	};
 }
 

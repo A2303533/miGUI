@@ -37,6 +37,8 @@
 #include "OpenSSL/md2.h"
 #include "OpenSSL/mdc2.h"
 
+#include "OpenSSL/sha.h"
+
 using namespace mgf;
 
 CryptographyMD::CryptographyMD(){}
@@ -74,15 +76,99 @@ void CryptographyMD::GenerateMDC2(const void* buf, size_t len)
 	MDC2_Final(m_result, &ctx);
 }
 
-void CryptographyMD::Print(FILE* f, const char* prefix, const char* suffix)
+void Cryptography_Print(const unsigned char* buffer, size_t size, FILE* f, const char* prefix, const char* suffix)
 {
 	if (prefix)
 		fprintf(f, "%s", prefix);
-	for (int i = 0; i < 16; ++i)
+	for (size_t i = 0; i < size; ++i)
 	{
-		fprintf(f, "%x", (unsigned char)m_result[i]);
+		fprintf(f, "%02x", (unsigned char)buffer[i]);
 	}
 	if (suffix)
 		fprintf(f, "%s", suffix);
 }
 
+void CryptographyMD::Print(FILE* f, const char* prefix, const char* suffix)
+{
+	Cryptography_Print(m_result, CryptographyDigestLengthMD, f, prefix, suffix);
+}
+
+CryptographySHA1::CryptographySHA1(){}
+CryptographySHA1::~CryptographySHA1(){}
+
+void CryptographySHA1::Generate(const void* buf, size_t len)
+{
+	SHA_CTX ctx;
+	SHA1_Init(&ctx);
+	SHA1_Update(&ctx, (const unsigned char*)buf, len);
+	SHA1_Final(m_result, &ctx);
+}
+
+void CryptographySHA1::Print(FILE* f, const char* prefix, const char* suffix)
+{
+	Cryptography_Print(m_result, CryptographyDigestLengthSHA1, f, prefix, suffix);
+}
+
+CryptographySHA224::CryptographySHA224() {}
+CryptographySHA224::~CryptographySHA224() {}
+
+void CryptographySHA224::Generate(const void* buf, size_t len)
+{
+	SHA256_CTX ctx;
+	SHA224_Init(&ctx);
+	SHA224_Update(&ctx, (const unsigned char*)buf, len);
+	SHA224_Final(m_result, &ctx);
+}
+
+void CryptographySHA224::Print(FILE* f, const char* prefix, const char* suffix)
+{
+	Cryptography_Print(m_result, CryptographyDigestLengthSHA224, f, prefix, suffix);
+}
+
+CryptographySHA256::CryptographySHA256() {}
+CryptographySHA256::~CryptographySHA256() {}
+
+void CryptographySHA256::Generate(const void* buf, size_t len)
+{
+	SHA256_CTX ctx;
+	SHA256_Init(&ctx);
+	SHA256_Update(&ctx, (const unsigned char*)buf, len);
+	SHA256_Final(m_result, &ctx);
+}
+
+void CryptographySHA256::Print(FILE* f, const char* prefix, const char* suffix)
+{
+	Cryptography_Print(m_result, CryptographyDigestLengthSHA256, f, prefix, suffix);
+}
+
+CryptographySHA384::CryptographySHA384() {}
+CryptographySHA384::~CryptographySHA384() {}
+
+void CryptographySHA384::Generate(const void* buf, size_t len)
+{
+	SHA512_CTX ctx;
+	SHA384_Init(&ctx);
+	SHA384_Update(&ctx, (const unsigned char*)buf, len);
+	SHA384_Final(m_result, &ctx);
+}
+
+void CryptographySHA384::Print(FILE* f, const char* prefix, const char* suffix)
+{
+	Cryptography_Print(m_result, CryptographyDigestLengthSHA384, f, prefix, suffix);
+}
+
+CryptographySHA512::CryptographySHA512() {}
+CryptographySHA512::~CryptographySHA512() {}
+
+void CryptographySHA512::Generate(const void* buf, size_t len)
+{
+	SHA512_CTX ctx;
+	SHA512_Init(&ctx);
+	SHA512_Update(&ctx, (const unsigned char*)buf, len);
+	SHA512_Final(m_result, &ctx);
+}
+
+void CryptographySHA512::Print(FILE* f, const char* prefix, const char* suffix)
+{
+	Cryptography_Print(m_result, CryptographyDigestLengthSHA512, f, prefix, suffix);
+}
