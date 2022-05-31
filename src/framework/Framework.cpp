@@ -47,6 +47,11 @@ HRESULT g_CoInitializeResult = 0;
 #pragma comment(lib, "Crypt32.lib")
 #endif
 
+MGF_LINK_LIBRARY("OpenSSL")
+MGF_LINK_LIBRARY("curl")
+MGF_LINK_LIBRARY("libssh2")
+MGF_LINK_LIBRARY("brotli")
+
 using namespace mgf;
 
 Backend* g_backend = 0;
@@ -135,11 +140,9 @@ void Framework::InitCURL()
 			m_isCURLReady = 1;
 			curl_version_info_data* vi = curl_version_info(CURLVERSION_FIRST);
 			mgf::LogWriteInfo("%s: curl version %s (%u)\n", MGF_FUNCTION, vi->version, vi->version_num);
-			
-			if(vi->libssh_version)
-				mgf::LogWriteInfo("%s: libssh version %s\n", MGF_FUNCTION, vi->libssh_version);
-
+			mgf::LogWriteInfo("%s: libssh version %s\n", MGF_FUNCTION, vi->libssh_version);
 			mgf::LogWriteInfo("%s: OpenSSL version %s (%u)\n", MGF_FUNCTION, vi->ssl_version, vi->ssl_version_num);
+			mgf::LogWriteInfo("%s: OpenSSL version %s (%u)\n", MGF_FUNCTION, vi->ares, vi->ssl_version_num);
 		}
 		else
 			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);

@@ -68,3 +68,12 @@ demos/gdi_d3d11/Debug
 demos/gdi_d3d11/Release
 demos/ap/Debug
 demos/ap/Release
+build/brotli/Debug
+
+build/brotli/Release
+build/curl/Debug
+build/curl/Release
+build/libssh2/Debug
+build/libssh2/Release
+build/OpenSSL/Debug
+build/OpenSSL/Release

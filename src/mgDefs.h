@@ -81,4 +81,27 @@
 #define MGF_FUNCTION "functionname"
 #endif
 
+#ifdef _MSC_VER
+
+#if _MSC_VER < 1930
+#define MGF_LINK_LIBRARY_CMP "_vs142"
+#endif
+
+#ifdef MG_BIT_64
+#define MGF_LINK_LIBRARY_ARCH "_x64"
+#else
+#define MGF_LINK_LIBRARY_ARCH "_x86"
+#endif
+
+#ifdef MG_DEBUG
+#define MGF_LINK_LIBRARY_CONF "_debug"
+#else
+#define MGF_LINK_LIBRARY_CONF "_release"
+#endif
+
+#define MGF_LINK_LIBRARY(n) \
+	__pragma(comment(lib, n MGF_LINK_LIBRARY_CMP MGF_LINK_LIBRARY_ARCH MGF_LINK_LIBRARY_CONF))
+#endif
+
+
 #endif

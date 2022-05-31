@@ -32,4 +32,11 @@ GUI for C and framework for C++.
 * using scrollbar element in table
 * tabPanel
 
+# Compilation
 
+* Build libraries with static linking (/MT without dll)
+* All static libraries must have /NODEFAULTLIB
+* Use Visual Studio 2019
+* If you use Visual Studio 2022 you need to edit project names (you need to change "vs142" to "vs<put here number from VS2022>")
+* Link libraries using MGF_LINK_LIBRARY
+* If you use other compiler you need to link all libraries by yourself.

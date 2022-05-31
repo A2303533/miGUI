@@ -29,6 +29,7 @@
 #include "mgf.h"
 #include "Archive.h"
 #include "fastlz.h"
+#include "brotli/encode.h"
 #include "Log.h"
 
 #include <iterator>

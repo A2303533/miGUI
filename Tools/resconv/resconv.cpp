@@ -2,11 +2,7 @@
 #include <filesystem>
 #include "framework/Archive.h"
 
-#ifdef MG_DEBUG
-#pragma comment(lib, "mgfd.lib")
-#else
-#pragma comment(lib, "mgf.lib")
-#endif
+MGF_LINK_LIBRARY("mgf")
 
 // Function must create outFile, .h file, that contain array and (maybe some 
 //  other data) with `name`

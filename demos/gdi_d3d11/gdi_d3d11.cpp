@@ -13,11 +13,8 @@
 #include "framework/Color.h"
 #include <filesystem>
 
-#ifdef MG_DEBUG
-#pragma comment(lib, "mgfd.lib")
-#else
-#pragma comment(lib, "mgf.lib")
-#endif
+MGF_LINK_LIBRARY("mgf")
+
 
 // there is 3 types of menu 
 // (1)native menu, (2)migui with system window, and (3)migui without system window
