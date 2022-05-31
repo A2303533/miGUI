@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\unistring">
+      <UniqueIdentifier>{f97242b0-5e34-449c-bc96-ad0a86a36eda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uniconv">
+      <UniqueIdentifier>{7333e19b-ec11-4957-a3ba-ac6a4ecd22c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uninorm">
+      <UniqueIdentifier>{7f589359-15bf-43de-871d-9227b9711e19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\unistr">
+      <UniqueIdentifier>{bd1463e5-78dd-464e-9393-7069dade165b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\unictype">
+      <UniqueIdentifier>{beb4cd0f-2d78-4810-bfc2-db063c7a5757}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\libidn2\lib\puny_decode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\puny_encode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\register.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\tables.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\tr46map.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\tr46map_data.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\version.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\context.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\data.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\decode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\error.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\idn2_free.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\gendata.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\idna.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\lookup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\free.c">
+      <Filter>Source Files\unistring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\localcharset.c">
+      <Filter>Source Files\unistring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\striconveh.c">
+      <Filter>Source Files\unistring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\striconveha.c">
+      <Filter>Source Files\unistring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistd.c">
+      <Filter>Source Files\unistring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\c-ctype.c">
+      <Filter>Source Files\unistring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\c-strcasecmp.c">
+      <Filter>Source Files\unistring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\c-strncasecmp.c">
+      <Filter>Source Files\unistring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-strconv-from-enc.c">
+      <Filter>Source Files\uniconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-strconv-from-locale.c">
+      <Filter>Source Files\uniconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-strconv-to-enc.c">
+      <Filter>Source Files\uniconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-strconv-to-locale.c">
+      <Filter>Source Files\uniconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-conv-from-enc.c">
+      <Filter>Source Files\uniconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\canonical-decomposition.c">
+      <Filter>Source Files\uninorm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\composition.c">
+      <Filter>Source Files\uninorm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\decompose-internal.c">
+      <Filter>Source Files\uninorm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\decomposition-table.c">
+      <Filter>Source Files\uninorm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\nfc.c">
+      <Filter>Source Files\uninorm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\nfd.c">
+      <Filter>Source Files\uninorm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\u32-normalize.c">
+      <Filter>Source Files\uninorm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-strlen.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-to-u32.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-uctomb.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-uctomb-aux.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-cmp.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-cpy.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-cpy-alloc.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-mbtouc-unsafe.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-strlen.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-to-u8.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-uctomb.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-check.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mblen.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtouc.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtouc-aux.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtoucr.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtouc-unsafe.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtouc-unsafe-aux.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-prev.c">
+      <Filter>Source Files\unistr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unictype\bidi_of.c">
+      <Filter>Source Files\unictype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unictype\categ_M.c">
+      <Filter>Source Files\unictype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unictype\categ_none.c">
+      <Filter>Source Files\unictype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unictype\categ_of.c">
+      <Filter>Source Files\unictype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unictype\categ_test.c">
+      <Filter>Source Files\unictype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unictype\combiningclass.c">
+      <Filter>Source Files\unictype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unictype\joiningtype_of.c">
+      <Filter>Source Files\unictype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\unistring\unictype\scripts.c">
+      <Filter>Source Files\unictype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\libidn2\lib\bidi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

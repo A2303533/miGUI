@@ -54,6 +54,7 @@ MGF_LINK_LIBRARY("brotli")
 MGF_LINK_LIBRARY("zlib")
 MGF_LINK_LIBRARY("zstd")
 MGF_LINK_LIBRARY("cares")
+MGF_LINK_LIBRARY("libidn2")
 
 using namespace mgf;
 
@@ -149,6 +150,7 @@ void Framework::InitCURL()
 			mgf::LogWriteInfo("%s: zlib version %s\n", MGF_FUNCTION, vi->libz_version);
 			mgf::LogWriteInfo("%s: Zstandard version %s (%u)\n", MGF_FUNCTION, vi->zstd_version, vi->zstd_ver_num);
 			mgf::LogWriteInfo("%s: c-ares version %s (%u)\n", MGF_FUNCTION, vi->ares, vi->ares_num);
+			mgf::LogWriteInfo("%s: libidn2 version %s \n", MGF_FUNCTION, vi->libidn);
 		}
 		else
 			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);
