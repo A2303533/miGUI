@@ -83,4 +83,5 @@ build/zstd/Debug
 build/zstd/Release
 demos/ap/x64/Debug
 demos/ap/x64/Release
-
+build/cares/Debug
+build/cares/Release

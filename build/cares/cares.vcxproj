@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{2cd9f77b-611e-4592-947f-3f9091e0cf76}</ProjectGuid>
+    <RootNamespace>cares</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\libs\</OutDir>
+    <TargetName>$(ProjectName)_$(PlatformToolset)_$(PlatformShortName)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\libs\</OutDir>
+    <TargetName>$(ProjectName)_$(PlatformToolset)_$(PlatformShortName)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\libs\</OutDir>
+    <TargetName>$(ProjectName)_$(PlatformToolset)_$(PlatformShortName)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\libs\</OutDir>
+    <TargetName>$(ProjectName)_$(PlatformToolset)_$(PlatformShortName)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);CARES_STATICLIB</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\..\src\c-ares\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);CARES_STATICLIB</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\..\src\c-ares\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);CARES_STATICLIB</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\..\src\c-ares\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);CARES_STATICLIB</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\..\src\c-ares\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>Iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_android.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_cancel.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_create_query.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_data.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_destroy.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_expand_name.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_expand_string.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_fds.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_freeaddrinfo.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_free_hostent.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_free_string.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_getaddrinfo.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_getenv.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_gethostbyaddr.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_gethostbyname.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_getnameinfo.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_getsock.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_init.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_library_init.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_llist.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_mkquery.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_nowarn.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_options.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_aaaa_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_a_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_caa_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_mx_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_naptr_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_ns_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_ptr_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_soa_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_srv_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_txt_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_uri_reply.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_platform.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_process.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_query.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_search.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_send.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_strcasecmp.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_strdup.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_strerror.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_strsplit.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_timeout.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_version.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_writev.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__addrinfo2hostent.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__addrinfo_localhost.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__close_sockets.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__get_hostent.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__parse_into_addrinfo.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__readaddrinfo.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__read_line.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__sortaddrinfo.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__timeval.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\bitncmp.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\inet_net_pton.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\inet_ntop.c" />
+    <ClCompile Include="..\..\src\c-ares\src\lib\windows_port.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

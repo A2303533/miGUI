@@ -375,5 +375,8 @@
     <ClCompile Include="..\..\src\curl\lib\wildcard.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\curl\lib\asyn-ares.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

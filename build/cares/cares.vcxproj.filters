@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\lib">
+      <UniqueIdentifier>{089ec70a-0a71-448c-8bc9-6be228e57c86}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_writev.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\bitncmp.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\inet_net_pton.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\inet_ntop.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\windows_port.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__addrinfo_localhost.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__addrinfo2hostent.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__close_sockets.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__get_hostent.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__parse_into_addrinfo.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__read_line.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__readaddrinfo.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__sortaddrinfo.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares__timeval.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_android.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_cancel.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_create_query.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_data.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_destroy.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_expand_name.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_expand_string.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_fds.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_free_hostent.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_free_string.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_freeaddrinfo.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_getaddrinfo.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_getenv.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_gethostbyaddr.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_gethostbyname.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_getnameinfo.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_getsock.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_init.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_library_init.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_llist.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_mkquery.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_nowarn.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_options.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_a_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_aaaa_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_caa_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_mx_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_naptr_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_ns_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_ptr_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_soa_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_srv_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_txt_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_parse_uri_reply.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_platform.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_process.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_query.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_search.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_send.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_strcasecmp.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_strdup.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_strerror.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_strsplit.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_timeout.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\c-ares\src\lib\ares_version.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
