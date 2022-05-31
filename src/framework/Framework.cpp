@@ -51,6 +51,8 @@ MGF_LINK_LIBRARY("OpenSSL")
 MGF_LINK_LIBRARY("curl")
 MGF_LINK_LIBRARY("libssh2")
 MGF_LINK_LIBRARY("brotli")
+MGF_LINK_LIBRARY("zlib")
+MGF_LINK_LIBRARY("zstd")
 
 using namespace mgf;
 
@@ -142,7 +144,9 @@ void Framework::InitCURL()
 			mgf::LogWriteInfo("%s: curl version %s (%u)\n", MGF_FUNCTION, vi->version, vi->version_num);
 			mgf::LogWriteInfo("%s: libssh version %s\n", MGF_FUNCTION, vi->libssh_version);
 			mgf::LogWriteInfo("%s: OpenSSL version %s (%u)\n", MGF_FUNCTION, vi->ssl_version, vi->ssl_version_num);
-			mgf::LogWriteInfo("%s: OpenSSL version %s (%u)\n", MGF_FUNCTION, vi->ares, vi->ssl_version_num);
+			mgf::LogWriteInfo("%s: Brotli version %s (%u)\n", MGF_FUNCTION, vi->brotli_version, vi->brotli_ver_num);
+			mgf::LogWriteInfo("%s: zlib version %s\n", MGF_FUNCTION, vi->libz_version);
+			mgf::LogWriteInfo("%s: Zstandard version %s (%u)\n", MGF_FUNCTION, vi->zstd_version, vi->zstd_ver_num);
 		}
 		else
 			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);

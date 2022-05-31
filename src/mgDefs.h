@@ -84,7 +84,7 @@
 #ifdef _MSC_VER
 
 #if _MSC_VER < 1930
-#define MGF_LINK_LIBRARY_CMP "_vs142"
+#define MGF_LINK_LIBRARY_CMP "_v142"
 #endif
 
 #ifdef MG_BIT_64
@@ -94,9 +94,9 @@
 #endif
 
 #ifdef MG_DEBUG
-#define MGF_LINK_LIBRARY_CONF "_debug"
+#define MGF_LINK_LIBRARY_CONF "_Debug"
 #else
-#define MGF_LINK_LIBRARY_CONF "_release"
+#define MGF_LINK_LIBRARY_CONF "_Release"
 #endif
 
 #define MGF_LINK_LIBRARY(n) \

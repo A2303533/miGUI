@@ -72,22 +72,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(ProjectName)_vs142_x86_debug</TargetName>
+    <TargetName>$(ProjectName)_$(PlatformToolset)_$(PlatformShortName)_$(Configuration)</TargetName>
     <OutDir>..\..\libs\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(ProjectName)_vs142_x86_release</TargetName>
+    <TargetName>$(ProjectName)_$(PlatformToolset)_$(PlatformShortName)_$(Configuration)</TargetName>
     <OutDir>..\..\libs\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(ProjectName)_vs142_x64_debug</TargetName>
+    <TargetName>$(ProjectName)_$(PlatformToolset)_$(PlatformShortName)_$(Configuration)</TargetName>
     <OutDir>..\..\libs\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(ProjectName)_vs142_x64_release</TargetName>
+    <TargetName>$(ProjectName)_$(PlatformToolset)_$(PlatformShortName)_$(Configuration)</TargetName>
     <OutDir>..\..\libs\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

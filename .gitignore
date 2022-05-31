@@ -77,3 +77,10 @@ build/libssh2/Debug
 build/libssh2/Release
 build/OpenSSL/Debug
 build/OpenSSL/Release
+build/zlib/Debug
+build/zlib/Release
+build/zstd/Debug
+build/zstd/Release
+demos/ap/x64/Debug
+demos/ap/x64/Release
+
