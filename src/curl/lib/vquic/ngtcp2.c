@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef USE_NGTCP2
 #include <ngtcp2/ngtcp2.h>

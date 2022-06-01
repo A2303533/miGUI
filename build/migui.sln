@@ -33,6 +33,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cares", "cares\cares.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libidn2", "libidn2\libidn2.vcxproj", "{2D84CAB1-49F0-4C96-9714-16F8A0E9FF12}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nghttp2", "nghttp2\nghttp2.vcxproj", "{3381CD6B-CFD2-4A96-831F-A85B01BB1583}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -145,6 +147,14 @@ Global
 		{2D84CAB1-49F0-4C96-9714-16F8A0E9FF12}.Release|x64.Build.0 = Release|x64
 		{2D84CAB1-49F0-4C96-9714-16F8A0E9FF12}.Release|x86.ActiveCfg = Release|Win32
 		{2D84CAB1-49F0-4C96-9714-16F8A0E9FF12}.Release|x86.Build.0 = Release|Win32
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583}.Debug|x64.ActiveCfg = Debug|x64
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583}.Debug|x64.Build.0 = Debug|x64
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583}.Debug|x86.ActiveCfg = Debug|Win32
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583}.Debug|x86.Build.0 = Debug|Win32
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583}.Release|x64.ActiveCfg = Release|x64
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583}.Release|x64.Build.0 = Release|x64
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583}.Release|x86.ActiveCfg = Release|Win32
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -159,6 +169,7 @@ Global
 		{3D2422B7-5DC6-4F7F-A0FC-F8781EFD5E56} = {75C7C56B-CA95-476C-A267-A629FC7BBDD4}
 		{2CD9F77B-611E-4592-947F-3F9091E0CF76} = {75C7C56B-CA95-476C-A267-A629FC7BBDD4}
 		{2D84CAB1-49F0-4C96-9714-16F8A0E9FF12} = {75C7C56B-CA95-476C-A267-A629FC7BBDD4}
+		{3381CD6B-CFD2-4A96-831F-A85B01BB1583} = {75C7C56B-CA95-476C-A267-A629FC7BBDD4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39107F34-AFC7-413B-837E-706586072D74}

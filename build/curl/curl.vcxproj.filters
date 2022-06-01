@@ -22,6 +22,9 @@
     <Filter Include="Source Files\vtls">
       <UniqueIdentifier>{ff168ed0-c7dd-4a2c-9a83-6e02eff7f2da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\vquic">
+      <UniqueIdentifier>{51e74e1a-87c1-4549-96ef-b6b5e434c009}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\curl\lib\vauth\cleartext.c">
@@ -376,6 +379,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\curl\lib\asyn-ares.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\curl\lib\vquic\ngtcp2.c">
+      <Filter>Source Files\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\curl\lib\vquic\msh3.c">
+      <Filter>Source Files\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\curl\lib\vquic\vquic.c">
+      <Filter>Source Files\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\curl\lib\vquic\quiche.c">
+      <Filter>Source Files\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\curl\lib\h2h3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

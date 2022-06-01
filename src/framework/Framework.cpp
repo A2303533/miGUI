@@ -55,6 +55,7 @@ MGF_LINK_LIBRARY("zlib")
 MGF_LINK_LIBRARY("zstd")
 MGF_LINK_LIBRARY("cares")
 MGF_LINK_LIBRARY("libidn2")
+MGF_LINK_LIBRARY("nghttp2")
 
 using namespace mgf;
 
@@ -138,19 +139,19 @@ void Framework::InitCURL()
 {
 	if (!m_isCURLReady)
 	{
-		mgf::LogWriteInfo("%s: ...\n", MGF_FUNCTION);
 		if (curl_global_init(CURL_GLOBAL_ALL) == CURLE_OK)
 		{
 			m_isCURLReady = 1;
 			curl_version_info_data* vi = curl_version_info(CURLVERSION_FIRST);
-			mgf::LogWriteInfo("%s: curl version %s (%u)\n", MGF_FUNCTION, vi->version, vi->version_num);
-			mgf::LogWriteInfo("%s: libssh version %s\n", MGF_FUNCTION, vi->libssh_version);
-			mgf::LogWriteInfo("%s: OpenSSL version %s (%u)\n", MGF_FUNCTION, vi->ssl_version, vi->ssl_version_num);
-			mgf::LogWriteInfo("%s: Brotli version %s (%u)\n", MGF_FUNCTION, vi->brotli_version, vi->brotli_ver_num);
-			mgf::LogWriteInfo("%s: zlib version %s\n", MGF_FUNCTION, vi->libz_version);
-			mgf::LogWriteInfo("%s: Zstandard version %s (%u)\n", MGF_FUNCTION, vi->zstd_version, vi->zstd_ver_num);
-			mgf::LogWriteInfo("%s: c-ares version %s (%u)\n", MGF_FUNCTION, vi->ares, vi->ares_num);
-			mgf::LogWriteInfo("%s: libidn2 version %s \n", MGF_FUNCTION, vi->libidn);
+			mgf::LogWriteInfo("curl version %s (%u)\n", vi->version, vi->version_num);
+			mgf::LogWriteInfo("libssh version %s\n", vi->libssh_version);
+			mgf::LogWriteInfo("OpenSSL version %s (%u)\n", vi->ssl_version, vi->ssl_version_num);
+			mgf::LogWriteInfo("Brotli version %s (%u)\n", vi->brotli_version, vi->brotli_ver_num);
+			mgf::LogWriteInfo("zlib version %s\n", vi->libz_version);
+			mgf::LogWriteInfo("Zstandard version %s (%u)\n", vi->zstd_version, vi->zstd_ver_num);
+			mgf::LogWriteInfo("c-ares version %s (%u)\n", vi->ares, vi->ares_num);
+			mgf::LogWriteInfo("libidn2 version %s \n", vi->libidn);
+			mgf::LogWriteInfo("nghttp2 version %s (%u)\n", vi->nghttp2_version, vi->nghttp2_ver_num);
 		}
 		else
 			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);

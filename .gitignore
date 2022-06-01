@@ -87,3 +87,7 @@ build/cares/Debug
 build/cares/Release
 build/libidn2/Debug
 build/libidn2/Release
+build/nghttp2/Debug
+
+build/nghttp2/Release
+

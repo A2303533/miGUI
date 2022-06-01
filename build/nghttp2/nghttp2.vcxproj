@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{2d84cab1-49f0-4c96-9714-16f8a0e9ff12}</ProjectGuid>
-    <RootNamespace>libidn2</RootNamespace>
+    <ProjectGuid>{3381cd6b-cfd2-4a96-831f-a85b01bb1583}</ProjectGuid>
+    <RootNamespace>nghttp2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -94,12 +94,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);IDN2_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);HAVE_CONFIG_H;NGHTTP2_STATICLIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\src\libidn2\lib\;..\..\src\libidn2\unistring\;..\..\src\libidn2\gl\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\src\nghttp2\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,12 +113,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);IDN2_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);HAVE_CONFIG_H;NGHTTP2_STATICLIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\src\libidn2\lib\;..\..\src\libidn2\unistring\;..\..\src\libidn2\gl\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\src\nghttp2\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,12 +132,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);IDN2_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);HAVE_CONFIG_H;NGHTTP2_STATICLIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\src\libidn2\lib\;..\..\src\libidn2\unistring\;..\..\src\libidn2\gl\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\src\nghttp2\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,12 +151,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);IDN2_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);HAVE_CONFIG_H;NGHTTP2_STATICLIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\src\libidn2\lib\;..\..\src\libidn2\unistring\;..\..\src\libidn2\gl\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>..\..\src\nghttp2\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -175,69 +167,28 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\libidn2\lib\bidi.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\context.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\data.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\decode.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\error.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\idn2_free.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\gendata.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\idna.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\lookup.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\puny_decode.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\puny_encode.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\register.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\tables.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\tr46map.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\tr46map_data.c" />
-    <ClCompile Include="..\..\src\libidn2\lib\version.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\c-ctype.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\c-strcasecmp.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\c-strncasecmp.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\free.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\localcharset.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\striconveh.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\striconveha.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-conv-from-enc.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-strconv-from-enc.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-strconv-from-locale.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-strconv-to-enc.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uniconv\u8-strconv-to-locale.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unictype\bidi_of.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unictype\categ_M.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unictype\categ_none.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unictype\categ_of.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unictype\categ_test.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unictype\combiningclass.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unictype\joiningtype_of.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unictype\scripts.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\canonical-decomposition.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\composition.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\decompose-internal.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\decomposition-table.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\nfc.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\nfd.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\uninorm\u32-normalize.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistd.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-cmp.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-cpy-alloc.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-cpy.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-mbtouc-unsafe.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-strlen.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-to-u8.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u32-uctomb.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-check.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mblen.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtouc-aux.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtouc-unsafe-aux.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtouc-unsafe.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtouc.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-mbtoucr.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-prev.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-strlen.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-to-u32.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-uctomb-aux.c" />
-    <ClCompile Include="..\..\src\libidn2\unistring\unistr\u8-uctomb.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_buf.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_callbacks.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_debug.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_frame.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_hd.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_hd_huffman.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_hd_huffman_data.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_helper.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_http.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_map.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_mem.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_npn.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_option.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_outbound_item.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_pq.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_priority_spec.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_queue.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_rcbuf.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_session.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_stream.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_submit.c" />
+    <ClCompile Include="..\..\src\nghttp2\lib\nghttp2_version.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
