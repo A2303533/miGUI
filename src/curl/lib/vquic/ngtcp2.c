@@ -29,30 +29,30 @@
 #ifdef USE_OPENSSL
 #include <openssl/err.h>
 #include <ngtcp2/ngtcp2_crypto_openssl.h>
-#include "vtls/openssl.h"
+#include "../vtls/openssl.h"
 #elif defined(USE_GNUTLS)
 #include <ngtcp2/ngtcp2_crypto_gnutls.h>
 #include "vtls/gtls.h"
 #endif
-#include "urldata.h"
-#include "sendf.h"
-#include "strdup.h"
-#include "rand.h"
+#include "../urldata.h"
+#include "../sendf.h"
+#include "../strdup.h"
+#include "../rand.h"
 #include "ngtcp2.h"
-#include "multiif.h"
-#include "strcase.h"
-#include "connect.h"
-#include "strerror.h"
-#include "dynbuf.h"
+#include "../multiif.h"
+#include "../strcase.h"
+#include "../connect.h"
+#include "../strerror.h"
+#include "../dynbuf.h"
 #include "vquic.h"
-#include "h2h3.h"
-#include "vtls/keylog.h"
-#include "vtls/vtls.h"
+#include "../h2h3.h"
+#include "../vtls/keylog.h"
+#include "../vtls/vtls.h"
 
 /* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
+#include "../curl_printf.h"
+#include "../curl_memory.h"
+#include "../memdebug.h"
 
 /* #define DEBUG_NGTCP2 */
 #ifdef CURLDEBUG

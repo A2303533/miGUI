@@ -22,7 +22,7 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#include "../curl_setup.h"
 
 #ifdef ENABLE_QUIC
 CURLcode Curl_qlogdir(struct Curl_easy *data,

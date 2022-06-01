@@ -94,10 +94,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;HAVE_BROTLI;USE_OPENSSL;HAVE_LIBZ;HAVE_ZLIB_H;HAVE_ZSTD;USE_ARES;USE_LIBIDN2;IDN2_STATIC;USE_NGHTTP2;NGHTTP2_STATICLIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;HAVE_BROTLI;USE_OPENSSL;HAVE_LIBZ;HAVE_ZLIB_H;HAVE_ZSTD;USE_ARES;USE_LIBIDN2;IDN2_STATIC;USE_NGHTTP2;NGHTTP2_STATICLIB;NGHTTP3_STATICLIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\brotli\c\include\;..\..\src\OpenSSL\include\;..\..\src\zlib\;..\..\src\zstd\lib\;..\..\src\c-ares\include\;..\..\src\libidn2\lib\;..\..\src\nghttp2\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\brotli\c\include\;..\..\src\OpenSSL\include\;..\..\src\zlib\;..\..\src\zstd\lib\;..\..\src\c-ares\include\;..\..\src\libidn2\lib\;..\..\src\nghttp2\lib\includes\;..\..\src\nghttp3\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -114,10 +114,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;HAVE_BROTLI;USE_OPENSSL;HAVE_LIBZ;HAVE_ZLIB_H;HAVE_ZSTD;USE_ARES;USE_LIBIDN2;IDN2_STATIC;USE_NGHTTP2;NGHTTP2_STATICLIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;HAVE_BROTLI;USE_OPENSSL;HAVE_LIBZ;HAVE_ZLIB_H;HAVE_ZSTD;USE_ARES;USE_LIBIDN2;IDN2_STATIC;USE_NGHTTP2;NGHTTP2_STATICLIB;NGHTTP3_STATICLIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\brotli\c\include\;..\..\src\OpenSSL\include\;..\..\src\zlib\;..\..\src\zstd\lib\;..\..\src\c-ares\include\;..\..\src\libidn2\lib\;..\..\src\nghttp2\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\brotli\c\include\;..\..\src\OpenSSL\include\;..\..\src\zlib\;..\..\src\zstd\lib\;..\..\src\c-ares\include\;..\..\src\libidn2\lib\;..\..\src\nghttp2\lib\includes\;..\..\src\nghttp3\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -134,10 +134,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;HAVE_BROTLI;USE_OPENSSL;HAVE_LIBZ;HAVE_ZLIB_H;HAVE_ZSTD;USE_ARES;USE_LIBIDN2;IDN2_STATIC;USE_NGHTTP2;NGHTTP2_STATICLIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;HAVE_BROTLI;USE_OPENSSL;HAVE_LIBZ;HAVE_ZLIB_H;HAVE_ZSTD;USE_ARES;USE_LIBIDN2;IDN2_STATIC;USE_NGHTTP2;NGHTTP2_STATICLIB;NGHTTP3_STATICLIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\brotli\c\include\;..\..\src\OpenSSL\include\;..\..\src\zlib\;..\..\src\zstd\lib\;..\..\src\c-ares\include\;..\..\src\libidn2\lib\;..\..\src\nghttp2\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\brotli\c\include\;..\..\src\OpenSSL\include\;..\..\src\zlib\;..\..\src\zstd\lib\;..\..\src\c-ares\include\;..\..\src\libidn2\lib\;..\..\src\nghttp2\lib\includes\;..\..\src\nghttp3\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -154,10 +154,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;HAVE_BROTLI;USE_OPENSSL;HAVE_LIBZ;HAVE_ZLIB_H;HAVE_ZSTD;USE_ARES;USE_LIBIDN2;IDN2_STATIC;USE_NGHTTP2;NGHTTP2_STATICLIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;HAVE_BROTLI;USE_OPENSSL;HAVE_LIBZ;HAVE_ZLIB_H;HAVE_ZSTD;USE_ARES;USE_LIBIDN2;IDN2_STATIC;USE_NGHTTP2;NGHTTP2_STATICLIB;NGHTTP3_STATICLIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\brotli\c\include\;..\..\src\OpenSSL\include\;..\..\src\zlib\;..\..\src\zstd\lib\;..\..\src\c-ares\include\;..\..\src\libidn2\lib\;..\..\src\nghttp2\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\brotli\c\include\;..\..\src\OpenSSL\include\;..\..\src\zlib\;..\..\src\zstd\lib\;..\..\src\c-ares\include\;..\..\src\libidn2\lib\;..\..\src\nghttp2\lib\includes\;..\..\src\nghttp3\lib\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -284,7 +284,6 @@
     <ClCompile Include="..\..\src\curl\lib\version.c" />
     <ClCompile Include="..\..\src\curl\lib\version_win32.c" />
     <ClCompile Include="..\..\src\curl\lib\vquic\msh3.c" />
-    <ClCompile Include="..\..\src\curl\lib\vquic\ngtcp2.c" />
     <ClCompile Include="..\..\src\curl\lib\vquic\quiche.c" />
     <ClCompile Include="..\..\src\curl\lib\vquic\vquic.c" />
     <ClCompile Include="..\..\src\curl\lib\vssh\libssh2.c" />

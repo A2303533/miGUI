@@ -27,9 +27,9 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#include "urldata.h"
-#include "dynbuf.h"
-#include "curl_printf.h"
+#include "../urldata.h"
+#include "../dynbuf.h"
+#include "../curl_printf.h"
 #include "vquic.h"
 
 #ifdef O_BINARY

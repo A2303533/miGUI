@@ -56,6 +56,7 @@ MGF_LINK_LIBRARY("zstd")
 MGF_LINK_LIBRARY("cares")
 MGF_LINK_LIBRARY("libidn2")
 MGF_LINK_LIBRARY("nghttp2")
+MGF_LINK_LIBRARY("nghttp3")
 
 using namespace mgf;
 
@@ -152,6 +153,7 @@ void Framework::InitCURL()
 			mgf::LogWriteInfo("c-ares version %s (%u)\n", vi->ares, vi->ares_num);
 			mgf::LogWriteInfo("libidn2 version %s \n", vi->libidn);
 			mgf::LogWriteInfo("nghttp2 version %s (%u)\n", vi->nghttp2_version, vi->nghttp2_ver_num);
+			//mgf::LogWriteInfo("quic version %s\n", vi->quic_version);
 		}
 		else
 			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);

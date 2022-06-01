@@ -90,4 +90,5 @@ build/libidn2/Release
 build/nghttp2/Debug
 
 build/nghttp2/Release
-
+build/nghttp3/Debug
+build/nghttp3/Release

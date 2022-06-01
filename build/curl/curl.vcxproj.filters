@@ -381,9 +381,6 @@
     <ClCompile Include="..\..\src\curl\lib\asyn-ares.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\curl\lib\vquic\ngtcp2.c">
-      <Filter>Source Files\vquic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\curl\lib\vquic\msh3.c">
       <Filter>Source Files\vquic</Filter>
     </ClCompile>
