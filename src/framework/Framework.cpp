@@ -38,7 +38,7 @@
 #include "framework/FontImpl.h"
 #include "framework/Log.h"
 
-#include "curl/curl.h"
+//#include "curl/curl.h"
 
 #ifdef MG_PLATFORM_WINDOWS
 #include <Windows.h>
@@ -47,16 +47,19 @@ HRESULT g_CoInitializeResult = 0;
 #pragma comment(lib, "Crypt32.lib")
 #endif
 
+#ifdef MGF_OPENSSL
 MGF_LINK_LIBRARY("OpenSSL")
-MGF_LINK_LIBRARY("curl")
-MGF_LINK_LIBRARY("libssh2")
+#endif
+
+//MGF_LINK_LIBRARY("curl")
+//MGF_LINK_LIBRARY("libssh2")
 MGF_LINK_LIBRARY("brotli")
 MGF_LINK_LIBRARY("zlib")
 MGF_LINK_LIBRARY("zstd")
-MGF_LINK_LIBRARY("cares")
-MGF_LINK_LIBRARY("libidn2")
-MGF_LINK_LIBRARY("nghttp2")
-MGF_LINK_LIBRARY("nghttp3")
+//MGF_LINK_LIBRARY("cares")
+//MGF_LINK_LIBRARY("libidn2")
+//MGF_LINK_LIBRARY("nghttp2")
+//MGF_LINK_LIBRARY("nghttp3")
 
 using namespace mgf;
 
@@ -107,16 +110,16 @@ Framework::Framework()
 	}
 #endif
 
-	InitCURL();
+	//InitCURL();
 }
 
 Framework::~Framework()
 {
-	if (m_isCURLReady)
+	/*if (m_isCURLReady)
 	{
 		mgf::LogWriteInfo("%s: shutdown curl\n", MGF_FUNCTION);
 		curl_global_cleanup();
-	}
+	}*/
 
 #ifdef MG_PLATFORM_WINDOWS
 	if(g_CoInitializeResult == S_OK
@@ -136,29 +139,80 @@ StringW* Framework::GetAppDir()
 	return &m_appDirectory;
 }
 
-void Framework::InitCURL()
+#define FROM_ADDR    "<admin@mail.my>"
+#define TO_ADDR      "<artembasov@outlook.com>"
+#define CC_ADDR      "<artembasov@outlook.com>"
+#define FROM_MAIL "Sender Person " FROM_ADDR
+#define TO_MAIL   "A Receiver " TO_ADDR
+#define CC_MAIL   "John CC Smith " CC_ADDR
+static const char* payload_text =
+"Date: Mon, 29 Nov 2010 21:54:29 +1100\r\n"
+"To: " TO_MAIL "\r\n"
+"From: " FROM_MAIL "\r\n"
+"Cc: " CC_MAIL "\r\n"
+"Message-ID: <dcd7cb36-11db-487a-9f3a-e652a9458efd@"
+"rfcpedant.example.org>\r\n"
+"Subject: SMTP example message\r\n"
+"\r\n" /* empty line to divide headers from body, see RFC5322 */
+"The body of the message starts here.\r\n"
+"\r\n"
+"It could be a lot of lines, could be MIME encoded, whatever.\r\n"
+"Check RFC5322.\r\n";
+
+struct upload_status {
+	size_t bytes_read;
+};
+
+static size_t payload_source(char* ptr, size_t size, size_t nmemb, void* userp)
 {
-	if (!m_isCURLReady)
-	{
-		if (curl_global_init(CURL_GLOBAL_ALL) == CURLE_OK)
-		{
-			m_isCURLReady = 1;
-			curl_version_info_data* vi = curl_version_info(CURLVERSION_FIRST);
-			mgf::LogWriteInfo("curl version %s (%u)\n", vi->version, vi->version_num);
-			mgf::LogWriteInfo("libssh version %s\n", vi->libssh_version);
-			mgf::LogWriteInfo("OpenSSL version %s (%u)\n", vi->ssl_version, vi->ssl_version_num);
-			mgf::LogWriteInfo("Brotli version %s (%u)\n", vi->brotli_version, vi->brotli_ver_num);
-			mgf::LogWriteInfo("zlib version %s\n", vi->libz_version);
-			mgf::LogWriteInfo("Zstandard version %s (%u)\n", vi->zstd_version, vi->zstd_ver_num);
-			mgf::LogWriteInfo("c-ares version %s (%u)\n", vi->ares, vi->ares_num);
-			mgf::LogWriteInfo("libidn2 version %s \n", vi->libidn);
-			mgf::LogWriteInfo("nghttp2 version %s (%u)\n", vi->nghttp2_version, vi->nghttp2_ver_num);
-			//mgf::LogWriteInfo("quic version %s\n", vi->quic_version);
-		}
-		else
-			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);
+	struct upload_status* upload_ctx = (struct upload_status*)userp;
+	const char* data;
+	size_t room = size * nmemb;
+
+	if ((size == 0) || (nmemb == 0) || ((size * nmemb) < 1)) {
+		return 0;
 	}
+
+	data = &payload_text[upload_ctx->bytes_read];
+
+	if (data) {
+		size_t len = strlen(data);
+		if (room < len)
+			len = room;
+		memcpy(ptr, data, len);
+		upload_ctx->bytes_read += len;
+
+		return len;
+	}
+
+	return 0;
 }
+
+//void Framework::InitCURL()
+//{
+//	if (!m_isCURLReady)
+//	{
+//		if (curl_global_init(CURL_GLOBAL_ALL) == CURLE_OK)
+//		{
+//			m_isCURLReady = 1;
+//			curl_version_info_data* vi = curl_version_info(CURLVERSION_FIRST);
+//			mgf::LogWriteInfo("curl version %s (%u)\n", vi->version, vi->version_num);
+//			mgf::LogWriteInfo("libssh version %s\n", vi->libssh_version);
+//			mgf::LogWriteInfo("OpenSSL version %s (%u)\n", vi->ssl_version, vi->ssl_version_num);
+//			mgf::LogWriteInfo("Brotli version %s (%u)\n", vi->brotli_version, vi->brotli_ver_num);
+//			mgf::LogWriteInfo("zlib version %s\n", vi->libz_version);
+//			mgf::LogWriteInfo("Zstandard version %s (%u)\n", vi->zstd_version, vi->zstd_ver_num);
+//			mgf::LogWriteInfo("c-ares version %s (%u)\n", vi->ares, vi->ares_num);
+//			mgf::LogWriteInfo("libidn2 version %s \n", vi->libidn);
+//			mgf::LogWriteInfo("nghttp2 version %s (%u)\n", vi->nghttp2_version, vi->nghttp2_ver_num);
+//			//mgf::LogWriteInfo("quic version %s\n", vi->quic_version);
+//
+//			
+//		}
+//		else
+//			mgf::LogWriteError("%s: can't init curl\n", MGF_FUNCTION);
+//	}
+//}
 
 bool Framework::Run()
 {

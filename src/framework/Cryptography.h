@@ -33,6 +33,8 @@
 namespace mgf
 {
 
+#ifdef MGF_OPENSSL
+
 #define CryptographyDigestLengthMD 16
 #define CryptographyDigestLengthSHA1 20
 #define CryptographyDigestLengthSHA224 28
@@ -104,6 +106,8 @@ namespace mgf
 		void Print(FILE*, const char* prefix, const char* suffix);
 		unsigned char m_result[CryptographyDigestLengthSHA512];
 	};
+
+#endif
 }
 
 #endif

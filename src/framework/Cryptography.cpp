@@ -32,6 +32,8 @@
 #include "framework/Framework.h"
 #include "framework/Cryptography.h"
 
+#ifdef MGF_OPENSSL
+
 #include "OpenSSL/md5.h"
 #include "OpenSSL/md4.h"
 #include "OpenSSL/md2.h"
@@ -172,3 +174,5 @@ void CryptographySHA512::Print(FILE* f, const char* prefix, const char* suffix)
 {
 	Cryptography_Print(m_result, CryptographyDigestLengthSHA512, f, prefix, suffix);
 }
+
+#endif

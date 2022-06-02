@@ -14,8 +14,10 @@
 #include "framework/Table.h"
 #include "framework/TextBuffer.h"
 #include "framework/Popup.h"
-#include "framework/CURL.h"
+
+#ifdef MGF_OPENSSL
 #include "framework/Cryptography.h"
+#endif
 
 #include "framework/AudioEngine_waveOut.h"
 
@@ -178,7 +180,7 @@ bool AP_application::Init(backend_type bt)
 		mgPoint(MGCW_USEDEFAULT, 0));
 	m_sysWindow->SetUserData(this);
 
-
+#ifdef MGF_OPENSSL
 	{
 		const char* testString = "HelloWorld";
 		printf("Test string: %s\n", testString);
@@ -212,6 +214,7 @@ bool AP_application::Init(backend_type bt)
 		sha512.Generate(testString, strlen(testString));
 		sha512.Print(stdout, "SHA512:[", "]\n");
 	}
+#endif
 	
 	m_style = m_framework->GetNewStyle(1);
 	m_style.listItemBG1.setAsIntegerARGB(0xFFBFDDFF);
@@ -303,8 +306,6 @@ bool AP_application::Init(backend_type bt)
 	
 	// also rebuild all gui
 	m_context->GetSystemWindow()->OnSize();
-
-	mgf::CURL c;
 
 	return true;
 }

@@ -2,7 +2,6 @@
 #include "framework/BackendGDI.h"
 #include "framework/BackendOpenGL.h"
 #include "framework/Array.h"
-#include "framework/CURL.h"
 
 #include "ap.h"
 

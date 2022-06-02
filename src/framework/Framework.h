@@ -53,9 +53,9 @@ namespace mgf
 		virtual ~Framework();
 
 	private:
-		int m_isCURLReady = 0;
+		//int m_isCURLReady = 0;
 	public:
-		void InitCURL();
+		//void InitCURL();
 
 		bool m_run;
 
