@@ -85,11 +85,15 @@ namespace mgf
 
 	class SystemWindow : public BaseClass
 	{
+		friend LRESULT CALLBACK ::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
 		friend class BackendD3D11;
 		friend class BackendGDI;
 		friend class BackendOpenGL;
 		friend class Context;
 		friend class Framework;
+
+		int m_flags = 0;
 
 		struct mgSystemWindowOSData* m_OSData = 0;
 #ifdef MG_PLATFORM_WINDOWS

@@ -51,6 +51,7 @@ SystemWindow::SystemWindow()
 
 SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const mgPoint& windowSize)
 {
+    m_flags = windowFlags;
 #ifdef MG_PLATFORM_WINDOWS
     WNDCLASSEXW wcex;
     wcex.cbSize = sizeof(WNDCLASSEX);
@@ -103,6 +104,25 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     device.dwFlags = 0;
     device.hwndTarget = 0;
     RegisterRawInputDevices(&device, 1, sizeof device);
+
+    if (windowFlags & MGWS_POPUPWINDOW)
+    {
+        if (windowPosition.x == MGCW_USEDEFAULT)
+        {
+            RECT r;
+            GetWindowRect(GetDesktopWindow(), &r);
+
+            int ww = r.right - r.left;
+            int wh = r.bottom - r.top;
+            if (ww && wh)
+            {
+                MoveWindow(m_OSData->hWnd, 
+                (ww / 2) - (windowSize.x / 2),
+                (wh / 2) - (windowSize.y / 2),
+                windowSize.x, windowSize.y, TRUE);
+            }
+        }
+    }
 #endif
 
     m_sizeMinimum.x = 0;
@@ -456,73 +476,76 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                     uint32_t ht = 0;
                     const mgPoint& wsz = pW->GetSize();
-
-                    if ((cursor_point.x >= 0) && (cursor_point.x <= 5))
+                    if (!(pW->m_flags & MGWS_POPUPWINDOW))
                     {
-                        if ((cursor_point.y >= 0) && (cursor_point.y <= 5))
+
+
+                        if ((cursor_point.x >= 0) && (cursor_point.x <= 5))
                         {
+                            if ((cursor_point.y >= 0) && (cursor_point.y <= 5))
+                            {
+                                return HTTOPLEFT;
+                            }
+                        }
+
+                        if ((cursor_point.x >= 0) && (cursor_point.x <= 5))
+                        {
+                            if ((cursor_point.y >= wsz.y - 5) && (cursor_point.y <= wsz.y))
+                            {
+                                return HTBOTTOMLEFT;
+                            }
+                        }
+
+                        if ((cursor_point.x >= wsz.x - 5) && (cursor_point.x <= wsz.x))
+                        {
+                            if ((cursor_point.y >= 0) && (cursor_point.y <= 5))
+                            {
+                                return HTTOPRIGHT;
+                            }
+                        }
+
+                        if ((cursor_point.x >= wsz.x - 5) && (cursor_point.x <= wsz.x))
+                        {
+                            if ((cursor_point.y >= wsz.y - 5) && (cursor_point.y <= wsz.y))
+                            {
+                                return HTBOTTOMRIGHT;
+                            }
+                        }
+
+                        if (cursor_point.y > 0 && cursor_point.y < frame_y)
+                            ht |= 0x1;
+
+                        if (cursor_point.y < wsz.y
+                            && cursor_point.y >(wsz.y - frame_y))
+                            ht |= 0x2;
+
+                        if (cursor_point.x > 0 && cursor_point.x < frame_x)
+                            ht |= 0x4;
+
+                        if (cursor_point.x < wsz.x
+                            && cursor_point.x >(wsz.x - frame_x))
+                            ht |= 0x8;
+
+                        switch (ht)
+                        {
+                        case 1:
+                            return HTTOP;
+                        case 2:
+                            return HTBOTTOM;
+                        case 4:
+                            return HTLEFT;
+                        case 8:
+                            return HTRIGHT;
+                        case 5:
                             return HTTOPLEFT;
-                        }
-                    }
-
-                    if ((cursor_point.x >= 0) && (cursor_point.x <= 5))
-                    {
-                        if ((cursor_point.y >= wsz.y - 5) && (cursor_point.y <= wsz.y))
-                        {
-                            return HTBOTTOMLEFT;
-                        }
-                    }
-
-                    if ((cursor_point.x >= wsz.x - 5) && (cursor_point.x <= wsz.x))
-                    {
-                        if ((cursor_point.y >= 0) && (cursor_point.y <= 5))
-                        {
+                        case 9:
                             return HTTOPRIGHT;
-                        }
-                    }
-
-                    if ((cursor_point.x >= wsz.x - 5) && (cursor_point.x <= wsz.x))
-                    {
-                        if ((cursor_point.y >= wsz.y - 5) && (cursor_point.y <= wsz.y))
-                        {
+                        case 6:
+                            return HTBOTTOMLEFT;
+                        case 10:
                             return HTBOTTOMRIGHT;
                         }
                     }
-
-                    if (cursor_point.y > 0 && cursor_point.y < frame_y)
-                        ht |= 0x1;
-
-                    if (cursor_point.y < wsz.y
-                        && cursor_point.y >(wsz.y - frame_y))
-                        ht |= 0x2;
-
-                    if (cursor_point.x > 0 && cursor_point.x < frame_x)
-                        ht |= 0x4;
-
-                    if (cursor_point.x < wsz.x
-                        && cursor_point.x >(wsz.x - frame_x))
-                        ht |= 0x8;
-
-                    switch (ht)
-                    {
-                    case 1:
-                        return HTTOP;
-                    case 2:
-                        return HTBOTTOM;
-                    case 4:
-                        return HTLEFT;
-                    case 8:
-                        return HTRIGHT;
-                    case 5:
-                        return HTTOPLEFT;
-                    case 9:
-                        return HTTOPRIGHT;
-                    case 6:
-                        return HTBOTTOMLEFT;
-                    case 10:
-                        return HTBOTTOMRIGHT;
-                    }
-
                     if (cursor_point.y < pW->GetCustomTitleBarHitRect()->bottom
                         && cursor_point.y >= pW->GetCustomTitleBarHitRect()->top
                         && cursor_point.x < pW->GetCustomTitleBarHitRect()->right
