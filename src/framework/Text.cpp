@@ -62,6 +62,8 @@ namespace mgf
 }
 
 Text::Text(Window* w, const wchar_t* t, Font* f)
+	:
+	m_window(w)
 {
 	assert(t);
 	assert(f);
@@ -164,3 +166,14 @@ void Text::SetColor(int i)
 	mgColorSetAsIntegerARGB(&m_color, i);
 }
 
+uint32_t Text::GetWidth()
+{
+	uint32_t v = 0;
+	if (m_text.size() && m_font)
+	{
+		mgPoint p;
+		m_window->m_gui_context->getTextSize(m_text.c_str(), m_font, &p);
+		v = p.x;
+	}
+	return v;
+}
