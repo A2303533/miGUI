@@ -31,6 +31,9 @@
 #define _MG_SYSTEMWNDDATA_H_
 
 #ifdef MG_PLATFORM_WINDOWS
+#ifndef WIN32_LEAN_AND_MEAN 
+#define WIN32_LEAN_AND_MEAN 
+#endif
 #include <Windows.h>
 #endif
 

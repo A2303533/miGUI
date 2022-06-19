@@ -42,6 +42,29 @@ namespace mgf
 		Crypto();
 		~Crypto();
 
+		void InitDigestSHA1();
+		void InitDigestSHA224();
+		void InitDigestSHA384();
+		void InitDigestSHA512();
+		void InitDigestSHA512_224();
+		void InitDigestSHA512_256();
+		void InitDigestSHA3_224();
+		void InitDigestSHA3_256();
+		void InitDigestSHA3_384();
+		void InitDigestSHA3_512();
+		void InitDigestSHAKE_128();
+		void InitDigestSHAKE_256();
+		void InitDigestMD2();
+		void InitDigestMD4();
+		void InitDigestMD5();
+		void InitDigestMD5_SHA1();
+		void InitDigestBLAKE2b512();
+		void InitDigestBLAKE2s256();
+		void InitDigestMDC2();
+		void InitDigestRIPEMD160();
+		void InitDigestWHIRLPOOL();
+		void InitDigestSM3();
+
 		void UpdateDigestSHA1(const void* d, size_t sz);
 		void UpdateDigestSHA224(const void* d, size_t sz);
 		void UpdateDigestSHA384(const void* d, size_t sz);

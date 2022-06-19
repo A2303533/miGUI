@@ -131,115 +131,161 @@ Crypto::~Crypto()
 	CRYPTO_FREE_MD(ossdata->m_md_sm3);
 }
 
+void Crypto::InitDigestSHA1() { 
+	OpensslData* ossdata = (OpensslData*)m_opensslData; 
+	EVP_DigestInit_ex(ossdata->m_md_sha1_ctx, EVP_sha1(), 0);
+}
+void Crypto::InitDigestSHA224() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha224_ctx, EVP_sha224(), 0); }
+void Crypto::InitDigestSHA384() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha384_ctx, EVP_sha384(), 0); }
+void Crypto::InitDigestSHA512() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha512_ctx, EVP_sha512(), 0); }
+void Crypto::InitDigestSHA512_224() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha512_224_ctx, EVP_sha512_224(), 0); }
+void Crypto::InitDigestSHA512_256() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha512_256_ctx, EVP_sha512_256(), 0); }
+void Crypto::InitDigestSHA3_224() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha3_224, EVP_sha3_224(), 0); }
+void Crypto::InitDigestSHA3_256() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha3_256, EVP_sha3_256(), 0); }
+void Crypto::InitDigestSHA3_384() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha3_384, EVP_sha3_384(), 0); }
+void Crypto::InitDigestSHA3_512() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sha3_512, EVP_sha3_512(), 0); }
+void Crypto::InitDigestSHAKE_128() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_shake_128, EVP_shake128(), 0); }
+void Crypto::InitDigestSHAKE_256() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_shake_256, EVP_shake256(), 0); }
+void Crypto::InitDigestMD2() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_md2, EVP_md2(), 0); }
+void Crypto::InitDigestMD4() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_md4, EVP_md4(), 0); }
+void Crypto::InitDigestMD5() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_md5, EVP_md5(), 0); }
+void Crypto::InitDigestMD5_SHA1() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_md5_sha1, EVP_md5_sha1(), 0); }
+void Crypto::InitDigestBLAKE2b512() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_blake2b512, EVP_blake2b512(), 0); }
+void Crypto::InitDigestBLAKE2s256() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_blake2s256, EVP_blake2s256(), 0); }
+void Crypto::InitDigestMDC2() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_mdc2, EVP_mdc2(), 0); }
+void Crypto::InitDigestRIPEMD160() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_ripemd160, EVP_ripemd160(), 0); }
+void Crypto::InitDigestWHIRLPOOL() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_whirlpool, EVP_whirlpool(), 0); }
+void Crypto::InitDigestSM3() {
+	OpensslData* ossdata = (OpensslData*)m_opensslData;
+	EVP_DigestInit_ex(ossdata->m_md_sm3, EVP_sm3(), 0); }
+
 void Crypto::UpdateDigestSHA1(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha1_ctx, EVP_sha1(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha1_ctx, d, sz);
 }
 
 void Crypto::UpdateDigestSHA224(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha224_ctx, EVP_sha224(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha224_ctx, d, sz);
 }
 void Crypto::UpdateDigestSHA384(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha384_ctx, EVP_sha384(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha384_ctx, d, sz);
 }
 void Crypto::UpdateDigestSHA512(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha512_ctx, EVP_sha512(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha512_ctx, d, sz);
 }
 void Crypto::UpdateDigestSHA512_224(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha512_224_ctx, EVP_sha512_224(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha512_224_ctx, d, sz);
 }
 void Crypto::UpdateDigestSHA512_256(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha512_256_ctx, EVP_sha512_256(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha512_256_ctx, d, sz);
 }
 void Crypto::UpdateDigestSHA3_224(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha3_224, EVP_sha3_224(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha3_224, d, sz);
 }
 void Crypto::UpdateDigestSHA3_256(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha3_256, EVP_sha3_256(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha3_256, d, sz);
 }
 void Crypto::UpdateDigestSHA3_384(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha3_384, EVP_sha3_384(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha3_384, d, sz);
 }
 void Crypto::UpdateDigestSHA3_512(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sha3_512, EVP_sha3_512(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sha3_512, d, sz);
 }
 void Crypto::UpdateDigestSHAKE_128(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_shake_128, EVP_shake128(), 0);
 	EVP_DigestUpdate(ossdata->m_md_shake_128, d, sz);
 }
 void Crypto::UpdateDigestSHAKE_256(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_shake_256, EVP_shake256(), 0);
 	EVP_DigestUpdate(ossdata->m_md_shake_256, d, sz);
 }
 void Crypto::UpdateDigestMD2(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_md2, EVP_md2(), 0);
 	EVP_DigestUpdate(ossdata->m_md_md2, d, sz);
 }
 void Crypto::UpdateDigestMD4(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_md4, EVP_md4(), 0);
 	EVP_DigestUpdate(ossdata->m_md_md4, d, sz);
 }
 void Crypto::UpdateDigestMD5(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_md5, EVP_md5(), 0);
 	EVP_DigestUpdate(ossdata->m_md_md5, d, sz);
 }
 void Crypto::UpdateDigestMD5_SHA1(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_md5_sha1, EVP_md5_sha1(), 0);
 	EVP_DigestUpdate(ossdata->m_md_md5_sha1, d, sz);
 }
 void Crypto::UpdateDigestBLAKE2b512(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_blake2b512, EVP_blake2b512(), 0);
 	EVP_DigestUpdate(ossdata->m_md_blake2b512, d, sz);
 }
 void Crypto::UpdateDigestBLAKE2s256(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_blake2s256, EVP_blake2s256(), 0);
 	EVP_DigestUpdate(ossdata->m_md_blake2s256, d, sz);
 }
 void Crypto::UpdateDigestMDC2(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_mdc2, EVP_mdc2(), 0);
 	EVP_DigestUpdate(ossdata->m_md_mdc2, d, sz);
 }
 void Crypto::UpdateDigestRIPEMD160(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_ripemd160, EVP_ripemd160(), 0);
 	EVP_DigestUpdate(ossdata->m_md_ripemd160, d, sz);
 }
 void Crypto::UpdateDigestWHIRLPOOL(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_whirlpool, EVP_whirlpool(), 0);
 	EVP_DigestUpdate(ossdata->m_md_whirlpool, d, sz);
 }
 void Crypto::UpdateDigestSM3(const void* d, size_t sz) {
 	OpensslData* ossdata = (OpensslData*)m_opensslData;
-	EVP_DigestInit_ex(ossdata->m_md_sm3, EVP_sm3(), 0);
 	EVP_DigestUpdate(ossdata->m_md_sm3, d, sz);
 }
 

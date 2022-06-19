@@ -65,6 +65,12 @@ namespace mgf
 		mgf::Backend* GetBackend();
 
 		void OnWindowSize();
+
+		// use OnWindowSize
+		//void OnUpdate()
+		
+		// use OnWindowSize
+		//void OnRebuild()
 		
 		//mgf::Window* CreateWindow();
 		/*
