@@ -65,7 +65,9 @@ class Application
 		int m_mainMenu_close = -1;
 		int m_mainMenu_FileSave = -1;
 	}m_guiIcons_ids;
+	
 	mgf::Icons* m_guiIcons = 0;
+	mgf::ArchiveSystem* m_archiveSystem = 0;
 
 	uint32_t m_versionMaj = 0;
 	uint32_t m_versionMin = 2;

@@ -63,6 +63,7 @@ namespace mgf
 
 		Icons* CreateIcons(const char* imageFile, Backend* backend);
 		Icons* CreateIcons(const wchar_t* imageFile, Backend* backend);
+		Icons* CreateIcons(const uint8_t* buffer, uint32_t bufferSize, ImageLoader, Backend* backend);
 
 		Image* LoadImage(const uint8_t* buffer, uint32_t bufferSize, ImageLoader);
 		Image* LoadImage(const char* imageFile);

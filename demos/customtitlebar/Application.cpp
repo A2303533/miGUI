@@ -698,7 +698,22 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 		return false;
 	}
 
-	m_guiIcons = m_framework->CreateIcons(L"../data/app_icons.png", m_backend);
+	m_archiveSystem = new mgf::ArchiveSystem;
+	mgf::ArchiveZipFile* zip = m_archiveSystem->ZipAdd("../data/appicons.zip");
+	if (zip)
+	{
+		uint32_t dataSize = 0;
+		uint8_t* data = m_archiveSystem->ZipUnzip("app_icons.png", &dataSize, zip);
+		if (data)
+		{
+			m_guiIcons = m_framework->CreateIcons(data, dataSize, mgf::ImageLoader::png, m_backend);
+			free(data);
+		}
+	}
+
+	if(!m_guiIcons)
+		m_guiIcons = m_framework->CreateIcons(L"../data/app_icons.png", m_backend);
+
 	m_guiIcons_ids.m_mainMenu_logo = m_guiIcons->Add(0, 0, 29, 15);
 	m_guiIcons_ids.m_mainMenu_minimize = m_guiIcons->Add(33, 0, 17, 17);
 	m_guiIcons_ids.m_mainMenu_maximize = m_guiIcons->Add(50, 0, 17, 17);

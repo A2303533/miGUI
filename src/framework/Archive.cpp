@@ -47,11 +47,15 @@ ArchiveSystem::~ArchiveSystem()
 {
 	for (size_t i = 0; i < m_zipFiles.size(); ++i)
 	{
+		if (m_zipFiles[i]->m_implementation)
+		{
+			unzClose(m_zipFiles[i]->m_implementation);
+		}
 		delete m_zipFiles[i];
 	}
 }
 
-bool ArchiveSystem::ZipAdd(const char* fn)
+ArchiveZipFile* ArchiveSystem::ZipAdd(const char* fn)
 {
 	assert(fn);
 	LogWriteInfo("AddZip: [%s]\n", fn);
@@ -59,39 +63,85 @@ bool ArchiveSystem::ZipAdd(const char* fn)
 	if (!std::filesystem::exists(fn))
 	{
 		LogWriteWarning("AddZip: Unable to find zip file [%s]\n", fn);
-		return false;
+		return 0;
 	}
 
 	unzFile uf = unzOpen64(fn);
 	if (uf == NULL)
 	{
 		LogWriteWarning("AddZip: unzOpen64 failed [%s]\n", fn);
-		return false;
+		return 0;
 	}
-
+	
 	ArchiveZipFile* zp = new ArchiveZipFile;
 	zp->m_fileName = fn;
+	zp->m_implementation = uf;
+
 	m_zipFiles.push_back(zp);
 
-	return true;
-}
-
-ArchiveZipFile* ArchiveSystem::ZipContain(const char* fileInZip)
-{
-	for (auto* zip : m_zipFiles)
-	{
-		for (auto& s : zip->m_files)
-		{
-			if (strcmp(fileInZip, s.data()) == 0)
-				return zip;
-		}
-	}
-	return NULL;
+	return zp;
 }
 
 uint8_t* ArchiveSystem::ZipUnzip(const char* fileInZip, uint32_t* size, ArchiveZipFile* a)
 {
+	if (a)
+		goto lockate_file;
+
+	for (size_t i = 0, sz = m_zipFiles.size(); i < sz; ++i)
+	{
+		if (unzLocateFile(m_zipFiles[i]->m_implementation, fileInZip, 0) == UNZ_OK)
+		{
+			a = m_zipFiles[i];
+			goto unzip_file;
+		}
+	}
+
+	LogWriteWarning("file %s not found in the zipfile\n", fileInZip);
 	return 0;
+
+lockate_file:;
+	if (unzLocateFile(a->m_implementation, fileInZip, 0) != UNZ_OK)
+	{
+		LogWriteWarning("file %s not found in the zipfile\n", fileInZip);
+		return 0;
+	}
+
+unzip_file:;
+	char filename_inzip[256];
+
+	unz_file_info64 file_info;
+	int err = unzGetCurrentFileInfo64(a->m_implementation, &file_info, 
+		filename_inzip, 
+		sizeof(filename_inzip), 
+		NULL, 0, NULL, 0);
+
+	if (err != UNZ_OK)
+	{
+		LogWriteWarning("error %d with zipfile in unzGetCurrentFileInfo [%s]\n", err, fileInZip);
+		return 0;
+	}
+
+	err = unzOpenCurrentFilePassword(a->m_implementation, 0);
+	if (err != UNZ_OK)
+	{
+		LogWriteWarning("error %d with zipfile in unzOpenCurrentFilePassword [%s]\n", err, fileInZip);
+		return 0;
+	}
+
+	uint8_t* data = (uint8_t*)malloc(file_info.uncompressed_size);
+	*size = (uint32_t)file_info.uncompressed_size;
+	
+	err = unzReadCurrentFile(a->m_implementation, data, file_info.uncompressed_size);
+	if (err < 0)
+	{
+		LogWriteWarning("error %d with zipfile in unzReadCurrentFile [%s]\n", err, fileInZip);
+		free(data);
+		data = 0;
+	}
+
+	unzCloseCurrentFile(a->m_implementation);
+
+	return data;
 }
 
 bool ArchiveSystem::Compress(CompressionInfo* info)

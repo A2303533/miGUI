@@ -75,9 +75,9 @@ namespace mgf
 
     struct ArchiveZipFile
     {
-        std::vector<StringA> m_files;
-
         StringA m_fileName;
+
+        void* m_implementation = 0;
     };
 
     /// <summary>
@@ -102,15 +102,7 @@ namespace mgf
         /// Add zip file for unzipping files from it.
         /// </summary>
         /// <param name="zipFile">Path to .zip file</param>
-        /// <returns>true - if success</returns>
-        bool ZipAdd(const char* zipFile);
-
-        /// <summary>
-        /// Check if file inside of some .zip archive.
-        /// </summary>
-        /// <param name="fileInZip">File path.</param>
-        /// <returns>If some .zip file contain this file then return address.</returns>
-        ArchiveZipFile* ZipContain(const char* fileInZip);
+        ArchiveZipFile* ZipAdd(const char* zipFile);
 
         /// <summary>
         /// Unzip file. If a is NULL first found file will be processed.

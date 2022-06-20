@@ -322,6 +322,24 @@ Image* Framework::LoadImage(const char* imageFile)
 	return 0;
 }
 
+Icons* Framework::CreateIcons(const uint8_t* buffer, uint32_t bufferSize, ImageLoader il, Backend* backend)
+{
+	Icons* icons = 0;
+	Image* image = LoadImage(buffer, bufferSize, il);
+	if (image)
+	{
+		icons = new Icons(backend);
+		icons->m_texture = backend->CreateTexture(image->m_image);
+		mgPointSet(&icons->m_textureSize, image->m_image->width, image->m_image->height);
+		image->Release();
+	}
+	else
+	{
+		LogWriteWarning("Unable to load image in %s\n", MGF_FUNCTION);
+	}
+	return icons;
+}
+
 Icons* Framework::CreateIcons(const wchar_t* imageFile, Backend* backend)
 {
 	StringW strw = imageFile;
@@ -339,8 +357,10 @@ Icons* Framework::CreateIcons(const char* imageFile, Backend* backend)
 		icons->m_texture = backend->CreateTexture(image->m_image);
 		mgPointSet(&icons->m_textureSize, image->m_image->width, image->m_image->height);
 		image->Release();
-		
-		/*icons->m_icons = mgCreateIcons(t, image->m_image->width, image->m_image->height, iconsNum);*/
+	}
+	else
+	{
+		LogWriteWarning("Unable to load image in %s\n", MGF_FUNCTION);
 	}
 	return icons;
 }

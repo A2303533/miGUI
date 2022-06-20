@@ -53,6 +53,8 @@ namespace mgf
 	class Popup;
 	class AudioEngine;
 	class DND;
+	class ArchiveSystem;
+	struct ArchiveZipFile;
 }
 
 #endif
