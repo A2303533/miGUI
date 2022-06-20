@@ -31,6 +31,11 @@
 #include "mgf.h"
 #include "framework/Context.h"
 #include "framework/Backend.h"
+
+#ifdef WIN32_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#endif
+
 #include "framework/SystemWindow.h"
 
 using namespace mgf;
@@ -105,24 +110,6 @@ SystemWindow::SystemWindow(int windowFlags, const mgPoint& windowPosition, const
     device.hwndTarget = 0;
     RegisterRawInputDevices(&device, 1, sizeof device);
 
-    if (windowFlags & MGWS_POPUPWINDOW)
-    {
-        if (windowPosition.x == MGCW_USEDEFAULT)
-        {
-            RECT r;
-            GetWindowRect(GetDesktopWindow(), &r);
-
-            int ww = r.right - r.left;
-            int wh = r.bottom - r.top;
-            if (ww && wh)
-            {
-                MoveWindow(m_OSData->hWnd, 
-                (ww / 2) - (windowSize.x / 2),
-                (wh / 2) - (windowSize.y / 2),
-                windowSize.x, windowSize.y, TRUE);
-            }
-        }
-    }
 #endif
 
     m_sizeMinimum.x = 0;
@@ -422,7 +409,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return 0;
     }break;
     case WM_NCHITTEST: {
-        // return DefWindowProc(hWnd, message, wParam, lParam);
         if (pW)
         {
             if (pW->IsUseCustomTitleBar())
@@ -476,9 +462,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                     uint32_t ht = 0;
                     const mgPoint& wsz = pW->GetSize();
-                    if (!(pW->m_flags & MGWS_POPUPWINDOW))
+                    if ((pW->m_flags & MGWS_POPUPWINDOW) != MGWS_POPUPWINDOW)
                     {
-
 
                         if ((cursor_point.x >= 0) && (cursor_point.x <= 5))
                         {

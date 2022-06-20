@@ -37,6 +37,7 @@
 #include "framework/Popup.h"
 #include "framework/FontImpl.h"
 #include "framework/Log.h"
+#include "framework/List.h"
 
 //#include "curl/curl.h"
 
@@ -172,7 +173,7 @@ static size_t payload_source(char* ptr, size_t size, size_t nmemb, void* userp)
 	if ((size == 0) || (nmemb == 0) || ((size * nmemb) < 1)) {
 		return 0;
 	}
-
+	
 	data = &payload_text[upload_ctx->bytes_read];
 
 	if (data) {

@@ -31,8 +31,10 @@
 #include "fastlz.h"
 #include "brotli/encode.h"
 #include "Log.h"
+#include "unzip.h"
 
 #include <iterator>
+#include <filesystem>
 
 using namespace mgf;
 
@@ -43,7 +45,53 @@ ArchiveSystem::ArchiveSystem()
 
 ArchiveSystem::~ArchiveSystem()
 {
+	for (size_t i = 0; i < m_zipFiles.size(); ++i)
+	{
+		delete m_zipFiles[i];
+	}
+}
 
+bool ArchiveSystem::ZipAdd(const char* fn)
+{
+	assert(fn);
+	LogWriteInfo("AddZip: [%s]\n", fn);
+
+	if (!std::filesystem::exists(fn))
+	{
+		LogWriteWarning("AddZip: Unable to find zip file [%s]\n", fn);
+		return false;
+	}
+
+	unzFile uf = unzOpen64(fn);
+	if (uf == NULL)
+	{
+		LogWriteWarning("AddZip: unzOpen64 failed [%s]\n", fn);
+		return false;
+	}
+
+	ArchiveZipFile* zp = new ArchiveZipFile;
+	zp->m_fileName = fn;
+	m_zipFiles.push_back(zp);
+
+	return true;
+}
+
+ArchiveZipFile* ArchiveSystem::ZipContain(const char* fileInZip)
+{
+	for (auto* zip : m_zipFiles)
+	{
+		for (auto& s : zip->m_files)
+		{
+			if (strcmp(fileInZip, s.data()) == 0)
+				return zip;
+		}
+	}
+	return NULL;
+}
+
+uint8_t* ArchiveSystem::ZipUnzip(const char* fileInZip, uint32_t* size, ArchiveZipFile* a)
+{
+	return 0;
 }
 
 bool ArchiveSystem::Compress(CompressionInfo* info)

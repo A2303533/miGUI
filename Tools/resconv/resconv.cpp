@@ -3,6 +3,7 @@
 #include "framework/Archive.h"
 
 MGF_LINK_LIBRARY("mgf")
+MGF_LINK_LIBRARY("zlib")
 
 // Function must create outFile, .h file, that contain array and (maybe some 
 //  other data) with `name`

@@ -11,6 +11,7 @@
 #include <fstream>
 
 #include <ShlObj.h>
+#include <shellapi.h>
 
 extern AP_application* g_app;
 

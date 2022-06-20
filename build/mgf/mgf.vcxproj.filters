@@ -19,6 +19,9 @@
     <Filter Include="Source Files\migui">
       <UniqueIdentifier>{62aaf9c8-1c01-4b63-9b61-73c10b04813a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\mgf\minizip">
+      <UniqueIdentifier>{bb2c21b6-7c3c-498a-b152-f0094fb4db64}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\framework\SystemWindow.cpp">
@@ -221,6 +224,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\framework\Cryptography.cpp">
       <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zlib\contrib\minizip\unzip.c">
+      <Filter>Source Files\mgf\minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\zlib\contrib\minizip\ioapi.c">
+      <Filter>Source Files\mgf\minizip</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

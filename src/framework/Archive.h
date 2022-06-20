@@ -73,6 +73,13 @@ namespace mgf
         uint32_t m_level = 2;
     };
 
+    struct ArchiveZipFile
+    {
+        std::vector<StringA> m_files;
+
+        StringA m_fileName;
+    };
+
     /// <summary>
     /// Not super mega abstract class.
     /// Just simple wrapper class without some initializations
@@ -85,9 +92,34 @@ namespace mgf
         bool _compress_fastlz(CompressionInfo* info);
         bool _decompress_fastlz(CompressionInfo* info);
        // bool _decompress_fastlz(CompressionInfo* info, std::vector<uint8_t>& toVector);
+
+        std::vector<ArchiveZipFile*> m_zipFiles;
     public:
         ArchiveSystem();
         ~ArchiveSystem();
+
+        /// <summary>
+        /// Add zip file for unzipping files from it.
+        /// </summary>
+        /// <param name="zipFile">Path to .zip file</param>
+        /// <returns>true - if success</returns>
+        bool ZipAdd(const char* zipFile);
+
+        /// <summary>
+        /// Check if file inside of some .zip archive.
+        /// </summary>
+        /// <param name="fileInZip">File path.</param>
+        /// <returns>If some .zip file contain this file then return address.</returns>
+        ArchiveZipFile* ZipContain(const char* fileInZip);
+
+        /// <summary>
+        /// Unzip file. If a is NULL first found file will be processed.
+        /// Set a if you have many zip files with same file inside (use ZipContain to find a).
+        /// Function will allocate memory using malloc, and will write data size in size.
+        /// Pointer will return if everything is OK, use free for deallocation.
+        /// </summary>
+        /// <param name="fileInZip">File path.</param>
+        uint8_t* ZipUnzip(const char* fileInZip, uint32_t* size, ArchiveZipFile* a = NULL);
 
         /// <summary>
         /// Set all data in `info`. If compression is OK, true will return
