@@ -574,7 +574,7 @@ namespace mgf
 				}
 			}*/
 
-			const wchar_t* old = m_data;
+			const wchar_t* old = (const wchar_t*)m_data;
 
 			String_base<char> output;
 			std::mbstate_t state = std::mbstate_t();
@@ -695,54 +695,284 @@ namespace mgf
 
 		void trim_spaces()
 		{
-			for (size_t i = 0, sz = m_size; i < sz; ++i)
+			while (true)
 			{
-				if (m_data[m_size - 1] == (char_type)' '
-					|| m_data[m_size - 1] == (char_type)'\f'
-					|| m_data[m_size - 1] == (char_type)'\n'
-					|| m_data[m_size - 1] == (char_type)'\r'
-					|| m_data[m_size - 1] == (char_type)'\t'
-					|| m_data[m_size - 1] == (char_type)'\v')
-				{
-					pop_back();
-				}
+				if (is_space(0u))
+					pop_front();
 				else
 					break;
 			}
-			
-			if (m_data[0] == (char_type)' '
-				|| m_data[0] == (char_type)'\f'
-				|| m_data[0] == (char_type)'\n'
-				|| m_data[0] == (char_type)'\r'
-				|| m_data[0] == (char_type)'\t'
-				|| m_data[0] == (char_type)'\v')
-			{
-				int howMany = 0;
-				for (size_t i = 0, sz = m_size; i < sz; ++i)
-				{
-					if (m_data[i] == (char_type)' '
-						|| m_data[i] == (char_type)'\f'
-						|| m_data[i] == (char_type)'\n'
-						|| m_data[i] == (char_type)'\r'
-						|| m_data[i] == (char_type)'\t'
-						|| m_data[i] == (char_type)'\v')
-					{
-						++howMany;
-					}
-					else
-						break;
-				}
 
-				if (howMany == m_size)
-					clear();
+			while (true)
+			{
+				if (is_space(m_size - 1u))
+					pop_back();
 				else
-					erase(0, howMany-1);
+					break;
 			}
+
 		}
 	};
 
 	typedef String_base<wchar_t> StringW;
+	typedef String_base<char16_t> StringU16;
 	typedef String_base<char> StringA;
+
+	namespace util
+	{
+		template<typename char_type>
+		bool isDigit(char_type c)
+		{
+			if (c < 0x7B)
+			{
+				if (c >= (char_type)'0' && c <= (char_type)'9')
+					return true;
+			}
+			return false;
+		}
+
+		template<typename char_type>
+		bool isAlpha(char_type c)
+		{
+			if (c < 0x7B) {
+				if ((c >= (char_type)'a' && c <= (char_type)'z')
+					|| (c >= (char_type)'A' && c <= (char_type)'Z'))
+					return true;
+			}
+			else if (c >= 0xC0 && c <= 0x2AF) {
+				return true;
+			}
+			else if (c >= 0x370 && c < 0x374) {
+				return true;
+			}
+			else if (c >= 0x376 && c < 0x378) {
+				return true;
+			}
+			else if (c >= 0x376 && c < 0x378) {
+				return true;
+			}
+			else if (c == 0x37F || c == 0x386) {
+				return true;
+			}
+			else if (c > 0x387 && c < 0x38B) {
+				return true;
+			}
+			else if (c == 0x38C) {
+				return true;
+			}
+			else if (c > 0x38D && c < 0x3A2) {
+				return true;
+			}
+			else if (c > 0x3A2 && c < 0x482) {
+				return true;
+			}
+			else if (c > 0x489 && c < 0x530) {
+				return true;
+			}
+			else if (c > 0x530 && c < 0x557) {
+				return true;
+			}
+			else if (c > 0x560 && c < 0x588) {
+				return true;
+			}
+			else if (c >= 0x5D0 && c < 0x5EB) {
+				return true;
+			}/*
+				Mey be for isAlphaUnicode( c )
+				else if( c >= 0x630 && c < 0x64B ){
+				return true;
+			}else if( c > 0x66D && c < 0x6D4 ){
+				return true;
+			}else if( c > 0x6F9 && c < 0x6FD ){
+				return true;
+			}else if( c >= 0x710 && c < 0x730 ){
+				return true;
+			}else if( c > 0x74C && c < 0x7A6 ){
+				return true;
+			}else if( c == 0x7B0 || c == 0x7B1 ){
+				return true;
+			}else if( c > 0x7C9 && c < 0x7EB ){
+				return true;
+			}else if( c > 0x7FF && c < 0x816 ){
+				return true;
+			}else if( c > 0x83F && c < 0x859 ){
+				return true;
+			}else if( c > 0x85F && c < 0x86B ){
+				return true;
+			}else if( c > 0x89F && c < 0x8B5 ){
+				return true;
+			}else if( c > 0x8B5 && c < 0x8BE ){
+				return true;
+			}else if( c > 0x903 && c < 0x93A ){
+				return true;
+			}else if( c > 0x957 && c < 0x962 ){
+				return true;
+			}else if( c > 0x971 && c < 0x980 ){
+				return true;
+			}else if( c > 0x984 && c < 0x98D ){
+				return true;
+			}else if( c > 0x984 && c < 0x98D ){
+				return true;
+			}else if( c == 0x98F || c == 0x990 || c == 0x9B2 || c == 0x9DC || c == 0x9DD ){
+				return true;
+			}else if( c > 0x992 && c < 0x9A9 ){
+				return true;
+			}else if( c > 0x9A9 && c < 0x9B0 ){
+				return true;
+			}else if( c > 0x9B5 && c < 0x9BA ){
+				return true;
+			}else if( c > 0x9DE && c < 0x9E2 ){
+				return true;
+			}else if( c == 0x9F0 || c == 0x9F1 || c == 0xA0F || c == 0xA10 ){
+				return true;
+			}else if( c > 0xA04 && c < 0xA0B ){
+				return true;
+			}else if( c > 0xA13 && c < 0xA29 ){
+				return true;
+			}else if( c > 0xA29 && c < 0xA31 ){
+				return true;
+			}else if( c == 0xA32 || c == 0xA33 || c == 0xA35 || c == 0xA36 || c == 0xA38 || c == 0xA39 ){
+				return true;
+			}*/
+			return false;
+		}
+
+		template<typename T>
+		void stringReplaseSubString(String_base<T>& source, const String_base<T>& target, const String_base<T>& text)
+		{
+			String_base<T> result;
+
+			size_t source_sz = source.size();
+			size_t target_sz = target.size();
+			size_t text_sz = text.size();
+
+			for (size_t i = 0u; i < source_sz; ++i)
+			{
+				if ((source_sz - i) < target_sz)
+				{
+					for (size_t i2 = i; i2 < source_sz; ++i2)
+					{
+						result += source[i2];
+					}
+					break;
+				}
+
+				bool comp = false;
+				for (size_t o = 0u; o < target_sz; ++o)
+				{
+					if (source[i + o] == target[o])
+					{
+						if (!comp)
+						{
+							comp = true;
+						}
+					}
+					else
+					{
+						comp = false;
+						break;
+					}
+				}
+
+				if (comp)
+				{
+					for (size_t o = 0u; o < text_sz; ++o)
+					{
+						result += text[o];
+					}
+					i += target_sz - 1u;
+				}
+				else
+				{
+					result += source[i];
+				}
+			}
+
+			if (result.size())
+			{
+				source.clear();
+				source.assign(result);
+			}
+		}
+
+		inline 
+		void string_UTF16_to_UTF8(String_base<char16_t>& utf16, String_base<char>& utf8)
+		{
+			size_t sz = utf16.size();
+			for (size_t i = 0u; i < sz; ++i) {
+				char16_t ch16 = utf16[i];
+				if (ch16 < 0x80) {
+					utf8 += (char)ch16;
+				}
+				else if (ch16 < 0x800) {
+					utf8 += (char)((ch16 >> 6) | 0xc0);
+					utf8 += (char)((ch16 & 0x3f) | 0x80);
+				}
+			}
+		}
+		
+		inline 
+		void string_UTF8_to_UTF16(String_base<char16_t>& utf16, String_base<char>& utf8)
+		{
+			std::vector<uint32_t> unicode;
+			size_t i = 0u;
+			auto sz = utf8.size();
+			while (i < sz) {
+				size_t uni = 0u;
+				size_t todo = 0u;
+				//				bool error = false;
+				uint8_t ch = utf8[i++];
+				if (ch <= 0x7F) {
+					uni = ch;
+					todo = 0;
+				}
+				else if (ch <= 0xBF) {
+					//throw std::logic_error("not a UTF-8 string");
+				}
+				else if (ch <= 0xDF) {
+					uni = ch & 0x1F;
+					todo = 1;
+				}
+				else if (ch <= 0xEF) {
+					uni = ch & 0x0F;
+					todo = 2;
+				}
+				else if (ch <= 0xF7) {
+					uni = ch & 0x07;
+					todo = 3;
+				}
+				else {
+					//throw std::logic_error("not a UTF-8 string");
+				}
+				for (size_t j = 0; j < todo; ++j) {
+					//if( i == utf8.size() )
+						//throw std::logic_error("not a UTF-8 string");
+					uint8_t ch2 = utf8[i++];
+					//if( ch < 0x80 || ch > 0xBF )
+						//throw std::logic_error("not a UTF-8 string");
+					uni <<= 6;
+					uni += ch2 & 0x3F;
+				}
+				//if( uni >= 0xD800 && uni <= 0xDFFF )
+					//throw std::logic_error("not a UTF-8 string");
+				//if( uni > 0x10FFFF )
+					//throw std::logic_error("not a UTF-8 string");
+				unicode.push_back(uni);
+			}
+			auto sz2 = unicode.size();
+			for (size_t o = 0u; o < sz2; ++o) {
+				size_t uni = unicode[o];
+				if (uni <= 0xFFFF) {
+					utf16 += (char16_t)uni;
+				}
+				else {
+					uni -= 0x10000;
+					utf16 += (wchar_t)((uni >> 10) + 0xD800);
+					utf16 += (wchar_t)((uni & 0x3FF) + 0xDC00);
+				}
+			}
+		}
+	}
 }
 
 

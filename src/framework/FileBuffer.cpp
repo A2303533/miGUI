@@ -31,7 +31,7 @@
 
 using namespace mgf;
 
-FileBuffer::FileBuffer(const uint8_t* buffer, uint32_t size)
+FileBuffer::FileBuffer(const uint8_t* buffer, size_t size)
 	:
 	m_buffer((uint8_t*)buffer),
 	m_size(size)
@@ -42,7 +42,7 @@ FileBuffer::~FileBuffer()
 {
 }
 
-void FileBuffer::seek(uint32_t offset, int where)
+void FileBuffer::seek(size_t offset, int where)
 {
 	switch (where)
 	{
@@ -62,16 +62,16 @@ void FileBuffer::seek(uint32_t offset, int where)
 	}
 }
 
-uint32_t FileBuffer::tell()
+size_t FileBuffer::tell()
 {
 	return m_cursor;
 }
 
-uint32_t FileBuffer::read(void* buffer, uint32_t size)
+size_t FileBuffer::read(void* buffer, size_t size)
 {
 	uint8_t* bytes = (uint8_t*)buffer;
 
-	uint32_t numRead = 0;
+	size_t numRead = 0;
 	for (numRead = 0; numRead < size; ++numRead)
 	{
 		if (m_cursor == m_size)

@@ -231,5 +231,11 @@
     <ClCompile Include="..\..\src\zlib\contrib\minizip\ioapi.c">
       <Filter>Source Files\mgf\minizip</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\XML.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\FileSystem.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

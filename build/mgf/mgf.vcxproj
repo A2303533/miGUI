@@ -196,6 +196,7 @@
     <ClCompile Include="..\..\src\framework\DND.cpp" />
     <ClCompile Include="..\..\src\framework\Element.cpp" />
     <ClCompile Include="..\..\src\framework\fastlz.c" />
+    <ClCompile Include="..\..\src\framework\FileSystem.cpp" />
     <ClCompile Include="..\..\src\framework\FileBuffer.cpp" />
     <ClCompile Include="..\..\src\framework\FontImpl.cpp" />
     <ClCompile Include="..\..\src\framework\Framework.cpp" />
@@ -233,6 +234,7 @@
     <ClCompile Include="..\..\src\framework\Vec.cpp" />
     <ClCompile Include="..\..\src\framework\Vertex.cpp" />
     <ClCompile Include="..\..\src\framework\Window.cpp" />
+    <ClCompile Include="..\..\src\framework\XML.cpp" />
     <ClCompile Include="..\..\src\mgCursor.c" />
     <ClCompile Include="..\..\src\mgDockPanel.c" />
     <ClCompile Include="..\..\src\mgElementButton.c" />

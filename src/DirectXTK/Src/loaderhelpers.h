@@ -927,7 +927,7 @@ namespace DirectX
                 if (m_handle)
                 {
                     FILE_DISPOSITION_INFO info = {};
-                    info.DeleteFile = TRUE;
+                    info.DeleteFileW = TRUE;
                     (void)SetFileInformationByHandle(m_handle, FileDispositionInfo, &info, sizeof(info));
                 }
             }

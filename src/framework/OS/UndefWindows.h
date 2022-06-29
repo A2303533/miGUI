@@ -42,6 +42,18 @@
 #undef DrawText
 #endif
 
+#ifdef CreateFile
+#undef CreateFile
+#endif
+
+#ifdef CopyFile
+#undef CopyFile
+#endif
+
+#ifdef DeleteFile
+#undef DeleteFile
+#endif
+
 
 
 #endif

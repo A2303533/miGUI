@@ -42,19 +42,19 @@ namespace mgf
     class FileBuffer
     {
         uint8_t* m_buffer = 0;
-        uint32_t m_size = 0;
-        uint32_t m_cursor = 0;
+        size_t m_size = 0;
+        size_t m_cursor = 0;
     public:
-        FileBuffer(const uint8_t* buffer, uint32_t size);
+        FileBuffer(const uint8_t* buffer, size_t size);
         ~FileBuffer();
 
         /// <summary>
         /// Use SEEK_SET and other macros for second parameter
         /// </summary>
-        void seek(uint32_t offset, int);
+        void seek(size_t offset, int);
 
-        uint32_t tell();
-        uint32_t read(void* buffer, uint32_t size);
+        size_t tell();
+        size_t read(void* buffer, size_t size);
     };
 }
 
