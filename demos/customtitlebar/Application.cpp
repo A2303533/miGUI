@@ -10,6 +10,7 @@
 #include "framework/Font.h"
 #include "framework/Icons.h"
 #include "framework/Archive.h"
+#include "framework/Unicode.h"
 
 #include <filesystem>
 
@@ -95,6 +96,26 @@ bool Application::Init()
 
 	m_windowMain->SetUseCustomTitleBar(true);
 	m_windowMain->SetCustomTitleBarSize(22);
+
+	mgf::StringA stra;
+	mgf::StringW strw;
+	mgf::UnicodeConverter uConv;
+
+	stra.push_back('A');
+	stra.push_back('B');
+	stra.push_back('C');
+	stra.push_back('[');
+	stra.push_back(0xD0);
+	stra.push_back(0x90);
+	stra.push_back(0xD0);
+	stra.push_back(0x91);
+	stra.push_back(0xD0);
+	stra.push_back(0x92);
+	stra.push_back(']');
+	uConv.CharToWchar(stra, strw);
+
+
+
 
 	/*const char* big_buffer = "Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA \
 Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA\

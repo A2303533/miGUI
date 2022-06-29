@@ -231,6 +231,7 @@
     <ClCompile Include="..\..\src\framework\TextBuffer.cpp" />
     <ClCompile Include="..\..\src\framework\TextInput.cpp" />
     <ClCompile Include="..\..\src\framework\Trianlge.cpp" />
+    <ClCompile Include="..\..\src\framework\Unicode.cpp" />
     <ClCompile Include="..\..\src\framework\Vec.cpp" />
     <ClCompile Include="..\..\src\framework\Vertex.cpp" />
     <ClCompile Include="..\..\src\framework\Window.cpp" />

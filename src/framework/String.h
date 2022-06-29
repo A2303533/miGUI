@@ -715,6 +715,7 @@ namespace mgf
 	};
 
 	typedef String_base<wchar_t> StringW;
+	typedef String_base<char8_t> StringU8;
 	typedef String_base<char16_t> StringU16;
 	typedef String_base<char> StringA;
 
