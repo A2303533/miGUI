@@ -235,6 +235,7 @@
     <ClCompile Include="..\..\src\framework\Vec.cpp" />
     <ClCompile Include="..\..\src\framework\Vertex.cpp" />
     <ClCompile Include="..\..\src\framework\Window.cpp" />
+    <ClCompile Include="..\..\src\framework\WinReg.cpp" />
     <ClCompile Include="..\..\src\framework\XML.cpp" />
     <ClCompile Include="..\..\src\mgCursor.c" />
     <ClCompile Include="..\..\src\mgDockPanel.c" />
