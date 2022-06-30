@@ -114,11 +114,62 @@ void UnicodeConverter::U8ToU16(StringU8& in, StringU16& out)
 			}
 			else if ((c1 & 0xF0) == 0xE0) //3
 			{
-
+				++i;
+				if (i < sz)
+				{
+					c2 = in[i];
+					if ((c2 & 0xC0) == 0x80)
+					{
+						++i;
+						if (i < sz)
+						{
+							c3 = in[i];
+							if ((c3 & 0xC0) == 0x80)
+							{
+								char16_t wch = (c1 & 0xF) << 12;
+								wch |= (c2 & 0x3F) << 6;
+								wch |= (c3 & 0x3F);
+								out.push_back(wch);
+							}
+						}
+					}
+				}
 			}
 			else if ((c1 & 0xF8) == 0xF0) //4
 			{
+				++i;
+				if (i < sz)
+				{
+					c2 = in[i];
+					if ((c2 & 0xC0) == 0x80)
+					{
+						++i;
+						if (i < sz)
+						{
+							c3 = in[i];
+							if ((c3 & 0xC0) == 0x80)
+							{
+								++i;
+								if (i < sz)
+								{
+									c4 = in[i];
+									if ((c4 & 0xC0) == 0x80)
+									{
+										uint32_t u = (c1 & 0x7) << 18;
+										u |= (c2 & 0x3F) << 12;
+										u |= (c3 & 0x3F) << 6;
+										u |= (c4 & 0x3F);
 
+										uint16_t sh1 = 0xD800 + ((u - 0x10000) >> 10);
+										uint16_t sh2 = 0xDC00 + (u - 0x10000);
+										out.push_back(sh1);
+										out.push_back(sh2);
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 
 		}
@@ -141,8 +192,47 @@ void UnicodeConverter::U16ToWchar(StringU16& in, StringW& out)
 	}
 }
 
-void UnicodeConverter::U16ToU8(StringU16&, StringU8&)
+void UnicodeConverter::U16ToU8(StringU16& in, StringU8& out)
 {
+	out.clear();
+	size_t sz = in.size();
 
+	for (size_t i = 0u; i < sz; ++i) 
+	{
+		char16_t ch16 = in[i];
+		if (ch16 < 0x80) 
+		{
+			out.push_back((char8_t)ch16);
+		}
+		else if (ch16 < 0x800) 
+		{
+			out.push_back((char8_t)((ch16 >> 6) | 0xC0));
+			out.push_back((char8_t)((ch16 & 0x3F) | 0x80));
+		}
+		else if ((ch16 & 0xFC00) == 0xD800)
+		{
+			++i;
+			if (i < sz)
+			{
+				char16_t ch16_2 = in[i];
+				if ((ch16_2 & 0xFC00) == 0xDC00)
+				{
+					uint32_t u = (ch16 - 0xD800) * 0x400;
+					u += (ch16_2 - 0xDC00) + 0x10000;
+
+					out.push_back(0xF0 | ((u & 0x1C0000) >> 18));
+					out.push_back(0x80 | ((u & 0x3F000) >> 12));
+					out.push_back(0x80 | ((u & 0xFC0) >> 6));
+					out.push_back(0x80 | (u & 0x3F));
+				}
+			}
+		}
+		else
+		{
+			out.push_back((char8_t)((ch16 & 0xF000) >> 12) + 0xE0);
+			out.push_back((char8_t)((ch16 & 0xFC0) >> 6) + 0x80);
+			out.push_back((char8_t)(ch16 & 0x3F) + 0x80);
+		}
+	}
 }
 

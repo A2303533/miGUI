@@ -111,8 +111,16 @@ bool Application::Init()
 	stra.push_back(0x91);
 	stra.push_back(0xD0);
 	stra.push_back(0x92);
+	stra.push_back(0xE2);
+	stra.push_back(0x82);
+	stra.push_back(0xAC);
+	stra.push_back(0xF0);
+	stra.push_back(0x90);
+	stra.push_back(0x8D);
+	stra.push_back(0x88);
 	stra.push_back(']');
 	uConv.CharToWchar(stra, strw);
+	uConv.WcharToChar(strw, stra);
 
 
 
