@@ -117,6 +117,7 @@ namespace mgf
 		void SetSize(int x, int y);
 		void SetPosition(int x, int y);
 		void SetDrawBG(bool);
+		void SetDrawBGTexture(mgTexture*);
 		void SetCanDock(bool);
 		void SetCanResize(bool);
 		void SetCanToTop(bool);

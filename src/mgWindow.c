@@ -239,7 +239,24 @@ mgDrawWindow_f(struct mgWindow_s* w)
 	{
 		if ((w->flags & mgWindowFlag_drawBG)
 			&& (w->flagsInternal & mgWindowFlag_internal_isExpand))
-			w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG, w, &w->rect, &clrbg, &clrbg, 0, 0);
+		{
+			if (w->bgTexture)
+			{
+				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBGTexture,
+					w, &w->rect,
+					&clrbg,
+					&clrbg,
+					w->bgTexture, 0);
+			}
+			else
+			{
+				w->context->gpu->drawRectangle(mgDrawRectangleReason_windowBG,
+					w, &w->rect,
+					&clrbg,
+					&clrbg,
+					0, 0);
+			}
+		}
 
 		if ((w->flags & mgWindowFlag_withTitlebar) && !w->dockPanelWindow)
 		{

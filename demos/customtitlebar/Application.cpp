@@ -118,6 +118,14 @@ bool Application::Init()
 	stra.push_back(0x90);
 	stra.push_back(0x8D);
 	stra.push_back(0x88);
+	stra.push_back(0xF0);// chinese \four bytes
+	stra.push_back(0xA0);
+	stra.push_back(0x81);
+	stra.push_back(0xB3);
+	stra.push_back(0xF0);// emoji
+	stra.push_back(0x9F);
+	stra.push_back(0x98);
+	stra.push_back(0x9D);
 	stra.push_back(']');
 	uConv.CharToWchar(stra, strw);
 	uConv.WcharToChar(strw, stra);

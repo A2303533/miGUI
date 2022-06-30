@@ -112,6 +112,8 @@ typedef struct mgWindow_s {
 
 	mgMenu* menu;
 	mgRect  menuRect;
+
+	struct mgTexture_s* bgTexture;
 } mgWindow;
 
 

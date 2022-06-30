@@ -56,7 +56,7 @@ void UnicodeConverter::CharToU16(StringA& in, StringU16& out)
 
 void UnicodeConverter::WcharToChar(StringW& in, StringA& out)
 {
-	WcharToU8((StringW&)in, (StringU8&)out);
+	U16ToU8((StringU16&)in, (StringU8&)out);
 }
 
 void UnicodeConverter::WcharToU8(StringW& in, StringU8& out)

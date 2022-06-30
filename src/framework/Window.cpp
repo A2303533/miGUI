@@ -160,6 +160,11 @@ void Window::SetPosition(int x, int y)
 	UpdateRect();
 }
 
+void Window::SetDrawBGTexture(mgTexture* t)
+{
+	m_window->bgTexture = t;
+}
+
 void Window::SetDrawBG(bool v)
 {
 	if (v)

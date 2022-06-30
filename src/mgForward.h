@@ -80,6 +80,7 @@ enum mgDrawRectangleReason
 {
 	mgDrawRectangleReason_user,
 	mgDrawRectangleReason_windowBG,
+	mgDrawRectangleReason_windowBGTexture,
 	mgDrawRectangleReason_windowTitlebar,
 	mgDrawRectangleReason_windowCloseButton,
 	mgDrawRectangleReason_windowCollapseButton,
