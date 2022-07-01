@@ -54,6 +54,7 @@ typedef struct mgElementButton_s {
 	int iconID_push;
 	int iconID_disable;
 
+	struct mgTexture_s* BGtexture;
 } mgElementButton;
 
 

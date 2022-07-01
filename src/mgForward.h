@@ -93,6 +93,7 @@ enum mgDrawRectangleReason
 	mgDrawRectangleReason_rectangle,
 	mgDrawRectangleReason_rectangleWithTexture,
 	mgDrawRectangleReason_buttonBG,
+	mgDrawRectangleReason_buttonBGTexture,
 	mgDrawRectangleReason_buttonIcon,
 	mgDrawRectangleReason_dockBG,
 	mgDrawRectangleReason_dockElementBG,

@@ -62,6 +62,8 @@ namespace mgf
 
 		virtual void OnPushOn(); /*only when pushButton */
 		virtual void OnPushOff();
+
+		virtual void SetTexture(mgTexture*);
 	};
 }
 

@@ -94,6 +94,11 @@ void Button::SetAsPush(bool v)
 	m_elementButton->pushButton = (int)v;
 }
 
+void Button::SetTexture(mgTexture* t)
+{
+	m_elementButton->BGtexture = t;
+}
+
 void Button::SetIcons(
 	Icons* icons,
 	int id1,

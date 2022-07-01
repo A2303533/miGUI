@@ -141,9 +141,18 @@ miGUI_onDraw_button(mgElement* e)
 	if (e->drawBG)
 	{
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-		e->window->context->gpu->drawRectangle(mgDrawRectangleReason_buttonBG,
+		int reason = mgDrawRectangleReason_buttonBG;
+		if (impl->BGtexture)
+			reason = mgDrawRectangleReason_buttonBGTexture;
+
+		e->window->context->gpu->drawRectangle(
+			reason,
 			impl,
-			&e->transformWorld.buildArea, &impl->colorFinal1, &impl->colorFinal2, 0, 0);
+			&e->transformWorld.buildArea, 
+			&impl->colorFinal1, 
+			&impl->colorFinal2, 
+			impl->BGtexture,
+			0);
 	}
 
 	if (impl->icons)

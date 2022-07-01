@@ -517,6 +517,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 			}
 		}
 	}break;
+	case mgDrawRectangleReason_buttonBGTexture:
 	case mgDrawRectangleReason_windowBGTexture:
 	case mgDrawRectangleReason_rectangleWithTexture:
 	{
