@@ -31,6 +31,7 @@
 #define _MGF_UNICODE_H_
 
 #include "String.h"
+#include <string>
 
 namespace mgf
 {
@@ -65,6 +66,106 @@ namespace mgf
 		void U16ToU8(StringU16&, StringU8&);
 		
 		char m_defaultCharacter = ' ';
+	};
+
+	/// <summary>
+	/// Char is Unicode code point. Probably this is UTF-32 string.
+	/// </summary>
+	class UnicodeString
+	{
+	public:
+		using char_type = uint32_t;
+
+	private:
+		char_type* m_data = 0;
+		size_t m_size = 0;
+		size_t m_allocated = 0;
+
+		void reallocate(size_t new_allocated)
+		{
+			char_type* new_data = (char_type*)std::malloc(new_allocated * sizeof(char_type));
+			if (m_data)
+			{
+				std::memcpy(new_data, m_data, m_size * sizeof(char_type));
+				std::free(m_data);
+			}
+			else
+			{
+				std::memset(new_data, 0, new_allocated);
+			}
+			m_data = new_data;
+			m_allocated = new_allocated;
+		}
+	public:
+		UnicodeString()
+		{
+			reallocate(0xF);
+		}
+		UnicodeString(const char* str, size_t len);
+		UnicodeString(const wchar_t* str, size_t len);
+		UnicodeString(const char8_t* str, size_t len);
+		UnicodeString(const char16_t* str, size_t len);
+		UnicodeString(const char32_t* str, size_t len);
+		UnicodeString(const StringA& str);
+		UnicodeString(const StringW& str);
+		UnicodeString(const StringU8& str);
+		UnicodeString(const StringU16& str);
+		UnicodeString(const std::string& str);
+		UnicodeString(const std::wstring& str);
+		UnicodeString(const std::u16string& str);
+		UnicodeString(const std::u32string& str);
+
+		~UnicodeString() 
+		{
+			if (m_data)
+				delete[] m_data;
+		}
+
+		void Assign(const char* str, size_t len);
+		void Assign(const wchar_t* str, size_t len);
+		void Assign(const char8_t* str, size_t len);
+		void Assign(const char16_t* str, size_t len);
+		void Assign(const char32_t* str, size_t len);
+		void Assign(const StringA& str);
+		void Assign(const StringW& str);
+		void Assign(const StringU8& str);
+		void Assign(const StringU16& str);
+		void Assign(const std::string& str);
+		void Assign(const std::wstring& str);
+		void Assign(const std::u16string& str);
+		void Assign(const std::u32string& str);
+
+		void Clear();
+		size_t Size();
+		const char_type* Data();
+
+		void Append(char c);
+		void Append(wchar_t c);
+		void Append(char8_t c);
+		void Append(char16_t c);
+		void Append(char32_t c);
+		void Append(const char* str, size_t len);
+		void Append(const wchar_t* str, size_t len);
+		void Append(const char8_t* str, size_t len);
+		void Append(const char16_t* str, size_t len);
+		void Append(const char32_t* str, size_t len);
+		void Append(const StringA& str);
+		void Append(const StringW& str);
+		void Append(const StringU8& str);
+		void Append(const StringU16& str);
+		void Append(const std::string& str);
+		void Append(const std::wstring& str);
+		void Append(const std::u16string& str);
+		void Append(const std::u32string& str);
+
+		void Get(StringA& str);
+		void Get(StringW& str);
+		void Get(StringU8& str);
+		void Get(StringU16& str);
+		void Get(std::string& str);
+		void Get(std::wstring& str);
+		void Get(std::u16string& str);
+		void Get(std::u32string& str);
 	};
 }
 

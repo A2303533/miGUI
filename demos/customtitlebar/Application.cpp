@@ -100,6 +100,7 @@ bool Application::Init()
 	mgf::StringA stra;
 	mgf::StringA stra2;
 	mgf::StringW strw;
+	mgf::StringW strw2;
 	mgf::UnicodeConverter uConv;
 
 	stra.push_back('A');
@@ -132,7 +133,11 @@ bool Application::Init()
 	uConv.CharToWchar(stra, strw);
 	uConv.WcharToChar(strw, stra2);
 
-
+	stra2.clear();
+	mgf::UnicodeString ustr(stra);
+	ustr.Get(stra2);
+	ustr.Get(strw2);
+	stra2.clear();
 
 
 	/*const char* big_buffer = "Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA \

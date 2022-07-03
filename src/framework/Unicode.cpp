@@ -38,6 +38,13 @@ static UnicodeCharNode g_UnicodeChars[0x32000] =
 #include "framework/UnicodeChars.inl"
 };
 
+union UC
+{
+	uint8_t bytes[4];
+	uint16_t shorts[2];
+	uint32_t integer;
+};
+
 UnicodeCharNode* mgf::GetUnicodeTable()
 {
 	return g_UnicodeChars;
@@ -235,10 +242,6 @@ void UnicodeConverter::U16ToU8(StringU16& in, StringU8& out)
 					out.push_back(buf[2]);
 					out.push_back(buf[1]);
 					out.push_back(buf[0]);
-				//	out.push_back(0xF0 | ((u & 0x1C0000) >> 18));
-				//	out.push_back(0x80 | ((u & 0x3F000) >> 12));
-				//	out.push_back(0x80 | ((u & 0xFC0) >> 6));
-				//	out.push_back(0x80 | (u & 0x3F));
 				}
 			}
 		}
@@ -248,6 +251,506 @@ void UnicodeConverter::U16ToU8(StringU16& in, StringU8& out)
 			out.push_back((char8_t)((ch16 & 0xFC0) >> 6) + 0x80);
 			out.push_back((char8_t)(ch16 & 0x3F) + 0x80);
 		}
+	}
+}
+
+UnicodeString::UnicodeString(const char* str, size_t len) :UnicodeString()
+{
+	this->Assign(str, len);
+}
+
+UnicodeString::UnicodeString(const wchar_t* str, size_t len) : UnicodeString()
+{
+	this->Assign(str, len);
+}
+
+UnicodeString::UnicodeString(const char8_t* str, size_t len) : UnicodeString()
+{
+	this->Assign(str, len);
+}
+
+UnicodeString::UnicodeString(const char16_t* str, size_t len) : UnicodeString()
+{
+	this->Assign(str, len);
+}
+
+UnicodeString::UnicodeString(const char32_t* str, size_t len) : UnicodeString()
+{
+	this->Assign(str, len);
+}
+
+UnicodeString::UnicodeString(const StringA& str) : UnicodeString()
+{
+	this->Assign(str);
+}
+
+UnicodeString::UnicodeString(const StringW& str) : UnicodeString()
+{
+	this->Assign(str);
+}
+
+UnicodeString::UnicodeString(const StringU8& str) : UnicodeString()
+{
+	this->Assign(str);
+}
+
+UnicodeString::UnicodeString(const StringU16& str) : UnicodeString()
+{
+	this->Assign(str);
+}
+
+UnicodeString::UnicodeString(const std::string& str) : UnicodeString()
+{
+	this->Assign(str);
+}
+
+UnicodeString::UnicodeString(const std::wstring& str) : UnicodeString()
+{
+	this->Assign(str);
+}
+
+UnicodeString::UnicodeString(const std::u16string& str) : UnicodeString()
+{
+	this->Assign(str);
+}
+
+UnicodeString::UnicodeString(const std::u32string& str) : UnicodeString()
+{
+	this->Assign(str);
+}
+
+void UnicodeString::Assign(const char* str, size_t len)
+{
+	Assign((const char8_t*)str, len);
+}
+
+void UnicodeString::Assign(const wchar_t* str, size_t len)
+{
+	Assign((const char16_t*)str, len);
+}
+
+void UnicodeString::Assign(const char8_t* str, size_t len)
+{
+	Clear();
+	Append(str, len);
+}
+
+void UnicodeString::Assign(const char16_t* str, size_t len)
+{
+	Clear();
+	Append(str, len);
+}
+
+void UnicodeString::Assign(const char32_t* str, size_t len)
+{
+	Clear();
+	Append(str, len);
+}
+
+void UnicodeString::Assign(const StringA& str)
+{
+	Assign(str.data(), str.size());
+}
+
+void UnicodeString::Assign(const StringW& str)
+{
+	Assign(str.data(), str.size());
+}
+
+void UnicodeString::Assign(const StringU8& str)
+{
+	Assign(str.data(), str.size());
+}
+
+void UnicodeString::Assign(const StringU16& str)
+{
+	Assign(str.data(), str.size());
+}
+
+void UnicodeString::Assign(const std::string& str)
+{
+	Assign(str.data(), str.size());
+}
+
+void UnicodeString::Assign(const std::wstring& str)
+{
+	Assign(str.data(), str.size());
+}
+
+void UnicodeString::Assign(const std::u16string& str)
+{
+	Assign(str.data(), str.size());
+}
+
+void UnicodeString::Assign(const std::u32string& str)
+{
+	Assign(str.data(), str.size());
+}
+
+void UnicodeString::Clear()
+{
+	m_size = 0;
+	m_data[0] = 0;
+}
+
+size_t UnicodeString::Size()
+{
+	return m_size;
+}
+
+const UnicodeString::char_type* UnicodeString::Data()
+{
+	return m_data;
+}
+
+void UnicodeString::Append(char c)
+{
+	Append((char32_t)c);
+}
+
+void UnicodeString::Append(wchar_t c)
+{
+	Append((char32_t)c);
+}
+
+void UnicodeString::Append(char8_t c)
+{
+	Append((char32_t)c);
+}
+
+void UnicodeString::Append(char16_t c)
+{
+	Append((char32_t)c);
+}
+
+void UnicodeString::Append(char32_t c)
+{
+	size_t new_size = m_size + 1;
+
+	if ((new_size + 1u) > m_allocated)
+		reallocate((new_size + 1u) + (1 + (uint32_t)(m_size * 0.5f)));
+
+	m_data[m_size] = c;
+
+	m_size = new_size;
+	m_data[m_size] = static_cast<char_type>(0x0);
+}
+
+void UnicodeString::Append(const char* str, size_t len)
+{
+	Append((const char8_t*)str, len);
+}
+
+void UnicodeString::Append(const wchar_t* str, size_t len)
+{
+	Append((const char16_t*)str, len);
+}
+
+void UnicodeString::Append(const char8_t* str, size_t len)
+{
+	unsigned char c1 = 0;
+	unsigned char c2 = 0;
+	unsigned char c3 = 0;
+	unsigned char c4 = 0;
+	for (size_t i = 0; i < len; ++i)
+	{
+		c1 = str[i];
+
+		if (c1 <= 0x7F)
+		{
+			Append((char32_t)c1);
+		}
+		else
+		{
+			if ((c1 & 0xE0) == 0xC0) //2 bytes
+			{
+				++i;
+				if (i < len)
+				{
+					c2 = str[i];
+					if ((c2 & 0xC0) == 0x80)
+					{
+						char16_t wch = (c1 & 0x1F) << 6;
+						wch |= (c2 & 0x3F);
+						Append((char32_t)wch);
+					}
+				}
+			}
+			else if ((c1 & 0xF0) == 0xE0) //3
+			{
+				++i;
+				if (i < len)
+				{
+					c2 = str[i];
+					if ((c2 & 0xC0) == 0x80)
+					{
+						++i;
+						if (i < len)
+						{
+							c3 = str[i];
+							if ((c3 & 0xC0) == 0x80)
+							{
+								char16_t wch = (c1 & 0xF) << 12;
+								wch |= (c2 & 0x3F) << 6;
+								wch |= (c3 & 0x3F);
+								Append((char32_t)wch);
+							}
+						}
+					}
+				}
+			}
+			else if ((c1 & 0xF8) == 0xF0) //4
+			{
+				++i;
+				if (i < len)
+				{
+					c2 = str[i];
+					if ((c2 & 0xC0) == 0x80)
+					{
+						++i;
+						if (i < len)
+						{
+							c3 = str[i];
+							if ((c3 & 0xC0) == 0x80)
+							{
+								++i;
+								if (i < len)
+								{
+									c4 = str[i];
+									if ((c4 & 0xC0) == 0x80)
+									{
+										uint32_t u = (c1 & 0x7) << 18;
+										u |= (c2 & 0x3F) << 12;
+										u |= (c3 & 0x3F) << 6;
+										u |= (c4 & 0x3F);
+
+										Append((char32_t)u);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+		}
+	}
+}
+
+void UnicodeString::Append(const char16_t* str, size_t len)
+{
+	for (size_t i = 0u; i < len; ++i)
+	{
+		char16_t ch16 = str[i];
+		if (ch16 < 0x80)
+		{
+			Append((char32_t)ch16);
+		}
+		else if (ch16 < 0x800)
+		{
+			Append((char32_t)ch16); //????
+		}
+		else if ((ch16 & 0xFC00) == 0xD800)
+		{
+			++i;
+			if (i < len)
+			{
+				char16_t ch16_2 = str[i];
+				if ((ch16_2 & 0xFC00) == 0xDC00)
+				{
+					uint32_t u = (ch16 - 0xD800) * 0x400;
+					u += (ch16_2 - 0xDC00) + 0x10000;
+
+					Append((char32_t)u);
+				}
+			}
+		}
+		else
+		{
+			Append((char32_t)ch16);
+		}
+	}
+}
+
+void UnicodeString::Append(const char32_t* str, size_t len)
+{
+	for (size_t i = 0; i < len; ++i)
+	{
+		Append(str[i]);
+	}
+}
+
+void UnicodeString::Append(const StringA& str)
+{
+	Append(str.data(), str.size());
+}
+
+void UnicodeString::Append(const StringW& str)
+{
+	Append(str.data(), str.size());
+}
+
+void UnicodeString::Append(const StringU8& str)
+{
+	Append(str.data(), str.size());
+}
+
+void UnicodeString::Append(const StringU16& str)
+{
+	Append(str.data(), str.size());
+}
+
+void UnicodeString::Append(const std::string& str)
+{
+	Append(str.data(), str.size());
+}
+
+void UnicodeString::Append(const std::wstring& str)
+{
+	Append(str.data(), str.size());
+}
+
+void UnicodeString::Append(const std::u16string& str)
+{
+	Append(str.data(), str.size());
+}
+
+void UnicodeString::Append(const std::u32string& str)
+{
+	Append(str.data(), str.size());
+}
+
+void UnicodeString::Get(StringA& str)
+{
+	str.clear();
+	UC uc;
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		char_type c = m_data[i];
+		if (c >= 0x32000)
+			c = '?';
+		
+		uc.integer = g_UnicodeChars[c].m_utf8;
+
+		if (uc.bytes[3]) str.push_back(uc.bytes[3]);
+		if (uc.bytes[2]) str.push_back(uc.bytes[2]);
+		if (uc.bytes[1]) str.push_back(uc.bytes[1]);
+		if (uc.bytes[0]) str.push_back(uc.bytes[0]);
+	}
+}
+
+void UnicodeString::Get(StringW& str)
+{
+	str.clear();
+	UC uc;
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		char_type c = m_data[i];
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = g_UnicodeChars[c].m_utf16;
+
+		if (uc.shorts[1]) str.push_back(uc.shorts[1]);
+		if (uc.shorts[0]) str.push_back(uc.shorts[0]);
+	}
+}
+
+void UnicodeString::Get(StringU8& str)
+{
+	str.clear();
+	UC uc;
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		char_type c = m_data[i];
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = g_UnicodeChars[c].m_utf8;
+
+		if (uc.bytes[3]) str.push_back(uc.bytes[3]);
+		if (uc.bytes[2]) str.push_back(uc.bytes[2]);
+		if (uc.bytes[1]) str.push_back(uc.bytes[1]);
+		if (uc.bytes[0]) str.push_back(uc.bytes[0]);
+	}
+}
+
+void UnicodeString::Get(StringU16& str)
+{
+	str.clear();
+	UC uc;
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		char_type c = m_data[i];
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = g_UnicodeChars[c].m_utf16;
+
+		if (uc.shorts[1]) str.push_back(uc.shorts[1]);
+		if (uc.shorts[0]) str.push_back(uc.shorts[0]);
+	}
+}
+
+void UnicodeString::Get(std::string& str)
+{
+	str.clear();
+	UC uc;
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		char_type c = m_data[i];
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = g_UnicodeChars[c].m_utf8;
+
+		if (uc.bytes[3]) str.push_back(uc.bytes[3]);
+		if (uc.bytes[2]) str.push_back(uc.bytes[2]);
+		if (uc.bytes[1]) str.push_back(uc.bytes[1]);
+		if (uc.bytes[0]) str.push_back(uc.bytes[0]);
+	}
+}
+
+void UnicodeString::Get(std::wstring& str)
+{
+	str.clear();
+	UC uc;
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		char_type c = m_data[i];
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = g_UnicodeChars[c].m_utf16;
+
+		if (uc.shorts[1]) str.push_back(uc.shorts[1]);
+		if (uc.shorts[0]) str.push_back(uc.shorts[0]);
+	}
+}
+
+void UnicodeString::Get(std::u16string& str)
+{
+	str.clear();
+	UC uc;
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		char_type c = m_data[i];
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = g_UnicodeChars[c].m_utf16;
+
+		if (uc.shorts[1]) str.push_back(uc.shorts[1]);
+		if (uc.shorts[0]) str.push_back(uc.shorts[0]);
+	}
+}
+
+void UnicodeString::Get(std::u32string& str)
+{
+	str.clear();
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		str.push_back(m_data[i]);
 	}
 }
 
