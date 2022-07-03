@@ -39,6 +39,7 @@ struct mgContext_s;
 #include "mgRect.h"
 #include "mgVec4.h"
 #include "mgColor.h"
+#include "mgUnicode.h"
 #include "mgFont.h"
 #include "mgImage.h"
 #include "mgTexture.h"
@@ -53,10 +54,12 @@ struct mgContext_s;
 
 #include "mgSystemWindowData.h"
 
+
 // Before creating GUI context you must create this objects.
 // VideoDriverAPI - callbacks for drawing.
 // InputContext - information about pressed buttons, cursor position and other
-typedef struct mgVideoDriverAPI_s {
+typedef struct mgVideoDriverAPI_s 
+{
 	// Create GPU texture using RGBA data.
 	// Library can generate fonts, fonts is a textures.
 	mgTexture*(*createTexture)(mgImage*);
@@ -82,8 +85,11 @@ typedef struct mgVideoDriverAPI_s {
 
 	void(*drawText)( 
 		int reason, 
-		void* object,  /*depends on reason*/
-		mgPoint* position, const wchar_t* text, int textLen, mgColor*, mgFont*);
+		mgPoint* position, 
+		const mgUnicodeChar* text, 
+		size_t textLen,
+		mgColor*,
+		mgFont*);
 
 	void(*drawLine)(
 		int reason,
@@ -107,307 +113,84 @@ struct mgContext_s;
 extern "C" {
 #endif
 
-#ifdef MG_NO_DLL
-	MG_API void MG_C_DECL mgUpdateTransform_f(struct mgWindow_s* w);
-#define mgUpdateTransform mgUpdateTransform_f
-#else
-	typedef void (*PFNUPDATETRANSFORMPROC)(struct mgWindow_s* w);
-	extern PFNUPDATETRANSFORMPROC mgUpdateTransform;
-#endif
+void MG_C_DECL mgUpdateTransform(struct mgWindow_s* w);
 
-#ifdef MG_NO_DLL
-MG_API struct mgContext_s* MG_C_DECL mgCreateContext_f(mgVideoDriverAPI*, mgInputContext*);
-#define mgCreateContext mgCreateContext_f
-#else
-typedef struct mgContext_s* (*PFNMGCREATECONTEXTPROC)(mgVideoDriverAPI*, mgInputContext*);
-extern PFNMGCREATECONTEXTPROC mgCreateContext;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDestroyContext_f(struct mgContext_s*);
-#define mgDestroyContext mgDestroyContext_f
-#else
-typedef void (*PFNMGDESTROYCONTEXTPROC)(struct mgContext_s*);
-extern PFNMGDESTROYCONTEXTPROC mgDestroyContext;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API struct mgWindow_s* MG_C_DECL mgCreateWindow_f(struct mgContext_s*, int px, int py, int sx, int sy);
-#define mgCreateWindow mgCreateWindow_f
-#else
-typedef struct mgWindow_s* (*PFNMGCREATEWINDOWPROC)(struct mgContext_s*, int px, int py, int sx, int sy);
-extern PFNMGCREATEWINDOWPROC mgCreateWindow;
-#endif
-
-#if defined(MG_NO_DLL)
-MG_API void MG_C_DECL mgDestroyWindow_f(struct mgWindow_s*);
-#define mgDestroyWindow mgDestroyWindow_f
-#else
-typedef void (*PFNMGDESTROYWINDOWPROC)(struct mgWindow_s*);
-extern PFNMGDESTROYWINDOWPROC mgDestroyWindow;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgSetWindowTitle_f(struct mgWindow_s*, const wchar_t*);
-#define mgSetWindowTitle mgSetWindowTitle_f
-#else
-typedef void (*PFNMGSETWINDOWTITLEPROC)(struct mgWindow_s*, const wchar_t*);
-extern PFNMGSETWINDOWTITLEPROC mgSetWindowTitle;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgBringWindowToTop_f(struct mgWindow_s*);
-#define mgBringWindowToTop mgBringWindowToTop_f
-#else
-typedef void (*PFNMGBRINGWINDOWTOTOPPROC)(struct mgWindow_s*);
-extern PFNMGBRINGWINDOWTOTOPPROC mgBringWindowToTop;
-#endif
+struct mgContext_s* MG_C_DECL mgCreateContext(mgVideoDriverAPI*, mgInputContext*);
+void MG_C_DECL mgDestroyContext(struct mgContext_s*);
+struct mgWindow_s* MG_C_DECL mgCreateWindow(struct mgContext_s*, int px, int py, int sx, int sy, struct mgTextProcessor_s*);
+void MG_C_DECL mgDestroyWindow(struct mgWindow_s*);
+void MG_C_DECL mgSetWindowTitle(struct mgWindow_s*, const mgUnicodeChar*);
+void MG_C_DECL mgBringWindowToTop(struct mgWindow_s*);
 
 /*
 * 1 show
 * 0 hide
 */
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgShowWindow_f(struct mgWindow_s*, int);
-#define mgShowWindow mgShowWindow_f
-#else
-typedef void (*PFNMGSHOWWINDOWPROC)(struct mgWindow_s*, int);
-extern PFNMGSHOWWINDOWPROC mgShowWindow;
-#endif
+void MG_C_DECL mgShowWindow(struct mgWindow_s*, int);
 
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgOnWindowSize_f(struct mgContext_s*, int x, int y);
-#define mgOnWindowSize mgOnWindowSize_f
-#else
-typedef void (*PFNMGONWINDOWSIZEPROC)(struct mgContext_s*, int x, int y);
-extern PFNMGONWINDOWSIZEPROC mgOnWindowSize;
-#endif
+void MG_C_DECL mgOnWindowSize(struct mgContext_s*, int x, int y);
 
 /* Create bitmap font or load from file.
 * If filename exist load from file. If not then try to generate from installed system font.
 * Destroy it by yourself (call mgDestroyFont).
 * saveIt (optional) - save .txt and images dds rgba in ../data/fonts/$saveIt/
 */
-#ifdef MG_NO_DLL
-MG_API mgFont* MG_C_DECL mgCreateFont_f(struct mgContext_s*, const char* filename, unsigned int flags, int size, const char* saveIt);
-#define mgCreateFont mgCreateFont_f
-#else
-typedef mgFont* (*PFNMGCREATEFONTPROC)(struct mgContext_s*, const char* filename, unsigned int flags, int size, const char* saveIt);
-extern PFNMGCREATEFONTPROC mgCreateFont;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDestroyFont_f(struct mgContext_s*, mgFont*);
-#define mgDestroyFont mgDestroyFont_f
-#else
-typedef void (*PFNMGDESTROYFONTPROC)(struct mgContext_s*, mgFont*);
-extern PFNMGDESTROYFONTPROC mgDestroyFont;
-#endif
+mgFont* MG_C_DECL mgCreateFont(struct mgContext_s*, const char* filename, unsigned int flags, int size, const char* saveIt);
+void MG_C_DECL mgDestroyFont(struct mgContext_s*, mgFont*);
 
 /*call before event loop*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgStartFrame_f(struct mgContext_s*);
-#define mgStartFrame mgStartFrame_f
-#else
-typedef void (*PFNMGSTARTFRAMEPROC)(struct mgContext_s*);
-extern PFNMGSTARTFRAMEPROC mgStartFrame;
-#endif
+void MG_C_DECL mgStartFrame(struct mgContext_s*);
 
 /*do work*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgUpdate_f(struct mgContext_s*);
-#define mgUpdate mgUpdate_f
-#else
-typedef void (*PFNMGUPDATEPROC)(struct mgContext_s*);
-extern PFNMGUPDATEPROC mgUpdate;
-#endif
+void MG_C_DECL mgUpdate(struct mgContext_s*);
 
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgSetParent_f(mgElement* object, mgElement* parent);
-#define mgSetParent mgSetParent_f
-#else
-typedef void (*PFNMGSETPARENTPROC)(mgElement* object, mgElement* parent);
-extern PFNMGSETPARENTPROC mgSetParent;
-#endif
+void MG_C_DECL mgSetParent(mgElement* object, mgElement* parent);
 
-#ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
-#define mgCreateRectangle mgCreateRectangle_f
-#else
-typedef mgElement* (*PFNMGCREATERECTANGLEPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
-extern PFNMGCREATERECTANGLEPROC mgCreateRectangle;
-#endif
+mgElement* MG_C_DECL mgCreateRectangle(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
+mgElement* MG_C_DECL mgCreateText(struct mgWindow_s* w, mgPoint* position, struct mgTextProcessor_s*);
+mgElement* MG_C_DECL mgCreateButton(struct mgWindow_s* w, mgPoint* position, mgPoint* size, struct mgTextProcessor_s*);
 
-#ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* w, mgPoint* position);
-#define mgCreateText mgCreateText_f
-#else
-typedef mgElement* (*PFNMGCREATETEXTPROC)(struct mgWindow_s* w, mgPoint* position);
-extern PFNMGCREATETEXTPROC mgCreateText;
-#endif
+// arr and arrSz - can be 0, set this later
+mgElement* MG_C_DECL mgCreateListBox(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** items, uint32_t itemsSize, struct mgTextProcessor_s*);
 
-#ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
-#define mgCreateButton mgCreateButton_f
-#else
-typedef mgElement* (*PFNMGCREATEBUTTONPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
-extern PFNMGCREATEBUTTONPROC mgCreateButton;
-#endif
+mgElement* MG_C_DECL mgCreateTable(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** rows, uint32_t rowsSz, uint32_t colNum, struct mgTextProcessor_s*);
 
-/*
-* arr and arrSz - can be 0, set this later
-*/
-#ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** items, uint32_t itemsSize, mgFont* f);
-#define mgCreateListBox mgCreateListBox_f
-#else
-typedef mgElement* (*PFNMGCREATELISTBOXPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** items, uint32_t itemsSize, mgFont* f);
-extern PFNMGCREATELISTBOXPROC mgCreateListBox;
-#endif
 
-#ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateTable_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** rows, uint32_t rowsSz, uint32_t colNum, mgFont* f);
-#define mgCreateTable mgCreateTable_f
-#else
-typedef mgElement* (*PFNMGCREATETABLEPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** rows, uint32_t rowsSz, uint32_t colNum, mgFont* f);
-extern PFNMGCREATETABLEPROC mgCreateTable;
-#endif
+// Will destroy element and children.
+void MG_C_DECL mgDestroyElement(mgElement*);
 
-/*
-* Will destroy element and children.
-*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDestroyElement_f(mgElement*);
-#define mgDestroyElement mgDestroyElement_f
-#else
-typedef void (*PFNMGDESTROYELEMENTPROC)(mgElement*);
-extern PFNMGDESTROYELEMENTPROC mgDestroyElement;
-#endif
+//*set visible include all children*/
+void MG_C_DECL mgSetVisible(mgElement*, int);
 
-/*set visible include all children*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgSetVisible_f(mgElement*, int);
-#define mgSetVisible mgSetVisible_f
-#else
-typedef void (*PFNMGSETVISIBLEPROC)(mgElement*, int);
-extern PFNMGSETVISIBLEPROC mgSetVisible;
-#endif
+//*draw all*/
+void MG_C_DECL mgDraw(struct mgContext_s*);
 
-/*draw all*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDraw_f(struct mgContext_s*);
-#define mgDraw mgDraw_f
-#else
-typedef void (*PFNMGDRAWPROC)(struct mgContext_s*);
-extern PFNMGDRAWPROC mgDraw;
-#endif
-
-/*don't forget to destroy cursor with mgDestroyCursor*/
-#ifdef MG_NO_DLL
-MG_API mgCursor* MG_C_DECL mgCreateCursor_f(const wchar_t* fileName);
-#define mgCreateCursor mgCreateCursor_f
-#else
-typedef mgCursor*(*PFNMGCREATECURSORPROC)(const wchar_t* fileName);
-extern PFNMGCREATECURSORPROC mgCreateCursor;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDestroyCursor_f(mgCursor*);
-#define mgDestroyCursor mgDestroyCursor_f
-#else
-typedef void (*PFNMGDESTROYCURSORPROC)(mgCursor*);
-extern PFNMGDESTROYCURSORPROC mgDestroyCursor;
-#endif
+//*don't forget to destroy cursor with mgDestroyCursor*/
+mgCursor* MG_C_DECL mgCreateCursor(const wchar_t* fileName);
+void MG_C_DECL mgDestroyCursor(mgCursor*);
 
 /*if cursor == 0 then set default*/
 typedef void (*PFNMGSETCURSORPROC)(struct mgContext_s*, mgCursor* cursor, unsigned int type);
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgSetCursor_f(struct mgContext_s*, mgCursor* cursor, unsigned int type);
-#define mgSetCursor mgSetCursor_f
-#else
-extern PFNMGSETCURSORPROC mgSetCursor;
-#endif
+void MG_C_DECL mgSetCursor(struct mgContext_s*, mgCursor* cursor, unsigned int type);
 
-#ifdef MG_NO_DLL
-MG_API mgIcons* MG_C_DECL mgCreateIcons_f(mgTexture*, int textureSizeX, int textureSizeY, int iconNum);
-#define mgCreateIcons mgCreateIcons_f
-#else
-typedef mgIcons* (*PFNMGCREATEICONSPROC)(mgTexture*, int textureSizeX, int textureSizeY, int iconNum);
-extern PFNMGCREATEICONSPROC mgCreateIcons;
-#endif
+mgIcons* MG_C_DECL mgCreateIcons(mgTexture*, int textureSizeX, int textureSizeY, int iconNum);
+void MG_C_DECL mgDestroyIcons(mgIcons*);
 
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDestroyIcons_f(mgIcons*);
-#define mgDestroyIcons mgDestroyIcons_f
-#else
-typedef void (*PFNMGDESTROYICONSPROC)(mgIcons*);
-extern PFNMGDESTROYICONSPROC mgDestroyIcons;
-#endif
+// px, py - left top corner of rect
+// sx, sy - size
+void MG_C_DECL mgSetIcon(mgIcons*, int id, int px, int py, int sx, int sy);
+void MG_C_DECL mgInitDockPanel(struct mgContext_s*, int indentLeft, int indentTop, int indentRight, int indentBottom, mgDockPanelElementCreationInfo* elements, int elementsSize, struct mgTextProcessor_s*);
 
-/*
-* px, py - left top corner of rect
-* sx, sy - size
-*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgSetIcon_f(mgIcons*, int id, int px, int py, int sx, int sy);
-#define mgSetIcon mgSetIcon_f
-#else
-typedef void (*PFNMGSETICONPROC)(mgIcons*, int id, int px, int py, int sx, int sy);
-extern PFNMGSETICONPROC mgSetIcon;
-#endif
+//* if dw 0 then id is id of mgDockPanelElement_s
+//* if dw not 0 then id is where (0 - left, 1 - top, 2 - right, 3 - bottom)
+struct mgDockPanelWindow_s* MG_C_DECL mgDockAddWindow(struct mgWindow_s*, struct mgDockPanelWindow_s* dw, int id);
 
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgInitDockPanel_f(struct mgContext_s*, int indentLeft, int indentTop, int indentRight, int indentBottom, mgDockPanelElementCreationInfo* elements, int elementsSize);
-#define mgInitDockPanel mgInitDockPanel_f
-#else
-typedef void (*PFNMGINITDOCKPANELPROC)(struct mgContext_s*, int indentLeft, int indentTop, int indentRight, int indentBottom, mgDockPanelElementCreationInfo* elements, int elementsSize);
-extern PFNMGINITDOCKPANELPROC mgInitDockPanel;
-#endif
+struct mgPopup_s* MG_C_DECL mgCreatePopup(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, int flags, struct mgTextProcessor_s*);
+void MG_C_DECL mgDestroyPopup(struct mgPopup_s*);
+void MG_C_DECL mgShowPopup(struct mgContext_s*, struct mgPopup_s*, mgPoint* position);
 
-/*
-* if dw 0 then id is id of mgDockPanelElement_s
-* if dw not 0 then id is where (0 - left, 1 - top, 2 - right, 3 - bottom)
-*/
-#ifdef MG_NO_DLL
-MG_API struct mgDockPanelWindow_s* MG_C_DECL mgDockAddWindow_f(struct mgWindow_s*, struct mgDockPanelWindow_s* dw, int id);
-#define mgDockAddWindow mgDockAddWindow_f
-#else
-typedef struct mgDockPanelWindow_s* (*PFNMGDOCKADDWINDOWPROC)(struct mgWindow_s*, struct mgDockPanelWindow_s* dw, int id);
-extern PFNMGDOCKADDWINDOWPROC mgDockAddWindow;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API struct mgPopup_s* MG_C_DECL mgCreatePopup_f(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, mgFont*, int flags);
-#define mgCreatePopup mgCreatePopup_f
-#else
-typedef struct mgPopup_s* (*PFNMGCREATEPOPUPPROC)(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, mgFont*, int flags);
-extern PFNMGCREATEPOPUPPROC mgCreatePopup;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDestroyPopup_f(struct mgPopup_s*);
-#define mgDestroyPopup mgDestroyPopup_f
-#else
-typedef void (*PFNMGDESTROYPOPUPPROC)(struct mgPopup_s*);
-extern PFNMGDESTROYPOPUPPROC mgDestroyPopup;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgShowPopup_f(struct mgContext_s*, struct mgPopup_s*, mgPoint* position);
-#define mgShowPopup mgShowPopup_f
-#else
-typedef void (*PFNMGSHOWPOPUPPROC)(struct mgContext_s*, struct mgPopup_s*, mgPoint* position);
-extern PFNMGSHOWPOPUPPROC mgShowPopup;
-#endif
-
-/*return 0 if bad*/
-#ifdef MG_NO_DLL
-MG_API int MG_C_DECL mgInitDefaultIcons_f(struct mgContext_s*, mgTexture*);
-#define mgInitDefaultIcons mgInitDefaultIcons_f
-#else
-typedef int (*PFNMGINITDEFAULTICONSPROC)(struct mgContext_s*, mgTexture*);
-extern PFNMGINITDEFAULTICONSPROC mgInitDefaultIcons;
-#endif
+//*return 0 if bad*/
+int MG_C_DECL mgInitDefaultIcons(struct mgContext_s*, mgTexture*);
 
 /*return int* , use free().
 * Everything is in int
@@ -425,139 +208,41 @@ extern PFNMGINITDEFAULTICONSPROC mgInitDefaultIcons;
 * Every mgWindow in dockpanel must have unique ID.
 * dataSize_out in int, use `* sizeof(int)`
 */
-#ifdef MG_NO_DLL
-MG_API int* MG_C_DECL mgDockGetSaveData_f(struct mgContext_s*, int* dataSize_out);
-#define mgDockGetSaveData mgDockGetSaveData_f
-#else
-typedef int* (*PFNMGDOCKGETSAVEDATAPROC)(struct mgContext_s*, int* dataSize_out);
-extern PFNMGDOCKGETSAVEDATAPROC mgDockGetSaveData;
-#endif
+int* MG_C_DECL mgDockGetSaveData(struct mgContext_s*, int* dataSize_out);
 
-/*
-* callback must return window with same id
-*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDockLoadData_f(struct mgContext_s*, int* data, int dataSizeInInt, mgWindow* (*callback)(int windowID));
-#define mgDockLoadData mgDockLoadData_f
-#else
-typedef void (*PFNMGDOCKLOADDATAPROC)(struct mgContext_s*, int* data, int dataSizeInInt, mgWindow*(*callback)(int windowID));
-extern PFNMGDOCKLOADDATAPROC mgDockLoadData;
-#endif
+//* callback must return window with same id
+void MG_C_DECL mgDockLoadData(struct mgContext_s*, int* data, int dataSizeInInt, mgWindow* (*callback)(int windowID));
 
-/*
-* mgMenu works with mgWindow
-* You must create popups by yourself, and destroy them too.
-*/
-#ifdef MG_NO_DLL
-MG_API mgMenu* MG_C_DECL mgCreateMenu_f(struct mgContext_s*, mgMenuItemInfo* items, int itemsSize, mgFont* f);
-#define mgCreateMenu mgCreateMenu_f
-#else
-typedef mgMenu*(*PFNMGCREATEMENUPROC)(struct mgContext_s*, mgMenuItemInfo* items, int itemsSize, mgFont* f);
-extern PFNMGCREATEMENUPROC mgCreateMenu;
-#endif
+//* mgMenu works with mgWindow
+//* You must create popups by yourself, and destroy them too.
+mgMenu* MG_C_DECL mgCreateMenu(struct mgContext_s*, mgMenuItemInfo* items, int itemsSize, struct mgTextProcessor_s*);
 
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDestroyMenu_f(mgMenu*);
-#define mgDestroyMenu mgDestroyMenu_f
-#else
-typedef void (*PFNMGDESTROYMENUPROC)(mgMenu*);
-extern PFNMGDESTROYMENUPROC mgDestroyMenu;
-#endif
+void MG_C_DECL mgDestroyMenu(mgMenu*);
+void MG_C_DECL mgInitStyleLight(mgStyle*);
+void MG_C_DECL mgInitStyleDark(mgStyle*);
 
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgInitStyleLight_f(mgStyle*);
-#define mgInitStyleLight mgInitStyleLight_f
-#else
-typedef void (*PFNMGINITSTYLELIGHTPROC)(mgStyle*);
-extern PFNMGINITSTYLELIGHTPROC mgInitStyleLight;
-#endif
+mgElement* MG_C_DECL mgCreateTextInput(struct mgWindow_s* w, mgPoint* position, mgPoint* size, struct mgTextProcessor_s*);
+void MG_C_DECL mgTextInputSetText(struct mgElementTextInput_s* e, const mgUnicodeChar* text);
 
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgInitStyleDark_f(mgStyle*);
-#define mgInitStyleDark mgInitStyleDark_f
-#else
-typedef void (*PFNMGINITSTYLEDARKPROC)(mgStyle*);
-extern PFNMGINITSTYLEDARKPROC mgInitStyleDark;
-#endif
+//* freeMemory: 1 for free
+void MG_C_DECL mgTextInputClear(struct mgElementTextInput_s* e, int freeMemory);
 
-#ifdef MG_NO_DLL
-MG_API mgElement* MG_C_DECL mgCreateTextInput_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFont* font);
-#define mgCreateTextInput mgCreateTextInput_f
-#else
-typedef mgElement* (*PFNMGCREATETEXTINPUTPROC)(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFont* font);
-extern PFNMGCREATETEXTINPUTPROC mgCreateTextInput;
-#endif
+//*return width in pixels (max width)*/
+int MG_C_DECL mgTextInputPutText(struct mgElementTextInput_s* e, const mgUnicodeChar* text, uint32_t len);
+void MG_C_DECL mgTextInputDeleteSelected(struct mgElementTextInput_s* e);
 
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text);
-#define mgTextInputSetText mgTextInputSetText_f
-#else
-typedef void (*PFNMGTEXTINPUTSETTEXTPROC)(struct mgElementTextInput_s* e, const wchar_t* text);
-extern PFNMGTEXTINPUTSETTEXTPROC mgTextInputSetText;
-#endif
+//* deactivateCode is optional
+void MG_C_DECL mgTextInputActivate(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
 
-/*
-* freeMemory: 1 for free
-*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory);
-#define mgTextInputClear mgTextInputClear_f
-#else
-typedef void (*PFNMGTEXTINPUTCLEARPROC)(struct mgElementTextInput_s* e, int freeMemory);
-extern PFNMGTEXTINPUTCLEARPROC mgTextInputClear;
-#endif
-
-/*return width in pixels (max width)*/
-#ifdef MG_NO_DLL
-MG_API int MG_C_DECL mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
-#define mgTextInputPutText mgTextInputPutText_f
-#else
-typedef int (*PFNMGTEXTINPUTPUTTEXTPROC)(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
-extern PFNMGTEXTINPUTPUTTEXTPROC mgTextInputPutText;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e);
-#define mgTextInputDeleteSelected mgTextInputDeleteSelected_f
-#else
-typedef void (*PFNMGTEXTINPUTDELETESELECTEDPROC)(struct mgElementTextInput_s* e);
-extern PFNMGTEXTINPUTDELETESELECTEDPROC mgTextInputDeleteSelected;
-#endif
-
-/*
-* deactivateCode is optional
-*/
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgTextInputActivate_f(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
-#define mgTextInputActivate mgTextInputActivate_f
-#else
-typedef void (*PFNMGTEXTINPUTACTIVATEPROC)(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
-extern PFNMGTEXTINPUTACTIVATEPROC mgTextInputActivate;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDrawWindow_f(struct mgWindow_s* w);
-#define mgDrawWindow mgDrawWindow_f
-#else
-typedef void (*PFNMGDRAWWINDOWPROC)(struct mgWindow_s*);
-extern PFNMGDRAWWINDOWPROC mgDrawWindow;
-#endif
-
-#ifdef MG_NO_DLL
-MG_API void MG_C_DECL mgDrawPopup_f(struct mgContext_s* c, mgPopup* p);
-#define mgDrawPopup mgDrawPopup_f
-#else
-typedef void (*PFNMGDRAWPOPUPPROC)(struct mgContext_s* c, mgPopup* p);
-extern PFNMGDRAWPOPUPPROC mgDrawPopup;
-#endif
+void MG_C_DECL mgDrawWindow(struct mgWindow_s* w);
+void MG_C_DECL mgDrawPopup(struct mgContext_s* c, mgPopup* p);
 
 #if defined(__cplusplus)
 }
 #endif
 
 /*
-* Idea is: you load migui.dll in your exe,
-*   and then you can use functions in your dlls.
+* Idea is: you can use functions in your dlls.
 */
 struct mgFunctions_s {
 	PFNMGSETCURSORPROC SetCursor_p;
@@ -584,7 +269,7 @@ typedef struct mgContext_s {
 
 	// Get text size in pixels
 	// need to know text size.
-	void(*getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
+	//void(*getTextSize)(const mgUnicodeChar* text, mgTextCallbackFont, mgPoint*);
 
 	// mgPopup with systemWindow flag will create new window.
 	// you can/backends will use this for some initialization
@@ -598,9 +283,9 @@ typedef struct mgContext_s {
 	//mgRect currentIcon;
 	mgIconsNode* currentIcon;
 
-	mgStyle styleLight;
-	mgStyle styleDark;
-	mgStyle* activeStyle;
+	struct mgStyle_s styleLight;
+	struct mgStyle_s styleDark;
+	struct mgStyle_s* activeStyle;
 
 	mgPopup* activePopup;
 	mgPopup* popupUnderCursor;
@@ -616,7 +301,7 @@ typedef struct mgContext_s {
 	mgIconGroup* defaultIconGroup;
 	
 	mgFont* tooltipFont;
-	const wchar_t* tooltipText;
+	const mgUnicodeChar* tooltipText;
 
 
 } mgContext;

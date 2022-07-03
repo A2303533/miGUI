@@ -198,7 +198,8 @@ typedef struct mgInputContext_s {
 
 	uint32_t LMBClickCount;
 
-	wchar_t character;
+	mgUnicodeChar character;
+
 	uint8_t keyFlags[256]; /**/
 
 	/*keyboardModifier == MG_KBMOD_SHIFT*/

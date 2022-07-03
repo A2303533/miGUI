@@ -27,69 +27,55 @@
 */
 
 #pragma once
-#ifndef _MG_DEFS_H_
-#define _MG_DEFS_H_
-
-#include <stddef.h>
-#include <stdlib.h>
-#include <assert.h>
+#ifndef _MG_UNICODE_H_
+#define _MG_UNICODE_H_
 
 #include <stdint.h>
 
+typedef uint32_t mgUnicodeChar;
 
-#if defined(WIN32) | defined(_WIN64) | defined(_WIN32)
-#define MG_PLATFORM_WINDOWS
-#define MG_C_DECL _cdecl
-#else
-#error Please write code for other OS
+#if defined(__cplusplus)
+extern "C" {
 #endif
 
+/// <summary>
+/// Create Unicode string using UTF-8 string.
+/// No size check. Size of `out` must be at least size of `str`.
+/// `str` must be 0 terminated string.
+/// `lenOut` is length of new mgUnicodeChar string.
+/// </summary>
+void MG_C_DECL mgUnicodeFromChar(const char* str, mgUnicodeChar* out, size_t* lenOut);
 
+/// <summary>
+/// All fonts now here.
+/// And functions for text.
+/// </summary>
+typedef struct mgTextProcessor_s
+{
+	struct mgFont_s* fonts;
+	struct mgVideoDriverAPI_s* gpu;
 
-#ifdef _DEBUG
-#define MG_DEBUG
+	// callbacks.
+	// You must set this callbacks.
+	// reason is mgDrawTextReason_****
+	struct mgFont_s* (*onFont)(int reason, struct mgTextProcessor_s*, mgUnicodeChar);
+	struct mgColor_s* (*onColor)(int reason, struct mgTextProcessor_s*, mgUnicodeChar, struct mgStyle_s*);
+	void (*onGetTextSize)(int reason, struct mgTextProcessor_s*, const mgUnicodeChar* text, mgPoint*);
+	void (*onDraw)(int reason, struct mgTextProcessor_s*, mgUnicodeChar, mgPoint* position, struct mgColor_s*, struct mgFont_s*);
+
+	// method
+	void(*drawText)(int reason, struct mgTextProcessor_s*, mgPoint* position, const mgUnicodeChar* text, size_t textLen, struct mgStyle_s*);
+
+} mgTextProcessor;
+
+/// <summary>
+/// Create mgTextProcessor using this function;
+/// Use free() after using.
+/// </summary>
+mgTextProcessor* MG_C_DECL mgCreateTextProcessor(struct mgFont_s* fonts, struct mgVideoDriverAPI_s* gpu);
+
+#if defined(__cplusplus)
+}
 #endif
-
-#define MG_MAKEFOURCC( ch0, ch1, ch2, ch3 )\
-	((unsigned int)(unsigned char)(ch0)|((unsigned int)(unsigned char)(ch1)<<8)|\
-	((unsigned int)(unsigned char)(ch2)<<16)|((unsigned int)(unsigned char)(ch3)<<24))
-
-#ifdef MG_PLATFORM_WINDOWS
-#if defined _WIN64 || defined __x86_64__
-#define MG_BIT_64
-#endif
-#else
-#endif
-
-#ifdef _MSC_VER
-#define MGF_FUNCTION __FUNCTION__
-#else
-#define MGF_FUNCTION "functionname"
-#endif
-
-#ifdef _MSC_VER
-
-#if _MSC_VER < 1930
-#define MGF_LINK_LIBRARY_CMP "_v142"
-#endif
-
-#ifdef MG_BIT_64
-#define MGF_LINK_LIBRARY_ARCH "_x64"
-#else
-#define MGF_LINK_LIBRARY_ARCH "_x86"
-#endif
-
-#ifdef MG_DEBUG
-#define MGF_LINK_LIBRARY_CONF "_Debug"
-#else
-#define MGF_LINK_LIBRARY_CONF "_Release"
-#endif
-
-#define MGF_LINK_LIBRARY(n) \
-	__pragma(comment(lib, n MGF_LINK_LIBRARY_CMP MGF_LINK_LIBRARY_ARCH MGF_LINK_LIBRARY_CONF))
-#endif
-
-#define MG_LO32(l)           ((uint16_t)(((uint32_t)(l)) & 0xffff))
-#define MG_HI32(l)           ((uint16_t)((((uint32_t)(l)) >> 16) & 0xffff))
 
 #endif

@@ -199,8 +199,14 @@ miGUI_onDraw_button(mgElement* e)
 		pos.x += impl->textIndentInternal.x;
 		pos.y += impl->textIndentInternal.y;
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-		e->window->context->gpu->drawText(mgDrawTextReason_buttonText, impl, 
-			&pos, text, textLen, &impl->textColorFinal, impl->onFont(e));
+		e->window->context->gpu->drawText(
+			mgDrawTextReason_buttonText, 
+			impl, 
+			&pos, 
+			text, 
+			textLen, 
+			&impl->textColorFinal, 
+			impl->onFont(e));
 	}
 }
 

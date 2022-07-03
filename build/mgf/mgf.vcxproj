@@ -94,7 +94,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;USE_OPENSSL;OPENSSL_NO_DEPRECATED;LIBSSH2_OPENSSL;_WINSOCK_DEPRECATED_NO_WARNINGS;HAVE_BROTLI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;USE_OPENSSL;OPENSSL_NO_DEPRECATED;LIBSSH2_OPENSSL;_WINSOCK_DEPRECATED_NO_WARNINGS;HAVE_BROTLI</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\OpenSSL\include\;..\..\src\OpenSSL\crypto\modes\;..\..\src\brotli\c\include\;..\..\src\zlib\contrib\minizip\;..\..\src\zlib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -116,7 +116,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;USE_OPENSSL;OPENSSL_NO_DEPRECATED;LIBSSH2_OPENSSL;_WINSOCK_DEPRECATED_NO_WARNINGS;HAVE_BROTLI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;USE_OPENSSL;OPENSSL_NO_DEPRECATED;LIBSSH2_OPENSSL;_WINSOCK_DEPRECATED_NO_WARNINGS;HAVE_BROTLI</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\OpenSSL\include\;..\..\src\OpenSSL\crypto\modes\;..\..\src\brotli\c\include\;..\..\src\zlib\contrib\minizip\;..\..\src\zlib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -138,7 +138,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;USE_OPENSSL;OPENSSL_NO_DEPRECATED;LIBSSH2_OPENSSL;_WINSOCK_DEPRECATED_NO_WARNINGS;HAVE_BROTLI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;USE_OPENSSL;OPENSSL_NO_DEPRECATED;LIBSSH2_OPENSSL;_WINSOCK_DEPRECATED_NO_WARNINGS;HAVE_BROTLI</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\OpenSSL\include\;..\..\src\OpenSSL\crypto\modes\;..\..\src\brotli\c\include\;..\..\src\zlib\contrib\minizip\;..\..\src\zlib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -160,7 +160,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;MG_NO_DLL;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;USE_OPENSSL;OPENSSL_NO_DEPRECATED;LIBSSH2_OPENSSL;_WINSOCK_DEPRECATED_NO_WARNINGS;HAVE_BROTLI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;CURL_STATICLIB;BUILDING_LIBCURL;WIN32_LEAN_AND_MEAN;USE_LIBSSH2;HAVE_LIBSSH2_H;USE_OPENSSL;OPENSSL_NO_DEPRECATED;LIBSSH2_OPENSSL;_WINSOCK_DEPRECATED_NO_WARNINGS;HAVE_BROTLI</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\src\;..\..\src\DirectXTK\Inc\;..\..\src\curl\include\;..\..\src\libssh2\include\;..\..\src\OpenSSL\include\;..\..\src\OpenSSL\crypto\modes\;..\..\src\brotli\c\include\;..\..\src\zlib\contrib\minizip\;..\..\src\zlib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

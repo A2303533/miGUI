@@ -46,7 +46,7 @@ typedef struct mgFontBitmap_s {
 
 typedef struct mgFontGlyph_s
 {
-	wchar_t symbol;
+	mgUnicodeChar symbol;
 	mgVec4 UV;
 	mgRect rect;
 	int underhang;

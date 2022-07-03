@@ -5,7 +5,6 @@
 #include "win32_test.h"
 
 #include "miGUI.h"
-#include "miGUILoader.h"
 
 #include <time.h>
 #include <stdio.h>

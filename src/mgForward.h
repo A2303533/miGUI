@@ -30,6 +30,7 @@
 #ifndef _MG_FORWARD_H_
 #define _MG_FORWARD_H_
 
+struct mgTextProcessor_s;
 struct mgSystemWindowOSData;
 struct mgPoint_s;
 struct mgRect_s;
@@ -143,6 +144,7 @@ enum mgDrawTextReason
 	mgDrawTextReason_popupShortcut,
 	mgDrawTextReason_tooltip,
 	mgDrawTextReason_textInputDefaultText,
+	mgDrawTextReason_dockpanelTitlebar,
 };
 
 #endif

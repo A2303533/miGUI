@@ -68,8 +68,8 @@ miGUI_onDraw_text(mgElement* e)
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 		e->window->context->gpu->drawText(mgDrawTextReason_text, impl, &pos, 
 			text, textLen, 
-			impl->onColor(e),
-			impl->onFont(e));
+			impl->onColor,
+			impl->onFont);
 	}
 }
 
@@ -81,7 +81,7 @@ miGUI_onRebuild_text(mgElement* e) {
 	if (text && textLen)
 	{
 		mgPoint p;
-		e->window->context->getTextSize(text, impl->onFont(e), &p);
+		e->window->context->getTextSize(text, impl->onFont, &p);
 		e->transformLocal.sz = p;
 
 		miGUI_onUpdateTransform_rectangle(e);

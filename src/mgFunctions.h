@@ -29,46 +29,42 @@
 #ifndef _MG_FUNCTIONS_H_
 #define _MG_FUNCTIONS_H_
 
-/*
-* For DLL
-*/
-
-MG_API mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* c, mgPoint* position, mgPoint* size);
-MG_API mgContext* MG_C_DECL mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input);
-MG_API mgCursor* MG_C_DECL mgCreateCursor_f(const wchar_t* fileName);
-MG_API struct mgWindow_s* MG_C_DECL mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy);
-MG_API void MG_C_DECL mgDestroyWindow_f(struct mgWindow_s* w);
-MG_API mgFont* MG_C_DECL mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size, const char* saveIt);
-MG_API mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
-MG_API mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* c, mgPoint* position);
-MG_API void MG_C_DECL mgDestroyContext_f(mgContext* c);
-MG_API void MG_C_DECL mgDestroyCursor_f(mgCursor* c);
-MG_API void MG_C_DECL mgDestroyFont_f(struct mgContext_s* c, mgFont* f);
-MG_API void MG_C_DECL mgDraw_f(mgContext* c);
-MG_API void MG_C_DECL mgSetCursor_f(mgContext* ctx, mgCursor* c, unsigned int type);
-MG_API void MG_C_DECL mgSetParent_f(mgElement* object, mgElement* parent);
-MG_API void MG_C_DECL mgSetVisible_f(mgElement* e, int v);
-MG_API void MG_C_DECL mgStartFrame_f(mgContext* c);
-MG_API void MG_C_DECL mgUpdate_f(mgContext* c);
-MG_API struct mgDockPanelWindow_s* MG_C_DECL mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id);
-MG_API struct mgPopup_s* MG_C_DECL mgCreatePopup_f(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt, int flags);
-MG_API void MG_C_DECL mgDestroyPopup_f(struct mgPopup_s* p);
-MG_API void MG_C_DECL mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position);
-MG_API void MG_C_DECL mgShowWindow_f(struct mgWindow_s* w, int i);
-MG_API void MG_C_DECL mgDestroyIcons_f(mgIcons* ic);
-MG_API mgIcons* MG_C_DECL mgCreateIcons_f(mgTexture* t, int textureSizeX, int textureSizeY, int iconNum);
-MG_API void MG_C_DECL mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy);
-MG_API mgMenu* MG_C_DECL mgCreateMenu_f(struct mgContext_s*, mgMenuItemInfo* items, int itemsSize, mgFont* f);
-MG_API void MG_C_DECL mgDestroyMenu_f(mgMenu* m);
-MG_API mgElement* MG_C_DECL mgCreateTextInput_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFont* font);
-MG_API void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory);
-MG_API void MG_C_DECL mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e);
-MG_API int MG_C_DECL mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
-struct mgPopup_s* mgGetDefaultPopupTextInput(mgContext* c);
-MG_API mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w,mgPoint* position,mgPoint* size,void** items,uint32_t itemsSize,mgFont* f);
-MG_API void MG_C_DECL mgTextInputActivate_f(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
-MG_API void MG_C_DECL mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text);
-MG_API void MG_C_DECL mgDrawWindow_f(struct mgWindow_s* w);
-MG_API void MG_C_DECL mgDrawPopup_f(struct mgContext_s* c, mgPopup* p);
+//mgElement* MG_C_DECL mgCreateButton_f(struct mgWindow_s* c, mgPoint* position, mgPoint* size);
+//mgContext* MG_C_DECL mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input);
+//mgCursor* MG_C_DECL mgCreateCursor_f(const wchar_t* fileName);
+//struct mgWindow_s* MG_C_DECL mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy);
+//void MG_C_DECL mgDestroyWindow_f(struct mgWindow_s* w);
+//mgFont* MG_C_DECL mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size, const char* saveIt);
+//mgElement* MG_C_DECL mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
+//mgElement* MG_C_DECL mgCreateText_f(struct mgWindow_s* c, mgPoint* position);
+//void MG_C_DECL mgDestroyContext_f(mgContext* c);
+//void MG_C_DECL mgDestroyCursor_f(mgCursor* c);
+//void MG_C_DECL mgDestroyFont_f(struct mgContext_s* c, mgFont* f);
+//void MG_C_DECL mgDraw_f(mgContext* c);
+//void MG_C_DECL mgSetCursor_f(mgContext* ctx, mgCursor* c, unsigned int type);
+//void MG_C_DECL mgSetParent_f(mgElement* object, mgElement* parent);
+//void MG_C_DECL mgSetVisible_f(mgElement* e, int v);
+//void MG_C_DECL mgStartFrame_f(mgContext* c);
+//void MG_C_DECL mgUpdate_f(mgContext* c);
+//struct mgDockPanelWindow_s* MG_C_DECL mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id);
+//struct mgPopup_s* MG_C_DECL mgCreatePopup_f(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt, int flags);
+//void MG_C_DECL mgDestroyPopup_f(struct mgPopup_s* p);
+//void MG_C_DECL mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position);
+//void MG_C_DECL mgShowWindow_f(struct mgWindow_s* w, int i);
+//void MG_C_DECL mgDestroyIcons_f(mgIcons* ic);
+//mgIcons* MG_C_DECL mgCreateIcons_f(mgTexture* t, int textureSizeX, int textureSizeY, int iconNum);
+//void MG_C_DECL mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy);
+//mgMenu* MG_C_DECL mgCreateMenu_f(struct mgContext_s*, mgMenuItemInfo* items, int itemsSize, mgFont* f);
+//void MG_C_DECL mgDestroyMenu_f(mgMenu* m);
+//mgElement* MG_C_DECL mgCreateTextInput_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFont* font);
+//void MG_C_DECL mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory);
+//void MG_C_DECL mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e);
+//int MG_C_DECL mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len);
+//mgElement* MG_C_DECL mgCreateListBox_f(struct mgWindow_s* w,mgPoint* position,mgPoint* size,void** items,uint32_t itemsSize,mgFont* f);
+//void MG_C_DECL mgTextInputActivate_f(struct mgContext_s*, struct mgElementTextInput_s* e, int isActive, int deactivateCode);
+//void MG_C_DECL mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text);
+//void MG_C_DECL mgDrawWindow_f(struct mgWindow_s* w);
+//void MG_C_DECL mgDrawPopup_f(struct mgContext_s* c, mgPopup* p);
+//struct mgPopup_s* mgGetDefaultPopupTextInput(mgContext* c);
 
 #endif

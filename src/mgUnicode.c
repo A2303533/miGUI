@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -26,15 +26,47 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MG_ELEMENTTEXT_H_
-#define _MG_ELEMENTTEXT_H_
+#include "miGUI.h"
 
-typedef struct mgElementText_s {
+void 
+MG_C_DECL 
+mgUnicodeFromChar(const char* str, mgUnicodeChar* out, size_t* lenOut)
+{
+	assert(str);
+	assert(out);
+	assert(lenOut);
 
-	const mgUnicodeChar* (*onText)(struct mgElement_s*, size_t* textLen);
-} mgElementText;
+}
 
+void
+mgTextProcessor_drawText(
+	int reason, 
+	struct mgTextProcessor_s* tp, 
+	mgPoint* position, 
+	const mgUnicodeChar* text, 
+	size_t textLen, 
+	struct mgStyle_s* style)
+{
+	mgPoint p = *position;
 
+	for (size_t i = 0; i < textLen; ++i)
+	{
+		mgFont* font = tp->onFont(reason, tp, text[i]);
+		mgColor* color = tp->onColor(reason, tp, text[i], style);
+		tp->onDraw(reason, tp, text[i], &p, color, font);
+	}
+}
 
-#endif
+mgTextProcessor* 
+MG_C_DECL 
+mgCreateTextProcessor(mgFont* fonts, struct mgVideoDriverAPI_s* gpu)
+{
+	assert(fonts);
+	assert(gpu);
+
+	mgTextProcessor* tp = calloc(1, sizeof(mgTextProcessor));
+	tp->fonts = fonts;
+	tp->gpu = gpu;
+	tp->drawText = mgTextProcessor_drawText;
+	return tp;
+}

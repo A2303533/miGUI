@@ -128,7 +128,7 @@ mgTextInput_paste(mgElement* e)
 	else
 	{
 		mgPoint tsz;
-		e->window->context->getTextSize(impl->text, impl->font, &tsz);
+		e->window->context->getTextSize(impl->text, impl->onFont, &tsz);
 		impl->textWidth = tsz.x;
 	}
 
@@ -375,7 +375,7 @@ mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32
 	int w = 0;
 	
 	mgPoint pt;
-	e->element->window->context->getTextSize(text, e->font, &pt);
+	e->element->window->context->getTextSize(text, e->onFont, &pt);
 	
 	w = pt.x;
 
@@ -727,6 +727,8 @@ miGUI_onUpdate_textinput(mgElement* e)
 	if (isActive)
 	{
 		mgTextInput_updateScrollLimit(e);
+		
+		mgFont* fnt = impl->onFont(c->input->character, 0);
 
 		if (c->input->character)
 		{
@@ -789,7 +791,8 @@ miGUI_onUpdate_textinput(mgElement* e)
 
 						wchar_t t[2] = { c->input->character, 0 };
 						int w = mgTextInputPutText_f(impl, t, 1);
-						impl->textWidth += w + impl->font->characterSpacing;
+						
+						impl->textWidth += w + fnt->characterSpacing;
 					}
 				}break;
 				}
@@ -872,11 +875,12 @@ miGUI_onUpdate_textinput(mgElement* e)
 
 		if (e->lmbClickCount == 2)
 			mgTextInput_selectAll(impl);
+		
 
 		impl->textCursorRect.left = 0;
 		impl->textCursorRect.top = e->transformWorld.buildArea.top;
 		impl->textCursorRect.right = impl->textCursorRect.left + 2;
-		impl->textCursorRect.bottom = impl->textCursorRect.top + impl->font->maxSize.y;
+		impl->textCursorRect.bottom = impl->textCursorRect.top + fnt->maxSize.y;
 		/*impl->textBeginDrawIndex; for multiline*/
 
 		impl->textCursorRect.left = impl->textCursorRect.left + impl->textCursorPosition.x;
@@ -953,7 +957,7 @@ miGUI_onDraw_textinput(mgElement* e)
 	}
 
 	impl->charIndexUnderCursor = 0;
-
+	
 	if (impl->text && impl->textLen)
 	{
 		if (impl->multiline)
@@ -970,6 +974,10 @@ miGUI_onDraw_textinput(mgElement* e)
 			mgColor* textColor = 0;
 			for (uint32_t i = 0; i < impl->textLen; ++i)
 			{
+				wchar_t t[2] = { impl->text[i], 0 };
+
+				mgFont* fnt = impl->onFont(ch1, ch2);
+
 				rect.left = pos.x;
 				rect.top = pos.y;				
 
@@ -984,7 +992,6 @@ miGUI_onDraw_textinput(mgElement* e)
 				else
 				{
 					mgPoint p;
-					wchar_t t[2] = { impl->text[i], 0 };
 					e->window->context->getTextSize(t, impl->font, &p);
 
 					int v = p.x + impl->font->characterSpacing;
@@ -1024,8 +1031,10 @@ miGUI_onDraw_textinput(mgElement* e)
 					&pos2,
 					&impl->text[i],
 					1,
-					textColor,
-					impl->font);
+					impl->onColor,
+					impl->onFont);
+					/*textColor,
+					impl->font);*/
 
 				{
 					uint32_t rw = rect.right - rect.left;

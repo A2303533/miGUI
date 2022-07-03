@@ -30,15 +30,21 @@
 #ifndef _MG_ELEMENTTEXTIN_H_
 #define _MG_ELEMENTTEXTIN_H_
 
+#include "mgElementText.h"
+
 typedef struct mgElementTextInput_s {
 	struct mgElement_s* element;
 
-	mgFont* font;
-	wchar_t* text;
+	//mgFont* font;
+	//mgTextCallbackColor onColor;
+	//mgTextCallbackFont onFont;
+	struct mgTextProcessor_s * textProcessor;
+
+	mgUnicodeChar* text;
 	uint32_t textLen;
 	uint32_t allocated; /*in wchar_t*/
 	
-	const wchar_t* defaultText; /*default text like 'click to edit'*/
+	const mgUnicodeChar* defaultText; /*default text like 'click to edit'*/
 	uint32_t defaultTextLen;         /*set this too*/
 
 	/*
@@ -66,7 +72,7 @@ typedef struct mgElementTextInput_s {
 	* return 1 if need to deactivate input
 	*/
 	int(*onEndEdit)(struct mgElement_s*, int type);
-	wchar_t(*onCharEnter)(struct mgElement_s*, wchar_t);
+	mgUnicodeChar(*onCharEnter)(struct mgElement_s*, mgUnicodeChar);
 	void(*onActivate)(struct mgElement_s*);
 
 	uint32_t isSelected;

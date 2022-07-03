@@ -135,6 +135,7 @@ bool Application::Init()
 
 	stra2.clear();
 	mgf::UnicodeString ustr(stra);
+	ustr.Append((char32_t)0x24B62);
 	ustr.Get(stra2);
 	ustr.Get(strw2);
 	stra2.clear();

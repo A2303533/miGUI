@@ -181,6 +181,9 @@ mgDockPanelUpdateTabRect(struct mgContext_s* c, mgDockPanelWindow* pw)
 void
 mgDockPanelCheckRects(struct mgContext_s* c)
 {
+	assert(c->dockPanel);
+	assert(c->dockPanel->textProcessor);
+
 	if (c->dockPanel->elementsSize > 1)
 	{
 		int difx = c->dockPanel->mainElementSizeMinimum.x - c->dockPanel->mainElementSize.x;
@@ -376,7 +379,16 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 				if (wnd->titlebarText)
 				{
 					mgPoint pt;
-					c->getTextSize(pw->windows[i2]->titlebarText, pw->windows[i2]->titlebarFont, &pt);
+					
+					/*c->getTextSize(pw->windows[i2]->titlebarText,
+						pw->windows[i2]->titlebarFont, 
+						&pt);*/
+					c->dockPanel->textProcessor->onGetTextSize(
+						mgDrawTextReason_dockpanelTitlebar,
+						c->dockPanel->textProcessor,
+						pw->windows[i2]->titlebarText, 
+						&pt);
+
 					tl = pt.x;
 				}
 
@@ -583,7 +595,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 			c->gpu->drawText(0, &p, t, wcslen(t), &c->activeStyle->windowTitlebarTextColor, c->dockPanel->arrayWindows[i]->activeWindow->titlebarFont);*/
 
 			c->gpu->setClipRect(&c->dockPanel->arrayWindows[i]->windowRect);
-			mgDrawWindow_f(c->dockPanel->arrayWindows[i]->activeWindow);			
+			mgDrawWindow(c->dockPanel->arrayWindows[i]->activeWindow);			
 		}
 
 		for (int i = 0; i < c->dockPanel->elementsSize; ++i)
@@ -620,12 +632,20 @@ mgDrawDockPanel(struct mgContext_s* c)
 						mgPoint p;
 						p.x = wnd->dockPanelTabRect.left+3;
 						p.y = wnd->dockPanelTabRect.top;
-						c->gpu->drawText(0, c->dockPanel,
+						
+						/*c->gpu->drawText(0, c->dockPanel,
 							&p, 
 							wnd->titlebarText, 
 							wnd->titlebarTextLen, 
 							&c->activeStyle->windowTitlebarText, 
-							wnd->titlebarFont);
+							wnd->titlebarFont);*/
+						c->dockPanel->textProcessor->drawText(
+							mgDrawTextReason_dockpanelTitlebar,
+							c->dockPanel->textProcessor,
+							&p,
+							wnd->titlebarText,
+							wnd->titlebarTextLen,
+							c->activeStyle);
 					}
 				}
 				
@@ -720,11 +740,11 @@ mgDockPanelUpdate(struct mgContext_s* c)
 			case 0:
 			case 2:
 				if (!g_dockpanel_splitterModeElement)
-					mgSetCursor_f(c, c->defaultCursors[mgCursorType_SizeWE], mgCursorType_Arrow);
+					mgSetCursor(c, c->defaultCursors[mgCursorType_SizeWE], mgCursorType_Arrow);
 				break;
 			default:
 				if (!g_dockpanel_splitterModeElement)
-					mgSetCursor_f(c, c->defaultCursors[mgCursorType_SizeNS], mgCursorType_Arrow);
+					mgSetCursor(c, c->defaultCursors[mgCursorType_SizeNS], mgCursorType_Arrow);
 				break;
 			}
 			c->dockPanel->flags |= mgDockPanelFlag_cursorChanged;
@@ -763,7 +783,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 								{
 									mgPoint pp = c->input->mousePosition;
 									g_pnlWnd_onPopup = c->dockPanel->elements[i].panelWindows[i2];
-									mgShowPopup_f(c, c->dockPanel->windowTabPopup, &pp);
+									mgShowPopup(c, c->dockPanel->windowTabPopup, &pp);
 									return;
 								}
 							}
@@ -793,11 +813,11 @@ mgDockPanelUpdate(struct mgContext_s* c)
 				case 0:
 				case 2:
 					if (!g_dockpanel_splitterModePanel)
-						mgSetCursor_f(c, c->defaultCursors[mgCursorType_SizeWE], mgCursorType_Arrow);
+						mgSetCursor(c, c->defaultCursors[mgCursorType_SizeWE], mgCursorType_Arrow);
 					break;
 				default:
 					if (!g_dockpanel_splitterModePanel)
-						mgSetCursor_f(c, c->defaultCursors[mgCursorType_SizeNS], mgCursorType_Arrow);
+						mgSetCursor(c, c->defaultCursors[mgCursorType_SizeNS], mgCursorType_Arrow);
 					break;
 				}
 				c->dockPanel->flags |= mgDockPanelFlag_cursorChanged;
@@ -819,7 +839,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 		&& !g_dockpanel_splitterModeElement
 		&& !g_dockpanel_splitterModePanel)
 	{
-		mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+		mgSetCursor(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 		c->dockPanel->flags ^= mgDockPanelFlag_cursorChanged;
 	}
 
@@ -830,7 +850,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 			g_dockpanel_splitterModePanel = 0;
 			if (c->dockPanel->flags & mgDockPanelFlag_onSplitter)
 				c->dockPanel->flags ^= mgDockPanelFlag_onSplitter;
-			mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+			mgSetCursor(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 		}
 	}
 	static int panelSz = 0;
@@ -899,7 +919,7 @@ mgDockPanelUpdate(struct mgContext_s* c)
 			g_dockpanel_splitterModeElement = 0;
 			if (c->dockPanel->flags & mgDockPanelFlag_onSplitter)
 				c->dockPanel->flags ^= mgDockPanelFlag_onSplitter;
-			mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+			mgSetCursor(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 		}
 	}
 
@@ -964,16 +984,16 @@ mgColor colors[] = {
 	{1.f, 0.f, 1.f, 1.f},
 };
 
-MG_API
 void MG_C_DECL
-mgInitDockPanel_f(
+mgInitDockPanel(
 	struct mgContext_s* c, 
 	int indentLeft, 
 	int indentTop, 
 	int indentRight, 
 	int indentBottom, 
 	mgDockPanelElementCreationInfo* elements, 
-	int elementsSize)
+	int elementsSize,
+	struct mgTextProcessor_s* textProcessor)
 {
 	assert(c);
 	assert(!c->dockPanel);
@@ -982,6 +1002,7 @@ mgInitDockPanel_f(
 	assert(indentTop >= 0);
 	assert(indentRight >= 0);
 	assert(indentBottom >= 0);
+	assert(textProcessor);
 
 	c->dockPanel = calloc(1, sizeof(struct mgDockPanel_s));
 	c->dockPanel->indent.left = indentLeft;
@@ -993,17 +1014,18 @@ mgInitDockPanel_f(
 	c->dockPanel->mainElementSizeMinimum.x = 300;
 	c->dockPanel->mainElementSizeMinimum.y = 300;
 	c->dockPanel->tabHeight = 25;
+	c->dockPanel->textProcessor = textProcessor;
 
 	if (c->defaultPopupFont)
 	{
 		struct mgPopupItemInfo_s popupItems[] =
 		{
-			{0, L"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, L"Ctrl+A", 1},
+			{0, U"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, U"Ctrl+A", 1},
 			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-			{0, L"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, L"remove", 1},
-			{0, L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide", 1},
+			{0, U"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, U"remove", 1},
+			{0, U"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, U"hide", 1},
 		};
-		c->dockPanel->windowTabPopup = mgCreatePopup_f(c, popupItems, 4, c->defaultPopupFont, 0);
+		c->dockPanel->windowTabPopup = mgCreatePopup(c, popupItems, 4, 0, textProcessor);
 	}
 
 	c->dockPanel->elementsSize = elementsSize + 1;
@@ -1125,9 +1147,8 @@ add_new_dock_panel_window(mgDockPanelElement* dckEl, struct mgDockPanelWindow_s*
 	return pnlWnd;
 }
 
-MG_API
 struct mgDockPanelWindow_s* MG_C_DECL
-mgDockAddWindow_f(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
+mgDockAddWindow(struct mgWindow_s* w, struct mgDockPanelWindow_s* dw, int id)
 {
 	assert(w);
 	assert(w->context->dockPanel);
@@ -1335,7 +1356,7 @@ void dockPanel_popupCallback_close(int id, struct mgPopupItem_s* item)
 {
 	mgWindow* w = g_pnlWnd_onPopup->activeWindow;
 	dockPanel_popupCallback_unpin(id, item);
-	mgShowWindow_f(w, 0);
+	mgShowWindow(w, 0);
 }
 
 struct mgDockSaveData_element {
@@ -1353,9 +1374,8 @@ struct mgDockSaveData_window {
 	int panelIndex;
 };
 
-MG_API
 int* MG_C_DECL
-mgDockGetSaveData_f(struct mgContext_s* c, int* dataSize_out)
+mgDockGetSaveData(struct mgContext_s* c, int* dataSize_out)
 {
 	assert(c);
 	assert(c->dockPanel);
@@ -1466,9 +1486,8 @@ mgDockPanelClear(struct mgContext_s* c)
 	}
 }
 
-MG_API
 void MG_C_DECL
-mgDockLoadData_f(struct mgContext_s* c, int* data, int dataSizeInInt, mgWindow* (*callback)(int windowID))
+mgDockLoadData(struct mgContext_s* c, int* data, int dataSizeInInt, mgWindow* (*callback)(int windowID))
 {
 	assert(c);
 	assert(c->dockPanel);

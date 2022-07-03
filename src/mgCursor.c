@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (C) 2021 Basov Artyom
+  Copyright (C) 2022 Basov Artyom
   The authors can be contacted at <artembasov@outlook.com>
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -33,9 +33,8 @@
 #include "mgCursorWin32.h"
 #endif
 
-MG_API
 mgCursor* MG_C_DECL
-mgCreateCursor_f(const wchar_t* fileName)
+mgCreateCursor(const wchar_t* fileName)
 {
 	assert(fileName);
 	mgCursor* newCursor = malloc(sizeof(mgCursor));
@@ -49,9 +48,8 @@ mgCreateCursor_f(const wchar_t* fileName)
 	return newCursor;
 }
 
-MG_API
 void MG_C_DECL
-mgDestroyCursor_f(mgCursor* c)
+mgDestroyCursor(mgCursor* c)
 {
 	assert(c);
 	if (c->implementation)
@@ -59,9 +57,8 @@ mgDestroyCursor_f(mgCursor* c)
 	free(c);
 }
 
-MG_API
 void MG_C_DECL
-mgSetCursor_f(mgContext* ctx, mgCursor* c, unsigned int type)
+mgSetCursor(mgContext* ctx, mgCursor* c, unsigned int type)
 {
 	assert(c);
 	assert(type < mgCursorType__count);

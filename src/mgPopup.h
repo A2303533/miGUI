@@ -44,12 +44,12 @@ enum mgPopupItemType
 
 typedef struct mgPopupItemInfo_s {
 	int id;
-	const wchar_t* text;
+	const mgUnicodeChar* text;
 	struct mgPopup_s* subMenu; /*if subMenu then skip callback*/
 	void(*callback)(int id, struct mgPopupItem_s* );
 	uint32_t type;
 	uint32_t isChecked;
-	const wchar_t* shortcutText;
+	const mgUnicodeChar* shortcutText;
 	uint32_t isEnabled;
 } mgPopupItemInfo;
 
