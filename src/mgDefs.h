@@ -103,5 +103,7 @@
 	__pragma(comment(lib, n MGF_LINK_LIBRARY_CMP MGF_LINK_LIBRARY_ARCH MGF_LINK_LIBRARY_CONF))
 #endif
 
+#define MG_LO32(l)           ((uint16_t)(((uint32_t)(l)) & 0xffff))
+#define MG_HI32(l)           ((uint16_t)((((uint32_t)(l)) >> 16) & 0xffff))
 
 #endif

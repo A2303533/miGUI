@@ -33,8 +33,20 @@
 
 using namespace mgf;
 
+static UnicodeCharNode g_UnicodeChars[0x32000] =
+{
+#include "framework/UnicodeChars.inl"
+};
+
+UnicodeCharNode* mgf::GetUnicodeTable()
+{
+	return g_UnicodeChars;
+}
+
 void UnicodeConverter::CharToWchar(StringA& in, StringW& out)
 {
+	sizeof(g_UnicodeChars);
+	
 	U8ToU16((StringU8&)in, (StringU16&)out);
 }
 
@@ -160,10 +172,8 @@ void UnicodeConverter::U8ToU16(StringU8& in, StringU16& out)
 										u |= (c3 & 0x3F) << 6;
 										u |= (c4 & 0x3F);
 
-										uint16_t sh1 = 0xD800 + ((u - 0x10000) >> 10);
-										uint16_t sh2 = 0xDC00 + (u - 0x10000);
-										out.push_back(sh1);
-										out.push_back(sh2);
+										out.push_back(MG_HI32(g_UnicodeChars[u].m_utf16));
+										out.push_back(MG_LO32(g_UnicodeChars[u].m_utf16));
 									}
 								}
 							}
@@ -220,10 +230,15 @@ void UnicodeConverter::U16ToU8(StringU16& in, StringU8& out)
 					uint32_t u = (ch16 - 0xD800) * 0x400;
 					u += (ch16_2 - 0xDC00) + 0x10000;
 
-					out.push_back(0xF0 | ((u & 0x1C0000) >> 18));
-					out.push_back(0x80 | ((u & 0x3F000) >> 12));
-					out.push_back(0x80 | ((u & 0xFC0) >> 6));
-					out.push_back(0x80 | (u & 0x3F));
+					uint8_t* buf = (uint8_t*)&g_UnicodeChars[u].m_utf8;
+					out.push_back(buf[3]);
+					out.push_back(buf[2]);
+					out.push_back(buf[1]);
+					out.push_back(buf[0]);
+				//	out.push_back(0xF0 | ((u & 0x1C0000) >> 18));
+				//	out.push_back(0x80 | ((u & 0x3F000) >> 12));
+				//	out.push_back(0x80 | ((u & 0xFC0) >> 6));
+				//	out.push_back(0x80 | (u & 0x3F));
 				}
 			}
 		}

@@ -44,6 +44,8 @@ int g_dockElIdOrWhere = 0;
 int g_windowToDockPanelMode = 0;
 mgRect g_windowToDockRect;
 
+void mgRebuildElement(mgElement* e);
+
 void mgDestroyElement_f(mgElement* e);
 void mgrootobject_cb(mgElement*e) {}
 void mgDrawElement(mgElement* e);
@@ -1238,4 +1240,14 @@ mgShowWindow_f(struct mgWindow_s* w, int i)
 		if (w->flagsInternal & mgWindowFlag_internal_visible)
 			w->flagsInternal ^= mgWindowFlag_internal_visible;
 	}
+}
+
+MG_API
+void
+MG_C_DECL
+mgUpdateTransform_f(struct mgWindow_s* w)
+{
+	mgUpdateTransformElement(w->rootElement);
+	mgRebuildElement(w->rootElement);
+	mgUpdateWindow(w);
 }

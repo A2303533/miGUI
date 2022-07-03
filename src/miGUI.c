@@ -376,6 +376,8 @@ mgUpdateTransformElement(mgElement* e)
 	}
 }
 
+// I DONT KNOW WHY I ADD THIS
+// mgUpdateTransformElement is do all job
 void
 mgRebuildElement(mgElement* e)
 {

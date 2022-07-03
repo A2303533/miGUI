@@ -165,6 +165,11 @@ void Window::SetDrawBGTexture(mgTexture* t)
 	m_window->bgTexture = t;
 }
 
+void Window::UpdateTransform()
+{
+	mgUpdateTransform_f(m_window);
+}
+
 void Window::SetDrawBG(bool v)
 {
 	if (v)

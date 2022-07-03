@@ -34,6 +34,14 @@
 
 namespace mgf
 {
+	struct UnicodeCharNode
+	{
+		uint32_t m_utf8;
+		uint32_t m_utf16;
+	};
+
+	UnicodeCharNode* GetUnicodeTable();
+
 	class UnicodeConverter
 	{
 	public:

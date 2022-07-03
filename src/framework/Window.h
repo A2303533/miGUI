@@ -181,6 +181,11 @@ namespace mgf
 		void UpdateRect();
 		void Draw();
 
+		/// <summary>
+		/// Rebuild items.
+		/// </summary>
+		void UpdateTransform();
+
 		void SetUserStyle(mgStyle_s*);
 	};
 }

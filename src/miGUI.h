@@ -107,6 +107,13 @@ struct mgContext_s;
 extern "C" {
 #endif
 
+#ifdef MG_NO_DLL
+	MG_API void MG_C_DECL mgUpdateTransform_f(struct mgWindow_s* w);
+#define mgUpdateTransform mgUpdateTransform_f
+#else
+	typedef void (*PFNUPDATETRANSFORMPROC)(struct mgWindow_s* w);
+	extern PFNUPDATETRANSFORMPROC mgUpdateTransform;
+#endif
 
 #ifdef MG_NO_DLL
 MG_API struct mgContext_s* MG_C_DECL mgCreateContext_f(mgVideoDriverAPI*, mgInputContext*);

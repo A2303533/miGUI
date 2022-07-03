@@ -98,6 +98,7 @@ bool Application::Init()
 	m_windowMain->SetCustomTitleBarSize(22);
 
 	mgf::StringA stra;
+	mgf::StringA stra2;
 	mgf::StringW strw;
 	mgf::UnicodeConverter uConv;
 
@@ -127,8 +128,9 @@ bool Application::Init()
 	stra.push_back(0x98);
 	stra.push_back(0x9D);
 	stra.push_back(']');
+
 	uConv.CharToWchar(stra, strw);
-	uConv.WcharToChar(strw, stra);
+	uConv.WcharToChar(strw, stra2);
 
 
 
