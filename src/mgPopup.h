@@ -73,7 +73,8 @@ typedef struct mgPopup_s {
 
 	mgPoint indent;
 	int itemHeight;
-	mgFont* font;
+	//mgFont* font;
+	struct mgTextProcessor_s* textProcessor;
 
 	mgStyle* userStyle;
 

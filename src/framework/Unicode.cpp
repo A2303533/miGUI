@@ -33,11 +33,6 @@
 
 using namespace mgf;
 
-static UnicodeCharNode g_UnicodeChars[0x32000] =
-{
-#include "framework/UnicodeChars.inl"
-};
-
 union UC
 {
 	uint8_t bytes[4];
@@ -45,15 +40,13 @@ union UC
 	uint32_t integer;
 };
 
-UnicodeCharNode* mgf::GetUnicodeTable()
+mgUnicodeCharNode* mgf::GetUnicodeTable()
 {
-	return g_UnicodeChars;
+	return mgGetUnicodeTable();
 }
 
 void UnicodeConverter::CharToWchar(StringA& in, StringW& out)
 {
-	sizeof(g_UnicodeChars);
-	
 	U8ToU16((StringU8&)in, (StringU16&)out);
 }
 
@@ -102,6 +95,7 @@ void UnicodeConverter::U8ToU16(StringU8& in, StringU16& out)
 {
 	out.clear();
 	size_t sz = in.size();
+	auto ut = mgGetUnicodeTable();
 
 	unsigned char c1 = 0;
 	unsigned char c2 = 0;
@@ -179,8 +173,10 @@ void UnicodeConverter::U8ToU16(StringU8& in, StringU16& out)
 										u |= (c3 & 0x3F) << 6;
 										u |= (c4 & 0x3F);
 
-										out.push_back(MG_HI32(g_UnicodeChars[u].m_utf16));
-										out.push_back(MG_LO32(g_UnicodeChars[u].m_utf16));
+									//	out.push_back(0xD800 + ((u & 0xFFC00) >> 10));
+									//	out.push_back(0xDC00 + (u & 0x3FF));
+										out.push_back(MG_HI32(ut[u].m_utf16));
+										out.push_back(MG_LO32(ut[u].m_utf16));
 									}
 								}
 							}
@@ -213,6 +209,7 @@ void UnicodeConverter::U16ToU8(StringU16& in, StringU8& out)
 {
 	out.clear();
 	size_t sz = in.size();
+	auto ut = mgGetUnicodeTable();
 
 	for (size_t i = 0u; i < sz; ++i) 
 	{
@@ -237,7 +234,11 @@ void UnicodeConverter::U16ToU8(StringU16& in, StringU8& out)
 					uint32_t u = (ch16 - 0xD800) * 0x400;
 					u += (ch16_2 - 0xDC00) + 0x10000;
 
-					uint8_t* buf = (uint8_t*)&g_UnicodeChars[u].m_utf8;
+				//	out.push_back(0xF0 + ((u & 0x1C0000) >> 18));
+				//	out.push_back(0x80 + ((u & 0x3F000) >> 12));
+				//	out.push_back(0x80 + ((u & 0xFC0) >> 6));
+				//	out.push_back(0x80 + (u & 0x3F));
+					uint8_t* buf = (uint8_t*)&ut[u].m_utf8;
 					out.push_back(buf[3]);
 					out.push_back(buf[2]);
 					out.push_back(buf[1]);
@@ -624,13 +625,14 @@ void UnicodeString::Get(StringA& str)
 {
 	str.clear();
 	UC uc;
+	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
 		char_type c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 		
-		uc.integer = g_UnicodeChars[c].m_utf8;
+		uc.integer = ut[c].m_utf8;
 
 		if (uc.bytes[3]) str.push_back(uc.bytes[3]);
 		if (uc.bytes[2]) str.push_back(uc.bytes[2]);
@@ -643,13 +645,14 @@ void UnicodeString::Get(StringW& str)
 {
 	str.clear();
 	UC uc;
+	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
 		char_type c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
-		uc.integer = g_UnicodeChars[c].m_utf16;
+		uc.integer = ut[c].m_utf16;
 
 		if (uc.shorts[1]) str.push_back(uc.shorts[1]);
 		if (uc.shorts[0]) str.push_back(uc.shorts[0]);
@@ -660,13 +663,14 @@ void UnicodeString::Get(StringU8& str)
 {
 	str.clear();
 	UC uc;
+	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
 		char_type c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
-		uc.integer = g_UnicodeChars[c].m_utf8;
+		uc.integer = ut[c].m_utf8;
 
 		if (uc.bytes[3]) str.push_back(uc.bytes[3]);
 		if (uc.bytes[2]) str.push_back(uc.bytes[2]);
@@ -679,13 +683,14 @@ void UnicodeString::Get(StringU16& str)
 {
 	str.clear();
 	UC uc;
+	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
 		char_type c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
-		uc.integer = g_UnicodeChars[c].m_utf16;
+		uc.integer = ut[c].m_utf16;
 
 		if (uc.shorts[1]) str.push_back(uc.shorts[1]);
 		if (uc.shorts[0]) str.push_back(uc.shorts[0]);
@@ -696,13 +701,14 @@ void UnicodeString::Get(std::string& str)
 {
 	str.clear();
 	UC uc;
+	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
 		char_type c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
-		uc.integer = g_UnicodeChars[c].m_utf8;
+		uc.integer = ut[c].m_utf8;
 
 		if (uc.bytes[3]) str.push_back(uc.bytes[3]);
 		if (uc.bytes[2]) str.push_back(uc.bytes[2]);
@@ -715,13 +721,14 @@ void UnicodeString::Get(std::wstring& str)
 {
 	str.clear();
 	UC uc;
+	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
 		char_type c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
-		uc.integer = g_UnicodeChars[c].m_utf16;
+		uc.integer = ut[c].m_utf16;
 
 		if (uc.shorts[1]) str.push_back(uc.shorts[1]);
 		if (uc.shorts[0]) str.push_back(uc.shorts[0]);
@@ -732,13 +739,14 @@ void UnicodeString::Get(std::u16string& str)
 {
 	str.clear();
 	UC uc;
+	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
 		char_type c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
-		uc.integer = g_UnicodeChars[c].m_utf16;
+		uc.integer = ut[c].m_utf16;
 
 		if (uc.shorts[1]) str.push_back(uc.shorts[1]);
 		if (uc.shorts[0]) str.push_back(uc.shorts[0]);

@@ -62,14 +62,21 @@ miGUI_onDraw_text(mgElement* e)
 	mgElementText* impl = (mgElementText*)e->implementation;
 
 	size_t textLen = 0;
-	const wchar_t* text = impl->onText(e, &textLen);
+	const mgUnicodeChar* text = impl->onText(e, &textLen);
 	if (text && textLen)
 	{
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-		e->window->context->gpu->drawText(mgDrawTextReason_text, impl, &pos, 
+		/*e->window->context->gpu->drawText(mgDrawTextReason_text, impl, &pos, 
 			text, textLen, 
 			impl->onColor,
-			impl->onFont);
+			impl->onFont);*/
+		impl->textProcessor->onDrawText(
+			mgDrawTextReason_text,
+			impl->textProcessor,
+			&pos,
+			text,
+			textLen,
+			0);
 	}
 }
 
@@ -77,20 +84,25 @@ void
 miGUI_onRebuild_text(mgElement* e) {
 	mgElementText* impl = (mgElementText*)e->implementation;
 	size_t textLen = 0;
-	const wchar_t* text = impl->onText(e, &textLen);
+	const mgUnicodeChar* text = impl->onText(e, &textLen);
 	if (text && textLen)
 	{
 		mgPoint p;
-		e->window->context->getTextSize(text, impl->onFont, &p);
+		//e->window->context->getTextSize(text, impl->onFont, &p);
+		impl->textProcessor->onGetTextSize(
+			mgDrawTextReason_text,
+			impl->textProcessor,
+			text,
+			textLen,
+			&p);
 		e->transformLocal.sz = p;
 
 		miGUI_onUpdateTransform_rectangle(e);
 	}
 }
 
-MG_API
 mgElement* MG_C_DECL
-mgCreateText_f(struct mgWindow_s* w, mgPoint* position)
+mgCreateText(struct mgWindow_s* w, mgPoint* position, struct mgTextProcessor_s* tp)
 {
 	assert(w);
 	assert(position);
@@ -113,8 +125,8 @@ mgCreateText_f(struct mgWindow_s* w, mgPoint* position)
 
 	newElement->implementation = calloc(1, sizeof(mgElementText));
 	mgElementText* impl = (mgElementText*)newElement->implementation;
-
-	mgSetParent_f(newElement, 0);
+	impl->textProcessor = tp;
+	mgSetParent(newElement, 0);
 
 	// now user must call rebuild function (or just context->needRebuild = 1;)
 	//miGUI_onRebuild_text(newElement);

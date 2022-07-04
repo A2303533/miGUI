@@ -113,28 +113,43 @@ struct mgContext_s;
 extern "C" {
 #endif
 
+/// <summary>
+/// Force update elements in this window.
+/// </summary>
 void MG_C_DECL mgUpdateTransform(struct mgWindow_s* w);
 
+/// <summary>
+/// Allocate memory and set some data.
+/// </summary>
 struct mgContext_s* MG_C_DECL mgCreateContext(mgVideoDriverAPI*, mgInputContext*);
 void MG_C_DECL mgDestroyContext(struct mgContext_s*);
+
+/// <summary>
+/// Create GUI window
+/// </summary>
 struct mgWindow_s* MG_C_DECL mgCreateWindow(struct mgContext_s*, int px, int py, int sx, int sy, struct mgTextProcessor_s*);
 void MG_C_DECL mgDestroyWindow(struct mgWindow_s*);
 void MG_C_DECL mgSetWindowTitle(struct mgWindow_s*, const mgUnicodeChar*);
 void MG_C_DECL mgBringWindowToTop(struct mgWindow_s*);
-
 /*
 * 1 show
 * 0 hide
 */
 void MG_C_DECL mgShowWindow(struct mgWindow_s*, int);
 
+/// <summary>
+/// System will update all elements in all windows.
+/// </summary>
 void MG_C_DECL mgOnWindowSize(struct mgContext_s*, int x, int y);
 
-/* Create bitmap font or load from file.
-* If filename exist load from file. If not then try to generate from installed system font.
-* Destroy it by yourself (call mgDestroyFont).
-* saveIt (optional) - save .txt and images dds rgba in ../data/fonts/$saveIt/
-*/
+/// <summary>
+/// Create bitmap font or load from file.
+/// If filename exist load from file.If not then try to generate from installed system font.
+/// Destroy it by yourself(call mgDestroyFont).
+/// saveIt(optional) - save.txt and images dds rgba in .. / data / fonts / $saveIt /
+/// 
+/// If backend is GDI then probably create system font.
+/// </summary>
 mgFont* MG_C_DECL mgCreateFont(struct mgContext_s*, const char* filename, unsigned int flags, int size, const char* saveIt);
 void MG_C_DECL mgDestroyFont(struct mgContext_s*, mgFont*);
 
@@ -228,7 +243,7 @@ void MG_C_DECL mgTextInputSetText(struct mgElementTextInput_s* e, const mgUnicod
 void MG_C_DECL mgTextInputClear(struct mgElementTextInput_s* e, int freeMemory);
 
 //*return width in pixels (max width)*/
-int MG_C_DECL mgTextInputPutText(struct mgElementTextInput_s* e, const mgUnicodeChar* text, uint32_t len);
+int MG_C_DECL mgTextInputPutText(struct mgElementTextInput_s* e, const mgUnicodeChar* text, size_t len);
 void MG_C_DECL mgTextInputDeleteSelected(struct mgElementTextInput_s* e);
 
 //* deactivateCode is optional
@@ -293,16 +308,16 @@ typedef struct mgContext_s {
 	mgMenu* activeMenu;
 	mgElementTextInput* activeTextInput;
 
-	mgFont* defaultPopupFont;
+//	mgFont* defaultPopupFont;
 	int cursorInPopup;
 	
 	int cursorInElement; // 1 if cursor above element like button, menu item, but not in popup or window
 
 	mgIconGroup* defaultIconGroup;
 	
-	mgFont* tooltipFont;
+	//mgFont* tooltipFont;
 	const mgUnicodeChar* tooltipText;
-
+	struct mgTextProcessor_s* tooltipTextProcessor;
 
 } mgContext;
 

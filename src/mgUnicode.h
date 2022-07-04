@@ -32,11 +32,18 @@
 
 #include <stdint.h>
 
+#if defined(__cplusplus)
+typedef char32_t mgUnicodeChar;
+#else
 typedef uint32_t mgUnicodeChar;
+#endif
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+uint64_t MG_C_DECL mgDecToOctLL(uint64_t dec);
+void MG_C_DECL mgDecToHEX(uint64_t dec, char* buf, int* sz);
 
 /// <summary>
 /// Create Unicode string using UTF-8 string.
@@ -44,7 +51,38 @@ extern "C" {
 /// `str` must be 0 terminated string.
 /// `lenOut` is length of new mgUnicodeChar string.
 /// </summary>
-void MG_C_DECL mgUnicodeFromChar(const char* str, mgUnicodeChar* out, size_t* lenOut);
+	void MG_C_DECL mgUnicodeFromUTF8(const char* str, mgUnicodeChar* out, size_t* lenOut);
+	void MG_C_DECL mgUnicodeFromUTF16(const wchar_t* str, mgUnicodeChar* out, size_t* lenOut);
+	void MG_C_DECL mgUnicodeToUTF8(const mgUnicodeChar* str, char* out, size_t* lenOut);
+	void MG_C_DECL mgUnicodeToUTF16(const mgUnicodeChar* str, wchar_t* out, size_t* lenOut);
+	
+void MG_C_DECL mgUnicodeSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* fmt, ...);
+int  MG_C_DECL mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* fmt, va_list);
+
+size_t MG_C_DECL mgUnicodeStrlen(const mgUnicodeChar* str);
+
+// mode: 
+//  0 - normal,  decimal
+//  1 - hex 7fa
+//  2 - hex 7FA
+//  3 - octal 610
+void MG_C_DECL mgUnicodeULLTOA(uint64_t val, mgUnicodeChar* buf, size_t bufSz, int mode);
+void MG_C_DECL mgUnicodeLLTOA(int64_t val, mgUnicodeChar* buf, size_t bufSz, int mode);
+
+struct mgUnicodeCharNode
+{
+	uint32_t m_utf8;
+	uint32_t m_utf16;
+};
+
+struct mgUnicodeCharNode* MG_C_DECL mgGetUnicodeTable();
+
+union mgUnicodeUC
+{
+	uint8_t bytes[4];
+	uint16_t shorts[2];
+	uint32_t integer;
+};
 
 /// <summary>
 /// All fonts now here.
@@ -52,27 +90,26 @@ void MG_C_DECL mgUnicodeFromChar(const char* str, mgUnicodeChar* out, size_t* le
 /// </summary>
 typedef struct mgTextProcessor_s
 {
-	struct mgFont_s* fonts;
+	struct mgFont_s** fonts;
 	struct mgVideoDriverAPI_s* gpu;
 
 	// callbacks.
 	// You must set this callbacks.
 	// reason is mgDrawTextReason_****
+	void (*onDrawText)(int reason, struct mgTextProcessor_s*, mgPoint* position, const mgUnicodeChar* text, size_t textLen, struct mgColor_s*);
 	struct mgFont_s* (*onFont)(int reason, struct mgTextProcessor_s*, mgUnicodeChar);
 	struct mgColor_s* (*onColor)(int reason, struct mgTextProcessor_s*, mgUnicodeChar, struct mgStyle_s*);
-	void (*onGetTextSize)(int reason, struct mgTextProcessor_s*, const mgUnicodeChar* text, mgPoint*);
-	void (*onDraw)(int reason, struct mgTextProcessor_s*, mgUnicodeChar, mgPoint* position, struct mgColor_s*, struct mgFont_s*);
-
-	// method
-	void(*drawText)(int reason, struct mgTextProcessor_s*, mgPoint* position, const mgUnicodeChar* text, size_t textLen, struct mgStyle_s*);
+	void (*onGetTextSize)(int reason, struct mgTextProcessor_s*, const mgUnicodeChar* text, size_t textLen, mgPoint*);
+	//void (*onDraw)(int reason, struct mgTextProcessor_s*, mgUnicodeChar, mgPoint* position, struct mgColor_s*, struct mgFont_s*);
 
 } mgTextProcessor;
 
 /// <summary>
 /// Create mgTextProcessor using this function;
-/// Use free() after using.
+/// Use mgDestroyTextProcessor after using.
 /// </summary>
-mgTextProcessor* MG_C_DECL mgCreateTextProcessor(struct mgFont_s* fonts, struct mgVideoDriverAPI_s* gpu);
+mgTextProcessor* MG_C_DECL mgCreateTextProcessor(struct mgFont_s** fonts, struct mgVideoDriverAPI_s* gpu);
+void MG_C_DECL mgDestroyTextProcessor(mgTextProcessor*);
 
 #if defined(__cplusplus)
 }

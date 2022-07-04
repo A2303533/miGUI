@@ -31,11 +31,10 @@
 
 #include <wchar.h>
 
-MG_API
 mgMenu* MG_C_DECL
-mgCreateMenu_f(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, mgFont* f)
+mgCreateMenu(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, struct mgTextProcessor_s* tp)
 {
-	assert(f);
+	assert(tp);
 	assert(items);
 	assert(itemsSize > 0);
 
@@ -44,7 +43,8 @@ mgCreateMenu_f(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, mgFo
 	newMenu->itemsSize = itemsSize;
 	newMenu->height = 20;
 	newMenu->indent = 0;
-	newMenu->font = f;
+	//newMenu->font = f;
+	newMenu->textProcessor = tp;
 	newMenu->textIndent = 5;
 	for (int i = 0; i < itemsSize; ++i)
 	{
@@ -53,10 +53,16 @@ mgCreateMenu_f(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, mgFo
 
 		if (newMenu->items[i].info.text)
 		{
-			newMenu->items[i].textLen = (int)wcslen(newMenu->items[i].info.text);
+			newMenu->items[i].textLen = mgUnicodeStrlen(newMenu->items[i].info.text);
 
 			mgPoint tsz;
-			c->getTextSize(newMenu->items[i].info.text, f, &tsz);
+			tp->onGetTextSize(
+				mgDrawTextReason_menu,
+				tp,
+				newMenu->items[i].info.text,
+				newMenu->items[i].textLen,
+				&tsz);
+			//c->getTextSize(newMenu->items[i].info.text, f, &tsz);
 
 			newMenu->items[i].width = tsz.x;
 		}
@@ -65,9 +71,8 @@ mgCreateMenu_f(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, mgFo
 	return newMenu;
 }
 
-MG_API
 void MG_C_DECL
-mgDestroyMenu_f(mgMenu* m)
+mgDestroyMenu(mgMenu* m)
 {
 	assert(m);
 	if (m->items)

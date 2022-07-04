@@ -46,7 +46,7 @@ mgRect g_windowToDockRect;
 
 void mgRebuildElement(mgElement* e);
 
-void mgDestroyElement_f(mgElement* e);
+void mgDestroyElement(mgElement* e);
 void mgrootobject_cb(mgElement*e) {}
 void mgDrawElement(mgElement* e);
 void mgUpdateTransformElement(mgElement* e);
@@ -91,10 +91,9 @@ mgWindowUpdateContentHeight(mgWindow* w, mgElement* e)
 	}
 }
 
-MG_API
 struct mgWindow_s*
 MG_C_DECL
-mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
+mgCreateWindow(struct mgContext_s* ctx, int px, int py, int sx, int sy, struct mgTextProcessor_s* tp)
 {
 	assert(ctx);
 	mgWindow* newWindow = calloc(1, sizeof(mgWindow));
@@ -103,6 +102,7 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	newWindow->size.x = sx;
 	newWindow->size.y = sy;
 	newWindow->context = ctx;
+	newWindow->textProcessor = tp;
 	
 	newWindow->flags 
 		= mgWindowFlag_withTitlebar 
@@ -160,15 +160,14 @@ mgCreateWindow_f(struct mgContext_s* ctx, int px, int py, int sx, int sy)
 	return newWindow;
 }
 
-MG_API
 void 
 MG_C_DECL
-mgDestroyWindow_f(struct mgWindow_s* w)
+mgDestroyWindow(struct mgWindow_s* w)
 {
 	assert(w);
 
 	if (w->rootElement)
-		mgDestroyElement_f(w->rootElement);
+		mgDestroyElement(w->rootElement);
 
 	mgContext* ctx = w->context;
 	
@@ -184,10 +183,9 @@ mgDestroyWindow_f(struct mgWindow_s* w)
 	free(w);
 }
 
-MG_API
 void
 MG_C_DECL
-mgBringWindowToTop_f(struct mgWindow_s* w)
+mgBringWindowToTop(struct mgWindow_s* w)
 {
 	if (w->flags & mgWindowFlag_noToTop)
 		return;
@@ -219,10 +217,9 @@ mgBringWindowToTop_f(struct mgWindow_s* w)
 	}
 }
 
-MG_API
 void
 MG_C_DECL
-mgDrawWindow_f(struct mgWindow_s* w)
+mgDrawWindow(struct mgWindow_s* w)
 {
 	assert(w);
 	mgIconGroup* iconGroup = w->context->defaultIconGroup;
@@ -313,19 +310,26 @@ mgDrawWindow_f(struct mgWindow_s* w)
 				}
 			}
 
-			if (w->titlebarFont && w->titlebarText)
+			if (w->titlebarText)
 			{
 				mgPoint pos;
 				pos.x = w->position.x + text_move + 3;
 				pos.y = w->position.y;
 
 				w->context->gpu->setClipRect(&w->rect);
-				w->context->gpu->drawText(mgDrawTextReason_windowTitlebar, w,
+				/*w->context->gpu->drawText(mgDrawTextReason_windowTitlebar, w,
 					&pos,
 					w->titlebarText,
 					w->titlebarTextLen,
 					&style->windowTitlebarText,
-					w->titlebarFont);
+					w->titlebarFont);*/
+				w->textProcessor->onDrawText(
+					mgDrawTextReason_windowTitlebar,
+					w->textProcessor,
+					&pos,
+					w->titlebarText,
+					w->titlebarTextLen,
+					&style->windowTitlebarText);
 			}
 
 			if (w->flags & mgWindowFlag_closeButton)
@@ -457,12 +461,19 @@ mgDrawWindow_f(struct mgWindow_s* w)
 				pt.x = w->menu->items[i].rect.left + w->menu->textIndent + w->menu->textOffset.x;
 				pt.y = w->menu->items[i].rect.top + w->menu->textOffset.y;
 
-				w->context->gpu->drawText(mgDrawTextReason_windowMenu, w,
+				/*w->context->gpu->drawText(mgDrawTextReason_windowMenu, w,
 					&pt,
 					w->menu->items[i].info.text,
 					w->menu->items[i].textLen,
 					color,
-					w->menu->font);
+					w->menu->font);*/
+				w->textProcessor->onDrawText(
+					mgDrawTextReason_windowMenu,
+					w->textProcessor,
+					&pt,
+					w->menu->items[i].info.text,
+					w->menu->items[i].textLen,
+					color);
 			}
 		}
 	}
@@ -611,7 +622,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 			w->context->windowUnderCursor = w;
 
 			if (w->cursorInfoOld == mgWindowCursorInfo_out)
-				mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+				mgSetCursor(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
 			w->cursorInfo = mgWindowCursorInfo_client;
 
@@ -624,7 +635,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 			if ((w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 				|| (w->context->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
 				|| (w->context->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN))
-				mgBringWindowToTop_f(w);
+				mgBringWindowToTop(w);
 
 			if (w->flags & mgWindowFlag_withTitlebar)
 			{
@@ -711,7 +722,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 		}
 		else if (w->cursorInfo == mgWindowCursorInfo_resizeRB)
 		{
-			mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_SizeNWSE], mgCursorType_Arrow);
+			mgSetCursor(w->context, w->context->defaultCursors[mgCursorType_SizeNWSE], mgCursorType_Arrow);
 			if (!(w->flagsInternal & mgWindowFlag_internal_isResizeRB))
 			{
 				if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
@@ -725,7 +736,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 		}
 
 		if (!(w->cursorInfo & mgWindowCursorInfo_resizeRB) && (w->cursorInfoOld & mgWindowCursorInfo_resizeRB))
-			mgSetCursor_f(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+			mgSetCursor(w->context, w->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
 		if (w->context->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
 		{
@@ -756,7 +767,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 				if (g_windowToDockPanelMode)
 				{
 					g_windowToDockPanelMode = 0;
-					mgDockAddWindow_f(w, g_dockPanelWindow, g_dockElIdOrWhere);
+					mgDockAddWindow(w, g_dockPanelWindow, g_dockElIdOrWhere);
 					needUpdateTransform = 2;
 				}
 			}
@@ -1151,7 +1162,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 					{
 						if (&w->menu->items[i] != w->menu->activeItem)
 						{
-							mgShowPopup_f(w->context, 0, 0);
+							mgShowPopup(w->context, 0, 0);
 							w->context->activeMenu = w->menu;
 							w->menu->activeItem = &w->menu->items[i];
 							if (w->menu->activeItem->info.popup)
@@ -1160,7 +1171,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 								pt.x = w->menu->activeItem->rect.left - w->menu->textIndent;
 								pt.y = w->menu->activeItem->rect.bottom - 5;
 								w->menu->activeItem->info.popup->userStyle = w->userStyle;
-								mgShowPopup_f(w->context, w->menu->activeItem->info.popup, &pt);
+								mgShowPopup(w->context, w->menu->activeItem->info.popup, &pt);
 							}
 							break;
 						}
@@ -1171,7 +1182,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 			{
 				w->menu->activeItem = 0;
 				w->context->activeMenu = 0;
-				mgShowPopup_f(w->context, 0, 0);
+				mgShowPopup(w->context, 0, 0);
 			}
 		}
 		else
@@ -1197,7 +1208,7 @@ mgUpdateWindow(struct mgWindow_s* w)
 								pt.x = w->menu->activeItem->rect.left - w->menu->textIndent;
 								pt.y = w->menu->activeItem->rect.bottom - 5;
 								w->menu->activeItem->info.popup->userStyle = w->userStyle;
-								mgShowPopup_f(w->context, w->menu->activeItem->info.popup, &pt);
+								mgShowPopup(w->context, w->menu->activeItem->info.popup, &pt);
 							}
 						}
 						break;
@@ -1210,25 +1221,23 @@ mgUpdateWindow(struct mgWindow_s* w)
 	w->cursorInfoOld = w->cursorInfo;
 }
 
-MG_API
 void
 MG_C_DECL
-mgSetWindowTitle_f(struct mgWindow_s* w, const wchar_t* t)
+mgSetWindowTitle(struct mgWindow_s* w, const mgUnicodeChar* t)
 {
 	assert(w);
 	int newLen = 0;
 	if (t)
 	{
-		newLen = (int)wcslen(t);
+		newLen = mgUnicodeStrlen(t);
 		w->titlebarText = t;
 	}
 	w->titlebarTextLen = newLen;
 }
 
-MG_API
 void
 MG_C_DECL
-mgShowWindow_f(struct mgWindow_s* w, int i)
+mgShowWindow(struct mgWindow_s* w, int i)
 {
 	assert(w);
 	if (i)
@@ -1242,10 +1251,9 @@ mgShowWindow_f(struct mgWindow_s* w, int i)
 	}
 }
 
-MG_API
 void
 MG_C_DECL
-mgUpdateTransform_f(struct mgWindow_s* w)
+mgUpdateTransform(struct mgWindow_s* w)
 {
 	mgUpdateTransformElement(w->rootElement);
 	mgRebuildElement(w->rootElement);

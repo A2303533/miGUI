@@ -31,7 +31,9 @@
 #define _MG_ELEMENTTABLE_H_
 
 typedef struct mgElementTable_s {
-	struct mgFont_s* font;
+	//struct mgFont_s* font;
+	struct mgTextProcessor_s* textProcessor;
+
 	uint32_t numRows;
 	uint32_t numCols;
 
@@ -47,7 +49,7 @@ typedef struct mgElementTable_s {
 	* Return 0 - no draw
 	*        1 - draw (you must set `text` and `textlen`)
 	*/
-	int(*onDrawRow)(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+	int(*onDrawRow)(struct mgElement_s*, void* row, uint32_t col, mgUnicodeChar** text, uint32_t* textlen);
 	
 	/*
 	* If you want selection you must add this callbacks:
@@ -66,9 +68,9 @@ typedef struct mgElementTable_s {
 	*/
 	int(*onCellClick)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton);
 	
-	const wchar_t* (*onCellTextInputActivate)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
-	wchar_t(*onCellTextInputCharEnter)(struct mgElement_s*, wchar_t c);
-	int(*onCellTextInputEndEdit)(struct mgElement_s*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
+	const mgUnicodeChar* (*onCellTextInputActivate)(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
+	mgUnicodeChar(*onCellTextInputCharEnter)(struct mgElement_s*, mgUnicodeChar c);
+	int(*onCellTextInputEndEdit)(struct mgElement_s*, int type, const mgUnicodeChar* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
 
 	uint32_t firstRowIndexForDraw;
 	float rowScrollValue;
@@ -96,7 +98,7 @@ typedef struct mgElementTable_s {
 	* return text for current column, set also textLen.
 	* 
 	*/
-	const wchar_t* (*onColTitleText)(struct mgElement_s*, uint32_t* textLen, uint32_t colIndex);
+	const mgUnicodeChar* (*onColTitleText)(struct mgElement_s*, uint32_t* textLen, uint32_t colIndex);
 	uint32_t colTitleHeight; /*20*/
 	int activeColTitle;
 	int hoverColTitle;

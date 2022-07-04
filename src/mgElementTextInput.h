@@ -41,11 +41,11 @@ typedef struct mgElementTextInput_s {
 	struct mgTextProcessor_s * textProcessor;
 
 	mgUnicodeChar* text;
-	uint32_t textLen;
-	uint32_t allocated; /*in wchar_t*/
+	size_t textLen;
+	size_t allocated; /*in wchar_t*/
 	
 	const mgUnicodeChar* defaultText; /*default text like 'click to edit'*/
-	uint32_t defaultTextLen;         /*set this too*/
+	size_t defaultTextLen;         /*set this too*/
 
 	/*
 	* this points to place where to put new char.
@@ -53,14 +53,14 @@ typedef struct mgElementTextInput_s {
 	* 0 - put in front
 	* textLen - push_back
 	*/
-	uint32_t textCursor;
+	size_t textCursor;
 	mgPoint textCursorPosition; /*will set when draw text*/
 	float textCursorTimer;
 	float textCursorTimerLimit; /*0.5f*/
-	uint32_t drawTextCursor;/*bool, internal*/
+	size_t drawTextCursor;/*bool, internal*/
 	mgRect textCursorRect;
 	
-	uint32_t textBeginDrawIndex;
+	size_t textBeginDrawIndex;
 
 	uint32_t charLimit;/*0*/
 	uint32_t monospace;/*0*/

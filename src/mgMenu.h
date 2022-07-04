@@ -31,14 +31,14 @@
 #define _MG_MENU_H_
 
 typedef struct mgMenuItemInfo_s {
-	const wchar_t* text;
+	const mgUnicodeChar* text;
 	mgPopup* popup;
 	int id;
 } mgMenuItemInfo;
 
 typedef struct mgMenuItem_s {
 	mgMenuItemInfo info;
-	int textLen;
+	size_t textLen;
 	int width;
 	mgRect rect;
 	int isEnabled;
@@ -52,7 +52,8 @@ typedef struct mgMenu_s {
 	mgMenuItem* items;
 	int itemsSize;
 
-	mgFont* font;
+	//mgFont* font;
+	struct mgTextProcessor_s* textProcessor;
 
 	int height;
 	int currentHeight;

@@ -336,18 +336,37 @@ mgCreateFont_generate_win32(mgContext* c, const char* fn, unsigned int flags, in
 		Rectangle(bmpdc, 0, 0, textureSize, textureSize);
 		SetBkMode(bmpdc, TRANSPARENT);
 
-		
+		struct mgUnicodeCharNode* ut = mgGetUnicodeTable();
+		union mgUnicodeUC uc;
 		for (int j = 0; j < textureInfoArray[i].num; ++j)
 		{
 			mgFontGlyph* currGlyph = &textureInfoArray[i].fromThis[j];
 			newFont->glyphMap[currGlyph->symbol] = currGlyph;
 
-			TextOutW(
+			wchar_t toc[2];
+			int toci = 1;
+
+			uc.integer = ut[currGlyph->symbol].m_utf16;
+			if (uc.shorts[1])
+				toc[0] = uc.shorts[1];  // or toc[1]
+			if (uc.shorts[0])
+			{
+				toci = 2;
+				toc[1] = uc.shorts[0];  //    toc[0] ???
+			}
+
+			/*TextOutW(
 				bmpdc, 
 				currGlyph->rect.left - currGlyph->underhang,
 				currGlyph->rect.top,
 				&currGlyph->symbol,
-				1);
+				1);*/
+			TextOutW(
+				bmpdc,
+				currGlyph->rect.left - currGlyph->underhang,
+				currGlyph->rect.top,
+				toc,
+				toci);
 
 			if (textFile)
 			{
@@ -499,9 +518,8 @@ mgCreateFont_from_file(mgContext* c, const char* fn, unsigned int flags, int siz
 	return mgCreateFont_generate(c, fn, flags, size, saveIt);
 }
 
-MG_API
 mgFont* MG_C_DECL
-mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size, const char* saveIt)
+mgCreateFont(struct mgContext_s* c, const char* fn, unsigned int flags, int size, const char* saveIt)
 {
 	FILE* f =  fopen(fn, "rb");
 	if (f)
@@ -515,9 +533,8 @@ mgCreateFont_f(mgContext* c, const char* fn, unsigned int flags, int size, const
 	}
 }
 
-MG_API
 void MG_C_DECL
-mgDestroyFont_f(struct mgContext_s* c, mgFont* f)
+mgDestroyFont(struct mgContext_s* c, mgFont* f)
 {
 	assert(f);
 	if (f->glyphs) free(f->glyphs);

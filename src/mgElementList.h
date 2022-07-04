@@ -41,7 +41,8 @@ typedef struct mgElementList_s {
 	uint32_t firstItemIndexForDraw;/*internal*/
 	uint32_t numOfLines;/*internal*/
 	int32_t itemHeight;
-	struct mgFont_s* font;
+	//struct mgFont_s* font;
+	struct mgTextProcessor_s* textProcessor;
 
 	float itemScrollValue;
 	float itemScrollValueTarget;
@@ -68,16 +69,16 @@ typedef struct mgElementList_s {
 	* Return 0 - no draw
 	*        1 - draw (you must set `text` and `textlen`)
 	*/
-	int(*onDrawItem)(struct mgElement_s*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
+	int(*onDrawItem)(struct mgElement_s*, void* item, uint32_t itemIndex, mgUnicodeChar** text, uint32_t* textlen);
 	
-	wchar_t(*onTextInputCharEnter)(struct mgElement_s*, wchar_t);
-	int(*onTextInputEndEdit)(struct mgElement_s*, int, const wchar_t*, void* editItem);
+	mgUnicodeChar(*onTextInputCharEnter)(struct mgElement_s*, mgUnicodeChar);
+	int(*onTextInputEndEdit)(struct mgElement_s*, int, const mgUnicodeChar*, void* editItem);
 
 
 	struct mgElement_s* textInput;
 	mgRect hoverItemClipRect;
 	mgRect hoverItemBuildRect;
-	const wchar_t* hoverItemText;
+	const mgUnicodeChar* hoverItemText;
 
 	int(*onGetUserElementNum)(struct mgElement_s*, void* item, uint32_t itemIndex);
 	struct mgElement_s* (*onGetUserElement)(struct mgElement_s*, uint32_t index, void* item, uint32_t itemIndex);

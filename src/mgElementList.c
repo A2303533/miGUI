@@ -41,11 +41,11 @@ extern int g_skipFrame;
 
 struct lbData1
 {
-	const wchar_t* text;
+	const mgUnicodeChar* text;
 };
 struct lbData2
 {
-	const wchar_t* text;
+	const mgUnicodeChar* text;
 	uint32_t flags;
 };
 
@@ -54,7 +54,7 @@ int mgElementList_textinput_onEndEdit(struct mgElement_s* e, int type)
 	e->visible = 0;
 	e->window->context->activeTextInput = 0;
 	
-	mgSetCursor_f(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+	mgSetCursor(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
 	mgElementTextInput* ti = e->implementation;
 	mgElement* listBox = (mgElement*)e->userData;
@@ -66,7 +66,7 @@ int mgElementList_textinput_onEndEdit(struct mgElement_s* e, int type)
 	return 1;
 }
 
-wchar_t mgElementList_textinput_onCharEnter(struct mgElement_s* e, wchar_t c)
+mgUnicodeChar mgElementList_textinput_onCharEnter(struct mgElement_s* e, mgUnicodeChar c)
 {
 	mgElementTextInput* ti = e->implementation;
 	mgElement* listBox = (mgElement*)e->userData;
@@ -84,7 +84,7 @@ void mgElementList_textinput_onActivate(struct mgElement_s* e)
 
 	mgElementTextInput* ti = e->implementation;
 	if(listBoxImpl->hoverItemText)
-		mgTextInputSetText_f(ti, listBoxImpl->hoverItemText);
+		mgTextInputSetText(ti, listBoxImpl->hoverItemText);
 
 
 	ti->isSelected = 1;
@@ -205,7 +205,7 @@ miGUI_onUpdate_list(mgElement* e)
 			mgElementTextInput* ti = (mgElementTextInput*)impl->textInput->implementation;
 			impl->textInput->visible = 1;
 
-			mgTextInputActivate_f(c, ti, 1, 0);
+			mgTextInputActivate(c, ti, 1, 0);
 			mgRect r;
 			r.left = 0;
 			r.right = e->transformWorld.buildArea.right - e->transformWorld.buildArea.left;
@@ -262,7 +262,7 @@ miGUI_onDraw_list(mgElement* e)
 			&style->listBG, 0, 0);
 	}
 
-	if (impl->itemsSize && impl->font)
+	if (impl->itemsSize)
 	{
 		uint32_t index = impl->firstItemIndexForDraw;
 		mgPoint pos;
@@ -322,7 +322,7 @@ miGUI_onDraw_list(mgElement* e)
 					&style->listItemHoverBG, 0, 0);
 			}
 
-			wchar_t* str = 0;
+			mgUnicodeChar* str = 0;
 			uint32_t strLen = 0;
 			if (impl->onDrawItem(e, itemCurr, index, &str, &strLen))
 			{
@@ -342,12 +342,19 @@ miGUI_onDraw_list(mgElement* e)
 						&style->listItemSelectedBG, 0, 0);
 				}
 
-				e->window->context->gpu->drawText(mgDrawTextReason_listbox, impl,
+				/*e->window->context->gpu->drawText(mgDrawTextReason_listbox, impl,
 					&pos,
 					str,
 					(int)wcslen(str),
 					&style->listItemText,
-					impl->font);
+					impl->font);*/
+				impl->textProcessor->onDrawText(
+					mgDrawTextReason_listbox,
+					impl->textProcessor,
+					&pos,
+					str,
+					(size_t)strLen,
+					&style->listItemText);
 			}
 
 			pos.y = pos.y + impl->itemHeight;
@@ -364,15 +371,14 @@ miGUI_onRebuild_list(mgElement* e)
 {
 }
 
-MG_API
 mgElement* MG_C_DECL
-mgCreateListBox_f(
+mgCreateListBox(
 	struct mgWindow_s* w, 
 	mgPoint* position, 
 	mgPoint* size, 
 	void** items, 
 	uint32_t itemsSize,
-	mgFont* f)
+	struct mgTextProcessor_s* tp)
 {
 	assert(w);
 	assert(position);
@@ -402,18 +408,19 @@ mgCreateListBox_f(
 	impl->items = items;
 	impl->itemsSize = itemsSize;
 	impl->itemHeight = 12;
-	impl->font = f;
+	//impl->font = f;
+	impl->textProcessor = tp;
 	impl->useF2ForEdit = 1;
 	size->x = 20;
 	size->y = 20;
-	impl->textInput = mgCreateTextInput_f(w, position, size, f);
+	impl->textInput = mgCreateTextInput(w, position, size, tp);
 	impl->textInput->userData = newElement;
 	impl->textInput->visible = 0;
 	((mgElementTextInput*)impl->textInput->implementation)->onActivate = mgElementList_textinput_onActivate;
 	((mgElementTextInput*)impl->textInput->implementation)->onEndEdit = mgElementList_textinput_onEndEdit;
 	((mgElementTextInput*)impl->textInput->implementation)->onCharEnter = mgElementList_textinput_onCharEnter;
-	mgSetParent_f(impl->textInput, newElement);
+	mgSetParent(impl->textInput, newElement);
 
-	mgSetParent_f(newElement, 0);
+	mgSetParent(newElement, 0);
 	return newElement;
 }

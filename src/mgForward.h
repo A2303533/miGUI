@@ -143,8 +143,9 @@ enum mgDrawTextReason
 	mgDrawTextReason_popup,
 	mgDrawTextReason_popupShortcut,
 	mgDrawTextReason_tooltip,
+	mgDrawTextReason_textInput,
 	mgDrawTextReason_textInputDefaultText,
 	mgDrawTextReason_dockpanelTitlebar,
+	mgDrawTextReason_menu,
 };
-
 #endif

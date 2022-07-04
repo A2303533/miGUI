@@ -31,6 +31,7 @@
 #define _MG_ELEMENTTEXT_H_
 
 typedef struct mgElementText_s {
+	struct mgTextProcessor_s* textProcessor;
 
 	const mgUnicodeChar* (*onText)(struct mgElement_s*, size_t* textLen);
 } mgElementText;

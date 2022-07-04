@@ -174,7 +174,7 @@ miGUI_onDraw_button(mgElement* e)
 	}
 
 	size_t textLen = 0;
-	const wchar_t* text = impl->onText(e, &textLen);
+	const mgUnicodeChar* text = impl->onText(e, &textLen);
 
 	if (text && textLen)
 	{
@@ -199,14 +199,21 @@ miGUI_onDraw_button(mgElement* e)
 		pos.x += impl->textIndentInternal.x;
 		pos.y += impl->textIndentInternal.y;
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-		e->window->context->gpu->drawText(
+		/*e->window->context->gpu->drawText(
 			mgDrawTextReason_buttonText, 
 			impl, 
 			&pos, 
 			text, 
 			textLen, 
 			&impl->textColorFinal, 
-			impl->onFont(e));
+			impl->onFont(e));*/
+		impl->textProcessor->onDrawText(
+			mgDrawTextReason_buttonText,
+			impl->textProcessor,
+			&pos,
+			text,
+			textLen,
+			&impl->textColorFinal);
 	}
 }
 
@@ -219,12 +226,13 @@ miGUI_onRebuild_button(mgElement* e)
 	impl->textIndentInternal.y = 0;
 
 	size_t textLen = 0;
-	const wchar_t* text = impl->onText(e, &textLen);
+	const mgUnicodeChar* text = impl->onText(e, &textLen);
 
-	if (text && e->window->context->getTextSize)
+	if (text)
 	{
 		mgPoint p;
-		e->window->context->getTextSize(text, impl->onFont(e), &p);
+		//e->window->context->getTextSize(text, impl->onFont(e), &p);
+		impl->textProcessor->onGetTextSize(mgDrawTextReason_buttonText, impl->textProcessor, text, textLen, &p);
 
 		mgPoint buttonCenter;
 		buttonCenter.x = (int)((float)(e->transformLocal.buildArea.right - e->transformLocal.buildArea.left) * 0.5f);
@@ -239,9 +247,8 @@ miGUI_onRebuild_button(mgElement* e)
 	}
 }
 
-MG_API
 mgElement* MG_C_DECL
-mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size)
+mgCreateButton(struct mgWindow_s* w, mgPoint* position, mgPoint* size, struct mgTextProcessor_s* tp)
 {
 	assert(w);
 	assert(position);
@@ -265,8 +272,9 @@ mgCreateButton_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size)
 
 	newElement->implementation = calloc(1, sizeof(mgElementButton));
 	mgElementButton* impl = (mgElementButton*)newElement->implementation;
-	
-	mgSetParent_f(newElement, 0);
+	impl->textProcessor = tp;
+
+	mgSetParent(newElement, 0);
 
 	// now user must call rebuild function (or just context->needRebuild = 1;) 
 	//miGUI_onRebuild_button(newElement);

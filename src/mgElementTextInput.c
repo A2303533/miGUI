@@ -47,8 +47,12 @@ void miGUI_onUpdateTransform_rectangle(mgElement* e);
 void miGUI_onUpdate_rectangle(mgElement* e);
 void mgTextInput_updateScrollLimit(mgElement* e);
 void mgTextInput_selectAll(struct mgElementTextInput_s* e);
+struct mgPopup_s* mgGetDefaultPopupTextInput(mgContext* c, struct mgTextProcessor_s* tp);
 
 extern int g_skipFrame;
+
+#define STRING2(x) #x
+#define STRING(x) STRING2(x)
 
 void
 mgTextInput_copy(mgElement* e)
@@ -73,12 +77,48 @@ mgTextInput_copy(mgElement* e)
 	uint32_t len = num_to_select;
 	EmptyClipboard();
 	HGLOBAL clipbuffer;
-	clipbuffer = GlobalAlloc(GMEM_DDESHARE, (len + 1) * sizeof(WCHAR));
+	
+//	mgUnicodeChar* utf32 = malloc(len * sizeof(mgUnicodeChar));
+//	size_t utf32sz = 0;
+//	mgUnicodeToUTF16(, utf32, &utf32sz);
+
+	clipbuffer = GlobalAlloc(GMEM_DDESHARE, ((len + len) + 1) * sizeof(WCHAR));
+
+//#pragma message("!!!!! !!!! !!!! Need to convert to UTF16 " __FILE__ __FUNCTION__ " LINE : " STRING(__LINE__))
+
 
 	wchar_t* buffer;
 	buffer = (wchar_t*)GlobalLock(clipbuffer);
 
-	memcpy(buffer, &impl->text[s1], len * sizeof(wchar_t));
+	memset(buffer,0, (len + len + 1) * sizeof(wchar_t));
+	wchar_t* wchar_ptr = buffer;
+	//memcpy(buffer, &impl->text[s1], len * sizeof(wchar_t));
+	union mgUnicodeUC uc;
+	for (size_t i = 0; i < len; ++i)
+	{
+		mgUnicodeChar c = impl->text[s1 + i];
+
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = mgGetUnicodeTable()[c].m_utf16;
+
+		if (uc.shorts[1])
+		{
+			*wchar_ptr = uc.shorts[1];
+			++wchar_ptr;
+			*wchar_ptr = 0;
+			++wchar_ptr;
+		}
+		if (uc.shorts[0])
+		{
+			*wchar_ptr = uc.shorts[0];
+			++wchar_ptr;
+			*wchar_ptr = 0;
+			++wchar_ptr;
+		}
+	}
+
 	buffer[len] = 0;
 
 	GlobalUnlock(clipbuffer);
@@ -92,14 +132,14 @@ void
 mgTextInput_cut(mgElement* e)
 {
 	mgTextInput_copy(e);
-	mgTextInputDeleteSelected_f(e->implementation);
+	mgTextInputDeleteSelected(e->implementation);
 }
 void
 mgTextInput_paste(mgElement* e)
 {
 	mgElementTextInput* impl = (mgElementTextInput*)e->implementation;
 	if(impl->isSelected)
-		mgTextInputDeleteSelected_f(e->implementation);
+		mgTextInputDeleteSelected(e->implementation);
 
 #ifdef MG_PLATFORM_WINDOWS
 	if (!OpenClipboard(0))
@@ -108,12 +148,21 @@ mgTextInput_paste(mgElement* e)
 	HANDLE hData = GetClipboardData(CF_UNICODETEXT);
 	if (hData)
 	{
+//#pragma message("!!!!! !!!! !!!! Need to convert to UTF16 " __FILE__ __FUNCTION__ " LINE : " STRING(__LINE__))
+
 		wchar_t* buffer = (wchar_t*)GlobalLock(hData);
 		if (buffer)
 		{
 			uint32_t len = (uint32_t)wcslen(buffer);
-			if(len)
-				mgTextInputPutText_f(impl, buffer, len);
+			if (len)
+			{
+				mgUnicodeChar* utf32 = malloc(len * sizeof(mgUnicodeChar));
+				size_t utf32sz = 0;
+				mgUnicodeFromUTF16(buffer, utf32, &utf32sz);
+
+				mgTextInputPutText(impl, utf32, utf32sz);
+				free(utf32);
+			}
 		}
 		GlobalUnlock(hData);
 	}
@@ -128,7 +177,14 @@ mgTextInput_paste(mgElement* e)
 	else
 	{
 		mgPoint tsz;
-		e->window->context->getTextSize(impl->text, impl->onFont, &tsz);
+		//e->window->context->getTextSize(impl->text, impl->onFont, &tsz);
+		impl->textProcessor->onGetTextSize(
+			mgDrawTextReason_textInput,
+			impl->textProcessor,
+			impl->text,
+			impl->textLen,
+			&tsz);
+
 		impl->textWidth = tsz.x;
 	}
 
@@ -152,7 +208,7 @@ mgTextInput_defaultPopup_onPaste(int id, struct mgPopupItem_s* item)
 void
 mgTextInput_defaultPopup_onDelete(int id, struct mgPopupItem_s* item)
 {
-	mgTextInputDeleteSelected_f(((mgElement*)item->userData)->implementation);
+	mgTextInputDeleteSelected(((mgElement*)item->userData)->implementation);
 }
 void
 mgTextInput_defaultPopup_onSelectAll(int id, struct mgPopupItem_s* item)
@@ -199,7 +255,7 @@ mgTextInput_updateScrollLimit(mgElement* e)
 void
 mgTextInputSetText_reallocate(struct mgElementTextInput_s* e, int newSize)
 {
-	wchar_t* newBuffer = malloc((newSize + 1) * sizeof(wchar_t));
+	mgUnicodeChar* newBuffer = malloc((newSize + 1) * sizeof(mgUnicodeChar));
 	for (uint32_t i = 0; i < e->textLen; ++i)
 	{
 		newBuffer[i] = e->text[i];
@@ -249,9 +305,8 @@ miGUI_textinput_activate(mgElement* e, int is)
 	g_skipFrame = 1;
 }
 
-MG_API 
 void MG_C_DECL 
-mgTextInputActivate_f(struct mgContext_s* c, struct mgElementTextInput_s* e, int isActive, int deactivateCode)
+mgTextInputActivate(struct mgContext_s* c, struct mgElementTextInput_s* e, int isActive, int deactivateCode)
 {
 	assert(c);
 	assert(e);
@@ -277,9 +332,8 @@ mgTextInputDeselect(struct mgElementTextInput_s* e)
 	e->isSelected = 0;
 }
 
-MG_API 
 void MG_C_DECL 
-mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e)
+mgTextInputDeleteSelected(struct mgElementTextInput_s* e)
 {
 	if (!e->isSelected)
 		return;
@@ -294,7 +348,7 @@ mgTextInputDeleteSelected_f(struct mgElementTextInput_s* e)
 
 	uint32_t num_to_delete = s2 - s1;
 	uint32_t str_len = e->textLen;
-	wchar_t * buf = e->text;
+	mgUnicodeChar * buf = e->text;
 	for (size_t i = s2, i2 = s1; i < str_len; ++i, ++i2)
 	{
 		buf[i2] = buf[i];
@@ -310,14 +364,14 @@ mgTextInput_backspace(struct mgElementTextInput_s* e)
 {
 	if (e->isSelected)
 	{
-		mgTextInputDeleteSelected_f(e);
+		mgTextInputDeleteSelected(e);
 		return;
 	}
 	
 	int ok = 0;
-	wchar_t* buf = e->text;
-	uint32_t str_len = e->textLen;
-	for (uint32_t i = e->textCursor; i < str_len; ++i)
+	mgUnicodeChar* buf = e->text;
+	size_t str_len = e->textLen;
+	for (size_t i = e->textCursor; i < str_len; ++i)
 	{
 		if (i == 0)
 			break;
@@ -344,15 +398,15 @@ mgTextInput_delete(struct mgElementTextInput_s* e)
 {
 	if (e->isSelected)
 	{
-		mgTextInputDeleteSelected_f(e);
+		mgTextInputDeleteSelected(e);
 		return;
 	}
 
 	if (e->textCursor < e->textLen)
 	{
 		int ok = 0;
-		wchar_t* buf = e->text;
-		uint32_t str_len = e->textLen;
+		mgUnicodeChar* buf = e->text;
+		size_t str_len = e->textLen;
 		for (size_t i = e->textCursor; i < str_len; ++i)
 		{
 			ok = 1;
@@ -368,24 +422,29 @@ mgTextInput_delete(struct mgElementTextInput_s* e)
 	}
 }
 
-MG_API 
 int MG_C_DECL
-mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32_t len)
+mgTextInputPutText(struct mgElementTextInput_s* e, const mgUnicodeChar* text, size_t len)
 {
 	int w = 0;
 	
 	mgPoint pt;
-	e->element->window->context->getTextSize(text, e->onFont, &pt);
+	//e->element->window->context->getTextSize(text, e->onFont, &pt);
+	e->textProcessor->onGetTextSize(
+		mgDrawTextReason_textInput,
+		e->textProcessor,
+		text,
+		len,
+		&pt);
 	
 	w = pt.x;
 
-	uint32_t newLen = e->textLen + len;
+	size_t newLen = e->textLen + len;
 
 	if (e->charLimit)
 	{
 		if (newLen > e->charLimit)
 		{
-			uint32_t dif = newLen - e->charLimit;
+			size_t dif = newLen - e->charLimit;
 			len -= dif;
 			newLen = e->charLimit;
 
@@ -397,10 +456,10 @@ mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32
 	if (newLen > e->allocated)
 		mgTextInputSetText_reallocate(e, newLen);
 
-	uint32_t i = e->textLen;
+	size_t i = e->textLen;
 	while (i >= e->textCursor)
 	{
-		uint32_t next = i + len;
+		size_t next = i + len;
 		if (next < e->allocated)
 			e->text[next] = e->text[i];
 
@@ -408,7 +467,7 @@ mgTextInputPutText_f(struct mgElementTextInput_s* e, const wchar_t* text, uint32
 			break;
 		--i;
 	}
-	for (uint32_t i2 = 0; i2 < len; ++i2)
+	for (size_t i2 = 0; i2 < len; ++i2)
 	{
 		e->text[e->textCursor] = text[i2];
 		e->textCursor++;
@@ -685,7 +744,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 	
 	if (e->cursorInRect)
 	{
-		mgSetCursor_f(c, c->defaultCursors[mgCursorType_IBeam], mgCursorType_Arrow);
+		mgSetCursor(c, c->defaultCursors[mgCursorType_IBeam], mgCursorType_Arrow);
 
 		if (e->enabled)
 		{
@@ -702,7 +761,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 	else
 	{
 		if (e->elementState & 0x1)
-			mgSetCursor_f(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+			mgSetCursor(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
 		if (e->enabled)
 		{
@@ -728,7 +787,10 @@ miGUI_onUpdate_textinput(mgElement* e)
 	{
 		mgTextInput_updateScrollLimit(e);
 		
-		mgFont* fnt = impl->onFont(c->input->character, 0);
+		//mgFont* fnt = impl->onFont(c->input->character, 0);
+		mgFont* fnt = impl->textProcessor->onFont(
+			mgDrawTextReason_textInput, 
+			impl->textProcessor, c->input->character);
 
 		if (c->input->character)
 		{
@@ -787,10 +849,10 @@ miGUI_onUpdate_textinput(mgElement* e)
 					if (c->input->character)
 					{
 						if (impl->isSelected)
-							mgTextInputDeleteSelected_f(impl);
+							mgTextInputDeleteSelected(impl);
 
-						wchar_t t[2] = { c->input->character, 0 };
-						int w = mgTextInputPutText_f(impl, t, 1);
+						mgUnicodeChar t[2] = { c->input->character, 0 };
+						int w = mgTextInputPutText(impl, t, 1);
 						
 						impl->textWidth += w + fnt->characterSpacing;
 					}
@@ -907,7 +969,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 			{
 				if (!impl->rightClickPopup->onShow)
 					impl->rightClickPopup->onShow = mgTextInput_defaultPopupOnShow;
-				mgShowPopup_f(c, impl->rightClickPopup, &c->input->mousePosition);
+				mgShowPopup(c, impl->rightClickPopup, &c->input->mousePosition);
 			}
 		}
 	}
@@ -974,9 +1036,10 @@ miGUI_onDraw_textinput(mgElement* e)
 			mgColor* textColor = 0;
 			for (uint32_t i = 0; i < impl->textLen; ++i)
 			{
-				wchar_t t[2] = { impl->text[i], 0 };
+				mgUnicodeChar t[2] = { impl->text[i], 0 };
 
-				mgFont* fnt = impl->onFont(ch1, ch2);
+				//mgFont* fnt = impl->onFont(ch1, ch2);
+				mgFont* fnt = impl->textProcessor->onFont(mgDrawTextReason_textInput, impl->textProcessor, impl->text[i]);
 
 				rect.left = pos.x;
 				rect.top = pos.y;				
@@ -985,21 +1048,27 @@ miGUI_onDraw_textinput(mgElement* e)
 
 				if (impl->monospace)
 				{
-					int v = impl->font->maxSize.x + impl->font->characterSpacing;
+					int v = fnt->maxSize.x + fnt->characterSpacing;
 					pos.x += v;
 					impl->textWidth += v;
 				}
 				else
 				{
 					mgPoint p;
-					e->window->context->getTextSize(t, impl->font, &p);
+					//e->window->context->getTextSize(t, impl->font, &p);
+					impl->textProcessor->onGetTextSize(
+						mgDrawTextReason_textInput,
+						impl->textProcessor,
+						t,
+						1,
+						&p);
 
-					int v = p.x + impl->font->characterSpacing;
-					pos.x += p.x + impl->font->characterSpacing;
+					int v = p.x + fnt->characterSpacing;
+					pos.x += p.x + fnt->characterSpacing;
 					impl->textWidth += v;
 				}
 				rect.right = pos.x;
-				rect.bottom = pos.y + impl->font->maxSize.y;
+				rect.bottom = pos.y + fnt->maxSize.y;
 
 				textColor = &style->textInputText;
 				if (impl->isSelected)
@@ -1025,16 +1094,23 @@ miGUI_onDraw_textinput(mgElement* e)
 					}
 				}
 
-				e->window->context->gpu->drawText(
+				/*e->window->context->gpu->drawText(
 					mgDrawTextReason_textInputDefaultText,
 					impl,
 					&pos2,
 					&impl->text[i],
 					1,
 					impl->onColor,
-					impl->onFont);
+					impl->onFont);*/
 					/*textColor,
 					impl->font);*/
+				impl->textProcessor->onDrawText(
+					mgDrawTextReason_textInputDefaultText,
+					impl->textProcessor,
+					&pos,
+					&impl->text[i],
+					1,
+					0);
 
 				{
 					uint32_t rw = rect.right - rect.left;
@@ -1075,14 +1151,21 @@ miGUI_onDraw_textinput(mgElement* e)
 			pos.x = e->transformWorld.buildArea.left;
 			pos.y = e->transformWorld.buildArea.top;
 
-			e->window->context->gpu->drawText(
+			/*e->window->context->gpu->drawText(
 				mgDrawTextReason_textInputDefaultText,
 				impl, 
 				&pos,
 				impl->defaultText, 
 				impl->defaultTextLen,
 				&style->textInputDefaultText,
-				impl->font);
+				impl->font);*/
+			impl->textProcessor->onDrawText(
+				mgDrawTextReason_textInputDefaultText,
+				impl->textProcessor,
+				&pos,
+				impl->defaultText,
+				impl->defaultTextLen,
+				&style->textInputDefaultText);
 		}
 		else
 		{
@@ -1113,14 +1196,13 @@ miGUI_onRebuild_textinput(mgElement* e) {
 	//}
 }
 
-MG_API
 mgElement* MG_C_DECL
-mgCreateTextInput_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFont* font)
+mgCreateTextInput(struct mgWindow_s* w, mgPoint* position, mgPoint* size, struct mgTextProcessor_s* tp)
 {
 	assert(w);
 	assert(position);
 	assert(size);
-	assert(font);
+	//assert(font);
 	mgElement* newElement = calloc(1, sizeof(mgElement));
 	newElement->type = MG_TYPE_TEXTINPUT;
 	
@@ -1141,36 +1223,37 @@ mgCreateTextInput_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size, mgFo
 
 	newElement->implementation = calloc(1, sizeof(mgElementTextInput));
 	mgElementTextInput* impl = (mgElementTextInput*)newElement->implementation;
-	impl->font = font;
-	impl->defaultText = L"Click...";
+	//impl->font = font;
+	impl->textProcessor = tp;
+	impl->defaultText = U"Click...";
 	impl->defaultTextLen = 9;
 	impl->canSelect = 1;
 	impl->textCursorTimerLimit = 0.5f;
 	impl->element = newElement;
-	impl->rightClickPopup = mgGetDefaultPopupTextInput(w->context);
+	impl->rightClickPopup = mgGetDefaultPopupTextInput(w->context, tp);
 	
-	mgTextInputClear_f(impl, 1);
+	mgTextInputClear(impl, 1);
 
-	mgSetParent_f(newElement, 0);
+	mgSetParent(newElement, 0);
 	miGUI_onRebuild_textinput(newElement);
 
 	return newElement;
 }
 
-MG_API 
 void MG_C_DECL 
-mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text)
+mgTextInputSetText(struct mgElementTextInput_s* e, const mgUnicodeChar* text)
 {
 	assert(e);
 
 	if (text)
 	{
-		uint32_t len = (uint32_t)wcslen(text);
+		//uint32_t len = (uint32_t)wcslen(text);
+		size_t len = mgUnicodeStrlen(text);
 		if (len)
 		{
 			if (len > e->allocated)
 				mgTextInputSetText_reallocate(e, len);
-			mgTextInputClear_f(e, 0);
+			mgTextInputClear(e, 0);
 			for (uint32_t i = 0; i < len; ++i)
 			{
 				e->text[i] = text[i];
@@ -1191,9 +1274,8 @@ mgTextInputSetText_f(struct mgElementTextInput_s* e, const wchar_t* text)
 	}
 }
 
-MG_API 
 void MG_C_DECL 
-mgTextInputClear_f(struct mgElementTextInput_s* e, int freeMemory)
+mgTextInputClear(struct mgElementTextInput_s* e, int freeMemory)
 {
 	if (freeMemory)
 	{

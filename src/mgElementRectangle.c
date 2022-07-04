@@ -342,9 +342,8 @@ void
 miGUI_onRebuild_rectangle(mgElement* e) 
 {}
 
-MG_API
 mgElement* MG_C_DECL
-mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size)
+mgCreateRectangle(struct mgWindow_s* w, mgPoint* position, mgPoint* size)
 {
 	assert(w);
 	assert(position);
@@ -373,8 +372,7 @@ mgCreateRectangle_f(struct mgWindow_s* w, mgPoint* position, mgPoint* size)
 	newElement->implementation = calloc(1, sizeof(mgElementRectangle));
 	mgElementRectangle* impl = (mgElementRectangle*)newElement->implementation;
 
-	mgSetParent_f(newElement, 0);
-
+	mgSetParent(newElement, 0);
 
 	return newElement;
 }

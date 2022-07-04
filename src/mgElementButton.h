@@ -41,12 +41,9 @@ typedef struct mgElementButton_s {
 	void(*onPushOn)(struct mgElement_s* e); /*only when pushButton */
 	void(*onPushOff)(struct mgElement_s* e);
 
-	//mgFont* font;
-	//const wchar_t* text;
-	//int textLen;
-	mgFont* (*onFont)(struct mgElement_s*);
-	const wchar_t* (*onText)(struct mgElement_s*, size_t* textLen);
+	const mgUnicodeChar* (*onText)(struct mgElement_s*, size_t* textLen);
 	mgPoint textIndentInternal;
+	struct mgTextProcessor_s* textProcessor;
 
 	mgIcons* icons;
 	int iconID_default;

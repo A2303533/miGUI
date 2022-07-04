@@ -254,7 +254,13 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 					notSeparatorItems++;
 					if (p->items[i].info.text)
 					{
-						c->getTextSize(p->items[i].info.text, p->font, &tsz);
+						//c->getTextSize(p->items[i].info.text, p->font, &tsz);
+						p->textProcessor->onGetTextSize(
+							mgDrawTextReason_popup,
+							p->textProcessor,
+							p->items[i].info.text,
+							p->items[i].textLen,
+							&tsz);
 
 						if (tsz.y > p->itemHeight)
 							p->itemHeight = tsz.y;
@@ -265,7 +271,14 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 
 					if (p->items[i].info.shortcutText)
 					{
-						c->getTextSize(p->items[i].info.shortcutText, p->font, &tsz);
+						//c->getTextSize(p->items[i].info.shortcutText, p->font, &tsz);
+						p->textProcessor->onGetTextSize(
+							mgDrawTextReason_popupShortcut,
+							p->textProcessor,
+							p->items[i].info.text,
+							p->items[i].textLen,
+							&tsz);
+
 						if (tsz.x > p->maxShortcutTextWidth)
 							p->maxShortcutTextWidth = tsz.x;
 						p->items[i].shortcutTextWidth = tsz.x;
@@ -334,9 +347,8 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 	}
 }
 
-MG_API
 void MG_C_DECL
-mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
+mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 {
 	mgRect popupRect = p->rect;
 	struct mgSystemWindowOSData* oldWindow = 0;
@@ -424,13 +436,20 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 			if(!p->items[i].info.isEnabled)
 				textColor = &style->popupTextDisabled;
 
-			c->gpu->drawText(mgDrawTextReason_popup, 
+			/*c->gpu->drawText(mgDrawTextReason_popup, 
 				p,
 				&pt,
 				p->items[i].info.text,
 				p->items[i].textLen,
 				textColor,
-				p->font);
+				p->font);*/
+			p->textProcessor->onDrawText(
+				mgDrawTextReason_popup,
+				p->textProcessor,
+				&pt,
+				p->items[i].info.text,
+				p->items[i].textLen,
+				textColor);
 
 			if (p->items[i].info.shortcutText)
 			{
@@ -441,13 +460,20 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 				if (!p->items[i].info.isEnabled)
 					textColor = &style->popupTextShortcutDisabled;
 
-				c->gpu->drawText(mgDrawTextReason_popupShortcut, 
+				/*c->gpu->drawText(mgDrawTextReason_popupShortcut, 
 					p,
 					&pt2,
 					p->items[i].info.shortcutText,
 					p->items[i].shortcutTextLen,
 					textColor,
-					p->font);
+					p->font);*/
+				p->textProcessor->onDrawText(
+					mgDrawTextReason_popupShortcut,
+					p->textProcessor,
+					&pt,
+					p->items[i].info.shortcutText,
+					p->items[i].shortcutTextLen,
+					textColor);
 			}
 
 			if (p->items[i].info.subMenu)
@@ -546,7 +572,7 @@ mgDrawPopup_f(struct mgContext_s* c, mgPopup* p)
 			if (p->items[i].info.subMenu->subVisible)
 			{
 				p->items[i].info.subMenu->userStyle = p->userStyle;
-				mgDrawPopup_f(c, p->items[i].info.subMenu);
+				mgDrawPopup(c, p->items[i].info.subMenu);
 			}
 		}
 	}
@@ -619,7 +645,7 @@ _mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 			{
 				if (p->nodeUnderCursor->info.callback)
 					p->nodeUnderCursor->info.callback(p->nodeUnderCursor->info.id, p->nodeUnderCursor);
-				mgShowPopup_f(c, 0, 0);
+				mgShowPopup(c, 0, 0);
 				c->cursorInPopup = 0;
 
 				if (c->activeMenu)
@@ -674,16 +700,18 @@ mgUpdatePopup(struct mgContext_s* c, mgPopup* p)
 	}
 }
 
-MG_API
 struct mgPopup_s* MG_C_DECL
-mgCreatePopup_f(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, mgFont* fnt, int flags)
+mgCreatePopup(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSize, 
+	int flags, 
+	struct mgTextProcessor_s* tp)
 {
+	assert(tp);
 	assert(arr);
 	assert(arrSize>0);
 
 	struct mgPopup_s* newPopup = calloc(1, sizeof(struct mgPopup_s));
-
-	newPopup->font = fnt;
+	newPopup->textProcessor = tp;
+	//newPopup->font = fnt;
 	newPopup->itemsSize = arrSize;
 	newPopup->items = calloc(1, sizeof(struct mgPopupItem_s) * arrSize);
 	newPopup->indent.x = 5;
@@ -697,10 +725,10 @@ mgCreatePopup_f(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSiz
 	{
 		newPopup->items[i].info = arr[i];
 		if(newPopup->items[i].info.text)
-			newPopup->items[i].textLen = (int)wcslen(newPopup->items[i].info.text);
+			newPopup->items[i].textLen = mgUnicodeStrlen(newPopup->items[i].info.text);
 
 		if (newPopup->items[i].info.shortcutText)
-			newPopup->items[i].shortcutTextLen = (int)wcslen(newPopup->items[i].info.shortcutText);
+			newPopup->items[i].shortcutTextLen = mgUnicodeStrlen(newPopup->items[i].info.shortcutText);
 	}
 
 	if (newPopup->flags & mgPopupFlags_systemWindow)
@@ -716,9 +744,8 @@ mgCreatePopup_f(struct mgContext_s* c, struct mgPopupItemInfo_s* arr, int arrSiz
 	return newPopup;
 }
 
-MG_API
 void MG_C_DECL
-mgDestroyPopup_f(struct mgPopup_s* p)
+mgDestroyPopup(struct mgPopup_s* p)
 {
 	assert(p);
 	if (p)
@@ -732,9 +759,8 @@ mgDestroyPopup_f(struct mgPopup_s* p)
 	}
 }
 
-MG_API
 void MG_C_DECL
-mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
+mgShowPopup(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 {
 	assert(c);
 	
@@ -780,5 +806,5 @@ mgShowPopup_f(struct mgContext_s* c, struct mgPopup_s* p, mgPoint* position)
 	}
 
 	mgPopupSetPosition(c, p, position);
-	mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+	mgSetCursor(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 }

@@ -386,7 +386,8 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 					c->dockPanel->textProcessor->onGetTextSize(
 						mgDrawTextReason_dockpanelTitlebar,
 						c->dockPanel->textProcessor,
-						pw->windows[i2]->titlebarText, 
+						pw->windows[i2]->titlebarText,
+						pw->windows[i2]->titlebarTextLen,
 						&pt);
 
 					tl = pt.x;
@@ -639,13 +640,21 @@ mgDrawDockPanel(struct mgContext_s* c)
 							wnd->titlebarTextLen, 
 							&c->activeStyle->windowTitlebarText, 
 							wnd->titlebarFont);*/
-						c->dockPanel->textProcessor->drawText(
+						
+						/*c->dockPanel->textProcessor->drawText(
 							mgDrawTextReason_dockpanelTitlebar,
 							c->dockPanel->textProcessor,
 							&p,
 							wnd->titlebarText,
 							wnd->titlebarTextLen,
-							c->activeStyle);
+							c->activeStyle);*/
+						c->dockPanel->textProcessor->onDrawText(
+							mgDrawTextReason_dockpanelTitlebar,
+							c->dockPanel->textProcessor,
+							&p,
+							wnd->titlebarText,
+							wnd->titlebarTextLen,
+							&c->activeStyle->windowTitlebarText);
 					}
 				}
 				
@@ -1016,17 +1025,14 @@ mgInitDockPanel(
 	c->dockPanel->tabHeight = 25;
 	c->dockPanel->textProcessor = textProcessor;
 
-	if (c->defaultPopupFont)
+	struct mgPopupItemInfo_s popupItems[] =
 	{
-		struct mgPopupItemInfo_s popupItems[] =
-		{
-			{0, U"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, U"Ctrl+A", 1},
-			{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-			{0, U"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, U"remove", 1},
-			{0, U"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, U"hide", 1},
-		};
-		c->dockPanel->windowTabPopup = mgCreatePopup(c, popupItems, 4, 0, textProcessor);
-	}
+		{0, U"Make first", 0, dockPanel_popupCallback_makeFirst, mgPopupItemType_default, 0, U"Ctrl+A", 1},
+		{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
+		{0, U"Unpin", 0, dockPanel_popupCallback_unpin, mgPopupItemType_default, 0, U"remove", 1},
+		{0, U"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, U"hide", 1},
+	};
+	c->dockPanel->windowTabPopup = mgCreatePopup(c, popupItems, 4, 0, textProcessor);
 
 	c->dockPanel->elementsSize = elementsSize + 1;
 	c->dockPanel->elements = calloc(1, sizeof(mgDockPanelElement) * c->dockPanel->elementsSize);

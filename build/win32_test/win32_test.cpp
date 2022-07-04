@@ -13,6 +13,7 @@
 #include <gdiplus.h>
 
 #include <filesystem>
+#include <string>
 
 #pragma comment (lib,"Gdiplus.lib")
 Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -23,6 +24,8 @@ mgInputContext g_input;
 HRAWINPUT g_rawInputData[0xff];
 
 mgFont* g_win32font = 0;
+mgFont* g_fonts[3];
+
 mgIcons* g_icons = 0;
 
 mgWindow* test_guiWindow1 = 0;
@@ -347,10 +350,9 @@ void gui_drawRectangle(
 
 void gui_drawText(
     int reason,
-    void* object,
     mgPoint* position,
-    const wchar_t* text,
-    int textLen,
+    const mgUnicodeChar* text,
+    size_t textLen,
     mgColor* color,
     mgFont* font)
 {
@@ -362,23 +364,108 @@ void gui_drawText(
 
     HRGN rgn = CreateRectRgn(g_clipRect.left + borderSize.x, g_clipRect.top + borderSize.y, g_clipRect.right + borderSize.x, g_clipRect.bottom + borderSize.y);
     SelectClipRgn(hdcMem, rgn);
-    TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, text, textLen);
+    
+    static std::wstring wstr;
+    wstr.clear();
+    mgUnicodeUC uc;
+    for (size_t i = 0; i < textLen; ++i)
+    {
+        mgUnicodeChar c = text[i];
+        if (c >= 0x32000)
+            c = '?';
+        uc.integer = mgGetUnicodeTable()[c].m_utf16;
+
+        if (uc.shorts[1])
+            wstr.push_back(uc.shorts[1]);
+        if (uc.shorts[0])
+            wstr.push_back(uc.shorts[0]);
+    }
+
+    TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, 
+        wstr.c_str(),
+        wstr.size());
+
     DeleteObject(rgn);
     SelectClipRgn(hdcMem, 0);
 }
 
-void gui_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
+void gui_getTextSize(const mgUnicodeChar* text, mgFont* font, mgPoint* sz)
 {
     HDC hdcMem = (HDC)g_currSystemWindowOSData->hdcMem;
     
     SelectObject(hdcMem, font->implementation);
-    int c = wcslen(text);
-    if (!c)
+    size_t len = mgUnicodeStrlen(text);
+    if (!len)
         return;
-    SIZE s;
-    GetTextExtentPoint32W(hdcMem, text, c, &s);
-    sz->x = s.cx;
-    sz->y = s.cy;
+
+    sz->x = 0;
+    sz->y = 0;
+    mgUnicodeUC uc;
+    wchar_t wchbuf[2] = { 0,0 };
+    for (size_t i = 0; i < len; ++i)
+    {
+        mgUnicodeChar c = text[i];
+        
+        if (c >= 0x32000)
+            c = '?';
+
+        uc.integer = mgGetUnicodeTable()[c].m_utf16;
+        int cl = 1;
+        if (uc.shorts[1])
+            wchbuf[0] = uc.shorts[1];
+        if (uc.shorts[0])
+        {
+            wchbuf[1] = uc.shorts[0];
+            cl = 2;
+        }
+
+        SIZE s;
+        GetTextExtentPoint32W(hdcMem, wchbuf, cl, &s);
+        sz->x += s.cx;
+        sz->y += s.cy;
+    }
+}
+
+void textProcessor_onDrawText(
+    int reason, 
+    struct mgTextProcessor_s* tp, 
+    mgPoint* position, 
+    const mgUnicodeChar* text, 
+    size_t textLen, 
+    struct mgColor_s* c)
+{
+    static mgColor defaultColor(0xFF0000);
+    if (!c)
+        c = &defaultColor;
+
+    gui_drawText(reason, position, text, textLen, c, g_fonts[0]);
+}
+
+struct mgFont_s* textProcessor_onFont(
+    int reason, 
+    struct mgTextProcessor_s* tp, 
+    mgUnicodeChar c)
+{
+    return g_fonts[0];
+}
+
+struct mgColor_s* textProcessor_onColor(
+    int reason, 
+    struct mgTextProcessor_s* tp, 
+    mgUnicodeChar c, 
+    struct mgStyle_s* s)
+{
+    return &s->button1;
+}
+
+void textProcessor_onGetTextSize(
+    int reason, 
+    struct mgTextProcessor_s* tp, 
+    const mgUnicodeChar* text, 
+    size_t textLen, 
+    mgPoint* p)
+{
+    gui_getTextSize(text, g_fonts[0], p);
 }
 
 mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
@@ -457,57 +544,57 @@ void draw_gui()
         mgPointSet(&textPosition, 10, 10);
         mgColor textColor;
         mgColorSetAsIntegerRGB(&textColor, 0xFF005000);
-        wchar_t textBuffer[200];
+        
+        mgUnicodeChar textBuffer[200];
+        mgUnicodeSnprintf(textBuffer, 200, U"FPS: %i", g_fps);
 
-
-        swprintf_s(textBuffer, L"FPS: %i", g_fps);
         mgPointSet(&textPosition, 0, 0);
-        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
 
-        swprintf_s(textBuffer, L"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
+        mgUnicodeSnprintf(textBuffer, 200, U"mousePosition: %i %i", g_input.mousePosition.x, g_input.mousePosition.y);
         mgPointSet(&textPosition, 10, 10);
-        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
 
-        swprintf_s(textBuffer, L"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
+        mgUnicodeSnprintf(textBuffer, 200, U"mouseMoveDelta: %i %i", g_input.mouseMoveDelta.x, g_input.mouseMoveDelta.y);
         mgPointSet(&textPosition, 10, 20);
-        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
 
-        swprintf_s(textBuffer, L"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
+        mgUnicodeSnprintf(textBuffer, 200, U"mouseWheelDelta: %.1f", g_input.mouseWheelDelta);
         mgPointSet(&textPosition, 10, 30);
-        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
 
-        swprintf_s(textBuffer, L"mouseButtons: 0x%x 0x%x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
+        mgUnicodeSnprintf(textBuffer, 200, U"mouseButtons: 0x%x 0x%x", g_input.mouseButtonFlags1, g_input.mouseButtonFlags2);
         mgPointSet(&textPosition, 10, 40);
-        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
 
-        swprintf_s(textBuffer, L"key char: %c 0x%x", g_input.character, g_input.character);
+        mgUnicodeSnprintf(textBuffer, 200, U"key char: %c 0x%x", g_input.character, g_input.character);
         mgPointSet(&textPosition, 10, 50);
-        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
 
         if (mgIsKeyHit(&g_input, MG_KEY_ENTER))
         {
-            swprintf_s(textBuffer, L"Hit ENTER");
+            mgUnicodeSnprintf(textBuffer, 200, U"Hit ENTER");
             mgPointSet(&textPosition, 10, 60);
-            gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+            gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
         }
 
         if (mgIsKeyHold(&g_input, MG_KEY_ENTER))
         {
-            swprintf_s(textBuffer, L"Hold ENTER");
+            mgUnicodeSnprintf(textBuffer, 200, U"Hold ENTER");
             mgPointSet(&textPosition, 10, 70);
-            gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+            gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
         }
 
         if (mgIsKeyRelease(&g_input, MG_KEY_ENTER))
         {
-            swprintf_s(textBuffer, L"Release ENTER");
+            mgUnicodeSnprintf(textBuffer, 200, U"Release ENTER");
             mgPointSet(&textPosition, 10, 80);
-            gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+            gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
         }
 
-        swprintf_s(textBuffer, L"KB modifier 0x%x\n", g_input.keyboardModifier);
+        mgUnicodeSnprintf(textBuffer, 200, U"KB modifier 0x%x\n", g_input.keyboardModifier);
         mgPointSet(&textPosition, 10, 90);
-        gui_drawText(0, 0, &textPosition, textBuffer, wcslen(textBuffer), &textColor, g_win32font);
+        gui_drawText(0, &textPosition, textBuffer, mgUnicodeStrlen(textBuffer), &textColor, g_win32font);
     }
     
 
@@ -574,12 +661,7 @@ void loadDock(struct mgElement_s* e)
     }
 }
 
-mgFont* Button_onFont(struct mgElement_s* e)
-{
-    return g_win32font;
-}
-
-const wchar_t* Button_onText(struct mgElement_s* e, size_t* textLen)
+const mgUnicodeChar* Button_onText(struct mgElement_s* e, size_t* textLen)
 {
     mgElementButton* btn = (mgElementButton*)e->implementation;
 
@@ -587,13 +669,13 @@ const wchar_t* Button_onText(struct mgElement_s* e, size_t* textLen)
     {
     case ButtonID_Button:
         *textLen = 6;
-        return L"Button";
+        return U"Button";
     case ButtonID_SaveDock:
         *textLen = 10;
-        return L"Save dock";
+        return U"Save dock";
     case ButtonID_LoadDock:
         *textLen = 10;
-        return L"Load dock";
+        return U"Load dock";
     }
 
     *textLen = 0;
@@ -607,15 +689,10 @@ mgColor* Text_onColor(struct mgElement_s* e)
     return &c;
 }
 
-mgFont* Text_onFont(struct mgElement_s*)
-{
-    return g_win32font;
-}
-
-const wchar_t* Text_onText(struct mgElement_s*, size_t* textLen)
+const mgUnicodeChar* Text_onText(struct mgElement_s*, size_t* textLen)
 {
     *textLen = 4;
-    return L"Text";
+    return U"Text";
 }
 
 static unsigned int LocaleIdToCodepage(unsigned int lcid);
@@ -665,13 +742,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
     RegisterRawInputDevices(&device, 1, sizeof device);
 
 
-    MG_LIB_HANDLE gui_lib = mgLoad();
-    if (!gui_lib)
-    {
-        MessageBoxA(0, "Can't load migui.dll", "Error", MB_OK);
-        return 0;
-    }
-
     mgVideoDriverAPI gui_gpu;
     gui_gpu.createTexture = gui_createTexture;
     gui_gpu.destroyTexture = gui_destroyTexture;
@@ -686,13 +756,24 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
 
     memset(&g_input, 0, sizeof(g_input));
     g_gui_context = mgCreateContext(&gui_gpu, &g_input);
-    g_gui_context->getTextSize = gui_getTextSize;
+    //g_gui_context->getTextSize = gui_getTextSize;
 
     g_mainSystemWindowOSData = &g_gui_context->systemWindowData;
 
     g_mainSystemWindowOSData->hWnd = hwnd; // for multiple windows. save main window
     g_currSystemWindowOSData = g_mainSystemWindowOSData; // for multiple windows. set current
     UpdateBackBuffer(); // need to create hdcMem and hbmMem before font creation
+
+    g_fonts[0] = gui_createFont("Impact", 0, 10);
+    g_fonts[1] = gui_createFont("Times New Roman", 0, 12);
+    g_fonts[2] = gui_createFont("Webdings", 0, 14);
+
+    mgTextProcessor* defaultTextProcessor = mgCreateTextProcessor(g_fonts, &gui_gpu);
+    defaultTextProcessor->onColor = textProcessor_onColor;
+    defaultTextProcessor->onDrawText = textProcessor_onDrawText;
+    defaultTextProcessor->onFont = textProcessor_onFont;
+    defaultTextProcessor->onGetTextSize = textProcessor_onGetTextSize;
+
 
     {
         RECT rc;
@@ -711,8 +792,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
 
 
     g_win32font = gui_createFont("Segoe", 0, 10);
-    g_gui_context->defaultPopupFont = g_win32font;
-    g_gui_context->tooltipFont = g_win32font;
+    //g_gui_context->defaultPopupFont = g_win32font;
+   // g_gui_context->tooltipFont = g_win32font;
+    g_gui_context->tooltipTextProcessor = defaultTextProcessor;
     {
         mgDockPanelElementCreationInfo dckElmts[] = {
             {1, 20, 20, 1000},
@@ -723,7 +805,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
             {1, 20, 20, 1000},
         };
         
-        mgInitDockPanel(g_gui_context, 0, 30, 0, 0, dckElmts, sizeof(dckElmts) / sizeof(mgDockPanelElementCreationInfo));
+        mgInitDockPanel(g_gui_context, 0, 30, 0, 0, dckElmts, sizeof(dckElmts) / sizeof(mgDockPanelElementCreationInfo), defaultTextProcessor);
 
        // mgColorSet(&g_gui_context->activeStyle->dockpanelBGColor, 0.9f, 0.9f, 0.9f, 1.f);
         g_gui_context->dockPanel->flags |= mgDockPanelFlag_drawBG;
@@ -732,13 +814,12 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
             //g_gui_context->dockPanel->elements[i].flags |= mgDockPanelElementFlag_drawBG;
         }
 
-        test_guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180);
-        test_guiWindow1->titlebarFont = g_win32font;
+        test_guiWindow1 = mgCreateWindow(g_gui_context, 10, 10, 300, 180, defaultTextProcessor);
         test_guiWindow1->titlebarHeight = 30;
         test_guiWindow1->flags ^= mgWindowFlag_closeButton;
         test_guiWindow1->flags |= mgWindowFlag_canDock;
         test_guiWindow1->id = WindowID_1;
-        mgSetWindowTitle(test_guiWindow1, L"Window1");
+        mgSetWindowTitle(test_guiWindow1, U"Window1");
         
         mgPoint pos, sz;
         mgColor c1, c2;
@@ -751,100 +832,87 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
 
         mgPointSet(&sz, 100, 40);
         mgPointSet(&pos, 100, 60);
-        mgElement* eb = mgCreateButton(test_guiWindow1, &pos, &sz);
+        mgElement* eb = mgCreateButton(test_guiWindow1, &pos, &sz, defaultTextProcessor);
         eb->id = ButtonID_Button;
         eb->align = mgAlignment_rightBottom;
         ((mgElementButton*)eb->implementation)->pushButton = 1;
-        ((mgElementButton*)eb->implementation)->onFont = Button_onFont;
         ((mgElementButton*)eb->implementation)->onText = Button_onText;
 
         mgPointSet(&pos, 100, 120);
-        eb = mgCreateButton(test_guiWindow1, &pos, &sz);
+        eb = mgCreateButton(test_guiWindow1, &pos, &sz, defaultTextProcessor);
         eb->id = ButtonID_SaveDock;
         eb->onReleaseLMB = saveDock;
         eb->enabled = 1;
-        ((mgElementButton*)eb->implementation)->onFont = Button_onFont;
         ((mgElementButton*)eb->implementation)->onText = Button_onText;
 
         mgPointSet(&pos, 100, 160);
-        eb = mgCreateButton(test_guiWindow1, &pos, &sz);
+        eb = mgCreateButton(test_guiWindow1, &pos, &sz, defaultTextProcessor);
         eb->id = ButtonID_LoadDock;
         eb->onReleaseLMB = loadDock;
-        ((mgElementButton*)eb->implementation)->onFont = Button_onFont;
         ((mgElementButton*)eb->implementation)->onText = Button_onText;
 
         mgPointSet(&pos, 100, 100);
-        mgElement* et = mgCreateText(test_guiWindow1, &pos);
+        mgElement* et = mgCreateText(test_guiWindow1, &pos, defaultTextProcessor);
         et->align = mgAlignment_rightBottom;
-        ((mgElementText*)et->implementation)->onColor = Text_onColor;
-        ((mgElementText*)et->implementation)->onFont = Text_onFont;
         ((mgElementText*)et->implementation)->onText = Text_onText;
 
-        test_guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-        test_guiWindow2->titlebarFont = g_win32font;
+        test_guiWindow2 = mgCreateWindow(g_gui_context, 30, 30, 300, 180, defaultTextProcessor);
         test_guiWindow2->flags ^= mgWindowFlag_collapseButton;
         test_guiWindow2->flags |= mgWindowFlag_canDock;
         test_guiWindow2->sizeMinimum.x = 200;
         test_guiWindow2->sizeMinimum.y = 100;
         test_guiWindow2->id = WindowID_2;
-        mgSetWindowTitle(test_guiWindow2, L"_canDock");
+        mgSetWindowTitle(test_guiWindow2, U"_canDock");
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
-            mgElement* btn = mgCreateButton(test_guiWindow2, &pos, &sz);
+            mgElement* btn = mgCreateButton(test_guiWindow2, &pos, &sz, defaultTextProcessor);
             btn->id = ButtonID_Button;
-            ((mgElementButton*)btn->implementation)->onFont = Button_onFont;
             ((mgElementButton*)btn->implementation)->onText = Button_onText;
         }
 
-        test_guiWindow3 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-        test_guiWindow3->titlebarFont = g_win32font;
+        test_guiWindow3 = mgCreateWindow(g_gui_context, 30, 30, 300, 180, defaultTextProcessor);
         test_guiWindow3->flags ^= mgWindowFlag_collapseButton;
         test_guiWindow3->flags |= mgWindowFlag_canDock;
         test_guiWindow3->sizeMinimum.x = 200;
         test_guiWindow3->sizeMinimum.y = 100;
         test_guiWindow3->id = WindowID_3;
-        mgSetWindowTitle(test_guiWindow3, L"_canDock3");
+        mgSetWindowTitle(test_guiWindow3, U"_canDock3");
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
-            mgElement* btn = mgCreateButton(test_guiWindow3, &pos, &sz);
+            mgElement* btn = mgCreateButton(test_guiWindow3, &pos, &sz, defaultTextProcessor);
             btn->id = ButtonID_Button;
-            ((mgElementButton*)btn->implementation)->onFont = Button_onFont;
             ((mgElementButton*)btn->implementation)->onText = Button_onText;
         }
 
-        test_guiWindow4 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-        test_guiWindow4->titlebarFont = g_win32font;
+        test_guiWindow4 = mgCreateWindow(g_gui_context, 30, 30, 300, 180, defaultTextProcessor);
         test_guiWindow4->flags ^= mgWindowFlag_collapseButton;
         test_guiWindow4->flags |= mgWindowFlag_canDock;
         test_guiWindow4->sizeMinimum.x = 200;
         test_guiWindow4->sizeMinimum.y = 100;
         test_guiWindow4->id = WindowID_4;
-        mgSetWindowTitle(test_guiWindow4, L"_canDock4");
+        mgSetWindowTitle(test_guiWindow4, U"_canDock4");
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
-            mgElement* btn = mgCreateButton(test_guiWindow4, &pos, &sz);
+            mgElement* btn = mgCreateButton(test_guiWindow4, &pos, &sz, defaultTextProcessor);
             btn->id = ButtonID_Button;
-            ((mgElementButton*)btn->implementation)->onFont = Button_onFont;
             ((mgElementButton*)btn->implementation)->onText = Button_onText;
         }
 
-        test_guiWindow5 = mgCreateWindow(g_gui_context, 30, 30, 300, 180);
-        test_guiWindow5->titlebarFont = g_win32font;
+        test_guiWindow5 = mgCreateWindow(g_gui_context, 30, 30, 300, 180, defaultTextProcessor);
         test_guiWindow5->flags ^= mgWindowFlag_collapseButton;
         test_guiWindow5->flags |= mgWindowFlag_canDock;
         test_guiWindow5->sizeMinimum.x = 200;
         test_guiWindow5->sizeMinimum.y = 100;
         test_guiWindow5->id = WindowID_5;
-        mgSetWindowTitle(test_guiWindow5, L"_canDock5");
+        mgSetWindowTitle(test_guiWindow5, U"_canDock5");
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
-            mgElement* btn = mgCreateButton(test_guiWindow5, &pos, &sz);
+            mgElement* btn = mgCreateButton(test_guiWindow5, &pos, &sz, defaultTextProcessor);
             btn->id = ButtonID_Button;
-            ((mgElementButton*)btn->implementation)->onFont = Button_onFont;
             ((mgElementButton*)btn->implementation)->onText = Button_onText;
         }
         
@@ -854,45 +922,45 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
         {
             mgPopupItemInfo items_file_popup[] =
             {
-                {0, L"Open", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O", 1},
-                {0, L"New", 0, 0, mgPopupItemType_default, 0, 0, 1},
+                {0, U"Open", 0, 0, mgPopupItemType_default, 0, U"Ctrl+O", 1},
+                {0, U"New", 0, 0, mgPopupItemType_default, 0, 0, 1},
                 {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-                {0, L"Save", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S", 1},
-                {0, L"Save ass...", 0, 0, mgPopupItemType_default, 0, L"Ctrl+Shift+S", 1},
+                {0, U"Save", 0, 0, mgPopupItemType_default, 0, U"Ctrl+S", 1},
+                {0, U"Save ass...", 0, 0, mgPopupItemType_default, 0, U"Ctrl+Shift+S", 1},
                 {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-                {0, L"Exit", 0, 0, mgPopupItemType_default, 0, L"Alt+F4", 1},
+                {0, U"Exit", 0, 0, mgPopupItemType_default, 0, U"Alt+F4", 1},
             };
-            mgPopup* file_popup = mgCreatePopup(g_gui_context, items_file_popup, 7, g_win32font, popupFlags);
+            mgPopup* file_popup = mgCreatePopup(g_gui_context, items_file_popup, 7, popupFlags, defaultTextProcessor);
 
             mgPopupItemInfo items_submenu1_popup[] =
             {
-                {0, L"Item1", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O", 1},
-                {0, L"Item2", 0, 0, mgPopupItemType_default, 0, 0, 1},
-                {0, L"Item3", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S", 1},
-                {0, L"Sub menu2", 0, 0, mgPopupItemType_default, 0, 0, 1},
+                {0, U"Item1", 0, 0, mgPopupItemType_default, 0, U"Ctrl+O", 1},
+                {0, U"Item2", 0, 0, mgPopupItemType_default, 0, 0, 1},
+                {0, U"Item3", 0, 0, mgPopupItemType_default, 0, U"Ctrl+S", 1},
+                {0, U"Sub menu2", 0, 0, mgPopupItemType_default, 0, 0, 1},
             };
-            mgPopup* submenu1_popup = mgCreatePopup(g_gui_context, items_submenu1_popup, 4, g_win32font, popupFlags);
+            mgPopup* submenu1_popup = mgCreatePopup(g_gui_context, items_submenu1_popup, 4, popupFlags, defaultTextProcessor);
 
             mgPopupItemInfo items_edit_popup[] =
             {
-                {0, L"Copy", 0, 0, mgPopupItemType_default, 0, L"Ctrl+O", 1},
-                {0, L"Paste", 0, 0, mgPopupItemType_default, 0, 0, 1},
+                {0, U"Copy", 0, 0, mgPopupItemType_default, 0, U"Ctrl+O", 1},
+                {0, U"Paste", 0, 0, mgPopupItemType_default, 0, 0, 1},
                 {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-                {0, L"Cut", 0, 0, mgPopupItemType_default, 0, L"Ctrl+S", 1},
+                {0, U"Cut", 0, 0, mgPopupItemType_default, 0, U"Ctrl+S", 1},
                 {0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-                {0, L"Sub menu1", submenu1_popup, 0, mgPopupItemType_default, 0, 0, 1},
+                {0, U"Sub menu1", submenu1_popup, 0, mgPopupItemType_default, 0, 0, 1},
             };
-            mgPopup* edit_popup = mgCreatePopup(g_gui_context, items_edit_popup, 6, g_win32font, popupFlags);
+            mgPopup* edit_popup = mgCreatePopup(g_gui_context, items_edit_popup, 6, popupFlags, defaultTextProcessor);
 
             mgMenuItemInfo menu_items[] =
             {
-                {L"File", file_popup},
-                {L"Edit", edit_popup},
-                {L"Window", 0},
-                {L"View", 0},
-                {L"Extension", 0},
+                {U"File", file_popup},
+                {U"Edit", edit_popup},
+                {U"Window", 0},
+                {U"View", 0},
+                {U"Extension", 0},
             };
-            mgMenu* menu = mgCreateMenu(g_gui_context, menu_items, 5, g_win32font);
+            mgMenu* menu = mgCreateMenu(g_gui_context, menu_items, 5, defaultTextProcessor);
             test_guiWindow1->menu = menu;
         }
     }
@@ -930,6 +998,17 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
         draw_gui();
     }
     
+    if (g_fonts[0])
+    {
+        DeleteObject(g_fonts[0]->implementation);
+        DeleteObject(g_fonts[1]->implementation);
+        DeleteObject(g_fonts[2]->implementation);
+
+        free(g_fonts[0]);
+        free(g_fonts[1]);
+        free(g_fonts[2]);
+    }
+
     if (g_icons)
         mgDestroyIcons(g_icons);
 
@@ -942,7 +1021,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
     DeleteBackBuffer(g_mainSystemWindowOSData);
 
     mgDestroyContext(g_gui_context);
-    mgUnload(gui_lib);
 
     if (myim)
         delete myim;

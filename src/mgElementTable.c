@@ -40,11 +40,11 @@ float lerp(float v0, float v1, float t);
 
 struct lbData1
 {
-	const wchar_t* text;
+	const mgUnicodeChar* text;
 };
 struct lbData2
 {
-	const wchar_t* text;
+	const mgUnicodeChar* text;
 	uint32_t flags;
 };
 
@@ -53,7 +53,7 @@ int mgElementTable_textinput_onEndEdit(struct mgElement_s* e, int type)
 	e->visible = 0;
 	e->window->context->activeTextInput = 0;
 	
-	mgSetCursor_f(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+	mgSetCursor(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
 	mgElementTextInput* ti = e->implementation;
 	mgElement* table = (mgElement*)e->userData;
@@ -69,7 +69,7 @@ int mgElementTable_textinput_onEndEdit(struct mgElement_s* e, int type)
 	return 1;
 }
 
-wchar_t mgElementTable_textinput_onCharEnter(struct mgElement_s* e, wchar_t c)
+mgUnicodeChar mgElementTable_textinput_onCharEnter(struct mgElement_s* e, mgUnicodeChar c)
 {
 	mgElementTextInput* ti = e->implementation;
 	mgElement* table = (mgElement*)e->userData;
@@ -87,7 +87,7 @@ void mgElementTable_textinput_onActivate(struct mgElement_s* e)
 
 	mgElementTextInput* ti = e->implementation;
 	if (tableImpl->onCellTextInputActivate)
-		mgTextInputSetText_f(ti, tableImpl->onCellTextInputActivate(table, tableImpl->hoverRow, tableImpl->hoverRowIndex, tableImpl->hoverColIndex));
+		mgTextInputSetText(ti, tableImpl->onCellTextInputActivate(table, tableImpl->hoverRow, tableImpl->hoverRowIndex, tableImpl->hoverColIndex));
 
 
 	ti->isSelected = 1;
@@ -212,7 +212,7 @@ miGUI_onUpdate_table(mgElement* e)
 			{
 				mgElementTextInput* ti = (mgElementTextInput*)impl->textInput->implementation;
 				impl->textInput->visible = 1;
-				mgTextInputActivate_f(c, ti, 1, 0);
+				mgTextInputActivate(c, ti, 1, 0);
 				mgRect r;
 				r.left = impl->hoverCellClipRect.left - e->transformWorld.buildArea.left;
 				r.right = r.left + (impl->hoverCellClipRect.right - impl->hoverCellClipRect.left);
@@ -253,7 +253,7 @@ miGUI_onUpdate_table(mgElement* e)
 	static int cursorInColSplitterOld = 0;
 	if (impl->cursorInColSplitter || impl->colSplitterMode)
 	{
-		mgSetCursor_f(c, c->defaultCursors[mgCursorType_SizeWE], mgCursorType_Arrow);
+		mgSetCursor(c, c->defaultCursors[mgCursorType_SizeWE], mgCursorType_Arrow);
 		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 		{
 			impl->colSplitterMode = 1;
@@ -279,12 +279,12 @@ miGUI_onUpdate_table(mgElement* e)
 		if (c->input->mouseButtonFlags1 & MG_MBFL_LMBUP)
 		{
 			impl->colSplitterMode = 0;
-			mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+			mgSetCursor(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 		}
 	}
 
 	if (cursorInColSplitterOld && !impl->cursorInColSplitter && !impl->colSplitterMode)
-		mgSetCursor_f(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
+		mgSetCursor(c, c->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 	cursorInColSplitterOld = impl->cursorInColSplitter;
 }
 
@@ -312,7 +312,7 @@ miGUI_onDraw_table(mgElement* e)
 
 		impl->hoverColTitle = -1;
 		impl->cursorInColSplitter = 0;
-		const wchar_t* str = 0;
+		const mgUnicodeChar* str = 0;
 		uint32_t strLen = 0;
 		mgPoint pos;
 		pos.x = rect.left;
@@ -368,13 +368,20 @@ miGUI_onDraw_table(mgElement* e)
 						&style->tableColTitleColActive, 0, 0);
 				}
 				
-				e->window->context->gpu->drawText(mgDrawTextReason_tableColTitle,
+				/*e->window->context->gpu->drawText(mgDrawTextReason_tableColTitle,
 					impl,
 					&pos,
 					str,
 					strLen,
 					&style->tableCellText,
-					impl->font);
+					impl->font);*/
+				impl->textProcessor->onDrawText(
+					mgDrawTextReason_tableColTitle,
+					impl->textProcessor,
+					&pos,
+					str,
+					(size_t)strLen,
+					&style->tableCellText);
 			}
 
 			pos.x += impl->colsSizes[i2];
@@ -391,7 +398,7 @@ miGUI_onDraw_table(mgElement* e)
 	}
 
 
-	if (impl->rows && impl->font)
+	if (impl->rows)
 	{
 		uint32_t index = impl->firstRowIndexForDraw;
 
@@ -483,7 +490,7 @@ miGUI_onDraw_table(mgElement* e)
 						0, 0);
 				}
 
-				wchar_t* str = 0;
+				mgUnicodeChar* str = 0;
 				uint32_t strLen = 0;
 				for (uint32_t i2 = 0; i2 < impl->numCols; ++i2)
 				{
@@ -533,13 +540,20 @@ miGUI_onDraw_table(mgElement* e)
 
 						if (str)
 						{
-							e->window->context->gpu->drawText(mgDrawTextReason_table,
+							/*e->window->context->gpu->drawText(mgDrawTextReason_table,
 								impl,
 								&pos2,
 								str,
 								strLen,
 								&style->tableCellText,
-								impl->font);
+								impl->font);*/
+							impl->textProcessor->onDrawText(
+								mgDrawTextReason_table,
+								impl->textProcessor,
+								&pos2,
+								str,
+								(size_t)strLen,
+								&style->tableCellText);
 						}
 
 						if (impl->onGetUserElementNum && impl->onGetUserElement && impl->onBeginGetUserElement)
@@ -592,15 +606,14 @@ miGUI_onRebuild_table(mgElement* e)
 {
 }
 
-MG_API
 mgElement* MG_C_DECL
-mgCreateTable_f(struct mgWindow_s* w, 
+mgCreateTable(struct mgWindow_s* w, 
 	mgPoint* position, 
 	mgPoint* size, 
 	void** rows, 
 	uint32_t rowsSz, 
 	uint32_t colNum, 
-	mgFont* f)
+	struct mgTextProcessor_s* tp)
 {
 	assert(w);
 	assert(position);
@@ -630,21 +643,22 @@ mgCreateTable_f(struct mgWindow_s* w,
 	impl->rows = rows;
 	impl->numRows = rowsSz;
 	impl->numCols = colNum;
-	impl->font = f;
+	//impl->font = f;
+	impl->textProcessor = tp;
 	impl->rowHeight = 16;
 	impl->drawItemBG = 1;
 	impl->scrollSpeed = 10.f;
 	impl->colTitleHeight = 20;
 	size->x = 20;
 	size->y = 20;
-	impl->textInput = mgCreateTextInput_f(w, position, size, f);
+	impl->textInput = mgCreateTextInput(w, position, size, tp);
 	impl->textInput->userData = newElement;
 	impl->textInput->visible = 0;
 	((mgElementTextInput*)impl->textInput->implementation)->onActivate = mgElementTable_textinput_onActivate;
 	((mgElementTextInput*)impl->textInput->implementation)->onEndEdit = mgElementTable_textinput_onEndEdit;
 	((mgElementTextInput*)impl->textInput->implementation)->onCharEnter = mgElementTable_textinput_onCharEnter;
-	mgSetParent_f(impl->textInput, newElement);
+	mgSetParent(impl->textInput, newElement);
 
-	mgSetParent_f(newElement, 0);
+	mgSetParent(newElement, 0);
 	return newElement;
 }

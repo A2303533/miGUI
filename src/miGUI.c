@@ -38,7 +38,7 @@ void mgUpdateWindow(struct mgWindow_s* w);
 void mgDrawDockPanel(struct mgContext_s* c);
 void mgDockPanelOnSize(struct mgContext_s* c);
 void mgDockPanelUpdate(struct mgContext_s* c);
-void mgDrawPopup_f(struct mgContext_s* c, mgPopup* p);
+void mgDrawPopup(struct mgContext_s* c, mgPopup* p);
 void mgUpdatePopup(struct mgContext_s* c, mgPopup* p);
 void mgDockPanelClear(struct mgContext_s* c);
 
@@ -63,9 +63,8 @@ mgDestroyElement_internal(mgElement* e)
 	free(e);
 }
 
-MG_API
 void MG_C_DECL
-mgDestroyElement_f(mgElement* e)
+mgDestroyElement(mgElement* e)
 {
 	assert(e);
 
@@ -98,16 +97,14 @@ mgDestroyElement_f(mgElement* e)
 	}
 }
 
-MG_API
 void MG_C_DECL
-mgInitStyleDark_f(mgStyle* s)
+mgInitStyleDark(mgStyle* s)
 {
 	assert(s);
 }
 
-MG_API
 void MG_C_DECL
-mgInitStyleLight_f(mgStyle* s)
+mgInitStyleLight(mgStyle* s)
 {
 	assert(s);
 	mgColorSetAsIntegerRGB(&s->button1, 0x999999);
@@ -182,9 +179,8 @@ mgInitStyleLight_f(mgStyle* s)
 	mgColorSetAsIntegerRGB(&s->buttonIcon, 0x0);
 }
 
-MG_API 
 mgContext* MG_C_DECL
-mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
+mgCreateContext(mgVideoDriverAPI* gpu, mgInputContext* input)
 {
 	assert(gpu);
 	assert(input);
@@ -200,8 +196,8 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 	c->activeStyle = &c->styleLight;
 	c->deltaTime = 0.f;
 
-	mgInitStyleLight_f(&c->styleLight);
-	c->functions.SetCursor_p = mgSetCursor_f;
+	mgInitStyleLight(&c->styleLight);
+	c->functions.SetCursor_p = mgSetCursor;
 
 	mgInitDefaultCursors(c);
 
@@ -210,27 +206,25 @@ mgCreateContext_f(mgVideoDriverAPI* gpu, mgInputContext* input)
 }
 
 struct mgPopup_s*
-mgGetDefaultPopupTextInput(mgContext* c)
+mgGetDefaultPopupTextInput(mgContext* c, struct mgTextProcessor_s* tp)
 {
 	assert(c);
-	assert(c->defaultPopupFont);
 
 	if (c->defaultPopupForTextInput)
 		return c->defaultPopupForTextInput;
 	struct mgPopupItemInfo_s items[] = {
-		{0, L"Cut", 0, 0, mgPopupItemType_default, 0, L"Ctl+X", 1},
-		{0, L"Copy", 0, 0, mgPopupItemType_default, 0, L"Ctl+C", 1},
-		{0, L"Paste", 0, 0, mgPopupItemType_default, 0, L"Ctl+V", 1},
-		{0, L"Delete", 0, 0, mgPopupItemType_default, 0, 0, 1},
-		{0, L"Select All", 0, 0, mgPopupItemType_default, 0, L"Ctrl+A", 1},
+		{0, U"Cut", 0, 0, mgPopupItemType_default, 0, U"Ctl+X", 1},
+		{0, U"Copy", 0, 0, mgPopupItemType_default, 0, U"Ctl+C", 1},
+		{0, U"Paste", 0, 0, mgPopupItemType_default, 0, U"Ctl+V", 1},
+		{0, U"Delete", 0, 0, mgPopupItemType_default, 0, 0, 1},
+		{0, U"Select All", 0, 0, mgPopupItemType_default, 0, U"Ctrl+A", 1},
 	};
-	c->defaultPopupForTextInput = mgCreatePopup_f(c, items, 5, c->defaultPopupFont, 0);
+	c->defaultPopupForTextInput = mgCreatePopup(c, items, 5, 0, tp);
 	return c->defaultPopupForTextInput;
 }
 
-MG_API 
 void MG_C_DECL
-mgDestroyContext_f(mgContext* c)
+mgDestroyContext(mgContext* c)
 {
 	assert(c);
 
@@ -239,12 +233,12 @@ mgDestroyContext_f(mgContext* c)
 	if (c->defaultIconGroup)
 	{
 		if (c->defaultIconGroup->icons)
-			mgDestroyIcons_f(c->defaultIconGroup->icons);
+			mgDestroyIcons(c->defaultIconGroup->icons);
 		free(c->defaultIconGroup);
 	}
 
 	if (c->defaultPopupForTextInput)
-		mgDestroyPopup_f(c->defaultPopupForTextInput);
+		mgDestroyPopup(c->defaultPopupForTextInput);
 
 	mgWindow* cw = c->firstWindow;
 	if (cw)
@@ -253,7 +247,7 @@ mgDestroyContext_f(mgContext* c)
 		while (1)
 		{
 			mgWindow* nw = cw->right;
-			mgDestroyWindow_f(cw);
+			mgDestroyWindow(cw);
 			if (cw == lw)
 				break;
 			cw = nw;
@@ -265,7 +259,7 @@ mgDestroyContext_f(mgContext* c)
 		if (c->dockPanel->windowTabPopup)
 		{
 			c->activePopup = 0;
-			mgDestroyPopup_f(c->dockPanel->windowTabPopup);
+			mgDestroyPopup(c->dockPanel->windowTabPopup);
 		}
 
 		mgDockPanelClear(c);
@@ -278,39 +272,38 @@ mgDestroyContext_f(mgContext* c)
 	free(c);
 }
 
-MG_API
 int MG_C_DECL
-mgInitDefaultIcons_f(struct mgContext_s* c, mgTexture* t)
+mgInitDefaultIcons(struct mgContext_s* c, mgTexture* t)
 {
 	if (c->defaultIconGroup)
 		return 0;
 
 	c->defaultIconGroup = calloc(1, sizeof(mgIconGroup));
-	c->defaultIconGroup->icons = mgCreateIcons_f(t, 512, 512, 8);
+	c->defaultIconGroup->icons = mgCreateIcons(t, 512, 512, 8);
 	
 	c->defaultIconGroup->windowCloseButton = 0;
-	mgSetIcon_f(c->defaultIconGroup->icons, 0, 15, 2, 11, 11); //close wnd
+	mgSetIcon(c->defaultIconGroup->icons, 0, 15, 2, 11, 11); //close wnd
 
 	c->defaultIconGroup->windowCloseButtonMouseHover = 1;
-	mgSetIcon_f(c->defaultIconGroup->icons, 1, 2, 2, 11, 11); // close wnd mouse hover
+	mgSetIcon(c->defaultIconGroup->icons, 1, 2, 2, 11, 11); // close wnd mouse hover
 
 	c->defaultIconGroup->windowCloseButtonPress = 2;
-	mgSetIcon_f(c->defaultIconGroup->icons, 2, 29, 2, 11, 11); // close wnd push
+	mgSetIcon(c->defaultIconGroup->icons, 2, 29, 2, 11, 11); // close wnd push
 
 	c->defaultIconGroup->windowCollapseButton = 3;
-	mgSetIcon_f(c->defaultIconGroup->icons, 3, 42, 2, 11, 11); // collapse wnd
+	mgSetIcon(c->defaultIconGroup->icons, 3, 42, 2, 11, 11); // collapse wnd
 
 	c->defaultIconGroup->windowExpandButton = 4;
-	mgSetIcon_f(c->defaultIconGroup->icons, 4, 53, 2, 11, 11); // expand wnd
+	mgSetIcon(c->defaultIconGroup->icons, 4, 53, 2, 11, 11); // expand wnd
 
 	c->defaultIconGroup->popupNext = 5;
-	mgSetIcon_f(c->defaultIconGroup->icons, 5, 64, 2, 11, 11); // popup next
+	mgSetIcon(c->defaultIconGroup->icons, 5, 64, 2, 11, 11); // popup next
 
 	c->defaultIconGroup->popupCheck = 6;
-	mgSetIcon_f(c->defaultIconGroup->icons, 6, 78, 0, 12, 13);
+	mgSetIcon(c->defaultIconGroup->icons, 6, 78, 0, 12, 13);
 
 	c->defaultIconGroup->popupCheckRadio = 7;
-	mgSetIcon_f(c->defaultIconGroup->icons, 7, 90, 0, 12, 13);
+	mgSetIcon(c->defaultIconGroup->icons, 7, 90, 0, 12, 13);
 	
 	return 1;
 }
@@ -391,9 +384,8 @@ mgRebuildElement(mgElement* e)
 	}
 }
 
-MG_API
 void MG_C_DECL
-mgUpdate_f(mgContext* c)
+mgUpdate(mgContext* c)
 {
 	assert(c);
 
@@ -452,11 +444,11 @@ mgUpdate_f(mgContext* c)
 		if (!c->cursorInPopup)
 		{
 			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
-				mgShowPopup_f(c, 0, 0);
+				mgShowPopup(c, 0, 0);
 			if (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
-				mgShowPopup_f(c, 0, 0);
+				mgShowPopup(c, 0, 0);
 			if (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN)
-				mgShowPopup_f(c, 0, 0);
+				mgShowPopup(c, 0, 0);
 		}
 
 		if (!c->activeMenu)
@@ -544,9 +536,8 @@ mgUpdate_f(mgContext* c)
 	}
 }
 
-MG_API
 void MG_C_DECL
-mgStartFrame_f(mgContext* c)
+mgStartFrame(mgContext* c)
 {
 	assert(c);
 	g_skipFrame = 0;
@@ -591,9 +582,8 @@ mgStartFrame_f(mgContext* c)
 }
 
 
-MG_API
 void MG_C_DECL
-mgSetParent_f(mgElement* object, mgElement* parent)
+mgSetParent(mgElement* object, mgElement* parent)
 {
 	assert(object);
 
@@ -656,15 +646,14 @@ mgSetParent_f(mgElement* object, mgElement* parent)
 	object->window->flagsInternal |= mgWindowFlag_internal_updateContentHeight;
 }
 
-MG_API
 void MG_C_DECL
-mgSetVisible_f(mgElement* e, int v)
+mgSetVisible(mgElement* e, int v)
 {
 	assert(e);
 	e->visible = v;
 	for (uint32_t i = 0; i < e->childrenCount; ++i)
 	{
-		mgSetVisible_f(e->children[i].pointer, v);
+		mgSetVisible(e->children[i].pointer, v);
 	}
 }
 
@@ -682,9 +671,8 @@ mgDrawElement(mgElement* e)
 	}
 }
 
-MG_API
 void MG_C_DECL
-mgDraw_f(mgContext* c)
+mgDraw(mgContext* c)
 {
 	assert(c);
 
@@ -703,7 +691,7 @@ mgDraw_f(mgContext* c)
 				goto skip;
 
 			if (cw->flagsInternal & mgWindowFlag_internal_visible)
-				mgDrawWindow_f(cw);
+				mgDrawWindow(cw);
 
 		skip:;
 			if (cw == lw)
@@ -714,13 +702,13 @@ mgDraw_f(mgContext* c)
 
 	if (c->activePopup)
 	{
-		mgDrawPopup_f(c, c->activePopup);
+		mgDrawPopup(c, c->activePopup);
 	}
 
 	if(!c->tooltipText)
 		drawTooltip = 0;
 
-	if (c->tooltipText && c->tooltipFont)
+	if (c->tooltipText)
 	{
 		static float tttime = 0.f;
 		static mgRect cursorRect;
@@ -747,9 +735,9 @@ mgDraw_f(mgContext* c)
 			&c->activeStyle->popupSeparator,
 			0, 0, 0);*/
 
-		if (drawTooltip)
+		if (drawTooltip && c->tooltipTextProcessor)
 		{
-			size_t textLen = wcslen(c->tooltipText);
+			size_t textLen = mgUnicodeStrlen(c->tooltipText);
 			if (textLen)
 			{
 				int tooltipIndent = 3;
@@ -761,7 +749,13 @@ mgDraw_f(mgContext* c)
 				r.right = r.left;
 
 				mgPoint pt;
-				c->getTextSize(c->tooltipText, c->tooltipFont, &pt);
+				//c->getTextSize(c->tooltipText, c->tooltipFont, &pt);
+				c->tooltipTextProcessor->onGetTextSize(
+					mgDrawTextReason_tooltip,
+					c->tooltipTextProcessor,
+					c->tooltipText,
+					textLen,
+					&pt);
 
 				r.left -= tooltipIndent;
 				r.top -= tooltipIndent;
@@ -797,13 +791,20 @@ mgDraw_f(mgContext* c)
 				pt.x = r.left + tooltipIndent;
 				pt.y = r.top + tooltipIndent;
 
-				c->gpu->drawText(mgDrawTextReason_tooltip,
+				/*c->gpu->drawText(mgDrawTextReason_tooltip,
 					0,
 					&pt,
 					c->tooltipText,
 					(int)textLen,
 					&c->activeStyle->tooltipText,
-					c->tooltipFont);
+					c->tooltipFont);*/
+				c->tooltipTextProcessor->onDrawText(
+					mgDrawTextReason_tooltip,
+					c->tooltipTextProcessor,
+					&pt,
+					c->tooltipText,
+					textLen,
+					&c->activeStyle->tooltipText);
 			}
 		}
 
@@ -820,9 +821,8 @@ mgDraw_f(mgContext* c)
 	}
 }
 
-MG_API
 mgIcons* MG_C_DECL
-mgCreateIcons_f(mgTexture* t, int textureSizeX, int textureSizeY, int iconNum)
+mgCreateIcons(mgTexture* t, int textureSizeX, int textureSizeY, int iconNum)
 {
 	assert(t);
 	assert(textureSizeX > 0);
@@ -837,9 +837,8 @@ mgCreateIcons_f(mgTexture* t, int textureSizeX, int textureSizeY, int iconNum)
 	return newIc;
 }
 
-MG_API
 void MG_C_DECL
-mgDestroyIcons_f(mgIcons* ic)
+mgDestroyIcons(mgIcons* ic)
 {
 	assert(ic);
 	if (ic->iconNodes)
@@ -847,9 +846,8 @@ mgDestroyIcons_f(mgIcons* ic)
 	free(ic);
 }
 
-MG_API
 void MG_C_DECL
-mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy)
+mgSetIcon(mgIcons* ic, int id, int px, int py, int sx, int sy)
 {
 	sy++;
 	assert(ic);
@@ -873,9 +871,8 @@ mgSetIcon_f(mgIcons* ic, int id, int px, int py, int sx, int sy)
 	ic->iconNodes[id].uv.w = (py + sy) * my;
 }
 
-MG_API
 void MG_C_DECL
-mgOnWindowSize_f(struct mgContext_s* c, int x, int y)
+mgOnWindowSize(struct mgContext_s* c, int x, int y)
 {
 	assert(c);
 	c->needRebuild = 1;
@@ -885,7 +882,7 @@ mgOnWindowSize_f(struct mgContext_s* c, int x, int y)
 
 	g_skipFrame = 1;
 
-	mgUpdate_f(c);
+	mgUpdate(c);
 
 	if (c->dockPanel)
 		mgDockPanelOnSize(c);

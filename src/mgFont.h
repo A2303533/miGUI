@@ -77,7 +77,7 @@ typedef struct mgFont_s {
 
 	mgPoint maxSize;
 
-	mgFontGlyph* glyphMap[0xFFFF];
+	mgFontGlyph* glyphMap[0x32000];
 } mgFont;
 
 
