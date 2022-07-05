@@ -83,7 +83,7 @@ typedef struct mgVideoDriverAPI_s
 		mgTexture* texture, // optional
 		mgVec4* UVRegion); // optional
 
-	void(*drawText)( 
+	int(*drawText)( 
 		int reason, 
 		mgPoint* position, 
 		const mgUnicodeChar* text, 

@@ -383,10 +383,11 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 
 	mgPoint pt;
 	mgPoint pt2;
-	pt.x = popupRect.left + p->indent.x + p->iconLeftWidth;
 	pt.y = popupRect.top + p->indent.y;
 	for (int i = 0; i < p->itemsSize; ++i)
 	{
+		pt.x = popupRect.left + p->indent.x + p->iconLeftWidth;
+
 		if (p->items[i].info.type == mgPopupItemType_separator)
 		{
 			mgRect r;

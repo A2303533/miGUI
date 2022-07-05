@@ -348,7 +348,7 @@ void gui_drawRectangle(
     SelectClipRgn(hdcMem, 0);
 }
 
-void gui_drawText(
+int gui_drawText(
     int reason,
     mgPoint* position,
     const mgUnicodeChar* text,
@@ -381,50 +381,60 @@ void gui_drawText(
             wstr.push_back(uc.shorts[0]);
     }
 
+    //POINT point1, point2;
+    //GetCurrentPositionEx(hdcMem, &point1);
+
     TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, 
         wstr.c_str(),
         wstr.size());
+    SIZE s;
+    GetTextExtentPoint32W(hdcMem, wstr.c_str(), wstr.size(), &s);
+   // GetCurrentPositionEx(hdcMem, &point2);
+   // int dPos = point2.x - point1.x;
+   // if (dPos < 0)
+   //     dPos = 0;
 
     DeleteObject(rgn);
     SelectClipRgn(hdcMem, 0);
+    return s.cx;
 }
 
-void gui_getTextSize(const mgUnicodeChar* text, mgFont* font, mgPoint* sz)
-{
-    HDC hdcMem = (HDC)g_currSystemWindowOSData->hdcMem;
-    
-    SelectObject(hdcMem, font->implementation);
-    size_t len = mgUnicodeStrlen(text);
-    if (!len)
-        return;
-
-    sz->x = 0;
-    sz->y = 0;
-    mgUnicodeUC uc;
-    wchar_t wchbuf[2] = { 0,0 };
-    for (size_t i = 0; i < len; ++i)
-    {
-        mgUnicodeChar c = text[i];
-        
-        if (c >= 0x32000)
-            c = '?';
-
-        uc.integer = mgGetUnicodeTable()[c].m_utf16;
-        int cl = 1;
-        if (uc.shorts[1])
-            wchbuf[0] = uc.shorts[1];
-        if (uc.shorts[0])
-        {
-            wchbuf[1] = uc.shorts[0];
-            cl = 2;
-        }
-
-        SIZE s;
-        GetTextExtentPoint32W(hdcMem, wchbuf, cl, &s);
-        sz->x += s.cx;
-        sz->y += s.cy;
-    }
-}
+//void gui_getTextSize(const mgUnicodeChar* text, mgFont* font, mgPoint* sz)
+//{
+//    HDC hdcMem = (HDC)g_currSystemWindowOSData->hdcMem;
+//    
+//    SelectObject(hdcMem, font->implementation);
+//    size_t len = mgUnicodeStrlen(text);
+//    if (!len)
+//        return;
+//
+//    sz->x = 0;
+//    sz->y = 0;
+//    mgUnicodeUC uc;
+//    wchar_t wchbuf[2] = { 0,0 };
+//    for (size_t i = 0; i < len; ++i)
+//    {
+//        mgUnicodeChar c = text[i];
+//        
+//        if (c >= 0x32000)
+//            c = '?';
+//
+//        uc.integer = mgGetUnicodeTable()[c].m_utf16;
+//        int cl = 1;
+//        if (uc.shorts[1])
+//            wchbuf[0] = uc.shorts[1];
+//        if (uc.shorts[0])
+//        {
+//            wchbuf[1] = uc.shorts[0];
+//            cl = 2;
+//        }
+//
+//        SIZE s;
+//        GetTextExtentPoint32W(hdcMem, wchbuf, cl, &s);
+//        sz->x += s.cx;
+//        sz->y = s.cy;
+//    }
+//}
 
 void textProcessor_onDrawText(
     int reason, 
@@ -438,7 +448,11 @@ void textProcessor_onDrawText(
     if (!c)
         c = &defaultColor;
 
-    gui_drawText(reason, position, text, textLen, c, g_fonts[0]);
+    for (size_t i = 0; i < textLen; ++i)
+    {
+        mgFont* fnt = tp->onFont(reason, tp, text[i]);// g_fonts[1];
+        position->x += gui_drawText(reason, position, &text[i], 1, c, fnt);        
+    }
 }
 
 struct mgFont_s* textProcessor_onFont(
@@ -446,7 +460,49 @@ struct mgFont_s* textProcessor_onFont(
     struct mgTextProcessor_s* tp, 
     mgUnicodeChar c)
 {
-    return g_fonts[0];
+    if (isdigit((unsigned char)c))
+        return g_fonts[0];
+    else if (c == 0xA9 
+        || c == 0xAE
+        || c == 0x203C
+        || c == 0x2049
+        || c == 0x2122
+        || c == 0x2139
+        || c == 0x21A9
+        || c == 0x21AA
+        || (c >= 0x2194 && c <= 0x2199)
+        || (c >= 0x21A9 && c <= 0x21AA)
+        || c == 0x231A
+        || c == 0x231B
+        || c == 0x2328
+        || c == 0x23CF
+        || (c >= 0x23E9 && c <= 0x23F3)
+        || (c >= 0x23F8 && c <= 0x23FA)
+        || c == 0x24C2
+        || c == 0x25AA
+        || c == 0x25AB
+        || c == 0x25B6
+        || c == 0x25C0
+        || (c >= 0x25FB && c <= 0x25FE)
+        || (c >= 0x2600 && c <= 0x27EF)
+        || c == 0x2934
+        || c == 0x2935
+        || (c >= 0x2B00 && c <= 0x2BFF)
+        || c == 0x3030
+        || c == 0x303D
+        || c == 0x3297
+        || c == 0x3299
+        || (c >= 0x1F000 && c <= 0x1F02F)
+        || (c >= 0x1F0A0 && c <= 0x1F0FF)
+        || (c >= 0x1F100 && c <= 0x1F64F)
+        || (c >= 0x1F680 && c <= 0x1F6FF)
+        || (c >= 0x1F910 && c <= 0x1F96B)
+        || (c >= 0x1F980 && c <= 0x1F9E0)
+        )
+    {
+       return g_fonts[2];
+    }
+    return g_fonts[1];
 }
 
 struct mgColor_s* textProcessor_onColor(
@@ -465,7 +521,37 @@ void textProcessor_onGetTextSize(
     size_t textLen, 
     mgPoint* p)
 {
-    gui_getTextSize(text, g_fonts[0], p);
+    HDC hdcMem = (HDC)g_currSystemWindowOSData->hdcMem;
+
+    p->x = p->y = 0;
+    for (size_t i = 0; i < textLen; ++i)
+    {
+        mgFont* fnt = tp->onFont(reason, tp, text[i]);
+
+        SelectObject(hdcMem, fnt->implementation);
+
+        mgUnicodeUC uc;
+        wchar_t wchbuf[2] = { 0,0 };
+        mgUnicodeChar c = text[i];
+
+        if (c >= 0x32000)
+            c = '?';
+
+        uc.integer = mgGetUnicodeTable()[c].m_utf16;
+        int cl = 1;
+        if (uc.shorts[1])
+            wchbuf[0] = uc.shorts[1];
+        if (uc.shorts[0])
+        {
+            wchbuf[1] = uc.shorts[0];
+            cl = 2;
+        }
+
+        SIZE s;
+        GetTextExtentPoint32W(hdcMem, wchbuf, cl, &s);
+        p->x += s.cx;
+        p->y = s.cy;
+    }
 }
 
 mgFont* gui_createFont(const char* fn, unsigned int flags, int size)
@@ -766,7 +852,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
 
     g_fonts[0] = gui_createFont("Impact", 0, 10);
     g_fonts[1] = gui_createFont("Times New Roman", 0, 12);
-    g_fonts[2] = gui_createFont("Webdings", 0, 14);
+    g_fonts[2] = gui_createFont("Noto Emoji", 0, 14);
 
     mgTextProcessor* defaultTextProcessor = mgCreateTextProcessor(g_fonts, &gui_gpu);
     defaultTextProcessor->onColor = textProcessor_onColor;
@@ -862,7 +948,12 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
         test_guiWindow2->sizeMinimum.x = 200;
         test_guiWindow2->sizeMinimum.y = 100;
         test_guiWindow2->id = WindowID_2;
-        mgSetWindowTitle(test_guiWindow2, U"_canDock");
+
+        mgUnicodeChar unicodeString[40];
+        mgUnicodeSnprintf(unicodeString, 40, U"\u262F Emoji:");
+        unicodeString[10] = 0x1F60B;
+        unicodeString[11] = 0;
+        mgSetWindowTitle(test_guiWindow2, unicodeString);
         {
             mgPointSet(&sz, 160, 20);
             mgPointSet(&pos, 0, 0);
