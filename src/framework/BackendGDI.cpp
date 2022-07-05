@@ -794,9 +794,7 @@ void BackendGDI::SetIcon(mgf::Icons* ic, int id)
 
 void BackendGDI::UpdateTexture(mgTexture* t, mgImage* img)
 {
-	Gdiplus::Bitmap* gdiImage = (Gdiplus::Bitmap*)t->implementation;
-	//memcpy(t->sourceCopy->data, img->data, img->dataSize);
-
+	//Gdiplus::Bitmap* gdiImage = (Gdiplus::Bitmap*)t->implementation;
 	ImagePixelFormat_RGBA8* pixelRGBA8_dst = (ImagePixelFormat_RGBA8*)t->sourceCopy->data;
 	ImagePixelFormat_RGBA8* pixelRGBA8_src = (ImagePixelFormat_RGBA8*)img->data;
 

@@ -1,5 +1,22 @@
-// win32_test.cpp : Defines the entry point for the application.
-//
+/*
+* This app shows basic concepts:
+* 1. Custom drawing backend. I use here GDI because its system library and everyone have it.
+*       You can write your own functions for drawing. And you need to write functions for texture
+*          creation (if you write something for DirectX or OpenGL, or for some graphics library\engine).
+*    Here functions for texture creation is empty. It's because migui create textures only for 
+*     sprite fonts(DirectX\OpenGL etc.). GDI fonts no need textures.
+* 2. Custom window creation. You have all the power. But you must do something for library, like
+*      get information about keyboard and mouse.
+* 
+* All library code can compile with C compiler. In this app I use some C++ things, I don't know how
+* to draw PNG using just GDI. Anyway, the main idea is to show how to implement callbacks. If you need
+* C language, use some graphics library for drawing.
+* 
+* In future I will add some functions to replace GDI. It will use vector graphics and old OpenGL.
+* It will be another emample app.
+* 
+* For C++ use framework.
+*/
 
 #include "framework.h"
 #include "win32_test.h"
@@ -17,7 +34,7 @@
 
 #pragma comment (lib,"Gdiplus.lib")
 Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-ULONG_PTR           gdiplusToken;
+ULONG_PTR gdiplusToken;
 
 mgContext* g_gui_context = 0;
 mgInputContext g_input;
@@ -45,18 +62,12 @@ mgWindow* test_guiWindow5 = 0;
 #define ButtonID_LoadDock 3
 
 mgSystemWindowOSData* g_mainSystemWindowOSData = 0; // mgContext has this.
-
 mgSystemWindowOSData* g_currSystemWindowOSData = 0;
-mgSystemWindowOSData* gui_setCurrentWindow(mgSystemWindowOSData* data)
-{
+mgSystemWindowOSData* gui_setCurrentWindow(mgSystemWindowOSData* data){
     mgSystemWindowOSData* prev = g_currSystemWindowOSData;
     g_currSystemWindowOSData = data;
-   
     return prev;
 }
-
-//HDC g_dc = 0; // now I have g_currSystemWindowOSData
-//HWND g_hwnd = 0;
 
 HKL KEYBOARD_INPUT_HKL = 0;
 unsigned int KEYBOARD_INPUT_CODEPAGE = 0;
@@ -67,30 +78,18 @@ mgPoint borderSizeMainWindow;
 int g_fps = 0;
 int g_run = 1;
 
-class MyImage
-{
+class MyImage{
 public:
     MyImage() {}
-    ~MyImage() {
-        if (m_gdiimage)
-            delete m_gdiimage;
-    }
-    void load(const wchar_t* f)
-    {
-        m_gdiimage = new Gdiplus::Image(f);
-    }
-
+    ~MyImage() {if (m_gdiimage)delete m_gdiimage;}
+    void load(const wchar_t* f){m_gdiimage = new Gdiplus::Image(f);}
     Gdiplus::Image * m_gdiimage = 0;
 };
-//MyImage g_iconsImage;
 mgTexture* g_iconsImage = 0;
 
-/*double buffering*/
-//HDC hdcMem = 0;
-//HBITMAP hbmMem = 0, hbmOld = 0;
+// DOUBLE BUFFERING FOR GDI
 void DeleteBackBuffer(mgSystemWindowOSData* data) {
-    if (data)
-    {
+    if (data){
         if (data->hdcMem)
             DeleteDC((HDC)data->hdcMem);
         if (data->hbmMem)
@@ -165,19 +164,11 @@ void gui_endDraw()
     ReleaseDC(hWnd, dc);
 }
 
-mgTexture* gui_createTexture(mgImage* img)
-{
-    return 0;
-}
-
-void gui_destroyTexture(mgTexture* t)
-{
-
-}
+mgTexture* gui_createTexture(mgImage* img){    return 0;}
+void gui_destroyTexture(mgTexture* t){}
 
 RECT g_clipRect;
-mgRect gui_setClipRect(mgRect* r)
-{
+mgRect gui_setClipRect(mgRect* r){
     static mgRect old;
     g_clipRect.left = r->left;
     g_clipRect.top = r->top;
@@ -190,7 +181,7 @@ mgRect gui_setClipRect(mgRect* r)
 
 void gui_drawRectangle(
     int reason,
-    void * object,
+    void * object, // object can have parameters that you can use here for drawing
     mgRect* rct,
     mgColor* color1,
     mgColor* color2,
@@ -375,67 +366,29 @@ int gui_drawText(
             c = '?';
         uc.integer = mgGetUnicodeTable()[c].m_utf16;
 
-        if (uc.shorts[1])
-            wstr.push_back(uc.shorts[1]);
+        // GDI can't draw 4 bytes unicode :( or idk how to
+
         if (uc.shorts[0])
             wstr.push_back(uc.shorts[0]);
+        if (uc.shorts[1])
+            wstr.push_back(uc.shorts[1]);
     }
-
-    //POINT point1, point2;
-    //GetCurrentPositionEx(hdcMem, &point1);
 
     TextOutW(hdcMem, position->x + borderSize.x, position->y + borderSize.y, 
         wstr.c_str(),
         wstr.size());
+
     SIZE s;
     GetTextExtentPoint32W(hdcMem, wstr.c_str(), wstr.size(), &s);
-   // GetCurrentPositionEx(hdcMem, &point2);
-   // int dPos = point2.x - point1.x;
-   // if (dPos < 0)
-   //     dPos = 0;
 
     DeleteObject(rgn);
     SelectClipRgn(hdcMem, 0);
     return s.cx;
 }
 
-//void gui_getTextSize(const mgUnicodeChar* text, mgFont* font, mgPoint* sz)
-//{
-//    HDC hdcMem = (HDC)g_currSystemWindowOSData->hdcMem;
-//    
-//    SelectObject(hdcMem, font->implementation);
-//    size_t len = mgUnicodeStrlen(text);
-//    if (!len)
-//        return;
-//
-//    sz->x = 0;
-//    sz->y = 0;
-//    mgUnicodeUC uc;
-//    wchar_t wchbuf[2] = { 0,0 };
-//    for (size_t i = 0; i < len; ++i)
-//    {
-//        mgUnicodeChar c = text[i];
-//        
-//        if (c >= 0x32000)
-//            c = '?';
-//
-//        uc.integer = mgGetUnicodeTable()[c].m_utf16;
-//        int cl = 1;
-//        if (uc.shorts[1])
-//            wchbuf[0] = uc.shorts[1];
-//        if (uc.shorts[0])
-//        {
-//            wchbuf[1] = uc.shorts[0];
-//            cl = 2;
-//        }
-//
-//        SIZE s;
-//        GetTextExtentPoint32W(hdcMem, wchbuf, cl, &s);
-//        sz->x += s.cx;
-//        sz->y = s.cy;
-//    }
-//}
-
+// library will call this callback for drawing text
+// you can set font for each symbol.
+// you can set color for each symbol or use `c`
 void textProcessor_onDrawText(
     int reason, 
     struct mgTextProcessor_s* tp, 
@@ -451,7 +404,8 @@ void textProcessor_onDrawText(
     for (size_t i = 0; i < textLen; ++i)
     {
         mgFont* fnt = tp->onFont(reason, tp, text[i]);// g_fonts[1];
-        position->x += gui_drawText(reason, position, &text[i], 1, c, fnt);        
+        //position->x += gui_drawText(reason, position, &text[i], 1, c, fnt);        
+        position->x += tp->gpu->drawText(reason, position, &text[i], 1, c, fnt);
     }
 }
 
@@ -584,9 +538,7 @@ void gui_drawLine(
     mgPoint* where,
     mgColor*,
     int size)
-{
-
-}
+{}
 
 void draw_gui()
 {
@@ -786,12 +738,6 @@ static unsigned int LocaleIdToCodepage(unsigned int lcid);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lpCmdLine, int       nCmdShow)
 {
-    //char buf[1024];
-    //memset(buf, 0, 1024);
-    //FILE * myf = fopen("data1", "wb");
-    //setvbuf(myf, buf, _IOFBF, 1024);
-    //fprintf(myf, "hello world!");
-
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
     
     AllocConsole();
@@ -1120,39 +1066,27 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
 }
 
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-
-    switch (message)
-    {
-    case WM_GETMINMAXINFO:
-    {
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
+    switch (message){
+    case WM_GETMINMAXINFO:{
         LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
         lpMMI->ptMinTrackSize.x = 800;
         lpMMI->ptMinTrackSize.y = 600;
     }
     break;
-    case WM_SIZE:
-    {
-        if (g_gui_context)
-        {
+    case WM_SIZE:{
+        if (g_gui_context){
             RECT rc;
             GetClientRect(hWnd, &rc);
             mgOnWindowSize(g_gui_context, rc.right - rc.left, rc.bottom - rc.top);
             g_mainSystemWindowOSData->size.x = rc.right - rc.left;
             g_mainSystemWindowOSData->size.y = rc.bottom - rc.top;
-            /*g_gui_context->needRebuild = 1;
-            g_gui_context->windowSize.x = rc.right - rc.left;
-            g_gui_context->windowSize.y = rc.bottom - rc.top;*/
         }
         UpdateBackBuffer();
     }return DefWindowProc(hWnd, message, wParam, lParam);
-    case WM_COMMAND:
-        {
+    case WM_COMMAND:{
             int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
-            {
+            switch (wmId){
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
@@ -1161,44 +1095,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-
     case WM_ERASEBKGND:
     case WM_ACTIVATE:
-    case WM_PAINT:
-    {
+    case WM_PAINT:{
         draw_gui();
-            //PAINTSTRUCT ps;
-            //HDC hdc = BeginPaint(hWnd, &ps);
-            ////// TODO: Add any drawing code that uses hdc here...
-            //EndPaint(hWnd, &ps);
     }break;
-    case WM_INPUT:
-    {
+    case WM_INPUT:{
         HRAWINPUT hRawInput = (HRAWINPUT)lParam;
         UINT dataSize;
         GetRawInputData(hRawInput, RID_INPUT, NULL, &dataSize, sizeof(RAWINPUTHEADER));
-
         if (dataSize == 0 || dataSize > 0xff)
             break;
-
         void* dataBuf = &g_rawInputData[0];
         GetRawInputData(hRawInput, RID_INPUT, dataBuf, &dataSize, sizeof(RAWINPUTHEADER));
-
         const RAWINPUT* raw = (const RAWINPUT*)dataBuf;
-        if (raw->header.dwType == RIM_TYPEMOUSE)
-        {
+        if (raw->header.dwType == RIM_TYPEMOUSE){
             HANDLE devicehWnd = raw->header.hDevice;
-
             const RAWMOUSE& mouseData = raw->data.mouse;
-
             USHORT flags = mouseData.usButtonFlags;
             short wheelDelta = (short)mouseData.usButtonData;
             LONG x = mouseData.lLastX, y = mouseData.lLastY;
-
             /*wprintf(
                 L"Mouse: Device=0x%08X, Flags=%04x, WheelDelta=%d, X=%d, Y=%d\n",
                 devicehWnd, flags, wheelDelta, x, y);*/
-
             //g_input.mouseMoveDelta.x = x;
             //g_input.mouseMoveDelta.y = y;
             if (wheelDelta)
@@ -1209,65 +1128,48 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ScreenToClient(hWnd, &cursorPoint);
             g_input.mousePosition.x = cursorPoint.x;
             g_input.mousePosition.y = cursorPoint.y;
-
-            if (flags)
-            {
-                if ((flags & 0x1) == 0x1)
-                {
+            if (flags){
+                if ((flags & 0x1) == 0x1){
                     g_input.mouseButtonFlags1 |= MG_MBFL_LMBDOWN;
                     g_input.mouseButtonFlags2 |= MG_MBFL_LMBHOLD;
                 }
-
-                if ((flags & 0x2) == 0x2)
-                {
+                if ((flags & 0x2) == 0x2){
                     g_input.mouseButtonFlags1 |= MG_MBFL_LMBUP;
                     if((g_input.mouseButtonFlags2 & MG_MBFL_LMBHOLD) == MG_MBFL_LMBHOLD)
                         g_input.mouseButtonFlags2 ^= MG_MBFL_LMBHOLD;
                 }
-
-                if ((flags & 0x4) == 0x4)
-                {
+                if ((flags & 0x4) == 0x4){
                     g_input.mouseButtonFlags1 |= MG_MBFL_RMBDOWN;
                     g_input.mouseButtonFlags2 |= MG_MBFL_RMBHOLD;
                 }
-                if ((flags & 0x8) == 0x8)
-                {
+                if ((flags & 0x8) == 0x8){
                     g_input.mouseButtonFlags1 |= MG_MBFL_RMBUP;
                     if ((g_input.mouseButtonFlags2 & MG_MBFL_RMBHOLD) == MG_MBFL_RMBHOLD)
                         g_input.mouseButtonFlags2 ^= MG_MBFL_RMBHOLD;
                 }
-
-                if ((flags & 0x10) == 0x10)
-                {
+                if ((flags & 0x10) == 0x10){
                     g_input.mouseButtonFlags1 |= MG_MBFL_MMBDOWN;
                     g_input.mouseButtonFlags2 |= MG_MBFL_MMBHOLD;
                 }
-                if ((flags & 0x20) == 0x20)
-                {
+                if ((flags & 0x20) == 0x20){
                     g_input.mouseButtonFlags1 |= MG_MBFL_MMBUP;
                     if ((g_input.mouseButtonFlags2 & MG_MBFL_MMBHOLD) == MG_MBFL_MMBHOLD)
                         g_input.mouseButtonFlags2 ^= MG_MBFL_MMBHOLD;
                 }
-
-                if ((flags & 0x100) == 0x100)
-                {
+                if ((flags & 0x100) == 0x100){
                     g_input.mouseButtonFlags1 |= MG_MBFL_X1MBDOWN;
                     g_input.mouseButtonFlags2 |= MG_MBFL_X1MBHOLD;
                 }
-                if ((flags & 0x200) == 0x200)
-                {
+                if ((flags & 0x200) == 0x200){
                     g_input.mouseButtonFlags1 |= MG_MBFL_X1MBUP;
                     if ((g_input.mouseButtonFlags2 & MG_MBFL_X1MBHOLD) == MG_MBFL_X1MBHOLD)
                         g_input.mouseButtonFlags2 ^= MG_MBFL_X1MBHOLD;
                 }
-
-                if ((flags & 0x40) == 0x40)
-                {
+                if ((flags & 0x40) == 0x40){
                     g_input.mouseButtonFlags1 |= MG_MBFL_X2MBDOWN;
                     g_input.mouseButtonFlags2 |= MG_MBFL_X2MBHOLD;
                 }
-                if ((flags & 0x80) == 0x80)
-                {
+                if ((flags & 0x80) == 0x80){
                     g_input.mouseButtonFlags1 |= MG_MBFL_X2MBUP;
                     if ((g_input.mouseButtonFlags2 & MG_MBFL_X2MBHOLD) == MG_MBFL_X2MBHOLD)
                         g_input.mouseButtonFlags2 ^= MG_MBFL_X2MBHOLD;
@@ -1282,8 +1184,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_SETCURSOR: {
         auto id = LOWORD(lParam);
-        switch (id)
-        {
+        switch (id){
         default:
             mgSetCursor(g_gui_context, g_gui_context->currentCursors[mgCursorType_Arrow], mgCursorType_Arrow);
             return TRUE;
@@ -1319,87 +1220,59 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SYSKEYDOWN:
     case WM_SYSKEYUP:
     case WM_KEYDOWN:
-    case WM_KEYUP:
-    {
+    case WM_KEYUP:{
         bool isPress = true;
-
         unsigned char key = (unsigned char)wParam;
-
         if (message == WM_SYSKEYUP) isPress = false;
         if (message == WM_KEYUP) isPress = false;
-
         const UINT MY_MAPVK_VSC_TO_VK_EX = 3;
-
-        if (key == MG_KEY_SHIFT)
-        { // shift -> lshift rshift
+        if (key == MG_KEY_SHIFT)// shift -> lshift rshift
             key = static_cast<unsigned char>(MapVirtualKey((static_cast<UINT>(lParam >> 16) & 255u), MY_MAPVK_VSC_TO_VK_EX));
-        }
-        if (key == MG_KEY_CTRL)
-        { // ctrl -> lctrl rctrl
+        if (key == MG_KEY_CTRL){ // ctrl -> lctrl rctrl
             key = static_cast<unsigned char>(MapVirtualKey((static_cast<UINT>(lParam >> 16) & 255), MY_MAPVK_VSC_TO_VK_EX));
             if (lParam & 0x1000000)
                 key = static_cast<unsigned char>(163);
         }
 
-        if (key == MG_KEY_ALT)
-        { // alt -> lalt ralt
+        if (key == MG_KEY_ALT){ // alt -> lalt ralt
             key = static_cast<unsigned char>(MapVirtualKey((static_cast<UINT>(lParam >> 16) & 255), MY_MAPVK_VSC_TO_VK_EX));
             if (lParam & 0x1000000)
                 key = static_cast<unsigned char>(165);
-            //printf("alt = %i\n",(int)ev.keyboardEvent.key);
         }
 
         static unsigned char keys[256u];
         GetKeyboardState(keys);
         WORD chars[2];
 
-        if (ToAsciiEx((UINT)wParam, HIWORD(lParam), keys, chars, 0, KEYBOARD_INPUT_HKL) == 1)
-        {
+        if (ToAsciiEx((UINT)wParam, HIWORD(lParam), keys, chars, 0, KEYBOARD_INPUT_HKL) == 1){
             MultiByteToWideChar(KEYBOARD_INPUT_CODEPAGE, MB_PRECOMPOSED, (LPCSTR)chars,
                 sizeof(chars), (WCHAR*)&g_input.character, 1);
         }
-
-        if (isPress)
-        {
-            if (key < 256)
-            {
+        if (isPress){
+            if (key < 256){
                 g_input.keyFlags[key] |= MG_KEYFL_HOLD;
                 g_input.keyFlags[key] |= MG_KEYFL_HIT;
             }
         }
-        else
-        {
-            if (key < 256)
-            {
+        else{
+            if (key < 256){
                 if((g_input.keyFlags[key] & MG_KEYFL_HOLD) == MG_KEYFL_HOLD)
                     g_input.keyFlags[key] ^= MG_KEYFL_HOLD;
-                
                 g_input.keyFlags[key] |= MG_KEYFL_RELEASE;
             }
         }
-
         if (message == WM_SYSKEYDOWN || message == WM_SYSKEYUP)
-        {
             return DefWindowProc(hWnd, message, wParam, lParam);
-        }
         else
-        {
             return 0;
-        }
     }break;
-
     case WM_INPUTLANGCHANGE:
         KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
         KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
         return 0;
     case WM_SYSCOMMAND:
-        if ((wParam & 0xFFF0) == SC_SCREENSAVE ||
-            (wParam & 0xFFF0) == SC_MONITORPOWER ||
-            (wParam & 0xFFF0) == SC_KEYMENU
-            )
-        {
+        if ((wParam & 0xFFF0) == SC_SCREENSAVE ||(wParam & 0xFFF0) == SC_MONITORPOWER ||(wParam & 0xFFF0) == SC_KEYMENU)
             return 0;
-        }
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
