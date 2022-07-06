@@ -342,7 +342,7 @@ bool ModelEditor::Init()
 	m_windowMain->SetVisible(true);
 	m_windowMain->Rebuild();
 	
-	m_backend = new mgf::BackendGDI();
+	m_backend = new mgf::BackendGDI(m_windowMain);
 	m_GUIContext = m_framework->CreateContext(m_windowMain, m_backend);
 	
 	/*if (std::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))

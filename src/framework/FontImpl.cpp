@@ -53,7 +53,3 @@ mgPoint FontImpl::GetMaxSize()
 	return m_font->maxSize;
 }
 
-mgFont_s* FontImpl::GetMGFont()
-{
-	return m_font;
-}

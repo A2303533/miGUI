@@ -82,12 +82,12 @@ namespace mgf
 			{0, L"Close", 0, dockPanel_popupCallback_close, mgPopupItemType_default, 0, L"hide", 1},
 		};
 		*/
-		Popup* CreatePopup(Font*, mgPopupItemInfo_s* arr, int arrSize, bool useSystemWindow);
+		Popup* CreatePopup(mgPopupItemInfo_s* arr, int arrSize, bool useSystemWindow);
 
 		// Will draw after drawing all windows
 		void SetOnDraw(ContextOnDraw);
 		
-		void SetDefaultPopupFont(Font*);
+		//void SetDefaultPopupFont(Font*);
 		
 		void DrawAll();
 		void DrawBegin();

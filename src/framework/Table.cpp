@@ -165,13 +165,13 @@ int Table_onCellClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint3
 	return tb->OnCellClick(tb, row, rowIndex, colIndex, mouseButton, e->window->context->input);
 }
 
-const mgUnicodeChar* Table_onCellTextInputActivate(struct mgElement_s* e, void* row, uint32_t rowIndex, size_t colIndex)
+const mgUnicodeChar* Table_onCellTextInputActivate(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
 	return tb->OnCellTextInputActivate(tb, row, rowIndex, colIndex);
 }
 
-mgUnicodeChar Table_onCellTextInputCharEnter(struct mgElement_s* e, wchar_t c)
+mgUnicodeChar Table_onCellTextInputCharEnter(struct mgElement_s* e, mgUnicodeChar c)
 {
 	Table* tb = (Table*)e->userData;
 	return tb->OnCellTextInputCharEnter(tb, c);

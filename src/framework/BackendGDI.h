@@ -86,7 +86,7 @@ namespace mgf
 
 		void OnDrawText(int reason, mgPoint* position, const mgUnicodeChar* text, size_t textLen, struct mgColor_s* c);
 	public:
-		BackendGDI();
+		BackendGDI(mgf::SystemWindow*);
 		virtual ~BackendGDI();
 		virtual void* GetVideoDriverAPI() override;
 

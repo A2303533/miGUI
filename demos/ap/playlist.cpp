@@ -326,7 +326,7 @@ PlayListManager::PlayListManager()
 		{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
 		{0, U"Show in explorer", 0, Playlist_popupCb_showexpl, mgPopupItemType_default, 0, 0, 1},
 	};
-	m_listBoxPopup = g_app->m_context->CreatePopup(g_app->m_popupFont, listboxPopupItems, 6, true);
+	m_listBoxPopup = g_app->m_context->CreatePopup(listboxPopupItems, 6, true);
 
 
 	IKnownFolderManager* pManager;
@@ -547,8 +547,11 @@ void PlayListManager::AddNew()
 	newPL->m_name.Assign(U"Playlist", 8);
 	newPL->m_name.Append(pl_number++);
 
+	std::wstring wstrFromUStr;
+	newPL->m_name.Get(wstrFromUStr);
+
 	mgf::StringW plFilePath = m_playlistDir;
-	plFilePath += newPL->m_name;
+	plFilePath += wstrFromUStr.c_str();
 	plFilePath += ".appl";
 
 	plFilePath = CheckPLName(&plFilePath);
@@ -556,9 +559,9 @@ void PlayListManager::AddNew()
 		std::filesystem::path p = plFilePath.data();
 		std::filesystem::path fn = p.filename();
 
-		newPL->m_name = fn.c_str();
-		newPL->m_name.pop_back_before(L'.');
-		newPL->m_name.pop_back();
+		newPL->m_name.Assign(fn.c_str(), wcslen(fn.c_str()));
+		newPL->m_name.PopBackBefore('.');
+		newPL->m_name.PopBack();
 	}
 
 
@@ -694,7 +697,7 @@ void PlayListManager::SelectPlaylist(PlayList* pl)
 						{
 							PlaylistNode * node = new PlaylistNode;
 							node->m_playlist = m_editPlaylist;
-							node->m_audioFilePath = wstr.data();
+							node->m_audioFilePath.Assign(wstr.data(), wstr.size());
 							m_editPlaylist->m_nodes.push_back(node);
 						}
 					}
@@ -840,7 +843,7 @@ void PlayListManager::AddTrackToEditPlaylist(const wchar_t* fn)
 		return;
 
 	PlaylistNode* node = new PlaylistNode;
-	node->m_audioFilePath = fn;
+	node->m_audioFilePath.Assign(fn, wcslen(fn));
 	node->m_playlist = m_editPlaylist;
 	m_editPlaylist->m_nodes.push_back(node);
 	SaveEditPlaylist();

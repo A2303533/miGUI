@@ -48,13 +48,15 @@ namespace mgf
 		}
 		m_type;
 
+		TextProcessor* m_textProcessor = 0;
 		Context* m_context;
 	public:
 		Popup(Context*);
 		virtual ~Popup();
 
-		void SetFont(Font*);
+		//void SetFont(Font*);
 		void Show(int x, int y);
+		void SetTextProcessor(TextProcessor*);
 	};
 }
 

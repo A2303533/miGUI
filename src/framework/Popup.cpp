@@ -33,8 +33,10 @@
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 #include "framework/Popup.h"
+#include "framework/TextProcessor.h"
 
 using namespace mgf;
+extern Backend* g_backend;
 
 Popup::Popup(Context* c)
 	:
@@ -53,15 +55,22 @@ Popup::~Popup()
 	}
 }
 
-void Popup::SetFont(Font* f)
+void Popup::SetTextProcessor(TextProcessor* tp)
 {
-	if (m_type == type_migui)
-	{
-		mgPopup* popup = (mgPopup*)m_implementation;
-#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
-				//popup->font = ((FontImpl*)f)->m_font;
-	}
+	m_textProcessor = tp;
+	mgPopup* popup = (mgPopup*)m_implementation;
+	popup->textProcessor = tp->GetTextProcessor();
 }
+
+//void Popup::SetFont(Font* f)
+//{
+//	if (m_type == type_migui)
+//	{
+//		mgPopup* popup = (mgPopup*)m_implementation;
+//#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
+//				//popup->font = ((FontImpl*)f)->m_font;
+//	}
+//}
 
 void Popup::Show(int x, int y)
 {

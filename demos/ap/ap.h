@@ -47,9 +47,9 @@ public:
 	mgf::Button* m_tableTracklist_testButton[testTable_buttonsSize];
 	int m_testTable_testButton_currBtn = 0;
 
-	mgf::Font* m_popupFont = 0;
+	/*mgf::Font* m_popupFont = 0;
 	mgf::Font* m_fontImpact = 0;
-	mgf::Font* m_listboxFont = 0;
+	mgf::Font* m_listboxFont = 0;*/
 
 	mgf::Window* m_guiWindow = 0;
 

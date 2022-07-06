@@ -219,6 +219,7 @@ namespace mgf
 {
 	class TextProcessor_GDI : public TextProcessor
 	{
+		
 	public:
 		TextProcessor_GDI()
 		{
@@ -235,24 +236,57 @@ namespace mgf
 
 		virtual mgFont_s* OnFont(int reason, mgUnicodeChar c) override
 		{
-			return 0;
+			return g_backendGDI->m_defaultFont->GetMGFont();
 		}
 
 		virtual mgColor* OnColor(int reason, mgUnicodeChar c, mgStyle_s* s) override
 		{
-			return 0;
+			return &s->button1;
 		}
 
 		virtual void OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p) override
 		{
+			//p->x = p->y = 10;
+			HDC hdcMem = (HDC)g_backendGDI->m_currWindow->GetOSData()->hdcMem;
 
+			p->x = p->y = 0;
+			for (size_t i = 0; i < textLen; ++i)
+			{
+				mgFont* fnt = OnFont(reason, text[i]);
+
+				SelectObject(hdcMem, fnt->implementation);
+
+				mgUnicodeUC uc;
+				wchar_t wchbuf[2] = { 0,0 };
+				mgUnicodeChar c = text[i];
+
+				if (c >= 0x32000)
+					c = '?';
+
+				uc.integer = mgGetUnicodeTable()[c].m_utf16;
+				int cl = 1;
+				if (uc.shorts[1])
+					wchbuf[0] = uc.shorts[1];
+				if (uc.shorts[0])
+				{
+					wchbuf[1] = uc.shorts[0];
+					cl = 2;
+				}
+
+				SIZE s;
+				GetTextExtentPoint32W(hdcMem, wchbuf, cl, &s);
+				p->x += s.cx;
+				p->y = s.cy;
+			}
 		}
-
+		
 	};
 }
 
-BackendGDI::BackendGDI()
+BackendGDI::BackendGDI(mgf::SystemWindow* sw)
 {
+	SetCurrentWindow(sw);
+
 	g_backendGDI = this;
 	GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
 
@@ -276,6 +310,7 @@ BackendGDI::BackendGDI()
 		PixelFormat32bppARGB, blackImage->GetData());
 
 	m_textProcessor = new TextProcessor_GDI();
+	GetDefaultFont();
 }
 
 BackendGDI::~BackendGDI()
@@ -921,7 +956,17 @@ void BackendGDI::OnDrawText(int reason,
 	size_t textLen, 
 	struct mgColor_s* c)
 {
+	static mgColor defaultColor(0x000000);
+	if (!c)
+		c = &defaultColor;
 
+	for (size_t i = 0; i < textLen; ++i)
+	{
+		mgFont* fnt = m_textProcessor->OnFont(reason, text[i]);// g_fonts[1];
+		
+		position->x += this->DrawText(reason, position, &text[i], 1, c, fnt);
+		//position->x += tp->gpu->drawText(reason, position, &text[i], 1, c, fnt);
+	}
 }
 
 #endif

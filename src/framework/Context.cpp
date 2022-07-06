@@ -183,14 +183,14 @@ mgf::Backend* Context::GetBackend()
 	return m_backend;
 }
 
-void Context::SetDefaultPopupFont(Font* f)
-{
-	//m_gui_context->defaultPopupFont = ((mgf::FontImpl*)f)->m_font;
-}
+//void Context::SetDefaultPopupFont(Font* f)
+//{
+//	m_gui_context->defaultPopupFont = ((mgf::FontImpl*)f)->m_font;
+//}
 
-Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize, bool useSystemWindow)
+Popup* Context::CreatePopup(mgPopupItemInfo_s* arr, int arrSize, bool useSystemWindow)
 {
-	FontImpl* fontImpl = (FontImpl*)f;
+	//FontImpl* fontImpl = (FontImpl*)f;
 
 	Popup* newPopup = new Popup(this);
 
@@ -200,6 +200,7 @@ Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize, bool u
 		flags |= mgPopupFlags_systemWindow;
 
 	
+	newPopup->m_textProcessor = m_backend->GetTextProcessor();
 	newPopup->m_implementation = mgCreatePopup(m_gui_context, arr, arrSize, flags, m_backend->GetTextProcessor()->GetTextProcessor());
 
 	return newPopup;

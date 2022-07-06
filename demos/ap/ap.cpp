@@ -227,7 +227,7 @@ bool AP_application::Init(backend_type bt)
 	switch (bt)
 	{
 	case backend_type::Gdi:
-		m_backend = new mgf::BackendGDI;
+		m_backend = new mgf::BackendGDI(m_sysWindow);
 		break;
 	case backend_type::OpenGLOld:
 	{
@@ -239,10 +239,10 @@ bool AP_application::Init(backend_type bt)
 	}
 	
 	m_context = m_framework->CreateContext(m_sysWindow, m_backend);
-	m_fontImpact = m_context->GetBackend()->CreateFont(L"Impact", 20, true, false);
+	/*m_fontImpact = m_context->GetBackend()->CreateFont(L"Impact", 20, true, false);
 	m_popupFont = m_context->GetBackend()->CreateFont(L"Arial", 9, false, false);
-	m_listboxFont = m_context->GetBackend()->CreateFont(L"Arial", 9, false, false);
-	m_context->SetDefaultPopupFont(m_popupFont);
+	m_listboxFont = m_context->GetBackend()->CreateFont(L"Arial", 9, false, false);*/
+	//m_context->SetDefaultPopupFont(m_popupFont);
 
 	m_sysWindow->SetVisible(true);
 
@@ -250,7 +250,7 @@ bool AP_application::Init(backend_type bt)
 	m_dnd = new mgf::DNDWin32(m_dndCallback, m_sysWindow->GetOSData()->hWnd);
 	
 	m_guiWindow = new mgf::Window(m_context);
-	m_guiWindow->SetTitle(L"Window", 0);
+	m_guiWindow->SetTitle(U"Window");
 	m_guiWindow->SetWithCloseButton(false);
 	m_guiWindow->SetWithCollapseButton(false);
 	m_guiWindow->SetWithTitlebar(false);
@@ -274,6 +274,7 @@ bool AP_application::Init(backend_type bt)
 	m_buttonNewPlaylist = new ButtonNewPlaylist(m_guiWindow);
 	m_buttonNewPlaylist->SetPositionAndSize(0, 5, 180, 18); //SetPositionAndSize is more comfortable
 	m_buttonNewPlaylist->SetDrawBG(false);
+	//m_buttonNewPlaylist->SetText(U"BUTT");
 	//m_buttonNewPlaylist->onReleaseLMB = Playlist_BTN_newPL_onRelease;
 	
 	m_icons = m_framework->CreateIcons("../data/ap/icons.png", m_context->GetBackend());
@@ -291,7 +292,7 @@ bool AP_application::Init(backend_type bt)
 	
 	m_listboxPlaylist = new ListboxPlaylist(m_guiWindow);// guiWindow.m_data->AddListBox(listboxFont.m_data);
 	m_listboxPlaylist->SetRect(50, 200, 200, 300);
-	m_listboxPlaylist->SetItemHeight(m_listboxFont->GetMaxSize().y);
+	m_listboxPlaylist->SetItemHeight(10);
 	m_listboxPlaylist->SetDrawBG(false);
 	m_listboxPlaylist->CanEdit(true);
 	m_listboxPlaylist->SetDrawItemBG(true);
