@@ -84,16 +84,15 @@ void BackendD3D11_drawRectangle(
 	g_backend->DrawRectangle(reason, object, rct, color1, color2, texture, UVRegion);
 }
 
-void BackendD3D11_drawText(
+int BackendD3D11_drawText(
 	int reason,
-	void* object,
 	mgPoint* position,
-	const wchar_t* text,
-	int textLen,
+	const mgUnicodeChar* text,
+	size_t textLen,
 	mgColor* color,
 	mgFont* font)
 {
-	g_backend->DrawText(reason, object, position, text, textLen, color, font);
+	return g_backend->DrawText(reason, position, text, textLen, color, font);
 }
 
 void BackendD3D11_drawLine(
@@ -112,6 +111,9 @@ mgRect BackendD3D11_setClipRect(mgRect* r)
 	return g_backend->SetClipRect(r);
 }
 
+void BackendD3D11_UpdateBackBuffer() {}
+mgSystemWindowOSData* BackendD3D11_setCurrentWindow(mgSystemWindowOSData* data) { return 0; }
+
 BackendD3D11::BackendD3D11(BackendD3D11Params params)
 {
 	m_params = params;
@@ -124,7 +126,10 @@ BackendD3D11::BackendD3D11(BackendD3D11Params params)
 	((mgVideoDriverAPI*)m_gpu)->endDraw = BackendD3D11_endDraw;
 	((mgVideoDriverAPI*)m_gpu)->drawRectangle = BackendD3D11_drawRectangle;
 	((mgVideoDriverAPI*)m_gpu)->drawText = BackendD3D11_drawText;
+	((mgVideoDriverAPI*)m_gpu)->drawLine = BackendD3D11_drawLine;
 	((mgVideoDriverAPI*)m_gpu)->setClipRect = BackendD3D11_setClipRect;
+	((mgVideoDriverAPI*)m_gpu)->setCurrentWindow = BackendD3D11_setCurrentWindow;
+	((mgVideoDriverAPI*)m_gpu)->updateBackBuffer = BackendD3D11_UpdateBackBuffer;
 	
 	//blackImage = new Image;
 	//blackImage->Create(20, 20, mgColor(0xff020202));
@@ -657,16 +662,16 @@ void BackendD3D11::DrawRectangle(int reason, void* object, mgRect* rct, mgColor*
 	//glScissor(0, 0, m_window->m_size.x, m_window->m_size.y);
 }
 
-void BackendD3D11::DrawText(int reason, void* object, mgPoint* position, const wchar_t* text, int textLen,
+int BackendD3D11::DrawText(int reason, mgPoint* position, const mgUnicodeChar* text, size_t textLen,
 	mgColor* color, mgFont* font)
 {
 	m_cbVertex_impl.m_Color1 = *color;
 	m_cbVertex_impl.m_Color2 = *color;
-
+	int r = 0;
 	mgPoint _position = *position;
-	for (int i = 0; i < textLen; ++i)
+	for (size_t i = 0; i < textLen; ++i)
 	{
-		wchar_t character = text[i];
+		mgUnicodeChar character = text[i];
 		auto glyph = font->glyphMap[character];
 		if (glyph)
 		{
@@ -692,13 +697,17 @@ void BackendD3D11::DrawText(int reason, void* object, mgPoint* position, const w
 			m_cbVertex_impl.m_UVs = glyph->UV;
 			_drawRectangle();
 
+
 			_position.x += glyph->width + glyph->overhang + font->characterSpacing;
-			if (character == L' ')
+			r += glyph->width + glyph->overhang + font->characterSpacing;
+
+			if (character == U' ')
 				_position.x += font->spaceSize;
-			if (character == L'\t')
+			if (character == U'\t')
 				_position.x += font->tabSize;
 		}
 	}
+	return r;
 }
 
 void BackendD3D11::DrawLine(

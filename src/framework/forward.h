@@ -55,6 +55,7 @@ namespace mgf
 	class DND;
 	class ArchiveSystem;
 	struct ArchiveZipFile;
+	class TextProcessor;
 }
 
 #endif

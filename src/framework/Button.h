@@ -32,23 +32,31 @@
 
 #include "Rectangle.h"
 
-#include <string>
+#include "String.h"
+#include "Unicode.h"
 
 namespace mgf
 {
 	class Button : public Element
 	{
 		mgElementButton_s* m_elementButton = 0;
-		std::wstring m_text;
+		
+		UnicodeString m_text;
+
 		Icons* m_icons = 0;
 		mgFont* m_font = 0;
-		friend mgFont* Button_onFont(struct mgElement_s* e);
-		friend const wchar_t* Button_onText(struct mgElement_s* e, size_t* textLen);
+		//friend mgFont* Button_onFont(struct mgElement_s* e);
+		friend const mgUnicodeChar* Button_onText(struct mgElement_s* e, size_t* textLen);
 	public:
 		Button(Window* w);
 		virtual ~Button();
 
+		virtual void SetText(const char*);
 		virtual void SetText(const wchar_t*);
+		virtual void SetText(const char8_t*);
+		virtual void SetText(const char16_t*);
+		virtual void SetText(const char32_t*);
+
 		virtual void SetAsPush(bool);
 		virtual void SetFont(Font*);
 		

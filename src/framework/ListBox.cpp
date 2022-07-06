@@ -33,16 +33,17 @@
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 #include "framework/ListBox.h"
+#include "framework/TextProcessor.h"
 
 using namespace mgf;
 
 extern Backend* g_backend;
 
-wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c);
-int LB_onEndEdit(struct mgElement_s*, int type, const wchar_t* str, void* editItem);
+mgUnicodeChar LB_onTextInputCharEnter(struct mgElement_s* e, mgUnicodeChar c);
+int LB_onEndEdit(struct mgElement_s*, int type, const mgUnicodeChar* str, void* editItem);
 int LB_onIsItemSelected(struct mgElement_s* e, void* item);
 void LB_onItemClick(struct mgElement_s* e, void* item, uint32_t itemIndex, uint32_t mouseButton);
-int LB_onDrawItem(struct mgElement_s*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen);
+int LB_onDrawItem(struct mgElement_s*, void* item, uint32_t itemIndex, mgUnicodeChar** text, size_t* textlen);
 
 ListBox::ListBox(Window* w)
 {
@@ -50,8 +51,10 @@ ListBox::ListBox(Window* w)
 	mgPointSet(&p, 0, 0);
 	
 	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
+	
+	this->SetTextProcessor(g_backend->GetTextProcessor());
 
-	m_element = mgCreateListBox(w->m_window, &p, &p, 0, 0, fi->m_font);
+	m_element = mgCreateListBox(w->m_window, &p, &p, 0, 0, /*fi->m_font*/m_textProcessor->GetTextProcessor());
 	m_element->userData = this;
 	m_elementList = (mgElementList*)m_element->implementation;
 	m_elementList->onTextInputCharEnter = LB_onTextInputCharEnter;
@@ -79,10 +82,11 @@ void** ListBox::GetData()
 	return m_elementList->items;
 }
 
-void ListBox::SetFont(Font* f)
-{
-	m_elementList->font = ((FontImpl*)f)->m_font;
-}
+//void ListBox::SetFont(Font* f)
+//{
+//	//m_elementList->font = ((FontImpl*)f)->m_font;
+//#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
+//}
 
 void ListBox::SetItemHeight(uint32_t i)
 {
@@ -94,13 +98,13 @@ void ListBox::CanEdit(bool v)
 	m_elementList->editText = (int)v;
 }
 
-wchar_t LB_onTextInputCharEnter(struct mgElement_s* e, wchar_t c)
+mgUnicodeChar LB_onTextInputCharEnter(struct mgElement_s* e, mgUnicodeChar c)
 {
 	ListBox* lb = (ListBox*)e->userData;
 	return lb->OnTextInputCharEnter(lb, c);
 }
 
-int LB_onEndEdit(struct mgElement_s* e, int type, const wchar_t* str, void* editItem)
+int LB_onEndEdit(struct mgElement_s* e, int type, const mgUnicodeChar* str, void* editItem)
 {
 	ListBox* lb = (ListBox*)e->userData;
 	return lb->OnTextInputEndEdit(lb, type, str, editItem);
@@ -130,15 +134,15 @@ void LB_onItemClick(struct mgElement_s* e, void* item, uint32_t itemIndex, uint3
 	return lb->OnItemClick(lb, item, itemIndex, mouseButton);
 }
 
-int LB_onDrawItem(struct mgElement_s* e, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen)
+int LB_onDrawItem(struct mgElement_s* e, void* item, uint32_t itemIndex, mgUnicodeChar** text, size_t* textlen)
 {
 	ListBox* lb = (ListBox*)e->userData;
 	return lb->OnDrawItem(lb, item, itemIndex, text, textlen);
 }
 
-wchar_t ListBox::OnTextInputCharEnter(ListBox*, wchar_t c) { return c; }
-int ListBox::OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, void* editItem) { return 0; }
+mgUnicodeChar ListBox::OnTextInputCharEnter(ListBox*, mgUnicodeChar c) { return c; }
+int ListBox::OnTextInputEndEdit(ListBox*, int i, const mgUnicodeChar* str, void* editItem) { return 0; }
 int ListBox::OnIsItemSelected(ListBox* e, void* item) { return 0; }
 void ListBox::OnItemClick(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton) {}
-int ListBox::OnDrawItem(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen) { return 0; }
+int ListBox::OnDrawItem(ListBox*, void* item, uint32_t itemIndex, mgUnicodeChar** text, size_t* textlen) { return 0; }
 

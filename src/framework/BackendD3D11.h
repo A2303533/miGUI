@@ -143,13 +143,14 @@ namespace mgf
 		virtual void DestroyTexture(mgTexture*)  override;
 		virtual void DrawRectangle(int reason,void* object,mgRect* rct,mgColor* color1,mgColor* color2,
 			mgTexture* texture,  mgVec4* UVRegion ) override;
-		virtual void DrawText(int reason,void* object,mgPoint* position,const wchar_t* text,int textLen,
+		virtual int DrawText(int reason,mgPoint* position,const mgUnicodeChar* text, size_t textLen,
 			mgColor* color, mgFont* font) override;
 		virtual void DrawLine( int reason, void* object, mgPoint* position, mgPoint* where,
 			mgColor* color, int size) override;
 		virtual mgRect SetClipRect(mgRect* r) override;
 		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) override;
 		virtual mgTexture_s* GetDefaultIcons() override;
+		
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) override;
 		virtual void DestroyFont(Font*) override;
 		virtual Font* GetDefaultFont() override;

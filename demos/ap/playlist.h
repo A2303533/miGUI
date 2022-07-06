@@ -11,11 +11,11 @@ class ListboxPlaylist : public mgf::ListBox
 public:
 	ListboxPlaylist(mgf::Window* w);
 	virtual ~ListboxPlaylist();
-	virtual wchar_t OnTextInputCharEnter(ListBox*, wchar_t) override;
-	virtual int OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, void* editItem) override;
+	virtual mgUnicodeChar OnTextInputCharEnter(ListBox*, mgUnicodeChar) override;
+	virtual int OnTextInputEndEdit(ListBox*, int i, const mgUnicodeChar* str, void* editItem) override;
 	virtual int OnIsItemSelected(ListBox* e, void* item) override;
 	virtual void OnItemClick(ListBox* e, void* item, uint32_t itemIndex, uint32_t mouseButton) override;
-	virtual int OnDrawItem(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen) override;
+	virtual int OnDrawItem(ListBox*, void* item, uint32_t itemIndex, mgUnicodeChar** text, size_t* textlen) override;
 };
 
 class TableTracklist : public mgf::Table
@@ -23,8 +23,8 @@ class TableTracklist : public mgf::Table
 public:
 	TableTracklist(mgf::Window* w, uint32_t colNum);
 	virtual ~TableTracklist();
-	virtual const wchar_t* OnColTitleText(Table*, uint32_t* textLen, uint32_t colIndex) override;
-	virtual int OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen) override;
+	virtual const mgUnicodeChar* OnColTitleText(Table*, size_t* textLen, uint32_t colIndex) override;
+	virtual int OnDrawRow(Table*, void* row, uint32_t col, mgUnicodeChar** text, size_t* textlen) override;
 	virtual void OnRowClick(Table*, void* row, uint32_t rowIndex, uint32_t mouseButton, mgInputContext_s* input) override;
 	virtual int OnIsRowSelected(Table*, void* row) override;
 };
@@ -37,7 +37,7 @@ struct PlaylistNode
 	PlaylistNode() {}
 	~PlaylistNode() {}
 
-	mgf::StringW m_audioFilePath;
+	mgf::UnicodeString m_audioFilePath;
 	uint32_t m_begin = 0;
 	uint32_t m_end = 0;
 
@@ -60,7 +60,7 @@ public:
 	void RenameFile();
 	void Save();
 
-	mgf::StringW m_name;
+	mgf::UnicodeString m_name;
 	mgf::StringW m_filePath;
 	mgf::StringW m_fileName;
 

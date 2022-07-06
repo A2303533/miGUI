@@ -131,7 +131,7 @@ namespace mgf
 		/// To get text.
 		/// Return 1 if need to draw this row.
 		/// </summary>
-		virtual int OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+		virtual int OnDrawRow(Table*, void* row, uint32_t col, mgUnicodeChar** text, size_t* textlen);
 
 
 		/// <summary>
@@ -156,24 +156,24 @@ namespace mgf
 		/// When OnCellClick return 1, will be activated textInput, and need to put some text in it.
 		/// Return text that will be placed in textInput.
 		/// </summary>
-		virtual const wchar_t* OnCellTextInputActivate(Table*, void* row, uint32_t rowIndex, uint32_t colIndex);
+		virtual const mgUnicodeChar* OnCellTextInputActivate(Table*, void* row, uint32_t rowIndex, uint32_t colIndex);
 		
 		/// <summary>
 		/// Return that character that you want to put in textInput. return 0 for skip.
 		/// </summary>
-		virtual wchar_t OnCellTextInputCharEnter(Table*, wchar_t c);
+		virtual mgUnicodeChar OnCellTextInputCharEnter(Table*, mgUnicodeChar c);
 		
 		/// <summary>
 		/// Will be called when Escape or Enter or click somewhere (type: see onEndEdit in mgElementTextInput.h)
 		/// Return 1 if need to deactivate input
 		/// </summary>
-		virtual int OnCellTextInputEndEdit(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
+		virtual int OnCellTextInputEndEdit(Table*, int type, const mgUnicodeChar* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
 
 		/// <summary>
 		/// Set this for column title, that can change column width.
 		/// Return text for current column, set also textLen.
 		/// </summary>
-		virtual const wchar_t* OnColTitleText(Table*, uint32_t* textLen, uint32_t colIndex);
+		virtual const mgUnicodeChar* OnColTitleText(Table*, size_t* textLen, uint32_t colIndex);
 
 		/// <summary>
 		/// 

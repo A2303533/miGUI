@@ -30,6 +30,8 @@
 #ifndef _MG_FONT_H_
 #define _MG_FONT_H_
 
+#include "mgUnicode.h"
+
 enum {
 	MG_FNTFL_BOLD = 1,
 	MG_FNTFL_ITALIC = 2,

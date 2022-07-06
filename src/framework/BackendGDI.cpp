@@ -42,6 +42,7 @@
 #include "framework/Icons.h"
 #include "framework/Image.h"
 #include "framework/Archive.h"
+#include "framework/TextProcessor.h"
 
 #include "data/icons.h"
 
@@ -59,7 +60,7 @@ using namespace mgf;
 
 extern mgf::Backend* g_backend;
 extern Framework* g_mgf;
-
+BackendGDI* g_backendGDI = 0;
 
 void BackendGDI_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
 {
@@ -98,16 +99,53 @@ void BackendGDI_drawRectangle(
 	g_backend->DrawRectangle(reason, object, rct, color1, color2, texture, UVRegion);
 }
 
-void BackendGDI_drawText(
+int BackendGDI_drawText(
 	int reason,
-	void* object,
 	mgPoint* position,
-	const wchar_t* text,
-	int textLen,
+	const mgUnicodeChar* text,
+	size_t textLen,
 	mgColor* color,
 	mgFont* font)
 {
-	g_backend->DrawText(reason, object, position, text, textLen, color, font);
+	return g_backend->DrawText(reason, position, text, textLen, color, font);
+}
+
+namespace mgf
+{
+	void BackendGDI_onDrawText(
+		int reason,
+		struct mgTextProcessor_s* tp,
+		mgPoint* position,
+		const mgUnicodeChar* text,
+		size_t textLen,
+		struct mgColor_s* c)
+	{
+		g_backendGDI->OnDrawText(reason, position, text, textLen, c);
+	}
+	struct mgFont_s* BackendGDI_onFont(
+		int reason,
+		struct mgTextProcessor_s* tp,
+		mgUnicodeChar c)
+	{
+		return g_backendGDI->m_textProcessor->OnFont(reason, c);
+	}
+	struct mgColor_s* BackendGDI_onColor(
+		int reason,
+		struct mgTextProcessor_s* tp,
+		mgUnicodeChar c,
+		struct mgStyle_s* s)
+	{
+		return g_backendGDI->m_textProcessor->OnColor(reason, c, s);
+	}
+	void BackendGDI_onGetTextSize(
+		int reason,
+		struct mgTextProcessor_s* tp,
+		const mgUnicodeChar* text,
+		size_t textLen,
+		mgPoint* p)
+	{
+		g_backendGDI->m_textProcessor->OnGetTextSize(reason, text, textLen, p);
+	}
 }
 
 void BackendGDI_drawLine(
@@ -177,8 +215,45 @@ void BackendGDI_updateBackBuffer()
 //	ReleaseDC(hWnd, dc);
 //}
 
+namespace mgf
+{
+	class TextProcessor_GDI : public TextProcessor
+	{
+	public:
+		TextProcessor_GDI()
+		{
+			m_tp = mgCreateTextProcessor((mgVideoDriverAPI*)g_backendGDI->m_gpu);
+			m_tp->onDrawText = BackendGDI_onDrawText;
+			m_tp->onFont = BackendGDI_onFont;
+			m_tp->onColor = BackendGDI_onColor;
+			m_tp->onGetTextSize = BackendGDI_onGetTextSize;
+		}
+		virtual ~TextProcessor_GDI()
+		{
+			if(m_tp) mgDestroyTextProcessor(m_tp);
+		}
+
+		virtual mgFont_s* OnFont(int reason, mgUnicodeChar c) override
+		{
+			return 0;
+		}
+
+		virtual mgColor* OnColor(int reason, mgUnicodeChar c, mgStyle_s* s) override
+		{
+			return 0;
+		}
+
+		virtual void OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p) override
+		{
+
+		}
+
+	};
+}
+
 BackendGDI::BackendGDI()
 {
+	g_backendGDI = this;
 	GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
 
 	m_getTextSize = BackendGDI_getTextSize;
@@ -190,6 +265,7 @@ BackendGDI::BackendGDI()
 	((mgVideoDriverAPI*)m_gpu)->endDraw = BackendGDI_endDraw;
 	((mgVideoDriverAPI*)m_gpu)->drawRectangle = BackendGDI_drawRectangle;
 	((mgVideoDriverAPI*)m_gpu)->drawText = BackendGDI_drawText;
+	((mgVideoDriverAPI*)m_gpu)->drawLine = BackendGDI_drawLine;
 	((mgVideoDriverAPI*)m_gpu)->setClipRect = BackendGDI_setClipRect;
 	((mgVideoDriverAPI*)m_gpu)->setCurrentWindow = BackendGDI_setCurrentWindow;
 	((mgVideoDriverAPI*)m_gpu)->updateBackBuffer = BackendGDI_updateBackBuffer;
@@ -198,6 +274,8 @@ BackendGDI::BackendGDI()
 	blackImage->Create(20, 20, mgColor(0xff020202));
 	blackBitmap = new Gdiplus::Bitmap(blackImage->GetWidth(), blackImage->GetHeight(), blackImage->GetPitch(), 
 		PixelFormat32bppARGB, blackImage->GetData());
+
+	m_textProcessor = new TextProcessor_GDI();
 }
 
 BackendGDI::~BackendGDI()
@@ -597,7 +675,7 @@ void BackendGDI::DrawRectangle(int reason, void* object, mgRect* rct, mgColor* c
 	SelectClipRgn(m_currWindow->m_OSData->hdcMem, 0);
 }
 
-void BackendGDI::DrawText(int reason, void* object, mgPoint* position, const wchar_t* text, int textLen,
+int BackendGDI::DrawText(int reason, mgPoint* position, const mgUnicodeChar* text, size_t textLen,
 	mgColor* color, mgFont* font)
 {
 	SelectObject(m_currWindow->m_OSData->hdcMem, font->implementation);
@@ -611,12 +689,39 @@ void BackendGDI::DrawText(int reason, void* object, mgPoint* position, const wch
 		m_clipRect.bottom);
 
 	SelectClipRgn(m_currWindow->m_OSData->hdcMem, rgn);
-	TextOutW(m_currWindow->m_OSData->hdcMem,
+
+	/*TextOutW(m_currWindow->m_OSData->hdcMem,
 		position->x, 
 		position->y, 
-		text, textLen);
+		text, textLen);*/
+	static std::wstring wstr;
+	wstr.clear();
+	mgUnicodeUC uc;
+	for (size_t i = 0; i < textLen; ++i)
+	{
+		mgUnicodeChar c = text[i];
+		if (c >= 0x32000)
+			c = '?';
+		uc.integer = mgGetUnicodeTable()[c].m_utf16;
+
+		// GDI can't draw 4 bytes unicode :( or idk how to
+
+		if (uc.shorts[0])
+			wstr.push_back(uc.shorts[0]);
+		if (uc.shorts[1])
+			wstr.push_back(uc.shorts[1]);
+	}
+
+	TextOutW(m_currWindow->m_OSData->hdcMem, position->x, position->y,
+		wstr.c_str(),
+		wstr.size());
+
+	SIZE s;
+	GetTextExtentPoint32W(m_currWindow->m_OSData->hdcMem, wstr.c_str(), wstr.size(), &s);
+
 	DeleteObject(rgn);
 	SelectClipRgn(m_currWindow->m_OSData->hdcMem, 0);
+	return s.cx;
 }
 
 void BackendGDI::DrawLine(
@@ -808,6 +913,15 @@ void BackendGDI::UpdateTexture(mgTexture* t, mgImage* img)
 		++pixelRGBA8_src;
 		++pixelRGBA8_dst;
 	}
+}
+
+void BackendGDI::OnDrawText(int reason,
+	mgPoint* position, 
+	const mgUnicodeChar* text, 
+	size_t textLen, 
+	struct mgColor_s* c)
+{
+
 }
 
 #endif

@@ -121,10 +121,14 @@ namespace mgf
 		/// </summary>
 		virtual void ToTop();
 
+		virtual void SetTextProcessor(TextProcessor*);
+		virtual TextProcessor* GetTextProcessor();
+
 	protected:
 		mgElement_s* m_element = 0;
 		void* m_userData = 0;
 		Alignment m_alignment = LeftTop;
+		TextProcessor* m_textProcessor;
 
 		void PostInit();
 	};

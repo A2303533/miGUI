@@ -33,19 +33,20 @@
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 #include "framework/Table.h"
+#include "framework/TextProcessor.h"
 
 using namespace mgf;
 
 extern Backend* g_backend;
 
-int Table_onDrawRow(struct mgElement_s*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen);
+int Table_onDrawRow(struct mgElement_s*, void* row, uint32_t col, mgUnicodeChar** text, size_t* textlen);
 int Table_onIsRowSelected(struct mgElement_s*, void* row);
 void Table_onRowClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t mouseButton);
 int Table_onCellClick(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex, uint32_t mouseButton);
-const wchar_t* Table_onCellTextInputActivate(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
-wchar_t Table_onCellTextInputCharEnter(struct mgElement_s*, wchar_t c);
-int Table_onCellTextInputEndEdit(struct mgElement_s*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
-const wchar_t* Table_onColTitleText(struct mgElement_s*, uint32_t* textLen, uint32_t colIndex);
+const mgUnicodeChar* Table_onCellTextInputActivate(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
+mgUnicodeChar Table_onCellTextInputCharEnter(struct mgElement_s*, mgUnicodeChar c);
+int Table_onCellTextInputEndEdit(struct mgElement_s*, int type, const mgUnicodeChar* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex);
+const mgUnicodeChar* Table_onColTitleText(struct mgElement_s*, size_t* textLen, uint32_t colIndex);
 void Table_onColTitleClick(struct mgElement_s*, uint32_t colIndex, uint32_t mouseButton);
 int Table_onGetUserElementNum(struct mgElement_s*, void* row, uint32_t rowIndex, uint32_t colIndex);
 struct mgElement_s* Table_onGetUserElement(struct mgElement_s*, uint32_t index, void* row, uint32_t rowIndex, uint32_t colIndex);
@@ -58,10 +59,17 @@ Table::Table(Window* w, uint32_t colNum)
 	mgPointSet(&p, 0, 0);
 	
 	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
-	m_element = mgCreateTable(w->m_window, &p, &p, 0, 0, colNum, fi->m_font);
+#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
+
+	this->SetTextProcessor(g_backend->GetTextProcessor());
+
+	m_element = mgCreateTable(w->m_window, &p, &p, 0, 0, colNum, m_textProcessor->GetTextProcessor());
+
 	m_element->userData = this;
 	m_elementTable = (mgElementTable*)m_element->implementation;
+	
 	m_elementTable->onDrawRow = Table_onDrawRow;
+
 	m_elementTable->onIsRowSelected = Table_onIsRowSelected;
 	m_elementTable->onRowClick = Table_onRowClick;
 	m_elementTable->onCellClick = Table_onCellClick;
@@ -116,7 +124,8 @@ void Table::SetData(void** arr, uint32_t arrSz)
 
 void Table::SetFont(Font* f)
 {
-	m_elementTable->font = ((FontImpl*)f)->m_font;
+	//m_elementTable->font = ((FontImpl*)f)->m_font;
+#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
 }
 
 void Table::SetDrawItemBG(bool v)
@@ -131,7 +140,7 @@ void Table::SetTextInputCharLimit(uint32_t i)
 	ti->charLimit = i;
 }
 
-int Table_onDrawRow(struct mgElement_s* e, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
+int Table_onDrawRow(struct mgElement_s* e, void* row, uint32_t col, mgUnicodeChar** text, size_t* textlen)
 {
 	Table* tb = (Table*)e->userData;
 
@@ -156,19 +165,19 @@ int Table_onCellClick(struct mgElement_s* e, void* row, uint32_t rowIndex, uint3
 	return tb->OnCellClick(tb, row, rowIndex, colIndex, mouseButton, e->window->context->input);
 }
 
-const wchar_t* Table_onCellTextInputActivate(struct mgElement_s* e, void* row, uint32_t rowIndex, uint32_t colIndex)
+const mgUnicodeChar* Table_onCellTextInputActivate(struct mgElement_s* e, void* row, uint32_t rowIndex, size_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
 	return tb->OnCellTextInputActivate(tb, row, rowIndex, colIndex);
 }
 
-wchar_t Table_onCellTextInputCharEnter(struct mgElement_s* e, wchar_t c)
+mgUnicodeChar Table_onCellTextInputCharEnter(struct mgElement_s* e, wchar_t c)
 {
 	Table* tb = (Table*)e->userData;
 	return tb->OnCellTextInputCharEnter(tb, c);
 }
 
-int Table_onCellTextInputEndEdit(struct mgElement_s* e, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex)
+int Table_onCellTextInputEndEdit(struct mgElement_s* e, int type, const mgUnicodeChar* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
 	return tb->OnCellTextInputEndEdit(tb, type, textinputText, row, rowIndex, colIndex);
@@ -186,7 +195,7 @@ void Table::SetRowHeight(uint32_t i)
 	m_elementTable->rowHeight = i;
 }
 
-const wchar_t* Table_onColTitleText(struct mgElement_s* e, uint32_t* textLen, uint32_t colIndex)
+const mgUnicodeChar* Table_onColTitleText(struct mgElement_s* e, size_t* textLen, uint32_t colIndex)
 {
 	Table* tb = (Table*)e->userData;
 	return tb->OnColTitleText(tb, textLen, colIndex);
@@ -236,7 +245,7 @@ int* Table::GetColSizes()
 	return m_elementTable->colsSizes;
 }
 
-int Table::OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
+int Table::OnDrawRow(Table*, void* row, uint32_t col, mgUnicodeChar** text, size_t* textlen)
 {
 	return 1;
 }
@@ -255,22 +264,22 @@ int Table::OnCellClick(Table*, void* row, uint32_t rowIndex, uint32_t colIndex, 
 	return 0;
 }
 
-const wchar_t* Table::OnCellTextInputActivate(Table*, void* row, uint32_t rowIndex, uint32_t colIndex)
+const mgUnicodeChar* Table::OnCellTextInputActivate(Table*, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	return 0;
 }
 
-wchar_t Table::OnCellTextInputCharEnter(Table*, wchar_t c)
+mgUnicodeChar Table::OnCellTextInputCharEnter(Table*, mgUnicodeChar c)
 {
 	return c;
 }
 
-int Table::OnCellTextInputEndEdit(Table*, int type, const wchar_t* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex)
+int Table::OnCellTextInputEndEdit(Table*, int type, const mgUnicodeChar* textinputText, void* row, uint32_t rowIndex, uint32_t colIndex)
 {
 	return 1;
 }
 
-const wchar_t* Table::OnColTitleText(Table*, uint32_t* textLen, uint32_t colIndex)
+const mgUnicodeChar* Table::OnColTitleText(Table*, size_t* textLen, uint32_t colIndex)
 {
 	return 0;
 }

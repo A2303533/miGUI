@@ -209,7 +209,7 @@ public:
 	mgf::GS* m_gs = 0;
 	mgf::Backend* m_backend = 0;
 	mgf::Context* m_GUIContext = 0;
-	mgf::Font* m_menuFont = 0;
+	//mgf::Font* m_menuFont = 0;
 	mgf::Rectangle* m_renderRect = 0;
 
 	mgf::Image* m_GDIRenderTextureImage = 0;
@@ -287,17 +287,17 @@ WindowMainMenu::WindowMainMenu(ModelEditor* app)
 #endif
 
 #ifndef DEMO_NATIVE_WIN32MENU
-	UseMenu(true, useSystemWindowMenu, app->m_menuFont);
-	BeginMenu(L"File");
+	UseMenu(true, useSystemWindowMenu);
+	BeginMenu(U"File");
 	{
 		AddMenuItem(0, 0);
-		AddMenuItem(L"Exit", WindowMainMenu::MenuItemID_File_Exit);
+		AddMenuItem(U"Exit", WindowMainMenu::MenuItemID_File_Exit);
 		EndMenu();
 	}
-	BeginMenu(L"View");
+	BeginMenu(U"View");
 	{
 		AddMenuItem(0, 0);
-		AddMenuItem(L"Reset camera", 0);
+		AddMenuItem(U"Reset camera", 0);
 		EndMenu();
 	}
 	RebuildMenu();
@@ -344,10 +344,11 @@ bool ModelEditor::Init()
 	
 	m_backend = new mgf::BackendGDI();
 	m_GUIContext = m_framework->CreateContext(m_windowMain, m_backend);
-	if (std::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))
+	
+	/*if (std::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))
 		m_menuFont = m_backend->CreateFontPrivate(L"..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf", 11, false, false, L"LT Internet");
 	else
-		m_menuFont = m_backend->CreateFont(L"Arial", 11, false, false);
+		m_menuFont = m_backend->CreateFont(L"Arial", 11, false, false);*/
 
 	m_windowMain->OnSize();
 
@@ -362,7 +363,7 @@ bool ModelEditor::Init()
 	m_gs = gsd3d11;
 
 	m_windowMenu = new WindowMainMenu(this);
-	m_textFPS = new mgf::Text(m_windowMenu, L"FPS:", m_menuFont);
+	m_textFPS = new mgf::Text(m_windowMenu, U"FPS:");
 	m_textFPS->SetPosition(0, 0);
 
 #ifdef DEMO_NATIVE_WIN32MENU

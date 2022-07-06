@@ -36,6 +36,7 @@
 #include "framework/Window.h"
 #include "framework/FontImpl.h"
 #include "framework/Popup.h"
+#include "framework/TextProcessor.h"
 
 using namespace mgf;
 
@@ -56,7 +57,7 @@ Context::Context(mgf::SystemWindow* sysWnd, Backend* backend)
 
 	mgVideoDriverAPI* gpu = (mgVideoDriverAPI*)backend->GetVideoDriverAPI();
 	m_gui_context = mgCreateContext(gpu, m_input);
-	m_gui_context->getTextSize = m_backend->m_getTextSize;
+	//m_gui_context->getTextSize = m_backend->m_getTextSize;
 
 	m_gui_context->systemWindowData = *sysWnd->GetOSData();
 
@@ -184,7 +185,7 @@ mgf::Backend* Context::GetBackend()
 
 void Context::SetDefaultPopupFont(Font* f)
 {
-	m_gui_context->defaultPopupFont = ((mgf::FontImpl*)f)->m_font;
+	//m_gui_context->defaultPopupFont = ((mgf::FontImpl*)f)->m_font;
 }
 
 Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize, bool useSystemWindow)
@@ -198,7 +199,8 @@ Popup* Context::CreatePopup(Font* f, mgPopupItemInfo_s* arr, int arrSize, bool u
 	if (useSystemWindow)
 		flags |= mgPopupFlags_systemWindow;
 
-	newPopup->m_implementation = mgCreatePopup(m_gui_context, arr, arrSize, fontImpl->m_font, flags);
+	
+	newPopup->m_implementation = mgCreatePopup(m_gui_context, arr, arrSize, flags, m_backend->GetTextProcessor()->GetTextProcessor());
 
 	return newPopup;
 }

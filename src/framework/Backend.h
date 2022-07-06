@@ -44,6 +44,9 @@ namespace mgf
 		/// For GDI its good to move it down that system menu will be draw correctly
 		/// </summary>
 		mgPoint m_endDrawIndent;
+
+		TextProcessor* m_textProcessor = 0;
+
 	public:
 
 		Backend()
@@ -82,12 +85,11 @@ namespace mgf
 			mgTexture* texture, /*optional*/
 			mgVec4* UVRegion /*optional*/
 		) = 0;
-		virtual void DrawText(
+		virtual int DrawText(
 			int reason,
-			void* object,
 			mgPoint* position,
-			const wchar_t* text,
-			int textLen,
+			const mgUnicodeChar* text,
+			size_t textLen,
 			mgColor* color,
 			mgFont* font) = 0;
 		virtual void DrawLine(
@@ -135,6 +137,11 @@ namespace mgf
 		/// </summary>
 		virtual void UpdateBackBuffer() = 0;
 		virtual void DeleteBackBuffer() = 0;
+
+		/// <summary>
+		/// Get default.
+		/// </summary>
+		virtual TextProcessor* GetTextProcessor() { return m_textProcessor; };
 	};
 }
 

@@ -27,27 +27,29 @@
 */
 
 #pragma once
-#ifndef _MGF_TEXTINPUT_H_
-#define _MGF_TEXTINPUT_H_
-
-#include "Element.h"
-
-#include <string>
+#ifndef _MGF_TEXTPROC_H_
+#define _MGF_TEXTPROC_H_
 
 namespace mgf
 {
-	class TextInput : public Element
+	/// <summary>
+	/// With this class you can set font and color for each character in text.
+	/// All elements can have TextProcessor*. By default, they use default text processor.
+	/// You must also implement OnGetTextSize because you decide what font to use and
+	///   different fonts have different sizes.
+	/// </summary>
+	class TextProcessor : public BaseClass
 	{
-		mgElementTextInput_s* m_elementText;
+	protected:
+		mgTextProcessor* m_tp = 0;
 	public:
-		TextInput(Window* w);
-		virtual ~TextInput();
+		//virtual void OnDrawText(int reason, mgUnicodeChar c) = 0;
+		virtual mgFont_s* OnFont(int reason, mgUnicodeChar c) = 0;
+		virtual mgColor* OnColor(int reason, mgUnicodeChar c, mgStyle_s* s) = 0;
+		virtual void OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p) = 0;
 
-		void SetText(const mgUnicodeChar*);
-		//void SetFont(Font*);
-
-		// 0 - no limit
-		void SetCharLimit(uint32_t);
+		mgTextProcessor* GetTextProcessor() { return m_tp; }
+		void SetTextProcessor(mgTextProcessor* tp) { m_tp = tp; }
 	};
 }
 

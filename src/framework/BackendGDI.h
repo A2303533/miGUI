@@ -58,7 +58,13 @@ namespace mgf
 	class BackendGDI : public Backend
 	{
 		friend class Context;
+		friend class TextProcessor_GDI;
 
+		friend void BackendGDI_onDrawText(int reason, struct mgTextProcessor_s* tp, mgPoint* position,
+			const mgUnicodeChar* text, size_t textLen, struct mgColor_s* c);
+		friend struct mgFont_s* BackendGDI_onFont(int reason, struct mgTextProcessor_s* tp, mgUnicodeChar c);
+		friend struct mgColor_s* BackendGDI_onColor(int reason, struct mgTextProcessor_s* tp, mgUnicodeChar c, struct mgStyle_s* s);
+		friend void BackendGDI_onGetTextSize(int reason, struct mgTextProcessor_s* tp, const mgUnicodeChar* text, size_t textLen, mgPoint* p);
 		//mgSystemWindowOSData* m_currSystemWindowOSData = 0;
 
 		mgf::SystemWindow* m_currWindow = 0;
@@ -78,6 +84,7 @@ namespace mgf
 		Image* blackImage = 0;
 		Gdiplus::Bitmap* blackBitmap = 0;
 
+		void OnDrawText(int reason, mgPoint* position, const mgUnicodeChar* text, size_t textLen, struct mgColor_s* c);
 	public:
 		BackendGDI();
 		virtual ~BackendGDI();
@@ -94,7 +101,7 @@ namespace mgf
 		virtual void DestroyTexture(mgTexture*)  override;
 		virtual void DrawRectangle(int reason,void* object,mgRect* rct,mgColor* color1,mgColor* color2,
 			mgTexture* texture,  mgVec4* UVRegion ) override;
-		virtual void DrawText(int reason,void* object,mgPoint* position,const wchar_t* text,int textLen,
+		virtual int DrawText(int reason,mgPoint* position,const mgUnicodeChar* text, size_t textLen,
 			mgColor* color, mgFont* font) override;
 		virtual void DrawLine( int reason, void* object, mgPoint* position, mgPoint* where,
 			mgColor* color, int size) override;

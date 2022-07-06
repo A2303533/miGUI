@@ -173,14 +173,15 @@ mgUnicodeStrlen(const mgUnicodeChar* str)
 	return sz;
 }
 
-void 
+int
 MG_C_DECL 
 mgUnicodeSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* fmt, ...)
 {
 	va_list vl;
 	va_start(vl, fmt);
-	mgUnicodeVSnprintf(str, sz, fmt, vl);
+	int l = mgUnicodeVSnprintf(str, sz, fmt, vl);
 	va_end(vl);
+	return l;
 }
 
 void 
@@ -725,11 +726,11 @@ mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* format, v
 					case _mgUnicode_CRT_vprintf_type_ls:
 					{
 						arg_constChar16 = va_arg(ap, wchar_t*);
-						if (arg_constChar16)
-						{
+						//if (arg_constChar16)
+						//{
 						//	fwprintf(stream, "%s", arg_constWchar);
 
-						}
+						//}
 					}break;
 					}
 
@@ -765,6 +766,146 @@ mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* format, v
 							}
 						}
 					}
+					if (arg_constChar8)
+					{
+						size_t argLen = strlen(arg_constChar8);
+						if (argLen)
+						{
+							unsigned char c1 = 0;
+							unsigned char c2 = 0;
+							unsigned char c3 = 0;
+							unsigned char c4 = 0;
+
+							for (size_t i2 = 0; i2 < argLen; ++i2)
+							{
+								c1 = arg_constChar8[i2];
+
+								if (c1 <= 0x7F)
+								{
+									FPUT_UNI(str, buffer_current_size, (mgUnicodeChar)c1, written_num, sz);
+									//Append((char32_t)c1);
+								}
+								else
+								{
+									if ((c1 & 0xE0) == 0xC0) //2 bytes
+									{
+										++i2;
+										if (i2 < argLen)
+										{
+											c2 = arg_constChar8[i2];
+											if ((c2 & 0xC0) == 0x80)
+											{
+												wchar_t wch = (c1 & 0x1F) << 6;
+												wch |= (c2 & 0x3F);
+												//Append((char32_t)wch);
+												FPUT_UNI(str, buffer_current_size, (mgUnicodeChar)wch, written_num, sz);
+											}
+										}
+									}
+									else if ((c1 & 0xF0) == 0xE0) //3
+									{
+										++i2;
+										if (i2 < argLen)
+										{
+											c2 = arg_constChar8[i2];
+											if ((c2 & 0xC0) == 0x80)
+											{
+												++i2;
+												if (i2 < argLen)
+												{
+													c3 = arg_constChar8[i2];
+													if ((c3 & 0xC0) == 0x80)
+													{
+														wchar_t wch = (c1 & 0xF) << 12;
+														wch |= (c2 & 0x3F) << 6;
+														wch |= (c3 & 0x3F);
+														//Append((char32_t)wch);
+														FPUT_UNI(str, buffer_current_size, (mgUnicodeChar)wch, written_num, sz);
+													}
+												}
+											}
+										}
+									}
+									else if ((c1 & 0xF8) == 0xF0) //4
+									{
+										++i2;
+										if (i2 < argLen)
+										{
+											c2 = arg_constChar8[i2];
+											if ((c2 & 0xC0) == 0x80)
+											{
+												++i2;
+												if (i2 < argLen)
+												{
+													c3 = arg_constChar8[i2];
+													if ((c3 & 0xC0) == 0x80)
+													{
+														++i2;
+														if (i2 < argLen)
+														{
+															c4 = arg_constChar8[i2];
+															if ((c4 & 0xC0) == 0x80)
+															{
+																uint32_t u = (c1 & 0x7) << 18;
+																u |= (c2 & 0x3F) << 12;
+																u |= (c3 & 0x3F) << 6;
+																u |= (c4 & 0x3F);
+
+																FPUT_UNI(str, buffer_current_size, (mgUnicodeChar)u, written_num, sz);
+																//	Append((char32_t)u);
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+
+								}
+							}
+						}
+					}
+					if (arg_constChar16)
+					{
+						size_t argLen = wcslen(arg_constChar16);
+						if (argLen)
+						{
+							for (size_t i2 = 0; i2 < argLen; ++i2)
+							{
+								wchar_t ch16 = arg_constChar16[i2];
+								if (ch16 < 0x80)
+								{
+									FPUT_UNI(str, buffer_current_size, (mgUnicodeChar)ch16, written_num, sz);
+								}
+								else if (ch16 < 0x800)
+								{
+									FPUT_UNI(str, buffer_current_size, (mgUnicodeChar)ch16, written_num, sz);
+									//Append((char32_t)ch16); //????
+								}
+								else if ((ch16 & 0xFC00) == 0xD800)
+								{
+									++i2;
+									if (i2 < argLen)
+									{
+										wchar_t ch16_2 = arg_constChar16[i2];
+										if ((ch16_2 & 0xFC00) == 0xDC00)
+										{
+											uint32_t u = (ch16 - 0xD800) * 0x400;
+											u += (ch16_2 - 0xDC00) + 0x10000;
+
+											FPUT_UNI(str, buffer_current_size, (mgUnicodeChar)u, written_num, sz);
+											//Append((char32_t)u);
+										}
+									}
+								}
+								else
+								{
+									FPUT_UNI(str, buffer_current_size, (mgUnicodeChar)ch16, written_num, sz);
+									//Append((char32_t)ch16);
+								}
+							}
+						}
+					}
 				}
 			}
 			return written_num ? written_num : EDOM;
@@ -796,13 +937,11 @@ mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* format, v
 
 mgTextProcessor* 
 MG_C_DECL 
-mgCreateTextProcessor(mgFont** fonts, struct mgVideoDriverAPI_s* gpu)
+mgCreateTextProcessor(struct mgVideoDriverAPI_s* gpu)
 {
-	assert(fonts);
 	assert(gpu);
 
 	mgTextProcessor* tp = calloc(1, sizeof(mgTextProcessor));
-	tp->fonts = fonts;
 	tp->gpu = gpu;
 	return tp;
 }

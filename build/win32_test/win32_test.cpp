@@ -800,7 +800,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
     g_fonts[1] = gui_createFont("Times New Roman", 0, 12);
     g_fonts[2] = gui_createFont("Noto Emoji", 0, 14);
 
-    mgTextProcessor* defaultTextProcessor = mgCreateTextProcessor(g_fonts, &gui_gpu);
+    mgTextProcessor* defaultTextProcessor = mgCreateTextProcessor(&gui_gpu);
     defaultTextProcessor->onColor = textProcessor_onColor;
     defaultTextProcessor->onDrawText = textProcessor_onDrawText;
     defaultTextProcessor->onFont = textProcessor_onFont;

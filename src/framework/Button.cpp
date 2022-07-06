@@ -30,6 +30,7 @@
 
 #include "framework/mgf.h"
 #include "framework/Window.h"
+#include "framework/TextProcessor.h"
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 #include "framework/Button.h"
@@ -41,17 +42,17 @@ extern Backend* g_backend;
 
 namespace mgf
 {
-	mgFont* Button_onFont(struct mgElement_s* e)
+	/*mgFont* Button_onFont(struct mgElement_s* e)
 	{
 		mgf::Button* btn = static_cast<mgf::Button*>(e->userData);
 		return btn->m_font;
-	}
+	}*/
 
-	const wchar_t* Button_onText(struct mgElement_s* e, size_t* textLen)
+	const mgUnicodeChar* Button_onText(struct mgElement_s* e, size_t* textLen)
 	{
 		mgf::Button* btn = static_cast<mgf::Button*>(e->userData);
-		*textLen = btn->m_text.size();
-		return btn->m_text.c_str();
+		*textLen = btn->m_text.Size();
+		return btn->m_text.Data();
 	}
 }
 
@@ -61,13 +62,15 @@ Button::Button(Window* w)
 	mgPointSet(&p, 0, 0);
 	
 	FontImpl* fi = (FontImpl*)g_backend->GetDefaultFont();
-	m_text.assign(L" ");
+	m_text.Assign(L" ", 1);
 	m_font = fi->m_font;
 
-	m_element = mgCreateButton(w->m_window, &p, &p);
+	this->SetTextProcessor(g_backend->GetTextProcessor());
+
+	m_element = mgCreateButton(w->m_window, &p, &p, m_textProcessor->GetTextProcessor());
 	m_element->userData = this;
 	m_elementButton = (mgElementButton*)m_element->implementation;
-	m_elementButton->onFont = Button_onFont;
+	//m_elementButton->onFont = Button_onFont;
 	m_elementButton->onText = Button_onText;
 	Element::PostInit();
 }
@@ -78,15 +81,65 @@ Button::~Button()
 		mgDestroyElement(m_element);
 }
 
+void Button::SetText(const char* t)
+{
+	m_text.Clear();
+	size_t slen = 0;
+	if (t)
+	{
+		slen = strlen(t);
+		if (slen)
+			m_text.Assign(t, slen);
+	}
+}
+
+void Button::SetText(const char8_t* t)
+{
+	m_text.Clear();
+	size_t slen = 0;
+	if (t)
+	{
+		slen = strlen((const char*)t);
+		if (slen)
+			m_text.Assign(t, slen);
+	}
+}
+
+void Button::SetText(const char16_t* t)
+{
+	m_text.Clear();
+	size_t slen = 0;
+	if (t)
+	{
+		slen = wcslen((const wchar_t*)t);
+		if (slen)
+			m_text.Assign(t, slen);
+	}
+}
+
+void Button::SetText(const char32_t* t)
+{
+	m_text.Clear();
+	size_t slen = 0;
+	if (t)
+	{
+		slen = mgUnicodeStrlen(t);
+		if (slen)
+			m_text.Assign(t, slen);
+	}
+}
+
+
 void Button::SetText(const wchar_t* t)
 {
-	m_text.clear();
-	int slen = 0;
+	m_text.Clear();
+	size_t slen = 0;
 	if (t)
-		slen = (int)wcslen(t);
-
-	if (slen)
-		m_text.assign(t);
+	{
+		slen = wcslen(t);
+		if (slen)
+			m_text.Assign(t, slen);
+	}
 }
 
 void Button::SetAsPush(bool v)

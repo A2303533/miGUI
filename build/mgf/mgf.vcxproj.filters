@@ -243,5 +243,11 @@
     <ClCompile Include="..\..\src\framework\WinReg.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\framework\TextProcessor.cpp">
+      <Filter>Source Files\mgf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mgUnicode.c">
+      <Filter>Source Files\migui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

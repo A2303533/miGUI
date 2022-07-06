@@ -56,10 +56,10 @@ void MG_C_DECL mgDecToHEX(uint64_t dec, char* buf, int* sz);
 	void MG_C_DECL mgUnicodeToUTF8(const mgUnicodeChar* str, char* out, size_t* lenOut);
 	void MG_C_DECL mgUnicodeToUTF16(const mgUnicodeChar* str, wchar_t* out, size_t* lenOut);
 	
-void MG_C_DECL mgUnicodeSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* fmt, ...);
-int  MG_C_DECL mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* fmt, va_list);
+	int MG_C_DECL mgUnicodeSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* fmt, ...);
+	int MG_C_DECL mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* fmt, va_list);
 
-size_t MG_C_DECL mgUnicodeStrlen(const mgUnicodeChar* str);
+	size_t MG_C_DECL mgUnicodeStrlen(const mgUnicodeChar* str);
 
 // mode: 
 //  0 - normal,  decimal
@@ -85,12 +85,10 @@ union mgUnicodeUC
 };
 
 /// <summary>
-/// All fonts now here.
 /// And functions for text.
 /// </summary>
 typedef struct mgTextProcessor_s
 {
-	struct mgFont_s** fonts;
 	struct mgVideoDriverAPI_s* gpu;
 
 	// callbacks.
@@ -108,7 +106,7 @@ typedef struct mgTextProcessor_s
 /// Create mgTextProcessor using this function;
 /// Use mgDestroyTextProcessor after using.
 /// </summary>
-mgTextProcessor* MG_C_DECL mgCreateTextProcessor(struct mgFont_s** fonts, struct mgVideoDriverAPI_s* gpu);
+mgTextProcessor* MG_C_DECL mgCreateTextProcessor(struct mgVideoDriverAPI_s* gpu);
 void MG_C_DECL mgDestroyTextProcessor(mgTextProcessor*);
 
 #if defined(__cplusplus)

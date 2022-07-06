@@ -58,7 +58,8 @@ void Popup::SetFont(Font* f)
 	if (m_type == type_migui)
 	{
 		mgPopup* popup = (mgPopup*)m_implementation;
-		popup->font = ((FontImpl*)f)->m_font;
+#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
+				//popup->font = ((FontImpl*)f)->m_font;
 	}
 }
 

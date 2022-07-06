@@ -230,6 +230,7 @@
     <ClCompile Include="..\..\src\framework\Text.cpp" />
     <ClCompile Include="..\..\src\framework\TextBuffer.cpp" />
     <ClCompile Include="..\..\src\framework\TextInput.cpp" />
+    <ClCompile Include="..\..\src\framework\TextProcessor.cpp" />
     <ClCompile Include="..\..\src\framework\Trianlge.cpp" />
     <ClCompile Include="..\..\src\framework\Unicode.cpp" />
     <ClCompile Include="..\..\src\framework\Vec.cpp" />
@@ -248,6 +249,7 @@
     <ClCompile Include="..\..\src\mgFont.c" />
     <ClCompile Include="..\..\src\mgMenu.c" />
     <ClCompile Include="..\..\src\mgPopup.c" />
+    <ClCompile Include="..\..\src\mgUnicode.c" />
     <ClCompile Include="..\..\src\mgWindow.c" />
     <ClCompile Include="..\..\src\miGUI.c" />
     <ClCompile Include="..\..\src\zlib\contrib\minizip\ioapi.c" />

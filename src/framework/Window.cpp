@@ -38,14 +38,19 @@
 #include "framework/Table.h"
 #include "framework/FontImpl.h"
 #include "framework/Icons.h"
+#include "framework/TextProcessor.h"
 
 using namespace mgf;
+extern Backend* g_backend;
 
 Window::Window(Context* ctx)
 	:m_gui_context(ctx->m_gui_context)
 {
-	m_window = mgCreateWindow(ctx->m_gui_context, 0, 0, 300, 200);
-	m_window->titlebarFont = ((mgf::FontImpl*)ctx->GetBackend()->GetDefaultFont())->m_font;
+	this->SetTextProcessor(g_backend->GetTextProcessor());
+
+	m_window = mgCreateWindow(ctx->m_gui_context, 0, 0, 300, 200, m_textProcessor->GetTextProcessor());
+	//m_window->titlebarFont = ((mgf::FontImpl*)ctx->GetBackend()->GetDefaultFont())->m_font;
+#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
 }
 
 Window::~Window()
@@ -60,15 +65,16 @@ Window::~Window()
 		mgDestroyWindow(m_window);
 }
 
-void Window::SetTitle(const wchar_t* t, Font* optionalFont)
+void Window::SetTitle(const mgUnicodeChar* t/*, Font* optionalFont*/)
 {
-	m_title.assign(t);
-	if (optionalFont)
+	if(t)
+		m_title.Assign(t, mgUnicodeStrlen(t));
+	/*if (optionalFont)
 	{
 		FontImpl* f = (FontImpl*)optionalFont;
 		m_window->titlebarFont = f->m_font;
-	}
-	mgSetWindowTitle(m_window, m_title.data());
+	}*/
+	mgSetWindowTitle(m_window, m_title.Data());
 }
 
 void Window::SetVisible(bool v)
@@ -167,7 +173,7 @@ void Window::SetDrawBGTexture(mgTexture* t)
 
 void Window::UpdateTransform()
 {
-	mgUpdateTransform_f(m_window);
+	mgUpdateTransform(m_window);
 }
 
 void Window::SetDrawBG(bool v)
@@ -315,13 +321,13 @@ void Window::SetMenuTextIndent(int val)
 		m_menu->textIndent = val;
 }
 
-void Window::UseMenu(bool v, bool useSystemWindowForPopup, Font* f)
+void Window::UseMenu(bool v, bool useSystemWindowForPopup/*, Font* f*/)
 {
-	m_menuFont = f;
+	//m_menuFont = f;
 	m_useSystemWindowForPopup = useSystemWindowForPopup;
 
-	if (m_menu)
-		m_menu->font = ((FontImpl*)f)->m_font;
+	/*if (m_menu)
+		m_menu->font = ((FontImpl*)f)->m_font;*/
 
 	if (v)
 		m_window->menu = m_menu;
@@ -397,8 +403,8 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 		info.id = curr->itemInfo.id;
 		info.isChecked = 0;
 		info.isEnabled = curr->itemInfo.enabled ? 1 : 0;
-		info.shortcutText = curr->itemInfo.shortcut_text.data();
-		info.text = curr->itemInfo.title.size() ? curr->itemInfo.title.data() : 0;
+		info.shortcutText = curr->itemInfo.shortcut_text.Data();
+		info.text = curr->itemInfo.title.Size() ? curr->itemInfo.title.Data() : 0;
 		info.type = info.text ? mgPopupItemType_default : mgPopupItemType_separator;
 
 		popupItems.push_back(info);
@@ -417,7 +423,10 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 			flags |= mgPopupFlags_systemWindow;
 		}
 
-		newPopup = mgCreatePopup(m_gui_context, popupItems.data(), (int)popupItems.size(), ((FontImpl*)m_menuFont)->m_font, flags);
+		newPopup = mgCreatePopup(m_gui_context, popupItems.data(), (int)popupItems.size(), flags, m_textProcessor->GetTextProcessor());
+#pragma message("!!!!! !!!! !!!! Probably after SetTextProcessor need to update pointers like here in popup: " __FILE__ __FUNCTION__ " LINE : ")
+
+
 		newPopup->onIsItemEnabled = Window_onIsItemEnabled;
 		newPopup->onIsItemChecked = Window_onIsItemChecked;
 		newPopup->onIsItemRadio = Window_onIsItemRadio;
@@ -464,7 +473,7 @@ void Window::RebuildMenu()
 			mii[index].popup = _menu_rebuild_createPopup(currSib->children);
 		}
 
-		mii[index].text = currSib->itemInfo.title.c_str();
+		mii[index].text = currSib->itemInfo.title.Data();
 		++index;
 
 		if (currSib == lastSib)
@@ -473,7 +482,8 @@ void Window::RebuildMenu()
 		currSib = currSib->siblings;
 	}
 
-	m_menu = mgCreateMenu(m_window->context, mii, num, ((FontImpl*)m_menuFont)->m_font);
+	m_menu = mgCreateMenu(m_window->context, mii, num, m_textProcessor->GetTextProcessor());
+#pragma message("!!!!! !!!! !!!! Probably after SetTextProcessor need to update pointers like here in menu: " __FILE__ __FUNCTION__ " LINE : ")
 	for (int i = 0; i < num; ++i)
 	{
 		m_menu->items[i].userData = this;
@@ -482,13 +492,13 @@ void Window::RebuildMenu()
 
 	delete[] mii;
 
-	UseMenu(true, m_useSystemWindowForPopup, m_menuFont);
+	UseMenu(true, m_useSystemWindowForPopup);
 }
 
 
 void Window::DeleteMenu()
 {
-	UseMenu(false, m_useSystemWindowForPopup, m_menuFont);
+	UseMenu(false, m_useSystemWindowForPopup);
 	if (m_menu)
 		mgDestroyMenu(m_menu);
 	m_menu = 0;
@@ -520,11 +530,12 @@ Window::_menuTreeNode* Window::_menu_getLastSibling(_menuTreeNode* node, int* nu
 	return node;
 }
 
-void Window::BeginMenu(const wchar_t* title, uint32_t id)
+void Window::BeginMenu(const mgUnicodeChar* title, uint32_t id)
 {
 	_menuTreeNode* newNode = new _menuTreeNode;
 	newNode->itemInfo.id = id;
-	newNode->itemInfo.title = title;
+	if(title)
+		newNode->itemInfo.title.Assign(title, mgUnicodeStrlen(title));
 	if (!m_menuTree.m_root)
 	{
 		m_menuTree.m_root = newNode;
@@ -541,9 +552,9 @@ void Window::BeginMenu(const wchar_t* title, uint32_t id)
 
 void Window::_menu_addMenuItem(
 	bool isSub, 
-	const wchar_t* title, 
+	const mgUnicodeChar* title,
 	uint32_t id, 
-	const wchar_t* shortcut_text, 
+	const mgUnicodeChar* shortcut_text,
 	bool enabled)
 {
 	_menuPopupItemInfo info;
@@ -551,8 +562,10 @@ void Window::_menu_addMenuItem(
 	info.icon = 0;
 	info.icon_index = 0;
 	info.id = id;
-	info.shortcut_text = shortcut_text;
-	info.title = title;
+	if(shortcut_text)
+		info.shortcut_text.Assign(shortcut_text, mgUnicodeStrlen(shortcut_text));
+	if(title)
+		info.title.Assign(title, mgUnicodeStrlen(title));
 
 	_menuTreeNode* newNode = new _menuTreeNode;
 	newNode->itemInfo = info;
@@ -578,7 +591,7 @@ void Window::_menu_addMenuItem(
 }
 
 void Window::BeginSubMenu(
-	const wchar_t* title, 
+	const mgUnicodeChar* title, 
 	uint32_t id,
 	bool enabled)
 {	
@@ -592,9 +605,9 @@ void Window::EndSubMenu()
 }
 
 void Window::AddMenuItem(
-	const wchar_t* title, 
+	const mgUnicodeChar* title,
 	uint32_t id,
-	const wchar_t* shortcut_text)
+	const mgUnicodeChar* shortcut_text)
 {
 	_menu_addMenuItem(false, title, id, shortcut_text, true);
 }
@@ -634,5 +647,15 @@ mgRect* Window::GetMenuRect()
 const mgRect& Window::GetRect()
 {
 	return m_window->rect;
+}
+
+TextProcessor* Window::GetTextProcessor()
+{
+	return m_textProcessor;
+}
+
+void Window::SetTextProcessor(TextProcessor* tp)
+{
+	m_textProcessor = tp;
 }
 

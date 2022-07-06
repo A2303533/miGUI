@@ -33,20 +33,22 @@
 #include "framework/Font.h"
 #include "framework/FontImpl.h"
 #include "framework/TextInput.h"
+#include "framework/TextProcessor.h"
 
 using namespace mgf;
+extern Backend* g_backend;
 
-TextInput::TextInput(Window* w, Font* f)
+TextInput::TextInput(Window* w)
 :
 m_elementText(0)
 {
 	assert(w);
-	assert(f);
 
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
+	this->SetTextProcessor(g_backend->GetTextProcessor());
 
-	m_element = mgCreateTextInput(w->m_window, &p, &p, ((FontImpl*)f)->m_font);
+	m_element = mgCreateTextInput(w->m_window, &p, &p, m_textProcessor->GetTextProcessor());
 	m_elementText = (mgElementTextInput_s*)m_element->implementation;
 
 	Element::PostInit();
@@ -58,15 +60,15 @@ TextInput::~TextInput()
 		mgDestroyElement(m_element);
 }
 
-void TextInput::SetText(const wchar_t* text)
+void TextInput::SetText(const mgUnicodeChar* text)
 {
 	mgTextInputSetText(m_elementText, text);
 }
 
-void TextInput::SetFont(Font* f)
-{
-	m_elementText->font = ((FontImpl*)f)->m_font;
-}
+//void TextInput::SetFont(Font* f)
+//{
+//	m_elementText->font = ((FontImpl*)f)->m_font;
+//}
 
 void TextInput::SetCharLimit(uint32_t i)
 {

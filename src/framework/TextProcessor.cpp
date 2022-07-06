@@ -26,29 +26,12 @@
   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-#ifndef _MGF_TEXTINPUT_H_
-#define _MGF_TEXTINPUT_H_
+#include "miGUI.h"
 
-#include "Element.h"
+#include "framework/mgf.h"
+#include "framework/TextProcessor.h"
 
-#include <string>
+using namespace mgf;
 
-namespace mgf
-{
-	class TextInput : public Element
-	{
-		mgElementTextInput_s* m_elementText;
-	public:
-		TextInput(Window* w);
-		virtual ~TextInput();
+//extern Backend* g_backend;
 
-		void SetText(const mgUnicodeChar*);
-		//void SetFont(Font*);
-
-		// 0 - no limit
-		void SetCharLimit(uint32_t);
-	};
-}
-
-#endif

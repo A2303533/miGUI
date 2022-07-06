@@ -67,20 +67,17 @@ namespace mgf
 	/// </summary>
 	class UnicodeString
 	{
-	public:
-		using char_type = uint32_t;
-
 	private:
-		char_type* m_data = 0;
+		mgUnicodeChar* m_data = 0;
 		size_t m_size = 0;
 		size_t m_allocated = 0;
 
 		void reallocate(size_t new_allocated)
 		{
-			char_type* new_data = (char_type*)std::malloc(new_allocated * sizeof(char_type));
+			mgUnicodeChar* new_data = (mgUnicodeChar*)std::malloc(new_allocated * sizeof(mgUnicodeChar));
 			if (m_data)
 			{
-				std::memcpy(new_data, m_data, m_size * sizeof(char_type));
+				std::memcpy(new_data, m_data, m_size * sizeof(mgUnicodeChar));
 				std::free(m_data);
 			}
 			else
@@ -115,6 +112,9 @@ namespace mgf
 				delete[] m_data;
 		}
 
+		/// <summary>
+		/// Always do this if(str) a.Assign(str, len);
+		/// </summary>
 		void Assign(const char* str, size_t len);
 		void Assign(const wchar_t* str, size_t len);
 		void Assign(const char8_t* str, size_t len);
@@ -128,10 +128,12 @@ namespace mgf
 		void Assign(const std::wstring& str);
 		void Assign(const std::u16string& str);
 		void Assign(const std::u32string& str);
+		void Assign(const UnicodeString& str);
 
 		void Clear();
-		size_t Size();
-		const char_type* Data();
+		size_t Size() const;
+		const mgUnicodeChar* Data() const;
+		mgUnicodeChar* Data();
 
 		void Append(char c);
 		void Append(wchar_t c);
@@ -151,6 +153,11 @@ namespace mgf
 		void Append(const std::wstring& str);
 		void Append(const std::u16string& str);
 		void Append(const std::u32string& str);
+		void Append(const UnicodeString& str);
+		void Append(uint32_t);
+		void Append(int32_t);
+		void Append(float);
+		void Append(double);
 
 		void Get(StringA& str);
 		void Get(StringW& str);
@@ -160,6 +167,9 @@ namespace mgf
 		void Get(std::wstring& str);
 		void Get(std::u16string& str);
 		void Get(std::u32string& str);
+
+		void PopBack();
+		void PopBackBefore(mgUnicodeChar before_this);
 	};
 }
 

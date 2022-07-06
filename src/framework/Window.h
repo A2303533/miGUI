@@ -31,6 +31,7 @@
 #define _MGF_WINDOW_H_
 
 #include "forward.h"
+#include "Unicode.h"
 
 #include <string>
 #include <vector>
@@ -52,7 +53,7 @@ namespace mgf
 
 	protected:
 		mgWindow_s* m_window = 0;
-		std::basic_string<wchar_t> m_title;
+		UnicodeString m_title;
 		std::vector<Element*> m_elements;
 
 		mgMenu_s* m_menu = 0;
@@ -62,13 +63,13 @@ namespace mgf
 		};
 		std::vector<_menuItem> m_menuItems;
 		_menuItem m_menu_currItem;*/
-		Font* m_menuFont = 0;
+		//Font* m_menuFont = 0;
 
 		struct _menuPopupItemInfo
 		{
-			StringW title;
+			UnicodeString title;
 			uint32_t id = 0;
-			StringW shortcut_text;
+			UnicodeString shortcut_text;
 			bool enabled = true;
 			Icons* icon = 0;
 			uint32_t icon_index = 0;
@@ -97,15 +98,16 @@ namespace mgf
 		_menuTreeNode* _menu_getLastSibling(_menuTreeNode*, int* num);
 		std::vector<_menuTreeNode*> m_menuNodes; // for easy delete
 		mgPopup_s* _menu_rebuild_createPopup(_menuTreeNode*);
-		void _menu_addMenuItem(bool isSub, const wchar_t* title, uint32_t id, const wchar_t* shortcut_text, bool enabled);
+		void _menu_addMenuItem(bool isSub, const mgUnicodeChar* title, uint32_t id, const mgUnicodeChar* shortcut_text, bool enabled);
 
 		bool m_isVisible = true;
 		bool m_useSystemWindowForPopup = false;
+		TextProcessor* m_textProcessor = 0;
 	public:
 		Window(Context*);
 		virtual ~Window();
 
-		void SetTitle(const wchar_t* t, Font* optionalFont);
+		void SetTitle(const mgUnicodeChar* t/*, Font* optionalFont*/);
 		
 		void SetVisible(bool);
 		bool IsVisible();
@@ -131,15 +133,15 @@ namespace mgf
 		mgRect* GetMenuRect();
 		const mgRect& GetRect();
 
-		void UseMenu(bool useornot, bool useSystemWindowForPopup, Font*);
+		void UseMenu(bool useornot, bool useSystemWindowForPopup/*, Font**/);
 		void RebuildMenu();
 		void DeleteMenu();
-		void BeginMenu(const wchar_t* title, uint32_t id = 0);
+		void BeginMenu(const mgUnicodeChar* title, uint32_t id = 0);
 
 		// for separator use 0 for title
 		// for Enabled/Disabled use OnIsMenuItemEnabled
-		void AddMenuItem(const wchar_t* title, uint32_t id, const wchar_t* shortcut_text = 0);
-		void BeginSubMenu(const wchar_t* title, uint32_t id, bool enabled = true);
+		void AddMenuItem(const mgUnicodeChar* title, uint32_t id, const mgUnicodeChar* shortcut_text = 0);
+		void BeginSubMenu(const mgUnicodeChar* title, uint32_t id, bool enabled = true);
 		void EndSubMenu();
 		void EndMenu();
 
@@ -187,6 +189,9 @@ namespace mgf
 		void UpdateTransform();
 
 		void SetUserStyle(mgStyle_s*);
+
+		TextProcessor* GetTextProcessor();
+		void SetTextProcessor(TextProcessor*);
 	};
 }
 

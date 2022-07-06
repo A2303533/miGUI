@@ -388,18 +388,28 @@ void UnicodeString::Assign(const std::u32string& str)
 	Assign(str.data(), str.size());
 }
 
+void UnicodeString::Assign(const UnicodeString& str)
+{
+	Assign(str.m_data, str.m_size);
+}
+
 void UnicodeString::Clear()
 {
 	m_size = 0;
 	m_data[0] = 0;
 }
 
-size_t UnicodeString::Size()
+size_t UnicodeString::Size() const
 {
 	return m_size;
 }
 
-const UnicodeString::char_type* UnicodeString::Data()
+const mgUnicodeChar* UnicodeString::Data() const
+{
+	return m_data;
+}
+
+mgUnicodeChar* UnicodeString::Data()
 {
 	return m_data;
 }
@@ -434,7 +444,7 @@ void UnicodeString::Append(char32_t c)
 	m_data[m_size] = c;
 
 	m_size = new_size;
-	m_data[m_size] = static_cast<char_type>(0x0);
+	m_data[m_size] = static_cast<mgUnicodeChar>(0x0);
 }
 
 void UnicodeString::Append(const char* str, size_t len)
@@ -533,7 +543,6 @@ void UnicodeString::Append(const char8_t* str, size_t len)
 					}
 				}
 			}
-
 		}
 	}
 }
@@ -621,6 +630,11 @@ void UnicodeString::Append(const std::u32string& str)
 	Append(str.data(), str.size());
 }
 
+void UnicodeString::Append(const UnicodeString& str)
+{
+	Append(str.Data(), str.Size());
+}
+
 void UnicodeString::Get(StringA& str)
 {
 	str.clear();
@@ -628,7 +642,7 @@ void UnicodeString::Get(StringA& str)
 	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
-		char_type c = m_data[i];
+		mgUnicodeChar c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 		
@@ -648,7 +662,7 @@ void UnicodeString::Get(StringW& str)
 	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
-		char_type c = m_data[i];
+		mgUnicodeChar c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
@@ -666,7 +680,7 @@ void UnicodeString::Get(StringU8& str)
 	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
-		char_type c = m_data[i];
+		mgUnicodeChar c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
@@ -686,7 +700,7 @@ void UnicodeString::Get(StringU16& str)
 	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
-		char_type c = m_data[i];
+		mgUnicodeChar c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
@@ -704,7 +718,7 @@ void UnicodeString::Get(std::string& str)
 	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
-		char_type c = m_data[i];
+		mgUnicodeChar c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
@@ -724,7 +738,7 @@ void UnicodeString::Get(std::wstring& str)
 	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
-		char_type c = m_data[i];
+		mgUnicodeChar c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
@@ -742,7 +756,7 @@ void UnicodeString::Get(std::u16string& str)
 	auto ut = mgGetUnicodeTable();
 	for (size_t i = 0; i < m_size; ++i)
 	{
-		char_type c = m_data[i];
+		mgUnicodeChar c = m_data[i];
 		if (c >= 0x32000)
 			c = '?';
 
@@ -762,3 +776,58 @@ void UnicodeString::Get(std::u32string& str)
 	}
 }
 
+void UnicodeString::PopBack()
+{
+	if (m_size)
+	{
+		--m_size;
+		m_data[m_size] = 0;
+	}
+}
+
+void UnicodeString::PopBackBefore(mgUnicodeChar before_this)
+{
+	if (Size())
+		PopBack();
+
+	if (Size())
+	{
+		for (size_t i = Size() - 1u; i >= 0u; --i)
+		{
+			if (m_data[i] == before_this)
+				break;
+			else
+				PopBack();
+			if (!i)
+				break;
+		}
+	}
+}
+
+void UnicodeString::Append(uint32_t v)
+{
+	mgUnicodeChar buf[20];
+	int l = mgUnicodeSnprintf(buf, 20, U"%u", v);
+	Append(buf, l);
+}
+
+void UnicodeString::Append(int32_t v)
+{
+	mgUnicodeChar buf[20];
+	int l = mgUnicodeSnprintf(buf, 20, U"%i", v);
+	Append(buf, l);
+}
+
+void UnicodeString::Append(float v)
+{
+	mgUnicodeChar buf[20];
+	int l = mgUnicodeSnprintf(buf, 20, U"%f", v);
+	Append(buf, l);
+}
+
+void UnicodeString::Append(double v)
+{
+	mgUnicodeChar buf[30];
+	int l = mgUnicodeSnprintf(buf, 30, U"%f", v);
+	Append(buf, l);
+}

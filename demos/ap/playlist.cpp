@@ -4,6 +4,7 @@
 #include "framework/TextBuffer.h"
 #include "framework/Popup.h"
 #include "framework/SystemWindow.h"
+#include "framework/Unicode.h"
 #include "ap.h"
 #include "playlist.h"
 
@@ -23,36 +24,37 @@ int Playlist_onIsRowSelected(mgf::Table* tb, void* row);
 
 TableTracklist::TableTracklist(mgf::Window* w, uint32_t colNum)	:mgf::Table(w, colNum){}
 TableTracklist::~TableTracklist() {}
-const wchar_t* TableTracklist::OnColTitleText(Table*, uint32_t* textLen, uint32_t colIndex)
+const mgUnicodeChar* TableTracklist::OnColTitleText(Table*, size_t* textLen, uint32_t colIndex)
 {
 	switch (colIndex)
 	{
 	case 0:
 		*textLen = 7;
-		return L"Playing";
+		return U"Playing";
 	case 1:
 		*textLen = 4;
-		return L"File";
+		return U"File";
 	case 2:
 		*textLen = 1;
-		return L"#";
+		return U"#";
 	case 3:
 		*textLen = 5;
-		return L"Title";
+		return U"Title";
 	case 4:
 		*textLen = 8;
-		return L"Duration";
+		return U"Duration";
 	}
 	return 0;
 }
-int TableTracklist::OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, uint32_t* textlen)
+int TableTracklist::OnDrawRow(Table*, void* row, uint32_t col, mgUnicodeChar** text, size_t* textlen)
 {
 	if (row)
 	{
-		static mgf::StringW playingText = L"*";
+		static mgf::UnicodeString playingText;
+		playingText.Assign(U"*", 1);
 
 		PlaylistNode* nd = (PlaylistNode*)row;
-		static mgf::StringW textBuffer;
+		static mgf::UnicodeString textBuffer;
 		// col is where you want to show text for current row
 		switch (col)
 		{
@@ -60,10 +62,10 @@ int TableTracklist::OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, u
 		{
 			if (nd->m_isPlaying)
 			{
-				textBuffer.clear();
-				textBuffer += playingText.data();
-				*text = textBuffer.data();
-				*textlen = textBuffer.size();
+				textBuffer.Clear();
+				textBuffer.Append(playingText);
+				*text = textBuffer.Data();
+				*textlen = textBuffer.Size();
 			}
 			else
 			{
@@ -72,26 +74,26 @@ int TableTracklist::OnDrawRow(Table*, void* row, uint32_t col, wchar_t** text, u
 			}
 		}break;
 		case 1:
-			*text = nd->m_audioFilePath.data();
-			*textlen = nd->m_audioFilePath.size();
+			*text = nd->m_audioFilePath.Data();
+			*textlen = nd->m_audioFilePath.Size();
 			break;
 		case 2:
-			textBuffer.clear();
-			textBuffer += nd->m_info_number.data();
-			*text = textBuffer.data();
-			*textlen = textBuffer.size();
+			textBuffer.Clear();
+			textBuffer.Append(nd->m_info_number.data(), nd->m_info_number.size());
+			*text = textBuffer.Data();
+			*textlen = textBuffer.Size();
 			break;
 		case 3:
-			textBuffer.clear();
-			textBuffer += nd->m_info_title.data();
-			*text = textBuffer.data();
-			*textlen = textBuffer.size();
+			textBuffer.Clear();
+			textBuffer.Append(nd->m_info_title.data(), nd->m_info_title.size());
+			*text = textBuffer.Data();
+			*textlen = textBuffer.Size();
 			break;
 		case 4:
-			textBuffer.clear();
-			textBuffer += nd->m_info_duration.data();
-			*text = textBuffer.data();
-			*textlen = textBuffer.size();
+			textBuffer.Clear();
+			textBuffer.Append(nd->m_info_duration.data(), nd->m_info_duration.size());
+			*text = textBuffer.Data();
+			*textlen = textBuffer.Size();
 			break;
 		}
 
@@ -132,11 +134,11 @@ int TableTracklist::OnIsRowSelected(Table*, void* row)
 
 ListboxPlaylist::ListboxPlaylist(mgf::Window* w) :mgf::ListBox(w) {}	
 ListboxPlaylist::~ListboxPlaylist() {}
-wchar_t ListboxPlaylist::OnTextInputCharEnter(ListBox*, wchar_t c)
+mgUnicodeChar ListboxPlaylist::OnTextInputCharEnter(ListBox*, mgUnicodeChar c)
 {
 	bool good = false;
 
-	if (iswalnum(c))
+	if (iswalnum((unsigned short)c))
 		good = true;
 
 	if (!good)
@@ -148,7 +150,7 @@ wchar_t ListboxPlaylist::OnTextInputCharEnter(ListBox*, wchar_t c)
 	return good ? c : 0;
 }
 
-int ListboxPlaylist::OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, void* item)
+int ListboxPlaylist::OnTextInputEndEdit(ListBox*, int i, const mgUnicodeChar* str, void* item)
 {
 	/*
 	* i:
@@ -162,10 +164,10 @@ int ListboxPlaylist::OnTextInputEndEdit(ListBox*, int i, const wchar_t* str, voi
 	{
 		if (i == 1)
 		{
-			uint32_t len = wcslen(str);
+			uint32_t len = mgUnicodeStrlen(str);
 			if (len)
 			{
-				pl->m_name = str;
+				pl->m_name.Assign(str, len);
 				pl->RenameFile();
 			}
 		}
@@ -193,12 +195,12 @@ void ListboxPlaylist::OnItemClick(ListBox* e, void* item, uint32_t itemIndex, ui
 	}
 }
 
-int ListboxPlaylist::OnDrawItem(ListBox*, void* item, uint32_t itemIndex, wchar_t** text, uint32_t* textlen)
+int ListboxPlaylist::OnDrawItem(ListBox*, void* item, uint32_t itemIndex, mgUnicodeChar** text, size_t* textlen)
 {
 	PlayList* pl = (PlayList*)item;
 
-	*text = pl->m_name.data();
-	*textlen = pl->m_name.size();
+	*text = pl->m_name.Data();
+	*textlen = pl->m_name.Size();
 
 	return 1;
 }
@@ -230,16 +232,23 @@ void PlayList::Save()
 		uint16_t bom = 0xFEFF;
 		fwrite(&bom, 2, 1, f);
 
+		std::wstring wstr;
+		m_name.Get(wstr);
+
 		fwrite(L"n:", 2 * sizeof(wchar_t), 1, f);
-		fwrite(m_name.data(), m_name.size() * sizeof(wchar_t), 1, f);
+		if(wstr.size())
+			fwrite(wstr.data(), wstr.size() * sizeof(wchar_t), 1, f);
 		fwrite(L"\n", 1 * sizeof(wchar_t), 1, f);
 
 		mgf::StringW strForNumbers;
 
 		for (uint32_t i = 0, sz = m_nodes.size(); i < sz; ++i)
 		{
+			m_nodes[i]->m_audioFilePath.Get(wstr);
+
 			fwrite(L"t:", 2 * sizeof(wchar_t), 1, f);
-			fwrite(m_nodes[i]->m_audioFilePath.data(), m_nodes[i]->m_audioFilePath.size() * sizeof(wchar_t), 1, f);
+			if (wstr.size())
+				fwrite(wstr.data(), wstr.size() * sizeof(wchar_t), 1, f);
 			fwrite(L"\n", 1 * sizeof(wchar_t), 1, f);
 
 			strForNumbers.clear();
@@ -266,9 +275,12 @@ void PlayList::RenameFile()
 {
 	std::filesystem::path p(m_filePath.data());
 	std::filesystem::path pP = p.remove_filename();
+	
+	std::wstring wstrFromUStr;
+	m_name.Get(wstrFromUStr);
 
 	mgf::StringW newFilePath = pP.c_str();
-	newFilePath += m_name.data();
+	newFilePath += wstrFromUStr.data();
 	newFilePath += L".appl";
 	newFilePath.flip_slash();
 
@@ -280,9 +292,9 @@ void PlayList::RenameFile()
 		std::filesystem::path p = newFilePath.data();
 		std::filesystem::path fn = p.filename();
 
-		m_name = fn.c_str();
-		m_name.pop_back_before(L'.');
-		m_name.pop_back();
+		m_name.Assign(fn.c_str(), wcslen(fn.c_str()));
+		m_name.PopBackBefore('.');
+		m_name.PopBack();
 	}
 
 	std::filesystem::rename(m_filePath.data(), newFilePath.data());
@@ -307,12 +319,12 @@ PlayListManager::PlayListManager()
 
 	mgPopupItemInfo_s listboxPopupItems[] =
 	{
-		{0, L"Open", 0, Playlist_popupCb_open, mgPopupItemType_default, 0, 0, 1},
-		{0, L"Play", 0, Playlist_popupCb_play, mgPopupItemType_default, 0, 0, 1},
+		{0, U"Open", 0, Playlist_popupCb_open, mgPopupItemType_default, 0, 0, 1},
+		{0, U"Play", 0, Playlist_popupCb_play, mgPopupItemType_default, 0, 0, 1},
 		{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-		{0, L"Delete", 0, Playlist_popupCb_delete, mgPopupItemType_default, 0, 0, 1},
+		{0, U"Delete", 0, Playlist_popupCb_delete, mgPopupItemType_default, 0, 0, 1},
 		{0, 0, 0, 0, mgPopupItemType_separator, 0, 0, 1},
-		{0, L"Show in explorer", 0, Playlist_popupCb_showexpl, mgPopupItemType_default, 0, 0, 1},
+		{0, U"Show in explorer", 0, Playlist_popupCb_showexpl, mgPopupItemType_default, 0, 0, 1},
 	};
 	m_listBoxPopup = g_app->m_context->CreatePopup(g_app->m_popupFont, listboxPopupItems, 6, true);
 
@@ -517,9 +529,9 @@ void PlayListManager::LoadPlaylist(const wchar_t* pth)
 	std::filesystem::path p = pth;
 	std::filesystem::path fn = p.filename();
 
-	newPL->m_name = fn.c_str();
-	newPL->m_name.pop_back_before(L'.');
-	newPL->m_name.pop_back();
+	newPL->m_name.Assign(fn.c_str(), wcslen(fn.c_str()));
+	newPL->m_name.PopBackBefore('.');
+	newPL->m_name.PopBack();
 
 	m_playlists.emplace_back(newPL);
 
@@ -532,8 +544,8 @@ void PlayListManager::AddNew()
 
 	PlayList* newPL = new PlayList;
 	newPL->m_mgr = this;
-	newPL->m_name = L"Playlist";
-	newPL->m_name += pl_number++;
+	newPL->m_name.Assign(U"Playlist", 8);
+	newPL->m_name.Append(pl_number++);
 
 	mgf::StringW plFilePath = m_playlistDir;
 	plFilePath += newPL->m_name;

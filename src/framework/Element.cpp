@@ -336,3 +336,12 @@ void Element::ToTop()
 	mgSetParent(m_element, 0);
 }
 
+void Element::SetTextProcessor(TextProcessor* tp)
+{
+	m_textProcessor = tp;
+}
+
+TextProcessor* Element::GetTextProcessor()
+{
+	return m_textProcessor;
+}

@@ -32,29 +32,35 @@
 
 #include "Element.h"
 
-#include <string>
+#include "Unicode.h"
 
 namespace mgf
 {
 	class Text : public Element
 	{
-		std::wstring m_text;
+		UnicodeString m_text;
 		mgElementText_s* m_elementText = 0;
-		mgFont* m_font = 0;
+		//mgFont* m_font = 0;
 		mgColor m_color;
 		Window* m_window = 0;
-		friend mgColor* Text_onColor(mgElement_s* e);
-		friend mgFont* Text_onFont(struct mgElement_s* e);
-		friend const wchar_t* Text_onText(struct mgElement_s* e, size_t* textLen);
+		//friend mgColor* Text_onColor(mgElement_s* e);
+		//friend mgFont* Text_onFont(struct mgElement_s* e);
+		friend const mgUnicodeChar* Text_onText(struct mgElement_s* e, size_t* textLen);
 
 	public:
-		Text(Window* w, const wchar_t* t, Font* f);
+		Text(Window* w, const mgUnicodeChar* t);
 		virtual ~Text();
 
 		void SetText(const wchar_t*);
 		void SetText(const char*);
+		void SetText(const char8_t*);
+		void SetText(const char16_t*);
+		void SetText(const char32_t*);
 		void SetTextF(const wchar_t*, ...);
 		void SetTextF(const char*, ...);
+		void SetTextF(const char8_t*, ...);
+		void SetTextF(const char16_t*, ...);
+		void SetTextF(const char32_t*, ...);
 		void SetFont(Font*);
 		void SetPosition(mgPoint*);
 		void SetPosition(int x, int y);

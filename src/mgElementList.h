@@ -69,7 +69,7 @@ typedef struct mgElementList_s {
 	* Return 0 - no draw
 	*        1 - draw (you must set `text` and `textlen`)
 	*/
-	int(*onDrawItem)(struct mgElement_s*, void* item, uint32_t itemIndex, mgUnicodeChar** text, uint32_t* textlen);
+	int(*onDrawItem)(struct mgElement_s*, void* item, uint32_t itemIndex, mgUnicodeChar** text, size_t* textlen);
 	
 	mgUnicodeChar(*onTextInputCharEnter)(struct mgElement_s*, mgUnicodeChar);
 	int(*onTextInputEndEdit)(struct mgElement_s*, int, const mgUnicodeChar*, void* editItem);

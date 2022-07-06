@@ -89,16 +89,15 @@ void BackendOpenGL_drawRectangle(
 	g_backend->DrawRectangle(reason, object, rct, color1, color2, texture, UVRegion);
 }
 
-void BackendOpenGL_drawText(
+int BackendOpenGL_drawText(
 	int reason,
-	void* object,
 	mgPoint* position,
-	const wchar_t* text,
-	int textLen,
+	const mgUnicodeChar* text,
+	size_t textLen,
 	mgColor* color,
 	mgFont* font)
 {
-	g_backend->DrawText(reason, object, position, text, textLen, color, font);
+	return g_backend->DrawText(reason, position, text, textLen, color, font);
 }
 
 void BackendOpenGL_drawLine(
@@ -117,6 +116,31 @@ mgRect BackendOpenGL_setClipRect(mgRect* r)
 	return g_backend->SetClipRect(r);
 }
 
+mgSystemWindowOSData* BackendOpenGL_setCurrentWindow(mgSystemWindowOSData* data)
+{
+	/*if (data->userData)
+	{
+		mgf::SystemWindow* w = g_backend->SetCurrentWindow((mgf::SystemWindow*)data->userData);
+		if (w) return w->GetOSData();
+		else return 0;
+	}
+	else
+	{
+		static mgf::SystemWindow tmpWnd;
+		tmpWnd.SetOSData(data);
+
+		mgf::SystemWindow* w = g_backend->SetCurrentWindow(&tmpWnd);
+		if (w) return w->GetOSData();
+		else return 0;
+	}*/
+	return 0;
+}
+
+void BackendOpenGL_updateBackBuffer()
+{
+	g_backend->UpdateBackBuffer();
+}
+
 BackendOpenGL::BackendOpenGL(BackendOpenGLParams params)
 {
 	m_params = params;
@@ -129,7 +153,10 @@ BackendOpenGL::BackendOpenGL(BackendOpenGLParams params)
 	((mgVideoDriverAPI*)m_gpu)->endDraw = BackendOpenGL_endDraw;
 	((mgVideoDriverAPI*)m_gpu)->drawRectangle = BackendOpenGL_drawRectangle;
 	((mgVideoDriverAPI*)m_gpu)->drawText = BackendOpenGL_drawText;
+	((mgVideoDriverAPI*)m_gpu)->drawLine = BackendOpenGL_drawLine;
 	((mgVideoDriverAPI*)m_gpu)->setClipRect = BackendOpenGL_setClipRect;
+	((mgVideoDriverAPI*)m_gpu)->setCurrentWindow = BackendOpenGL_setCurrentWindow;
+	((mgVideoDriverAPI*)m_gpu)->updateBackBuffer = BackendOpenGL_updateBackBuffer;
 	
 	blackImage = new Image;
 	blackImage->Create(20, 20, mgColor(0xff020202));
@@ -350,13 +377,15 @@ void BackendOpenGL::DrawRectangle(int reason, void* object, mgRect* rct, mgColor
 	glScissor(0, 0, m_currWindow->m_size.x, m_currWindow->m_size.y);
 }
 
-void BackendOpenGL::DrawText(int reason, void* object, mgPoint* position, const wchar_t* text, int textLen,
+int BackendOpenGL::DrawText(int reason, mgPoint* position, const mgUnicodeChar* text, size_t textLen,
 	mgColor* color, mgFont* font)
 {
+	int r = 0;
+
 	mgPoint _position = *position;
-	for (int i = 0; i < textLen; ++i)
+	for (size_t i = 0; i < textLen; ++i)
 	{
-		wchar_t character = text[i];
+		mgUnicodeChar character = text[i];
 		auto glyph = font->glyphMap[character];
 		if (glyph)
 		{
@@ -393,6 +422,8 @@ void BackendOpenGL::DrawText(int reason, void* object, mgPoint* position, const 
 			glEnd();
 
 			_position.x += glyph->width + glyph->overhang + font->characterSpacing;
+			r += glyph->width + glyph->overhang + font->characterSpacing;
+
 			if (character == L' ')
 				_position.x += font->spaceSize;
 			if (character == L'\t')
@@ -431,6 +462,7 @@ void BackendOpenGL::DrawText(int reason, void* object, mgPoint* position, const 
 	SelectClipRgn(m_currWindow->m_hdcMem, 0);*/
 
 	glScissor(0,0,m_currWindow->m_size.x,m_currWindow->m_size.y);
+	return r;
 }
 
 void BackendOpenGL::DrawLine(

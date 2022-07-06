@@ -67,21 +67,10 @@ using namespace mgf;
 Backend* g_backend = 0;
 Framework* g_mgf = 0;
 
-#ifndef MG_NO_DLL
-MG_LIB_HANDLE g_migui_dll = 0;
-#endif
-
 Framework* mgf::InitFramework()
 {
 	mgf::LogWriteInfo("%s: init framework\n", MGF_FUNCTION);
 
-#ifndef MG_NO_DLL
-	g_migui_dll = mgLoad();
-	if (!g_migui_dll)
-	{
-		throw "Can't load migui.dll";
-	}
-#endif
 	g_mgf = new Framework();
 	return g_mgf;
 }
@@ -127,11 +116,6 @@ Framework::~Framework()
 		|| g_CoInitializeResult == S_FALSE)
 		OleUninitialize();
 		//CoUninitialize();
-#endif
-
-#ifndef MG_NO_DLL
-	if(g_migui_dll)
-		mgUnload(g_migui_dll);
 #endif
 }
 
