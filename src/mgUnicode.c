@@ -387,6 +387,8 @@ enum _mgUnicode_CRT_vprintf_type {
 	_mgUnicode_CRT_vprintf_type_o,
 	_mgUnicode_CRT_vprintf_type_s,
 	_mgUnicode_CRT_vprintf_type_ls,
+	_mgUnicode_CRT_vprintf_type_S, // for unicode char
+	_mgUnicode_CRT_vprintf_type_u,
 };
 //  0 - nothing, skip
 //  1 - c
@@ -399,6 +401,7 @@ enum _mgUnicode_CRT_vprintf_type {
 //  8 - o
 //  9 - s
 //  10 - ls
+//  11 - u
 // leftPads: number of ' ' or '0' to write before writing the variable
 // flags:
 //   0x1 - pads with ' '
@@ -444,6 +447,10 @@ begin:;
 			break;
 		}
 	}break;
+	case 'u':
+		++fmt;
+		*type = _mgUnicode_CRT_vprintf_type_u;
+		break;
 	case 'o':
 		++fmt;
 		*type = _mgUnicode_CRT_vprintf_type_o;
@@ -499,6 +506,10 @@ begin:;
 	case 's':
 		++fmt;
 		*type = _mgUnicode_CRT_vprintf_type_s;
+		break;
+	case 'S':
+		++fmt;
+		*type = _mgUnicode_CRT_vprintf_type_S;
 		break;
 	case 'c':
 	{
@@ -664,6 +675,12 @@ mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* format, v
 
 						arg_constChar = unicodeBuffer;
 					}break;
+					case _mgUnicode_CRT_vprintf_type_u:
+					{
+						uint32_t arg = va_arg(ap, uint32_t);
+						mgUnicodeULLTOA(arg, itoa_buffer, 30, 0);
+						arg_constChar = itoa_buffer;
+					}break;
 					case _mgUnicode_CRT_vprintf_type_d_i:
 					{
 						int arg = va_arg(ap, int);
@@ -726,11 +743,10 @@ mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* format, v
 					case _mgUnicode_CRT_vprintf_type_ls:
 					{
 						arg_constChar16 = va_arg(ap, wchar_t*);
-						//if (arg_constChar16)
-						//{
-						//	fwprintf(stream, "%s", arg_constWchar);
-
-						//}
+					}break;
+					case _mgUnicode_CRT_vprintf_type_S:
+					{
+						arg_constChar = va_arg(ap, mgUnicodeChar*);
 					}break;
 					}
 

@@ -275,8 +275,8 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 						p->textProcessor->onGetTextSize(
 							mgDrawTextReason_popupShortcut,
 							p->textProcessor,
-							p->items[i].info.text,
-							p->items[i].textLen,
+							p->items[i].info.shortcutText,
+							p->items[i].shortcutTextLen,
 							&tsz);
 
 						if (tsz.x > p->maxShortcutTextWidth)
@@ -285,18 +285,7 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 					}
 				}
 			}
-			for (int i = 0; i < p->itemsSize; ++i)
-			{
-				if (p->items[i].info.type != mgPopupItemType_separator)
-				{
-					p->items[i].indentForShortcutText = p->maxTextWidth + p->textShortcutTextIndent;
-					if (p->items[i].shortcutTextWidth < p->maxShortcutTextWidth)
-					{
-						p->items[i].indentForShortcutText += p->maxShortcutTextWidth - p->items[i].shortcutTextWidth;
-					}
-				}
-			}
-
+			
 			p->rect.right = p->rect.left
 				+ p->maxTextWidth
 				+ p->maxShortcutTextWidth
@@ -305,6 +294,27 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 				+ p->indent.x
 				+ p->indent.x
 				+ p->iconRightWidth;
+
+			for (int i = 0; i < p->itemsSize; ++i)
+			{
+				if (p->items[i].info.type != mgPopupItemType_separator)
+				{
+					//p->items[i].indentForShortcutText = p->maxTextWidth + p->textShortcutTextIndent;
+					
+					p->items[i].indentForShortcutText = p->rect.right - p->rect.left
+						- p->items[i].shortcutTextWidth
+						- p->textShortcutTextIndent
+						- p->iconLeftWidth
+						- p->iconRightWidth;
+					
+
+					//if (p->items[i].shortcutTextWidth < p->maxShortcutTextWidth)
+					//{
+					//	p->items[i].indentForShortcutText += p->maxShortcutTextWidth - p->items[i].shortcutTextWidth;
+					//}
+				}
+			}
+
 
 			p->rect.bottom = p->rect.top + (p->itemHeight * notSeparatorItems) + p->indent.y + p->indent.y;
 			p->rect.bottom += 5 * separatorItems;

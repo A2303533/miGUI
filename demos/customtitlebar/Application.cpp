@@ -317,7 +317,7 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 			}
 
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(U"Exit", WindowMainMenu::MenuItemID_Exit);
+			m_mainMenuWindow->AddMenuItem(U"Exit", WindowMainMenu::MenuItemID_Exit, U"Alt+F4");
 			m_mainMenuWindow->EndMenu();
 		}
 
@@ -786,6 +786,7 @@ void Application::Run()
 		//m_backend->BeginDraw();
 		m_framework->DrawAll();
 		//m_backend->EndDraw();
+
 
 		//m_gs->EndDraw();
 		//m_gs->SwapBuffers();
