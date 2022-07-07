@@ -399,6 +399,27 @@ void UnicodeString::Clear()
 	m_data[0] = 0;
 }
 
+void UnicodeString::ClearFree()
+{
+	m_size = 0;
+	if (m_data)
+	{
+		free(m_data);
+		m_data = 0;
+	}
+	m_allocated = 0xF;
+	reallocate(m_allocated);
+}
+
+void UnicodeString::Reserve(size_t size)
+{
+	if (size > m_allocated)
+	{
+		reallocate(size);
+		m_data[m_size] = 0;
+	}
+}
+
 size_t UnicodeString::Size() const
 {
 	return m_size;
@@ -808,6 +829,13 @@ void UnicodeString::Append(uint32_t v)
 {
 	mgUnicodeChar buf[20];
 	int l = mgUnicodeSnprintf(buf, 20, U"%u", v);
+	Append(buf, l);
+}
+
+void UnicodeString::Append(uint64_t v)
+{
+	mgUnicodeChar buf[20];
+	int l = mgUnicodeSnprintf(buf, 20, U"%llu", v);
 	Append(buf, l);
 }
 

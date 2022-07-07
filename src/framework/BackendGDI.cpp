@@ -959,12 +959,13 @@ void BackendGDI::OnDrawText(int reason,
 	static mgColor defaultColor(0x000000);
 	if (!c)
 		c = &defaultColor;
+	mgPoint p = *position;
 
 	for (size_t i = 0; i < textLen; ++i)
 	{
 		mgFont* fnt = m_textProcessor->OnFont(reason, text[i]);// g_fonts[1];
 		
-		position->x += this->DrawText(reason, position, &text[i], 1, c, fnt);
+		p.x += this->DrawText(reason, &p, &text[i], 1, c, fnt);
 		//position->x += tp->gpu->drawText(reason, position, &text[i], 1, c, fnt);
 	}
 }

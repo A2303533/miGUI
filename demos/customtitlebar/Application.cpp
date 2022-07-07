@@ -20,7 +20,10 @@
 class MyBackend : public mgf::BackendGDI
 {
 public:
-	MyBackend() {};
+	MyBackend(mgf::SystemWindow* sw)
+	:
+		mgf::BackendGDI(sw)
+	{}
 	virtual ~MyBackend() {};
 
 	virtual void DrawRectangle(
@@ -70,8 +73,8 @@ Application::~Application()
 
 	if (m_backend)
 	{
-		if (m_menuFont)
-			m_menuFont->Release();
+		/*if (m_menuFont)
+			m_menuFont->Release();*/
 	}
 
 	if (m_GUIContext) m_GUIContext->Release();
@@ -196,14 +199,14 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 	SetTheme(&m_themeDark);
 
 	//m_backend = new mgf::BackendGDI();
-	m_backend = new MyBackend();
+	m_backend = new MyBackend(m_windowMain);
 	m_GUIContext = m_framework->CreateContext(m_windowMain, m_backend);
 
 
-	if(std::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))
-		m_menuFont = m_backend->CreateFontPrivate(L"..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf", 11, false, false, L"LT Internet");
+	/*if(std::filesystem::exists("..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf"))
+		m_menuFont = m_backend->CreateFontPrivate(U"..\\data\\fonts\\lt_internet\\LTInternet-Regular.ttf", 11, false, false, U"LT Internet");
 	else
-		m_menuFont = m_backend->CreateFont(L"Arial", 11, false, false);
+		m_menuFont = m_backend->CreateFont(U"Arial", 11, false, false);*/
 
 	m_windowBG = new mgf::Window(m_GUIContext);
 	m_windowBG->SetCanDock(false);
@@ -233,498 +236,498 @@ Big Data BiBigBIGBIGBIG DATABig Data BiBigBIGBIGBIG DATA";
 
 	//m_mainMenuWindow->Hide();
 	{
-		m_mainMenuWindow->UseMenu(true, true, m_menuFont);
+		m_mainMenuWindow->UseMenu(true, true);
 
-		m_mainMenuWindow->BeginMenu(L"File");
+		m_mainMenuWindow->BeginMenu(U"File");
 		{
-			m_mainMenuWindow->BeginSubMenu(L"New", 0);
+			m_mainMenuWindow->BeginSubMenu(U"New", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Project", 0, L"Ctrl+Shift+N");
-				m_mainMenuWindow->AddMenuItem(L"Repository", 0);
-				m_mainMenuWindow->AddMenuItem(L"File", 0, L"Ctrl+N");
-				m_mainMenuWindow->AddMenuItem(L"Project from", 0);
+				m_mainMenuWindow->AddMenuItem(U"Project", 0, U"Ctrl+Shift+N");
+				m_mainMenuWindow->AddMenuItem(U"Repository", 0);
+				m_mainMenuWindow->AddMenuItem(U"File", 0, U"Ctrl+N");
+				m_mainMenuWindow->AddMenuItem(U"Project from", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->BeginSubMenu(L"Open", WindowMainMenu::MenuItemID_Open, false);
+			m_mainMenuWindow->BeginSubMenu(U"Open", WindowMainMenu::MenuItemID_Open, false);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Project/Solution", 0, L"Ctrl+Shift+O");
-				m_mainMenuWindow->AddMenuItem(L"Folder", 0, L"Ctrl+Shift+Alt+O");
-				m_mainMenuWindow->AddMenuItem(L"Web site", 0, L"Shift+Alt+O");
+				m_mainMenuWindow->AddMenuItem(U"Project/Solution", 0, U"Ctrl+Shift+O");
+				m_mainMenuWindow->AddMenuItem(U"Folder", 0, U"Ctrl+Shift+Alt+O");
+				m_mainMenuWindow->AddMenuItem(U"Web site", 0, U"Shift+Alt+O");
 				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"File", 0, L"Ctrl+O");
+				m_mainMenuWindow->AddMenuItem(U"File", 0, U"Ctrl+O");
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->AddMenuItem(L"Clone rep", 0);
-			m_mainMenuWindow->AddMenuItem(L"Start window", 0);
+			m_mainMenuWindow->AddMenuItem(U"Clone rep", 0);
+			m_mainMenuWindow->AddMenuItem(U"Start window", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
 
-			m_mainMenuWindow->BeginSubMenu(L"Add", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Add", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"New Project", 0);
+				m_mainMenuWindow->AddMenuItem(U"New Project", 0);
 				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Existing project", 0);
-				m_mainMenuWindow->AddMenuItem(L"Existing web site", 0);
+				m_mainMenuWindow->AddMenuItem(U"Existing project", 0);
+				m_mainMenuWindow->AddMenuItem(U"Existing web site", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Close", 0);
-			m_mainMenuWindow->AddMenuItem(L"Close solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Close", 0);
+			m_mainMenuWindow->AddMenuItem(U"Close solution", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Start live session", 0);
-			m_mainMenuWindow->AddMenuItem(L"Join live session", 0);
+			m_mainMenuWindow->AddMenuItem(U"Start live session", 0);
+			m_mainMenuWindow->AddMenuItem(U"Join live session", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Save", WindowMainMenu::MenuItemID_Save);
-			m_mainMenuWindow->AddMenuItem(L"Save as", WindowMainMenu::MenuItemID_SaveAs);
-			m_mainMenuWindow->AddMenuItem(L"Save all", WindowMainMenu::MenuItemID_SaveAll);
+			m_mainMenuWindow->AddMenuItem(U"Save", WindowMainMenu::MenuItemID_Save);
+			m_mainMenuWindow->AddMenuItem(U"Save as", WindowMainMenu::MenuItemID_SaveAs);
+			m_mainMenuWindow->AddMenuItem(U"Save all", WindowMainMenu::MenuItemID_SaveAll);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Page setup", 0);
-			m_mainMenuWindow->AddMenuItem(L"Print", 0);
+			m_mainMenuWindow->AddMenuItem(U"Page setup", 0);
+			m_mainMenuWindow->AddMenuItem(U"Print", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Account settings", 0);
+			m_mainMenuWindow->AddMenuItem(U"Account settings", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
 
-			m_mainMenuWindow->BeginSubMenu(L"Recent files", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Recent files", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App1.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App2.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App3.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App4.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App5.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App6.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App7.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App8.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App9.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App10.cpp", 0);
-				m_mainMenuWindow->AddMenuItem(L"1 E:\\Code\\mixer\\src\\kkrooo\\App11.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App1.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App2.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App3.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App4.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App5.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App6.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App7.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App8.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App9.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App10.cpp", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 E:\\Code\\mixer\\src\\kkrooo\\App11.cpp", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->BeginSubMenu(L"recent projects", 0);
+			m_mainMenuWindow->BeginSubMenu(U"recent projects", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"1 Kkrooo", 0);
-				m_mainMenuWindow->AddMenuItem(L"2 WindowsProject", 0);
-				m_mainMenuWindow->AddMenuItem(L"3 Wx", 0);
-				m_mainMenuWindow->AddMenuItem(L"4 test", 0);
-				m_mainMenuWindow->AddMenuItem(L"5 dnd", 0);
-				m_mainMenuWindow->AddMenuItem(L"6 popup", 0);
+				m_mainMenuWindow->AddMenuItem(U"1 Kkrooo", 0);
+				m_mainMenuWindow->AddMenuItem(U"2 WindowsProject", 0);
+				m_mainMenuWindow->AddMenuItem(U"3 Wx", 0);
+				m_mainMenuWindow->AddMenuItem(U"4 test", 0);
+				m_mainMenuWindow->AddMenuItem(U"5 dnd", 0);
+				m_mainMenuWindow->AddMenuItem(U"6 popup", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Exit", WindowMainMenu::MenuItemID_Exit);
+			m_mainMenuWindow->AddMenuItem(U"Exit", WindowMainMenu::MenuItemID_Exit);
 			m_mainMenuWindow->EndMenu();
 		}
 
-		m_mainMenuWindow->BeginMenu(L"Edit");
+		m_mainMenuWindow->BeginMenu(U"Edit");
 		{
-			m_mainMenuWindow->BeginSubMenu(L"Go to", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Go to", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Go To Line", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Go To All", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Go To File", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Go To Recent", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Go To Type", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Go To Member", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Go To Symbol", 0, L"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To Line", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To All", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To File", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To Recent", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To Type", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To Member", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To Symbol", 0, U"Ctrl+G");
 				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Go To Next", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Go To Prev", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Go To Last", 0, L"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To Next", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To Prev", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Go To Last", 0, U"Ctrl+G");
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->BeginSubMenu(L"Find and replace", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Find and replace", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Quik find", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Quik replace", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Find in files", 0, L"Ctrl+G");
-				m_mainMenuWindow->AddMenuItem(L"Replace in files", 0, L"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Quik find", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Quik replace", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Find in files", 0, U"Ctrl+G");
+				m_mainMenuWindow->AddMenuItem(U"Replace in files", 0, U"Ctrl+G");
 				m_mainMenuWindow->EndSubMenu();
 			}
 			m_mainMenuWindow->AddMenuItem(0, 0);
 
-			m_mainMenuWindow->AddMenuItem(L"Undo", WindowMainMenu::MenuItemID_Undo, L"Ctrl+Z");
-			m_mainMenuWindow->AddMenuItem(L"Redo", WindowMainMenu::MenuItemID_Redo, L"Ctrl+Y");
-			m_mainMenuWindow->AddMenuItem(L"Undo last", 0);
-			m_mainMenuWindow->AddMenuItem(L"Redo last", 0);
+			m_mainMenuWindow->AddMenuItem(U"Undo", WindowMainMenu::MenuItemID_Undo, U"Ctrl+Z");
+			m_mainMenuWindow->AddMenuItem(U"Redo", WindowMainMenu::MenuItemID_Redo, U"Ctrl+Y");
+			m_mainMenuWindow->AddMenuItem(U"Undo last", 0);
+			m_mainMenuWindow->AddMenuItem(U"Redo last", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
 
-			m_mainMenuWindow->AddMenuItem(L"Cut", 0);
-			m_mainMenuWindow->AddMenuItem(L"Copy", 0);
-			m_mainMenuWindow->AddMenuItem(L"Paste", 0);
-			m_mainMenuWindow->AddMenuItem(L"Show clipboard", 0);
-			m_mainMenuWindow->AddMenuItem(L"Duplicate", 0);
-			m_mainMenuWindow->AddMenuItem(L"Delete", 0);
+			m_mainMenuWindow->AddMenuItem(U"Cut", 0);
+			m_mainMenuWindow->AddMenuItem(U"Copy", 0);
+			m_mainMenuWindow->AddMenuItem(U"Paste", 0);
+			m_mainMenuWindow->AddMenuItem(U"Show clipboard", 0);
+			m_mainMenuWindow->AddMenuItem(U"Duplicate", 0);
+			m_mainMenuWindow->AddMenuItem(U"Delete", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
 
-			m_mainMenuWindow->AddMenuItem(L"Select all", 0);
+			m_mainMenuWindow->AddMenuItem(U"Select all", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
 
-			m_mainMenuWindow->AddMenuItem(L"Insert file", 0);
+			m_mainMenuWindow->AddMenuItem(U"Insert file", 0);
 
-			m_mainMenuWindow->BeginSubMenu(L"Advanced", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Advanced", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Format Document", 0);
-				m_mainMenuWindow->AddMenuItem(L"Format Selection", 0);
-				m_mainMenuWindow->AddMenuItem(L"Tabify", 0);
-				m_mainMenuWindow->AddMenuItem(L"UnTabify", 0);
-				m_mainMenuWindow->AddMenuItem(L"Make upper", 0);
-				m_mainMenuWindow->AddMenuItem(L"Make lower", 0);
-				m_mainMenuWindow->AddMenuItem(L"Move selected up", 0);
-				m_mainMenuWindow->AddMenuItem(L"Move selected down", 0);
-				m_mainMenuWindow->AddMenuItem(L"delete horizontal", 0);
-				m_mainMenuWindow->AddMenuItem(L"expand selection to", 0);
-				m_mainMenuWindow->AddMenuItem(L"expand selection", 0);
-				m_mainMenuWindow->AddMenuItem(L"Contract selection", 0);
-				m_mainMenuWindow->AddMenuItem(L"view white space", 0);
-				m_mainMenuWindow->AddMenuItem(L"word wrap", 0);
-				m_mainMenuWindow->AddMenuItem(L"incremental search", 0);
-				m_mainMenuWindow->AddMenuItem(L"toggle line comment", 0);
-				m_mainMenuWindow->AddMenuItem(L"toggle block comment", 0);
-				m_mainMenuWindow->AddMenuItem(L"Sort lines", 0);
-				m_mainMenuWindow->AddMenuItem(L"join lines", 0);
-				m_mainMenuWindow->AddMenuItem(L"Comment selection", 0);
-				m_mainMenuWindow->AddMenuItem(L"Uncomment selection", 0);
-				m_mainMenuWindow->AddMenuItem(L"Increase line indent", 0);
-				m_mainMenuWindow->AddMenuItem(L"decrease line indent", 0);
+				m_mainMenuWindow->AddMenuItem(U"Format Document", 0);
+				m_mainMenuWindow->AddMenuItem(U"Format Selection", 0);
+				m_mainMenuWindow->AddMenuItem(U"Tabify", 0);
+				m_mainMenuWindow->AddMenuItem(U"UnTabify", 0);
+				m_mainMenuWindow->AddMenuItem(U"Make upper", 0);
+				m_mainMenuWindow->AddMenuItem(U"Make lower", 0);
+				m_mainMenuWindow->AddMenuItem(U"Move selected up", 0);
+				m_mainMenuWindow->AddMenuItem(U"Move selected down", 0);
+				m_mainMenuWindow->AddMenuItem(U"delete horizontal", 0);
+				m_mainMenuWindow->AddMenuItem(U"expand selection to", 0);
+				m_mainMenuWindow->AddMenuItem(U"expand selection", 0);
+				m_mainMenuWindow->AddMenuItem(U"Contract selection", 0);
+				m_mainMenuWindow->AddMenuItem(U"view white space", 0);
+				m_mainMenuWindow->AddMenuItem(U"word wrap", 0);
+				m_mainMenuWindow->AddMenuItem(U"incremental search", 0);
+				m_mainMenuWindow->AddMenuItem(U"toggle line comment", 0);
+				m_mainMenuWindow->AddMenuItem(U"toggle block comment", 0);
+				m_mainMenuWindow->AddMenuItem(U"Sort lines", 0);
+				m_mainMenuWindow->AddMenuItem(U"join lines", 0);
+				m_mainMenuWindow->AddMenuItem(U"Comment selection", 0);
+				m_mainMenuWindow->AddMenuItem(U"Uncomment selection", 0);
+				m_mainMenuWindow->AddMenuItem(U"Increase line indent", 0);
+				m_mainMenuWindow->AddMenuItem(U"decrease line indent", 0);
 
-				m_mainMenuWindow->BeginSubMenu(L"set end of line", 0);
+				m_mainMenuWindow->BeginSubMenu(U"set end of line", 0);
 				{
-					m_mainMenuWindow->AddMenuItem(L"CRLF", 0, 0);
-					m_mainMenuWindow->AddMenuItem(L"LF", 0, 0);
-					m_mainMenuWindow->AddMenuItem(L"CR", 0, 0);
+					m_mainMenuWindow->AddMenuItem(U"CRLF", 0, 0);
+					m_mainMenuWindow->AddMenuItem(U"LF", 0, 0);
+					m_mainMenuWindow->AddMenuItem(U"CR", 0, 0);
 					m_mainMenuWindow->EndSubMenu();
 				}
 
-				m_mainMenuWindow->BeginSubMenu(L"set indentation", 0);
+				m_mainMenuWindow->BeginSubMenu(U"set indentation", 0);
 				{
-					m_mainMenuWindow->AddMenuItem(L"Spaces", WindowMainMenu::MenuItemID_Spaces, 0);
-					m_mainMenuWindow->AddMenuItem(L"Tabs", WindowMainMenu::MenuItemID_Tabs, 0);
+					m_mainMenuWindow->AddMenuItem(U"Spaces", WindowMainMenu::MenuItemID_Spaces, 0);
+					m_mainMenuWindow->AddMenuItem(U"Tabs", WindowMainMenu::MenuItemID_Tabs, 0);
 					m_mainMenuWindow->EndSubMenu();
 				}
 
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->BeginSubMenu(L"Bookmarks", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Bookmarks", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Toggle bookmark", 0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Enable all", 0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Enable bookmark", 0, 0);
-				m_mainMenuWindow->AddMenuItem(L"prev bookmark", 0, 0);
-				m_mainMenuWindow->AddMenuItem(L"next bookmark", 0, 0);
-				m_mainMenuWindow->AddMenuItem(L"clear bookmark", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"Toggle bookmark", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"Enable all", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"Enable bookmark", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"prev bookmark", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"next bookmark", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"clear bookmark", 0, 0);
 				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"prev bookmark in", 0, 0);
-				m_mainMenuWindow->AddMenuItem(L"next bookmark in", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"prev bookmark in", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"next bookmark in", 0, 0);
 				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"prev bookmark in doc", 0, 0);
-				m_mainMenuWindow->AddMenuItem(L"next bookmark in doc", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"prev bookmark in doc", 0, 0);
+				m_mainMenuWindow->AddMenuItem(U"next bookmark in doc", 0, 0);
 				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Add task list shortcut", 0);
+				m_mainMenuWindow->AddMenuItem(U"Add task list shortcut", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->BeginSubMenu(L"Outlining", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Outlining", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Collapse block: ;", 0);
-				m_mainMenuWindow->AddMenuItem(L"Collapse all in: ;", 0);
+				m_mainMenuWindow->AddMenuItem(U"Collapse block: ;", 0);
+				m_mainMenuWindow->AddMenuItem(U"Collapse all in: ;", 0);
 				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Toggle outlining exp", 0);
-				m_mainMenuWindow->AddMenuItem(L"Toggle all outlining", 0);
-				m_mainMenuWindow->AddMenuItem(L"Stop outlining", 0);
-				m_mainMenuWindow->AddMenuItem(L"Stop hiding current", 0);
-				m_mainMenuWindow->AddMenuItem(L"Collapse to definition", 0);
+				m_mainMenuWindow->AddMenuItem(U"Toggle outlining exp", 0);
+				m_mainMenuWindow->AddMenuItem(U"Toggle all outlining", 0);
+				m_mainMenuWindow->AddMenuItem(U"Stop outlining", 0);
+				m_mainMenuWindow->AddMenuItem(U"Stop hiding current", 0);
+				m_mainMenuWindow->AddMenuItem(U"Collapse to definition", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->BeginSubMenu(L"Intellisense", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Intellisense", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"List members", 0);
-				m_mainMenuWindow->AddMenuItem(L"Parameter info", 0);
-				m_mainMenuWindow->AddMenuItem(L"quick info", 0);
-				m_mainMenuWindow->AddMenuItem(L"Complete word", 0);
-				m_mainMenuWindow->AddMenuItem(L"Switch between", 0);
+				m_mainMenuWindow->AddMenuItem(U"List members", 0);
+				m_mainMenuWindow->AddMenuItem(U"Parameter info", 0);
+				m_mainMenuWindow->AddMenuItem(U"quick info", 0);
+				m_mainMenuWindow->AddMenuItem(U"Complete word", 0);
+				m_mainMenuWindow->AddMenuItem(U"Switch between", 0);
 				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Surround with", 0);
+				m_mainMenuWindow->AddMenuItem(U"Surround with", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->BeginSubMenu(L"Multiple carets", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Multiple carets", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Insert next", 0);
-				m_mainMenuWindow->AddMenuItem(L"Insert carets", 0);
+				m_mainMenuWindow->AddMenuItem(U"Insert next", 0);
+				m_mainMenuWindow->AddMenuItem(U"Insert carets", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
-			m_mainMenuWindow->BeginSubMenu(L"Refactor", 0);
+			m_mainMenuWindow->BeginSubMenu(U"Refactor", 0);
 			{
-				m_mainMenuWindow->AddMenuItem(L"Convert to", 0);
-				m_mainMenuWindow->EndSubMenu();
-			}
-
-			m_mainMenuWindow->EndMenu();
-		}
-
-		m_mainMenuWindow->BeginMenu(L"View");
-		{
-			m_mainMenuWindow->AddMenuItem(L"Code", 0);
-			m_mainMenuWindow->AddMenuItem(L"Open", 0);
-			m_mainMenuWindow->AddMenuItem(L"Open with", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-
-			m_mainMenuWindow->AddMenuItem(L"Solution explorer", 0);
-			m_mainMenuWindow->AddMenuItem(L"Git changes", 0);
-			m_mainMenuWindow->AddMenuItem(L"Git repository", 0);
-			m_mainMenuWindow->AddMenuItem(L"Team expl", 0);
-			m_mainMenuWindow->AddMenuItem(L"Server expl", 0);
-			m_mainMenuWindow->AddMenuItem(L"Test expl", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-
-			m_mainMenuWindow->AddMenuItem(L"Bookmark window", 0);
-			m_mainMenuWindow->AddMenuItem(L"Call hier", 0);
-			m_mainMenuWindow->AddMenuItem(L"Class view", 0);
-			m_mainMenuWindow->AddMenuItem(L"Code def wind", 0);
-			m_mainMenuWindow->AddMenuItem(L"Obj brow", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-
-			m_mainMenuWindow->AddMenuItem(L"Error list", 0);
-			m_mainMenuWindow->AddMenuItem(L"Output", 0);
-			m_mainMenuWindow->AddMenuItem(L"Task list", 0);
-			m_mainMenuWindow->AddMenuItem(L"Toolbox", 0);
-			m_mainMenuWindow->AddMenuItem(L"Notifications", 0);
-			m_mainMenuWindow->AddMenuItem(L"Terminal", 0);
-
-			m_mainMenuWindow->BeginSubMenu(L"Other windows", 0);
-			{
-				m_mainMenuWindow->AddMenuItem(L"Command Window", 0);
-				m_mainMenuWindow->AddMenuItem(L"Web browser", 0);
-				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Load test", 0);
-				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Application insight", 0);
-				m_mainMenuWindow->AddMenuItem(L"Live share", 0);
-				m_mainMenuWindow->AddMenuItem(L"Web publish", 0);
-				m_mainMenuWindow->AddMenuItem(L"task runner", 0);
-				m_mainMenuWindow->AddMenuItem(L"Package manager", 0);
-				m_mainMenuWindow->AddMenuItem(L"Browser link", 0);
-				m_mainMenuWindow->AddMenuItem(L"Document outline", 0);
-				m_mainMenuWindow->AddMenuItem(L"Property manager", 0);
-				m_mainMenuWindow->AddMenuItem(L"Resource view", 0);
-				m_mainMenuWindow->AddMenuItem(L"F# interactive", 0);
-				m_mainMenuWindow->AddMenuItem(L"C# interactive", 0);
-				m_mainMenuWindow->AddMenuItem(0, 0);
-				m_mainMenuWindow->AddMenuItem(L"Code metrics", 0);
-
-				m_mainMenuWindow->EndSubMenu();
-			}
-			m_mainMenuWindow->AddMenuItem(0, 0);
-
-			m_mainMenuWindow->BeginSubMenu(L"Toolbars", 0);
-			{
-
+				m_mainMenuWindow->AddMenuItem(U"Convert to", 0);
 				m_mainMenuWindow->EndSubMenu();
 			}
 
 			m_mainMenuWindow->EndMenu();
 		}
 
-		m_mainMenuWindow->BeginMenu(L"Git", WindowMainMenu::MenuID_Git);
+		m_mainMenuWindow->BeginMenu(U"View");
 		{
-			m_mainMenuWindow->AddMenuItem(L"Clone rep", 0);
-			m_mainMenuWindow->AddMenuItem(L"local reps", 0);
+			m_mainMenuWindow->AddMenuItem(U"Code", 0);
+			m_mainMenuWindow->AddMenuItem(U"Open", 0);
+			m_mainMenuWindow->AddMenuItem(U"Open with", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Commit", 0);
+
+			m_mainMenuWindow->AddMenuItem(U"Solution explorer", 0);
+			m_mainMenuWindow->AddMenuItem(U"Git changes", 0);
+			m_mainMenuWindow->AddMenuItem(U"Git repository", 0);
+			m_mainMenuWindow->AddMenuItem(U"Team expl", 0);
+			m_mainMenuWindow->AddMenuItem(U"Server expl", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test expl", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Fetch", 0);
-			m_mainMenuWindow->AddMenuItem(L"Pull", 0);
-			m_mainMenuWindow->AddMenuItem(L"Push", 0);
-			m_mainMenuWindow->AddMenuItem(L"Sync", 0);
+
+			m_mainMenuWindow->AddMenuItem(U"Bookmark window", 0);
+			m_mainMenuWindow->AddMenuItem(U"Call hier", 0);
+			m_mainMenuWindow->AddMenuItem(U"Class view", 0);
+			m_mainMenuWindow->AddMenuItem(U"Code def wind", 0);
+			m_mainMenuWindow->AddMenuItem(U"Obj brow", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"New branch", 0);
-			m_mainMenuWindow->AddMenuItem(L"view branch history", 0);
-			m_mainMenuWindow->AddMenuItem(L"Manage branches", 0);
+
+			m_mainMenuWindow->AddMenuItem(U"Error list", 0);
+			m_mainMenuWindow->AddMenuItem(U"Output", 0);
+			m_mainMenuWindow->AddMenuItem(U"Task list", 0);
+			m_mainMenuWindow->AddMenuItem(U"Toolbox", 0);
+			m_mainMenuWindow->AddMenuItem(U"Notifications", 0);
+			m_mainMenuWindow->AddMenuItem(U"Terminal", 0);
+
+			m_mainMenuWindow->BeginSubMenu(U"Other windows", 0);
+			{
+				m_mainMenuWindow->AddMenuItem(U"Command Window", 0);
+				m_mainMenuWindow->AddMenuItem(U"Web browser", 0);
+				m_mainMenuWindow->AddMenuItem(0, 0);
+				m_mainMenuWindow->AddMenuItem(U"Load test", 0);
+				m_mainMenuWindow->AddMenuItem(0, 0);
+				m_mainMenuWindow->AddMenuItem(U"Application insight", 0);
+				m_mainMenuWindow->AddMenuItem(U"Live share", 0);
+				m_mainMenuWindow->AddMenuItem(U"Web publish", 0);
+				m_mainMenuWindow->AddMenuItem(U"task runner", 0);
+				m_mainMenuWindow->AddMenuItem(U"Package manager", 0);
+				m_mainMenuWindow->AddMenuItem(U"Browser link", 0);
+				m_mainMenuWindow->AddMenuItem(U"Document outline", 0);
+				m_mainMenuWindow->AddMenuItem(U"Property manager", 0);
+				m_mainMenuWindow->AddMenuItem(U"Resource view", 0);
+				m_mainMenuWindow->AddMenuItem(U"F# interactive", 0);
+				m_mainMenuWindow->AddMenuItem(U"C# interactive", 0);
+				m_mainMenuWindow->AddMenuItem(0, 0);
+				m_mainMenuWindow->AddMenuItem(U"Code metrics", 0);
+
+				m_mainMenuWindow->EndSubMenu();
+			}
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Github", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"open in file explorer", 0);
-			m_mainMenuWindow->AddMenuItem(L"open in cmd", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Manage remotes", 0);
-			m_mainMenuWindow->AddMenuItem(L"Settings", 0);
+
+			m_mainMenuWindow->BeginSubMenu(U"Toolbars", 0);
+			{
+
+				m_mainMenuWindow->EndSubMenu();
+			}
+
 			m_mainMenuWindow->EndMenu();
 		}
 
-		m_mainMenuWindow->BeginMenu(L"Project");
+		m_mainMenuWindow->BeginMenu(U"Git", WindowMainMenu::MenuID_Git);
 		{
-			m_mainMenuWindow->AddMenuItem(L"Retarget solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Clone rep", 0);
+			m_mainMenuWindow->AddMenuItem(U"local reps", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Add module", 0);
-			m_mainMenuWindow->AddMenuItem(L"Add class", 0);
-			m_mainMenuWindow->AddMenuItem(L"class wizard", 0);
+			m_mainMenuWindow->AddMenuItem(U"Commit", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Add new item", 0);
-			m_mainMenuWindow->AddMenuItem(L"Add existing item", 0);
+			m_mainMenuWindow->AddMenuItem(U"Fetch", 0);
+			m_mainMenuWindow->AddMenuItem(U"Pull", 0);
+			m_mainMenuWindow->AddMenuItem(U"Push", 0);
+			m_mainMenuWindow->AddMenuItem(U"Sync", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Exclude from project", 0);
-			m_mainMenuWindow->AddMenuItem(L"Show all files", 0);
+			m_mainMenuWindow->AddMenuItem(U"New branch", 0);
+			m_mainMenuWindow->AddMenuItem(U"view branch history", 0);
+			m_mainMenuWindow->AddMenuItem(U"Manage branches", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Rescan solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Display", 0);
+			m_mainMenuWindow->AddMenuItem(U"Github", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"open in file explorer", 0);
+			m_mainMenuWindow->AddMenuItem(U"open in cmd", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Manage remotes", 0);
+			m_mainMenuWindow->AddMenuItem(U"Settings", 0);
+			m_mainMenuWindow->EndMenu();
+		}
+
+		m_mainMenuWindow->BeginMenu(U"Project");
+		{
+			m_mainMenuWindow->AddMenuItem(U"Retarget solution", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Add module", 0);
+			m_mainMenuWindow->AddMenuItem(U"Add class", 0);
+			m_mainMenuWindow->AddMenuItem(U"class wizard", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Add new item", 0);
+			m_mainMenuWindow->AddMenuItem(U"Add existing item", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Exclude from project", 0);
+			m_mainMenuWindow->AddMenuItem(U"Show all files", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Rescan solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Display", 0);
 
 			m_mainMenuWindow->EndMenu();
 		}
 
-		m_mainMenuWindow->BeginMenu(L"Build");
+		m_mainMenuWindow->BeginMenu(U"Build");
 		{
-			m_mainMenuWindow->AddMenuItem(L"Build solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"ReBuild solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"clean solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Build solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"ReBuild solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"clean solution", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Build Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"ReBuild Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Clean Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Run code analysis", 0);
-			m_mainMenuWindow->AddMenuItem(L"Project only", 0);
+			m_mainMenuWindow->AddMenuItem(U"Build Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"ReBuild Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Clean Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Run code analysis", 0);
+			m_mainMenuWindow->AddMenuItem(U"Project only", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Batch build", 0);
-			m_mainMenuWindow->AddMenuItem(L"Config manager", 0);
+			m_mainMenuWindow->AddMenuItem(U"Batch build", 0);
+			m_mainMenuWindow->AddMenuItem(U"Config manager", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Compile", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->EndMenu();
-		}
-
-		m_mainMenuWindow->BeginMenu(L"Debug");
-		{
-			m_mainMenuWindow->AddMenuItem(L"Debug: Build solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: ReBuild solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: clean solution", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: Build Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: ReBuild Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: Clean Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: Run code analysis", 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: Project only", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: Batch build", 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: Config manager", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Debug: Compile", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->EndMenu();
-		}
-
-		m_mainMenuWindow->BeginMenu(L"Test");
-		{
-			m_mainMenuWindow->AddMenuItem(L"Test: Build solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: ReBuild solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: clean solution", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: Build Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: ReBuild Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: Clean Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: Run code analysis", 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: Project only", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: Batch build", 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: Config manager", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Test: Compile", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->EndMenu();
-		}
-
-		m_mainMenuWindow->BeginMenu(L"Analyze");
-		{
-			m_mainMenuWindow->AddMenuItem(L"Analyze: Build solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: ReBuild solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: clean solution", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: Build Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: ReBuild Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: Clean Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: Run code analysis", 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: Project only", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: Batch build", 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: Config manager", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Analyze: Compile", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->EndMenu();
-		}
-
-		m_mainMenuWindow->BeginMenu(L"Tools");
-		{
-			m_mainMenuWindow->AddMenuItem(L"Tools: Build solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: ReBuild solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: clean solution", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: Build Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: ReBuild Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: Clean Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: Run code analysis", 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: Project only", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: Batch build", 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: Config manager", 0);
-			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Tools: Compile", 0);
+			m_mainMenuWindow->AddMenuItem(U"Compile", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
 			m_mainMenuWindow->EndMenu();
 		}
 
-		m_mainMenuWindow->BeginMenu(L"Extensions");
+		m_mainMenuWindow->BeginMenu(U"Debug");
 		{
-			m_mainMenuWindow->AddMenuItem(L"Extensions: Build solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions:  solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: clean solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: Build solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: ReBuild solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: clean solution", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: Build Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: ReBuild Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: Clean Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: Run code analysis", 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: Project only", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: Build Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: ReBuild Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: Clean Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: Run code analysis", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: Project only", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: Batch build", 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: Config manager", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: Batch build", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: Config manager", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Extensions: Compile", 0);
+			m_mainMenuWindow->AddMenuItem(U"Debug: Compile", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
 			m_mainMenuWindow->EndMenu();
 		}
 
-		m_mainMenuWindow->BeginMenu(L"Window");
+		m_mainMenuWindow->BeginMenu(U"Test");
 		{
-			m_mainMenuWindow->AddMenuItem(L"Window: Build solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: ReBuild solution", 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: clean solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: Build solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: ReBuild solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: clean solution", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: Build Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: ReBuild Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: Clean Kkrooo", 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: Run code analysis", 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: Project only", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: Build Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: ReBuild Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: Clean Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: Run code analysis", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: Project only", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: Batch build", 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: Config manager", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: Batch build", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: Config manager", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Window: Compile", 0);
+			m_mainMenuWindow->AddMenuItem(U"Test: Compile", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
 			m_mainMenuWindow->EndMenu();
 		}
 
-		m_mainMenuWindow->BeginMenu(L"Help");
+		m_mainMenuWindow->BeginMenu(U"Analyze");
 		{
-			m_mainMenuWindow->AddMenuItem(L"View help", 0);
-			m_mainMenuWindow->AddMenuItem(L"Get started", 0);
-			m_mainMenuWindow->AddMenuItem(L"Tips", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: Build solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: ReBuild solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: clean solution", 0);
 			m_mainMenuWindow->AddMenuItem(0, 0);
-			m_mainMenuWindow->AddMenuItem(L"Feedbacks", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: Build Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: ReBuild Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: Clean Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: Run code analysis", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: Project only", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: Batch build", 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: Config manager", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Analyze: Compile", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->EndMenu();
+		}
+
+		m_mainMenuWindow->BeginMenu(U"Tools");
+		{
+			m_mainMenuWindow->AddMenuItem(U"Tools: Build solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: ReBuild solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: clean solution", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: Build Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: ReBuild Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: Clean Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: Run code analysis", 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: Project only", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: Batch build", 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: Config manager", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Tools: Compile", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->EndMenu();
+		}
+
+		m_mainMenuWindow->BeginMenu(U"Extensions");
+		{
+			m_mainMenuWindow->AddMenuItem(U"Extensions: Build solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions:  solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: clean solution", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: Build Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: ReBuild Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: Clean Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: Run code analysis", 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: Project only", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: Batch build", 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: Config manager", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Extensions: Compile", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->EndMenu();
+		}
+
+		m_mainMenuWindow->BeginMenu(U"Window");
+		{
+			m_mainMenuWindow->AddMenuItem(U"Window: Build solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: ReBuild solution", 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: clean solution", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: Build Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: ReBuild Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: Clean Kkrooo", 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: Run code analysis", 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: Project only", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: Batch build", 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: Config manager", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Window: Compile", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->EndMenu();
+		}
+
+		m_mainMenuWindow->BeginMenu(U"Help");
+		{
+			m_mainMenuWindow->AddMenuItem(U"View help", 0);
+			m_mainMenuWindow->AddMenuItem(U"Get started", 0);
+			m_mainMenuWindow->AddMenuItem(U"Tips", 0);
+			m_mainMenuWindow->AddMenuItem(0, 0);
+			m_mainMenuWindow->AddMenuItem(U"Feedbacks", 0);
 
 			m_mainMenuWindow->EndMenu();
 		}
@@ -796,13 +799,16 @@ mgf::GS* Application::GetGS()
 
 void Application::UpdateWindowTitle()
 {
-	m_titleText = "Kkrooo ";
+	m_titleText = U"Kkrooo ";
 	m_titleText += m_versionMaj;
 	m_titleText += ".";
 	m_titleText += m_versionMin;
 	m_titleText += ".";
 	m_titleText += m_versionPatch;
-	m_windowMain->SetTitle(m_titleText.data());
+
+	m_titleText.Get(m_titleTextW);
+	
+	m_windowMain->SetTitle(m_titleTextW.data());
 }
 
 void Application::_InitThemes()

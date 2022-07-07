@@ -400,12 +400,14 @@ void textProcessor_onDrawText(
     static mgColor defaultColor(0xFF0000);
     if (!c)
         c = &defaultColor;
+    
+    mgPoint p = *position;
 
     for (size_t i = 0; i < textLen; ++i)
     {
         mgFont* fnt = tp->onFont(reason, tp, text[i]);// g_fonts[1];
         //position->x += gui_drawText(reason, position, &text[i], 1, c, fnt);        
-        position->x += tp->gpu->drawText(reason, position, &text[i], 1, c, fnt);
+        p.x += tp->gpu->drawText(reason, &p, &text[i], 1, c, fnt);
     }
 }
 
@@ -1013,6 +1015,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
     Sleep(100);
     while (g_run)
     {
+       // Sleep(200);
+
         mgStartFrame(g_gui_context);
 
         while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))

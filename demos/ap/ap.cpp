@@ -292,7 +292,7 @@ bool AP_application::Init(backend_type bt)
 	
 	m_listboxPlaylist = new ListboxPlaylist(m_guiWindow);// guiWindow.m_data->AddListBox(listboxFont.m_data);
 	m_listboxPlaylist->SetRect(50, 200, 200, 300);
-	m_listboxPlaylist->SetItemHeight(10);
+	m_listboxPlaylist->SetItemHeight(16);
 	m_listboxPlaylist->SetDrawBG(false);
 	m_listboxPlaylist->CanEdit(true);
 	m_listboxPlaylist->SetDrawItemBG(true);

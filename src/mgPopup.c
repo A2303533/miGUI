@@ -471,7 +471,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 				p->textProcessor->onDrawText(
 					mgDrawTextReason_popupShortcut,
 					p->textProcessor,
-					&pt,
+					&pt2,
 					p->items[i].info.shortcutText,
 					p->items[i].shortcutTextLen,
 					textColor);

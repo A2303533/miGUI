@@ -92,6 +92,67 @@ namespace mgf
 		{
 			reallocate(0xF);
 		}
+
+		UnicodeString(const UnicodeString& other)
+			:
+			UnicodeString()
+		{
+			this->operator=(other);
+		}
+
+		UnicodeString& operator=(const UnicodeString& other)
+		{
+			Clear();
+			Reserve(other.m_size);
+			m_size = other.m_size;
+			for (uint32_t i = 0; i < m_size; ++i)
+			{
+				m_data[i] = other.m_data[i];
+			}
+			m_data[m_size] = 0;
+			return *this;
+		}
+
+		UnicodeString(UnicodeString&& other)
+			:
+			UnicodeString()
+		{
+			this->operator=(std::move(other));
+		}
+		UnicodeString& operator=(UnicodeString&& other)
+		{
+			free(m_data);
+			m_data = other.m_data;
+			m_allocated = other.m_allocated;
+			m_size = other.m_size;
+
+			other.m_data = 0;
+			other.m_allocated = 0;
+			other.m_size = 0;
+			return *this;
+		}
+
+		UnicodeString(const mgUnicodeChar* str)
+		{
+			if (str)
+			{
+				size_t len = mgUnicodeStrlen(str);
+				if (len)
+					Assign(str, len);
+			}
+		}
+
+		UnicodeString& operator=(const mgUnicodeChar* str) 
+		{
+			if (str)
+			{
+				size_t len = mgUnicodeStrlen(str);
+				if (len)
+					Assign(str, len);
+			}
+			return *this;
+		}
+
 		UnicodeString(const char* str, size_t len);
 		UnicodeString(const wchar_t* str, size_t len);
 		UnicodeString(const char8_t* str, size_t len);
@@ -131,6 +192,8 @@ namespace mgf
 		void Assign(const UnicodeString& str);
 
 		void Clear();
+		void ClearFree();
+		void Reserve(size_t);
 		size_t Size() const;
 		const mgUnicodeChar* Data() const;
 		mgUnicodeChar* Data();
@@ -155,9 +218,26 @@ namespace mgf
 		void Append(const std::u32string& str);
 		void Append(const UnicodeString& str);
 		void Append(uint32_t);
+		void Append(uint64_t);
 		void Append(int32_t);
 		void Append(float);
 		void Append(double);
+
+		void operator+=(char i) { Append(i); }
+		void operator+=(wchar_t i) { Append(i); }
+		void operator+=(char8_t i) { Append(i); }
+		void operator+=(char16_t i) { Append(i); }
+		void operator+=(char32_t i) { Append(i); }
+		void operator+=(const char* str) { Append(str, strlen(str)); }
+		void operator+=(const wchar_t* str) { Append(str, wcslen(str)); }
+		void operator+=(const char8_t* str) { Append(str, strlen((const char*)str)); }
+		void operator+=(const char16_t* str) { Append(str, wcslen((const wchar_t*)str)); }
+		void operator+=(const char32_t* str) { Append(str, mgUnicodeStrlen(str)); }
+		void operator+=(int32_t i) { Append(i); }
+		void operator+=(uint32_t i) { Append(i); }
+		void operator+=(uint64_t i) { Append(i); }
+		void operator+=(float i) { Append(i); }
+		void operator+=(double i) { Append(i); }
 
 		void Get(StringA& str);
 		void Get(StringW& str);

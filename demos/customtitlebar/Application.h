@@ -4,6 +4,7 @@
 
 #include "framework/mgf.h"
 #include "framework/GS.h"
+#include "framework/Unicode.h"
 
 class Application;
 
@@ -55,7 +56,7 @@ class Application
 	mgf::Backend* m_backend = 0;
 	mgf::Context* m_GUIContext = 0;
 
-	mgf::Font* m_menuFont = 0;
+	//mgf::Font* m_menuFont = 0;
 	
 	struct GUIIconsIDs
 	{
@@ -72,7 +73,9 @@ class Application
 	uint32_t m_versionMaj = 0;
 	uint32_t m_versionMin = 2;
 	uint32_t m_versionPatch = 0;
-	mgf::StringW m_titleText;
+	mgf::UnicodeString m_titleText;
+	mgf::StringW m_titleTextW;
+
 
 	mgColor m_colorWhite;
 	mgColor m_colorRed;

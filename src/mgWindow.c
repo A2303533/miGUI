@@ -750,10 +750,14 @@ mgUpdateWindow(struct mgWindow_s* w)
 			{
 
 				posXlerp += w->context->input->mouseMoveDelta.x;
-				w->position.x = (int)lerp((float)w->position.x, posXlerp, w->context->deltaTime * 30.f);
+				float lf = w->context->deltaTime * 30.f;
+				if (lf > 1.f)
+					lf = 1.f;
+
+				w->position.x = (int)lerp((float)w->position.x, posXlerp, lf);
 
 				posYlerp += w->context->input->mouseMoveDelta.y;
-				w->position.y = (int)lerp((float)w->position.y, posYlerp, w->context->deltaTime * 30.f);
+				w->position.y = (int)lerp((float)w->position.y, posYlerp, lf);
 
 				//printf("%f %f %i\n", posXlerp, posX, w->position.x);
 				//w->position.x = w->position.x + w->context->input->mouseMoveDelta.x;

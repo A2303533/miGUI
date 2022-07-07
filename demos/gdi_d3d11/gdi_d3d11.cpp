@@ -11,6 +11,7 @@
 #include "framework/Log.h"
 #include "framework/Mat.h"
 #include "framework/Color.h"
+#include "framework/Array.h"
 #include <filesystem>
 
 MGF_LINK_LIBRARY("mgf")

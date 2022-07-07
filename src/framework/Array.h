@@ -93,13 +93,6 @@ namespace mgf
 		}
 		Array<type>& operator=(Array<type>&& other)
 		{
-			/*clear();
-			reserve(other.m_size);
-			m_size = other.m_size;
-			for (uint32_t i = 0; i < m_size; ++i)
-			{
-				m_data[i] = other.m_data[i];
-			}*/
 			free_memory();
 			m_data = other.m_data;
 			m_allocated = other.m_allocated;

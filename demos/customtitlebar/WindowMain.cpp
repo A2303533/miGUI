@@ -117,8 +117,13 @@ void WindowMain::OnDrawCustomTitleBar()
 		textPos.x = menuRect->right + (int)((float)rightPartSize * 0.125f);
 		textPos.y = menuRect->top+3;
 	}
-	m_app->m_backend->DrawText(0, 0, &textPos, m_app->m_titleText.data(), m_app->m_titleText.size(),
-		&m_app->m_mainMenuWindowStyle.windowMenuText, m_app->m_menuFont->GetMGFont());
+	m_app->m_backend->DrawText(
+		0, 
+		&textPos, 
+		m_app->m_titleText.Data(), 
+		m_app->m_titleText.Size(),
+		&m_app->m_mainMenuWindowStyle.windowMenuText, 
+		m_app->m_backend->GetDefaultFont()->GetMGFont());
 
 	// buttons
 	{
