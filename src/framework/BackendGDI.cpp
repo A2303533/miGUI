@@ -310,7 +310,6 @@ BackendGDI::BackendGDI(mgf::SystemWindow* sw)
 		PixelFormat32bppARGB, blackImage->GetData());
 
 	m_textProcessor = new TextProcessor_GDI();
-	GetDefaultFont();
 }
 
 BackendGDI::~BackendGDI()
@@ -864,6 +863,8 @@ Font* BackendGDI::CreateFont(const wchar_t* file, int size, bool bold, bool ital
 	newFont->m_context = this->m_context;
 	{
 		mgFont* f = (mgFont*)calloc(1, sizeof(mgFont));
+		//f->maxSize.x = f->maxSize.y = size;
+
 		HDC g_dc = GetWindowDC(m_currWindow->m_OSData->hWnd);
 		f->implementation = CreateFontW(
 			-MulDiv(size, GetDeviceCaps(g_dc, LOGPIXELSY), 72),

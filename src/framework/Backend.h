@@ -107,6 +107,11 @@ namespace mgf
 		void (*m_getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
 		
 		virtual mgTexture_s* GetDefaultIcons() = 0;
+
+		/// <summary>
+		/// For Backend implementations: mgFont->maxSize must be set.
+		///  If don't have information about font size, set like this f->maxSize.x = f->maxSize.y = size;
+		/// </summary>
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) = 0;
 		virtual void DestroyFont(Font*) = 0;
 		virtual Font* GetDefaultFont() = 0;

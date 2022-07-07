@@ -78,14 +78,7 @@ mgTextInput_copy(mgElement* e)
 	EmptyClipboard();
 	HGLOBAL clipbuffer;
 	
-//	mgUnicodeChar* utf32 = malloc(len * sizeof(mgUnicodeChar));
-//	size_t utf32sz = 0;
-//	mgUnicodeToUTF16(, utf32, &utf32sz);
-
 	clipbuffer = GlobalAlloc(GMEM_DDESHARE, ((len + len) + 1) * sizeof(WCHAR));
-
-//#pragma message("!!!!! !!!! !!!! Need to convert to UTF16 " __FILE__ __FUNCTION__ " LINE : " STRING(__LINE__))
-
 
 	wchar_t* buffer;
 	buffer = (wchar_t*)GlobalLock(clipbuffer);
@@ -107,17 +100,15 @@ mgTextInput_copy(mgElement* e)
 		{
 			*wchar_ptr = uc.shorts[1];
 			++wchar_ptr;
-			*wchar_ptr = 0;
-			++wchar_ptr;
 		}
 		if (uc.shorts[0])
 		{
 			*wchar_ptr = uc.shorts[0];
 			++wchar_ptr;
-			*wchar_ptr = 0;
-			++wchar_ptr;
 		}
 	}
+	*wchar_ptr = 0;
+	++wchar_ptr;
 
 	buffer[len] = 0;
 
@@ -148,8 +139,6 @@ mgTextInput_paste(mgElement* e)
 	HANDLE hData = GetClipboardData(CF_UNICODETEXT);
 	if (hData)
 	{
-//#pragma message("!!!!! !!!! !!!! Need to convert to UTF16 " __FILE__ __FUNCTION__ " LINE : " STRING(__LINE__))
-
 		wchar_t* buffer = (wchar_t*)GlobalLock(hData);
 		if (buffer)
 		{
@@ -1107,7 +1096,7 @@ miGUI_onDraw_textinput(mgElement* e)
 				impl->textProcessor->onDrawText(
 					mgDrawTextReason_textInputDefaultText,
 					impl->textProcessor,
-					&pos,
+					&pos2,
 					&impl->text[i],
 					1,
 					0);
@@ -1283,7 +1272,7 @@ mgTextInputClear(struct mgElementTextInput_s* e, int freeMemory)
 			free(e->text);
 
 		e->allocated = 10;
-		e->text = malloc((e->allocated + 1) * sizeof(wchar_t));
+		e->text = malloc((e->allocated + 1) * sizeof(mgUnicodeChar));
 	}
 
 	e->textLen = 0;

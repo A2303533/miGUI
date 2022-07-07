@@ -29,6 +29,13 @@
 #include "miGUI.h"
 #include <math.h>
 
+union UC
+{
+	uint8_t bytes[4];
+	uint16_t shorts[2];
+	uint32_t integer;
+};
+
 #define FPUT_UNI(s,bcs,c,wn,sz) s[bcs++]=c;\
 s[bcs]=0; \
 ++wn; \
@@ -128,7 +135,100 @@ mgUnicodeFromUTF8(const char* str, mgUnicodeChar* out, size_t* lenOut)
 	assert(str);
 	assert(out);
 	assert(lenOut);
+	size_t len = strlen(str);
 
+	size_t newLen = 0;
+	
+	unsigned char c1 = 0;
+	unsigned char c2 = 0;
+	unsigned char c3 = 0;
+	unsigned char c4 = 0;
+	for (size_t i = 0; i < len; ++i)
+	{
+		c1 = str[i];
+
+		if (c1 <= 0x7F)
+		{
+			out[newLen] = (mgUnicodeChar)c1; ++newLen;
+		}
+		else
+		{
+			if ((c1 & 0xE0) == 0xC0) //2 bytes
+			{
+				++i;
+				if (i < len)
+				{
+					c2 = str[i];
+					if ((c2 & 0xC0) == 0x80)
+					{
+						wchar_t wch = (c1 & 0x1F) << 6;
+						wch |= (c2 & 0x3F);
+						//Append((char32_t)wch);
+						out[newLen] = (mgUnicodeChar)wch; ++newLen;
+					}
+				}
+			}
+			else if ((c1 & 0xF0) == 0xE0) //3
+			{
+				++i;
+				if (i < len)
+				{
+					c2 = str[i];
+					if ((c2 & 0xC0) == 0x80)
+					{
+						++i;
+						if (i < len)
+						{
+							c3 = str[i];
+							if ((c3 & 0xC0) == 0x80)
+							{
+								wchar_t wch = (c1 & 0xF) << 12;
+								wch |= (c2 & 0x3F) << 6;
+								wch |= (c3 & 0x3F);
+								out[newLen] = (mgUnicodeChar)wch; ++newLen;
+								//Append((char32_t)wch);
+							}
+						}
+					}
+				}
+			}
+			else if ((c1 & 0xF8) == 0xF0) //4
+			{
+				++i;
+				if (i < len)
+				{
+					c2 = str[i];
+					if ((c2 & 0xC0) == 0x80)
+					{
+						++i;
+						if (i < len)
+						{
+							c3 = str[i];
+							if ((c3 & 0xC0) == 0x80)
+							{
+								++i;
+								if (i < len)
+								{
+									c4 = str[i];
+									if ((c4 & 0xC0) == 0x80)
+									{
+										uint32_t u = (c1 & 0x7) << 18;
+										u |= (c2 & 0x3F) << 12;
+										u |= (c3 & 0x3F) << 6;
+										u |= (c4 & 0x3F);
+
+										out[newLen] = (mgUnicodeChar)u; ++newLen;
+										//Append((char32_t)u);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	*lenOut = newLen;
 }
 
 void 
@@ -138,7 +238,44 @@ mgUnicodeFromUTF16(const wchar_t* str, mgUnicodeChar* out, size_t* lenOut)
 	assert(str);
 	assert(out);
 	assert(lenOut);
+	size_t newLen = 0;
+	size_t len = wcslen(str);
+	for (size_t i = 0u; i < len; ++i)
+	{
+		wchar_t ch16 = str[i];
+		if (ch16 < 0x80)
+		{
+			out[newLen] = (mgUnicodeChar)ch16; ++newLen;
+			//Append((char32_t)ch16);
+		}
+		else if (ch16 < 0x800)
+		{
+			out[newLen] = (mgUnicodeChar)ch16; ++newLen;
+			//Append((char32_t)ch16); //????
+		}
+		else if ((ch16 & 0xFC00) == 0xD800)
+		{
+			++i;
+			if (i < len)
+			{
+				wchar_t ch16_2 = str[i];
+				if ((ch16_2 & 0xFC00) == 0xDC00)
+				{
+					uint32_t u = (ch16 - 0xD800) * 0x400;
+					u += (ch16_2 - 0xDC00) + 0x10000;
 
+					out[newLen] = (mgUnicodeChar)u; ++newLen;
+					//Append((char32_t)u);
+				}
+			}
+		}
+		else
+		{
+			out[newLen] = (mgUnicodeChar)ch16; ++newLen;
+			//Append((char32_t)ch16);
+		}
+	}
+	*lenOut = newLen;
 }
 
 void 
@@ -148,7 +285,44 @@ mgUnicodeToUTF8(const mgUnicodeChar* str, char* out, size_t* lenOut)
 	assert(str);
 	assert(out);
 	assert(lenOut);
+	size_t m_size = mgUnicodeStrlen(str);
+	size_t newLen = 0;
+	union UC uc;
+	struct mgUnicodeCharNode* ut = mgGetUnicodeTable();
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		mgUnicodeChar c = str[i];
+		if (c >= 0x32000)
+			c = '?';
 
+		uc.integer = ut[c].m_utf8;
+
+		if (uc.bytes[3])
+		{
+			//str.push_back(uc.bytes[3]);
+			out[newLen] = uc.bytes[3];
+			++newLen;
+		}
+		if (uc.bytes[2])
+		{
+			//str.push_back(uc.bytes[2]);
+			out[newLen] = uc.bytes[2];
+			++newLen;
+		}
+		if (uc.bytes[1])
+		{
+			//str.push_back(uc.bytes[1]);
+			out[newLen] = uc.bytes[1];
+			++newLen;
+		}
+		if (uc.bytes[0])
+		{
+			//str.push_back(uc.bytes[0]);
+			out[newLen] = uc.bytes[0];
+			++newLen;
+		}
+	}
+	*lenOut = newLen;
 }
 
 void 
@@ -158,7 +332,33 @@ mgUnicodeToUTF16(const mgUnicodeChar* str, wchar_t* out, size_t* lenOut)
 	assert(str);
 	assert(out);
 	assert(lenOut);
+	
+	size_t m_size = mgUnicodeStrlen(str);
+	size_t newLen = 0;
 
+	union UC uc;
+	struct mgUnicodeCharNode* ut = mgGetUnicodeTable();
+	for (size_t i = 0; i < m_size; ++i)
+	{
+		mgUnicodeChar c = str[i];
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = ut[c].m_utf16;
+
+		if (uc.shorts[1])
+		{
+			out[newLen] = uc.shorts[1];
+			++newLen;
+		}
+		if (uc.shorts[0])
+		{
+			//str.push_back(uc.shorts[0]);
+			out[newLen] = uc.shorts[0];
+			++newLen;
+		}
+	}
+	*lenOut = newLen;
 }
 
 size_t 
