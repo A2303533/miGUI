@@ -40,16 +40,23 @@ namespace mgf
 	/// </summary>
 	class TextProcessor : public BaseClass
 	{
+		friend void TextProcessor_onDrawText(int,struct mgTextProcessor_s*,mgPoint*,const mgUnicodeChar*,size_t,struct mgColor_s*);
 	protected:
+		Backend* m_backend = 0;
 		mgTextProcessor* m_tp = 0;
 	public:
-		//virtual void OnDrawText(int reason, mgUnicodeChar c) = 0;
-		virtual mgFont_s* OnFont(int reason, mgUnicodeChar c) = 0;
-		virtual mgColor* OnColor(int reason, mgUnicodeChar c, mgStyle_s* s) = 0;
-		virtual void OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p) = 0;
+		TextProcessor(Backend*);
+		virtual ~TextProcessor();
+
+
+		virtual mgFont_s* OnFont(int reason, mgUnicodeChar c);
+		virtual mgColor* OnColor(int reason, mgUnicodeChar c);
+		virtual void OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p);
 
 		mgTextProcessor* GetTextProcessor() { return m_tp; }
 		void SetTextProcessor(mgTextProcessor* tp) { m_tp = tp; }
+
+		virtual void OnDrawText(int reason,mgPoint* position,const mgUnicodeChar* text,size_t textLen,struct mgColor_s* c);
 	};
 }
 

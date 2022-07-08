@@ -40,14 +40,9 @@ namespace mgf
 		FontImpl();
 		virtual ~FontImpl();
 		virtual mgPoint GetMaxSize() override;
-		virtual mgFont_s* GetMGFont()
-		{
-			return m_font;
-		}
 
-		Backend* m_backend;
-		Context* m_context;
-		mgFont* m_font;
+		Backend* m_backend = 0;
+		Context* m_context = 0;
 
 		StringW m_private;
 	};

@@ -51,17 +51,20 @@ namespace mgf
 		Text(Window* w, const mgUnicodeChar* t);
 		virtual ~Text();
 
+		virtual void SetTextProcessor(TextProcessor*) override;
+
 		void SetText(const wchar_t*);
 		void SetText(const char*);
 		void SetText(const char8_t*);
 		void SetText(const char16_t*);
 		void SetText(const char32_t*);
+		void SetText(const UnicodeString&);
 		void SetTextF(const wchar_t*, ...);
 		void SetTextF(const char*, ...);
 		void SetTextF(const char8_t*, ...);
 		void SetTextF(const char16_t*, ...);
 		void SetTextF(const char32_t*, ...);
-		void SetFont(Font*);
+		
 		void SetPosition(mgPoint*);
 		void SetPosition(int x, int y);
 		void SetColor(mgColor*);

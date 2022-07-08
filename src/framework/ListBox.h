@@ -47,6 +47,7 @@ namespace mgf
 	public:
 		ListBox(Window* w);
 		virtual ~ListBox();
+		virtual void SetTextProcessor(TextProcessor*) override;
 
 		void SetDrawItemBG(bool);
 		

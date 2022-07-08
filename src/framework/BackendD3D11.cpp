@@ -47,11 +47,6 @@ using namespace mgf;
 
 extern mgf::Backend* g_backend;
 
-void BackendD3D11_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
-{
-	g_backend->GetTextSize(text, font, sz);
-}
-
 mgTexture* BackendD3D11_createTexture(mgImage* img)
 {
 	return g_backend->CreateTexture(img);
@@ -117,7 +112,6 @@ mgSystemWindowOSData* BackendD3D11_setCurrentWindow(mgSystemWindowOSData* data) 
 BackendD3D11::BackendD3D11(BackendD3D11Params params)
 {
 	m_params = params;
-	m_getTextSize = BackendD3D11_getTextSize;
 	g_backend = this;
 	m_gpu = new mgVideoDriverAPI;
 	((mgVideoDriverAPI*)m_gpu)->createTexture = BackendD3D11_createTexture;
@@ -783,16 +777,13 @@ void BackendD3D11::DeleteBackBuffer()
 
 }
 
-void BackendD3D11::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
+void BackendD3D11::GetTextSize(const mgUnicodeChar* text, size_t len, mgFont* font, mgPoint* sz)
 {
 	sz->x = 0;
 	sz->y = 0;
-	int c = (int)wcslen(text);
-	if (!c)
-		return;
-	for (int i = 0; i < c; ++i)
+	for (size_t i = 0; i < len; ++i)
 	{
-		wchar_t character = text[i];
+		mgUnicodeChar character = text[i];
 		auto glyph = font->glyphMap[character];
 		if (glyph)
 		{

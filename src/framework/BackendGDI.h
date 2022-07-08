@@ -63,7 +63,7 @@ namespace mgf
 		friend void BackendGDI_onDrawText(int reason, struct mgTextProcessor_s* tp, mgPoint* position,
 			const mgUnicodeChar* text, size_t textLen, struct mgColor_s* c);
 		friend struct mgFont_s* BackendGDI_onFont(int reason, struct mgTextProcessor_s* tp, mgUnicodeChar c);
-		friend struct mgColor_s* BackendGDI_onColor(int reason, struct mgTextProcessor_s* tp, mgUnicodeChar c, struct mgStyle_s* s);
+		friend struct mgColor_s* BackendGDI_onColor(int reason, struct mgTextProcessor_s* tp, mgUnicodeChar c);
 		friend void BackendGDI_onGetTextSize(int reason, struct mgTextProcessor_s* tp, const mgUnicodeChar* text, size_t textLen, mgPoint* p);
 		//mgSystemWindowOSData* m_currSystemWindowOSData = 0;
 
@@ -106,13 +106,13 @@ namespace mgf
 		virtual void DrawLine( int reason, void* object, mgPoint* position, mgPoint* where,
 			mgColor* color, int size) override;
 		virtual mgRect SetClipRect(mgRect* r) override;
-		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) override;
+		virtual void GetTextSize(const mgUnicodeChar* text, size_t len, mgFont* font, mgPoint* sz) override;
 		virtual mgTexture_s* GetDefaultIcons() override;
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) override;
 		virtual void DestroyFont(Font*) override;
 		virtual Font* GetDefaultFont() override;
 		virtual void SetIcon(mgf::Icons*, int id) override;
-		virtual Font* CreateFontPrivate(const wchar_t* file, int size, bool bold, bool italic, const wchar_t* name) override;
+		virtual Font* CreateFontPrivate(const wchar_t* file, int size, bool bold, bool italic, const wchar_t* name) /*override*/;
 		virtual void UpdateTexture(mgTexture* t, mgImage* i) override;
 
 		virtual void UpdateBackBuffer() override;

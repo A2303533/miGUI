@@ -34,14 +34,7 @@
 
 using namespace mgf;
 
-FontImpl::FontImpl()
-	:
-m_backend(0),
-m_context(0),
-m_font(0)
-{
-
-}
+FontImpl::FontImpl(){}
 
 FontImpl::~FontImpl()
 {

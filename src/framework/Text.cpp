@@ -96,6 +96,13 @@ Text::~Text()
 		mgDestroyElement(m_element);
 }
 
+void Text::SetTextProcessor(TextProcessor* tp)
+{
+	Element::SetTextProcessor(tp);
+	if(m_elementText)
+		m_elementText->textProcessor = tp->GetTextProcessor();
+}
+
 void Text::SetText(const wchar_t* t)
 {
 	m_text.Assign(t, wcslen(t));
@@ -104,12 +111,55 @@ void Text::SetText(const wchar_t* t)
 
 void Text::SetText(const char* t)
 {
-	/*StringA stra = t;
-	StringW str = stra.to_utf16();
-	SetText(str.data());*/
 	m_text.Assign(t, strlen(t));
 	m_element->onRebuild(m_element);
 }
+
+void Text::SetText(const char8_t* t)
+{
+	m_text.Clear();
+	size_t slen = 0;
+	if (t)
+	{
+		slen = strlen((const char*)t);
+		if (slen)
+			m_text.Assign(t, slen);
+	}
+	m_element->onRebuild(m_element);
+}
+
+void Text::SetText(const char16_t* t)
+{
+	m_text.Clear();
+	size_t slen = 0;
+	if (t)
+	{
+		slen = wcslen((const wchar_t*)t);
+		if (slen)
+			m_text.Assign(t, slen);
+	}
+	m_element->onRebuild(m_element);
+}
+
+void Text::SetText(const char32_t* t)
+{
+	m_text.Clear();
+	size_t slen = 0;
+	if (t)
+	{
+		slen = mgUnicodeStrlen(t);
+		if (slen)
+			m_text.Assign(t, slen);
+	}
+	m_element->onRebuild(m_element);
+}
+
+void Text::SetText(const UnicodeString& str)
+{
+	m_text.Assign(str);
+	m_element->onRebuild(m_element);
+}
+
 
 void Text::SetTextF(const wchar_t* f, ...)
 {
@@ -133,11 +183,36 @@ void Text::SetTextF(const char* f, ...)
 	SetText(buffer);
 }
 
-void Text::SetFont(Font* f)
+void Text::SetTextF(const char8_t* f, ...)
 {
-#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
-	//m_font = ((FontImpl*)f)->m_font;
+	va_list ap;
+	va_start(ap, f);
+	char buffer[500];
+	buffer[0] = 0;
+	vsprintf(buffer, (const char*)f, ap);
+	va_end(ap);
+	SetText(buffer);
+}
 
+void Text::SetTextF(const char16_t* f, ...)
+{
+	va_list ap;
+	va_start(ap, f);
+	wchar_t buffer[500];
+	buffer[0] = 0;
+	vswprintf(buffer, 500, (const wchar_t*)f, ap);
+	va_end(ap);
+	SetText(buffer);
+}
+void Text::SetTextF(const char32_t* f, ...)
+{
+	va_list ap;
+	va_start(ap, f);
+	mgUnicodeChar buffer[500];
+	buffer[0] = 0;
+	mgUnicodeVSnprintf(buffer, 500, f, ap);
+	va_end(ap);
+	SetText(buffer);
 }
 
 void Text::SetPosition(mgPoint* p)

@@ -60,6 +60,13 @@ TextInput::~TextInput()
 		mgDestroyElement(m_element);
 }
 
+void TextInput::SetTextProcessor(TextProcessor* tp)
+{
+	Element::SetTextProcessor(tp);
+	if(m_elementText)
+		m_elementText->textProcessor = tp->GetTextProcessor();
+}
+
 void TextInput::SetText(const mgUnicodeChar* text)
 {
 	mgTextInputSetText(m_elementText, text);

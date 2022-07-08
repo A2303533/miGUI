@@ -87,6 +87,8 @@ namespace mgf
 	public:
 		Table(Window* w, uint32_t colNum);
 		virtual ~Table();
+		virtual void SetTextProcessor(TextProcessor*) override;
+
 		virtual void SetRect(int left, int top, int right, int bottom) override;
 
 		void SetDrawItemBG(bool);

@@ -62,10 +62,10 @@ extern mgf::Backend* g_backend;
 extern Framework* g_mgf;
 BackendGDI* g_backendGDI = 0;
 
-void BackendGDI_getTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
-{
-	g_backend->GetTextSize(text, font, sz);
-}
+//void BackendGDI_getTextSize(const mgUnicodeChar* text, size_t len, mgFont* font, mgPoint* sz)
+//{
+//	g_backend->GetTextSize(text, len, font, sz);
+//}
 
 mgTexture* BackendGDI_createTexture(mgImage* img)
 {
@@ -132,10 +132,9 @@ namespace mgf
 	struct mgColor_s* BackendGDI_onColor(
 		int reason,
 		struct mgTextProcessor_s* tp,
-		mgUnicodeChar c,
-		struct mgStyle_s* s)
+		mgUnicodeChar c)
 	{
-		return g_backendGDI->m_textProcessor->OnColor(reason, c, s);
+		return g_backendGDI->m_textProcessor->OnColor(reason, c);
 	}
 	void BackendGDI_onGetTextSize(
 		int reason,
@@ -221,9 +220,11 @@ namespace mgf
 	{
 		
 	public:
-		TextProcessor_GDI()
+		TextProcessor_GDI(Backend* b)
+			:
+			TextProcessor(b)
 		{
-			m_tp = mgCreateTextProcessor((mgVideoDriverAPI*)g_backendGDI->m_gpu);
+			m_tp = mgCreateTextProcessor();
 			m_tp->onDrawText = BackendGDI_onDrawText;
 			m_tp->onFont = BackendGDI_onFont;
 			m_tp->onColor = BackendGDI_onColor;
@@ -236,47 +237,22 @@ namespace mgf
 
 		virtual mgFont_s* OnFont(int reason, mgUnicodeChar c) override
 		{
-			return g_backendGDI->m_defaultFont->GetMGFont();
+			return g_backendGDI->m_defaultFont->m_font;
 		}
 
-		virtual mgColor* OnColor(int reason, mgUnicodeChar c, mgStyle_s* s) override
+		virtual mgColor* OnColor(int reason, mgUnicodeChar c) override
 		{
-			return &s->button1;
+			static mgColor col(0x0);
+			return &col;
 		}
 
 		virtual void OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p) override
 		{
-			//p->x = p->y = 10;
-			HDC hdcMem = (HDC)g_backendGDI->m_currWindow->GetOSData()->hdcMem;
-
 			p->x = p->y = 0;
 			for (size_t i = 0; i < textLen; ++i)
 			{
 				mgFont* fnt = OnFont(reason, text[i]);
-
-				SelectObject(hdcMem, fnt->implementation);
-
-				mgUnicodeUC uc;
-				wchar_t wchbuf[2] = { 0,0 };
-				mgUnicodeChar c = text[i];
-
-				if (c >= 0x32000)
-					c = '?';
-
-				uc.integer = mgGetUnicodeTable()[c].m_utf16;
-				int cl = 1;
-				if (uc.shorts[1])
-					wchbuf[0] = uc.shorts[1];
-				if (uc.shorts[0])
-				{
-					wchbuf[1] = uc.shorts[0];
-					cl = 2;
-				}
-
-				SIZE s;
-				GetTextExtentPoint32W(hdcMem, wchbuf, cl, &s);
-				p->x += s.cx;
-				p->y = s.cy;
+				g_backendGDI->GetTextSize(text, textLen, fnt, p);
 			}
 		}
 		
@@ -290,7 +266,7 @@ BackendGDI::BackendGDI(mgf::SystemWindow* sw)
 	g_backendGDI = this;
 	GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
 
-	m_getTextSize = BackendGDI_getTextSize;
+	//m_getTextSize = BackendGDI_getTextSize;
 	g_backend = this;
 	m_gpu = new mgVideoDriverAPI;
 	((mgVideoDriverAPI*)m_gpu)->createTexture = BackendGDI_createTexture;
@@ -309,7 +285,7 @@ BackendGDI::BackendGDI(mgf::SystemWindow* sw)
 	blackBitmap = new Gdiplus::Bitmap(blackImage->GetWidth(), blackImage->GetHeight(), blackImage->GetPitch(), 
 		PixelFormat32bppARGB, blackImage->GetData());
 
-	m_textProcessor = new TextProcessor_GDI();
+	m_textProcessor = new TextProcessor_GDI(this);
 }
 
 BackendGDI::~BackendGDI()
@@ -824,16 +800,36 @@ void BackendGDI::UpdateBackBuffer()
 	_createBackbuffer();
 }
 
-void BackendGDI::GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz)
+void BackendGDI::GetTextSize(const mgUnicodeChar* text, size_t textLen, mgFont* font, mgPoint* sz)
 {
 	SelectObject(m_currWindow->m_OSData->hdcMem, font->implementation);
-	size_t c = wcslen(text);
-	if (!c)
-		return;
-	SIZE s;
-	GetTextExtentPoint32W(m_currWindow->m_OSData->hdcMem, text, (int)c, &s);
-	sz->x = s.cx;
-	sz->y = s.cy;
+	sz->x = sz->y = 0;
+	//size_t c = wcslen(text);
+	//if (!c)		return;
+	mgUnicodeUC uc;
+	for (size_t i = 0; i < textLen; ++i)
+	{
+		wchar_t wchbuf[2] = { 0,0 };
+		mgUnicodeChar c = text[i];
+
+		if (c >= 0x32000)
+			c = '?';
+
+		uc.integer = mgGetUnicodeTable()[c].m_utf16;
+		int cl = 1;
+		if (uc.shorts[1])
+			wchbuf[0] = uc.shorts[1];
+		if (uc.shorts[0])
+		{
+			wchbuf[1] = uc.shorts[0];
+			cl = 2;
+		}
+
+		SIZE s;
+		GetTextExtentPoint32W(m_currWindow->m_OSData->hdcMem, wchbuf, cl, &s);
+		sz->x += s.cx;
+		sz->y = s.cy;
+	}
 }
 
 Font* BackendGDI::CreateFontPrivate(const wchar_t* file, int size, bool bold, bool italic, const wchar_t* name)
@@ -967,7 +963,6 @@ void BackendGDI::OnDrawText(int reason,
 		mgFont* fnt = m_textProcessor->OnFont(reason, text[i]);// g_fonts[1];
 		
 		p.x += this->DrawText(reason, &p, &text[i], 1, c, fnt);
-		//position->x += tp->gpu->drawText(reason, position, &text[i], 1, c, fnt);
 	}
 }
 

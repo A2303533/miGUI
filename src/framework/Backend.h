@@ -49,10 +49,7 @@ namespace mgf
 
 	public:
 
-		Backend()
-			:
-			m_getTextSize(0)
-		{}
+		Backend(){}
 	
 		virtual ~Backend(){};
 
@@ -103,8 +100,8 @@ namespace mgf
 		/*return prev rect*/
 		virtual mgRect SetClipRect(mgRect* r) = 0;
 
-		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) = 0;
-		void (*m_getTextSize)(const wchar_t* text, mgFont*, mgPoint*);
+		virtual void GetTextSize(const mgUnicodeChar* text, size_t len, mgFont* font, mgPoint* sz) = 0;
+		//void (*m_getTextSize)(const mgUnicodeChar* text, size_t len, mgFont*, mgPoint*);
 		
 		virtual mgTexture_s* GetDefaultIcons() = 0;
 
@@ -125,7 +122,7 @@ namespace mgf
 		/// <param name="italic"></param>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		virtual Font* CreateFontPrivate(const wchar_t* file, int size, bool bold, bool italic, const wchar_t* name) { return 0; };
+		//virtual Font* CreateFontPrivate(const wchar_t* file, int size, bool bold, bool italic, const wchar_t* name) { return 0; };
 
 		virtual void SetIcon(mgf::Icons*, int id) {}
 		

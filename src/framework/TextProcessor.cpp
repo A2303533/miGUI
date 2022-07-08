@@ -30,8 +30,100 @@
 
 #include "framework/mgf.h"
 #include "framework/TextProcessor.h"
+#include "framework/Backend.h"
+#include "framework/Font.h"
 
 using namespace mgf;
 
 //extern Backend* g_backend;
+void mgf::TextProcessor_onDrawText(
+	int reason,
+	struct mgTextProcessor_s* tp,
+	mgPoint* position,
+	const mgUnicodeChar* text,
+	size_t textLen,
+	struct mgColor_s* c)
+{
+	TextProcessor* textProcessor = (TextProcessor*)tp->userData;
+	textProcessor->OnDrawText(reason, position, text, textLen, c);
 
+}
+struct mgFont_s* TextProcessor_onFont(
+	int reason,
+	struct mgTextProcessor_s* tp,
+	mgUnicodeChar c)
+{
+	TextProcessor* textProcessor = (TextProcessor*)tp->userData;
+	return textProcessor->OnFont(reason, c);
+}
+struct mgColor_s* TextProcessor_onColor(
+	int reason,
+	struct mgTextProcessor_s* tp,
+	mgUnicodeChar c)
+{
+	TextProcessor* textProcessor = (TextProcessor*)tp->userData;
+	return textProcessor->OnColor(reason, c);
+}
+void TextProcessor_onGetTextSize(
+	int reason,
+	struct mgTextProcessor_s* tp,
+	const mgUnicodeChar* text,
+	size_t textLen,
+	mgPoint* p)
+{
+	TextProcessor* textProcessor = (TextProcessor*)tp->userData;
+	textProcessor->OnGetTextSize(reason, text, textLen, p);
+}
+
+TextProcessor::TextProcessor(Backend* b)
+	:
+	m_backend(b)
+{
+	m_tp = mgCreateTextProcessor();
+	m_tp->onDrawText = TextProcessor_onDrawText;
+	m_tp->onFont = TextProcessor_onFont;
+	m_tp->onColor = TextProcessor_onColor;
+	m_tp->onGetTextSize = TextProcessor_onGetTextSize;
+	m_tp->userData = this;
+}
+
+TextProcessor::~TextProcessor()
+{
+	if (m_tp)
+		mgDestroyTextProcessor(m_tp);
+}
+
+mgFont_s* TextProcessor::OnFont(int reason, mgUnicodeChar c)
+{
+	return m_backend->GetDefaultFont()->m_font;
+}
+
+mgColor* TextProcessor::OnColor(int reason, mgUnicodeChar c)
+{
+	static mgColor defCol(0x0);
+	return &defCol;
+}
+
+void TextProcessor::OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p)
+{
+	p->x = p->y = 0;
+	for (size_t i = 0; i < textLen; ++i)
+	{
+		mgFont* fnt = OnFont(reason, text[i]);
+		m_backend->GetTextSize(text, textLen, fnt, p);
+	}
+}
+
+void TextProcessor::OnDrawText(int reason, 
+	mgPoint* position, 
+	const mgUnicodeChar* text, 
+	size_t textLen, 
+	struct mgColor_s* c)
+{
+	mgPoint p = *position;
+	for (size_t i = 0; i < textLen; ++i)
+	{
+		mgFont* fnt = OnFont(reason, text[i]);
+		p.x += m_backend->DrawText(reason, &p, &text[i], 1, c ? c : OnColor(reason, text[i]), fnt);
+	}
+}

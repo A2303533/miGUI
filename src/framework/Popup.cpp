@@ -59,7 +59,8 @@ void Popup::SetTextProcessor(TextProcessor* tp)
 {
 	m_textProcessor = tp;
 	mgPopup* popup = (mgPopup*)m_implementation;
-	popup->textProcessor = tp->GetTextProcessor();
+	if(popup)
+		popup->textProcessor = tp->GetTextProcessor();
 }
 
 //void Popup::SetFont(Font* f)

@@ -50,15 +50,16 @@ namespace mgf
 	public:
 		Button(Window* w);
 		virtual ~Button();
+		virtual void SetTextProcessor(TextProcessor*) override;
 
 		virtual void SetText(const char*);
 		virtual void SetText(const wchar_t*);
 		virtual void SetText(const char8_t*);
 		virtual void SetText(const char16_t*);
 		virtual void SetText(const char32_t*);
+		virtual void SetText(const UnicodeString&);
 
 		virtual void SetAsPush(bool);
-		virtual void SetFont(Font*);
 		
 		virtual void SetIcons(
 			Icons*, 

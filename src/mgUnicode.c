@@ -1153,12 +1153,9 @@ mgUnicodeVSnprintf(mgUnicodeChar* str, size_t sz, const mgUnicodeChar* format, v
 
 mgTextProcessor* 
 MG_C_DECL 
-mgCreateTextProcessor(struct mgVideoDriverAPI_s* gpu)
+mgCreateTextProcessor()
 {
-	assert(gpu);
-
 	mgTextProcessor* tp = calloc(1, sizeof(mgTextProcessor));
-	tp->gpu = gpu;
 	return tp;
 }
 

@@ -42,6 +42,7 @@ namespace mgf
 	public:
 		TextInput(Window* w);
 		virtual ~TextInput();
+		virtual void SetTextProcessor(TextProcessor*) override;
 
 		void SetText(const mgUnicodeChar*);
 		//void SetFont(Font*);

@@ -81,6 +81,13 @@ Button::~Button()
 		mgDestroyElement(m_element);
 }
 
+void Button::SetTextProcessor(TextProcessor* tp)
+{
+	Element::SetTextProcessor(tp);
+	if(m_elementButton)
+		m_elementButton->textProcessor = tp->GetTextProcessor();
+}
+
 void Button::SetText(const char* t)
 {
 	m_text.Clear();
@@ -91,6 +98,7 @@ void Button::SetText(const char* t)
 		if (slen)
 			m_text.Assign(t, slen);
 	}
+	m_element->onRebuild(m_element);
 }
 
 void Button::SetText(const char8_t* t)
@@ -103,6 +111,7 @@ void Button::SetText(const char8_t* t)
 		if (slen)
 			m_text.Assign(t, slen);
 	}
+	m_element->onRebuild(m_element);
 }
 
 void Button::SetText(const char16_t* t)
@@ -115,6 +124,7 @@ void Button::SetText(const char16_t* t)
 		if (slen)
 			m_text.Assign(t, slen);
 	}
+	m_element->onRebuild(m_element);
 }
 
 void Button::SetText(const char32_t* t)
@@ -127,6 +137,13 @@ void Button::SetText(const char32_t* t)
 		if (slen)
 			m_text.Assign(t, slen);
 	}
+	m_element->onRebuild(m_element);
+}
+
+void Button::SetText(const UnicodeString& str)
+{
+	m_text.Assign(str);
+	m_element->onRebuild(m_element);
 }
 
 
@@ -140,6 +157,7 @@ void Button::SetText(const wchar_t* t)
 		if (slen)
 			m_text.Assign(t, slen);
 	}
+	m_element->onRebuild(m_element);
 }
 
 void Button::SetAsPush(bool v)
@@ -166,12 +184,6 @@ void Button::SetIcons(
 	m_elementButton->iconID_hover = id2;
 	m_elementButton->iconID_push = id3;
 	m_elementButton->iconID_disable = id4;
-}
-
-void Button::SetFont(Font* f)
-{
-	FontImpl* fi = (FontImpl*)f;
-	m_font = fi->m_font;
 }
 
 void Button::OnPushOn() {}

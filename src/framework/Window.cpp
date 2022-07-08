@@ -46,11 +46,8 @@ extern Backend* g_backend;
 Window::Window(Context* ctx)
 	:m_gui_context(ctx->m_gui_context)
 {
+	m_window = mgCreateWindow(ctx->m_gui_context, 0, 0, 300, 200, g_backend->GetTextProcessor()->GetTextProcessor());
 	this->SetTextProcessor(g_backend->GetTextProcessor());
-
-	m_window = mgCreateWindow(ctx->m_gui_context, 0, 0, 300, 200, m_textProcessor->GetTextProcessor());
-	//m_window->titlebarFont = ((mgf::FontImpl*)ctx->GetBackend()->GetDefaultFont())->m_font;
-#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
 }
 
 Window::~Window()
@@ -69,11 +66,6 @@ void Window::SetTitle(const mgUnicodeChar* t/*, Font* optionalFont*/)
 {
 	if(t)
 		m_title.Assign(t, mgUnicodeStrlen(t));
-	/*if (optionalFont)
-	{
-		FontImpl* f = (FontImpl*)optionalFont;
-		m_window->titlebarFont = f->m_font;
-	}*/
 	mgSetWindowTitle(m_window, m_title.Data());
 }
 
@@ -657,5 +649,7 @@ TextProcessor* Window::GetTextProcessor()
 void Window::SetTextProcessor(TextProcessor* tp)
 {
 	m_textProcessor = tp;
+	if(m_window)
+		m_window->textProcessor = tp->GetTextProcessor();
 }
 

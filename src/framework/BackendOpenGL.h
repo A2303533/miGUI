@@ -122,7 +122,7 @@ namespace mgf
 		virtual void DrawLine( int reason, void* object, mgPoint* position, mgPoint* where,
 			mgColor* color, int size) override;
 		virtual mgRect SetClipRect(mgRect* r) override;
-		virtual void GetTextSize(const wchar_t* text, mgFont* font, mgPoint* sz) override;
+		virtual void GetTextSize(const mgUnicodeChar* text, size_t len, mgFont* font, mgPoint* sz) override;
 		virtual mgTexture_s* GetDefaultIcons() override;
 		
 		virtual Font* CreateFont(const wchar_t* file, int size, bool bold, bool italic) override;

@@ -71,6 +71,13 @@ ListBox::~ListBox()
 		mgDestroyElement(m_element);
 }
 
+void ListBox::SetTextProcessor(TextProcessor* tp)
+{
+	Element::SetTextProcessor(tp);
+	if(m_elementList)
+		m_elementList->textProcessor = tp->GetTextProcessor();
+}
+
 void ListBox::SetData(void** arr, uint32_t arrSz)
 {
 	m_elementList->items = arr;

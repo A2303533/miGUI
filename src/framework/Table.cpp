@@ -96,6 +96,13 @@ Table::~Table()
 		mgDestroyElement(m_element);
 }
 
+void Table::SetTextProcessor(TextProcessor* tp)
+{
+	Element::SetTextProcessor(tp);
+	if(m_elementTable)
+		m_elementTable->textProcessor = tp->GetTextProcessor();
+}
+
 void Table::SetRect(int left, int top, int right, int bottom)
 {
 	Element::SetRect(left, top, right, bottom);

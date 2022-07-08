@@ -108,7 +108,7 @@ namespace mgf
 		virtual ~Window();
 
 		void SetTitle(const mgUnicodeChar* t/*, Font* optionalFont*/);
-		
+
 		void SetVisible(bool);
 		bool IsVisible();
 

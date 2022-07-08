@@ -123,7 +123,7 @@ void WindowMain::OnDrawCustomTitleBar()
 		m_app->m_titleText.Data(), 
 		m_app->m_titleText.Size(),
 		&m_app->m_mainMenuWindowStyle.windowMenuText, 
-		m_app->m_backend->GetDefaultFont()->GetMGFont());
+		m_app->m_backend->GetDefaultFont()->m_font);
 
 	// buttons
 	{
