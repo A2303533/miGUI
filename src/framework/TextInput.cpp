@@ -86,6 +86,7 @@ TextInput::TextInput(Window* w)
 	m_elementText->onActivate = TextInput_onActivate;
 	m_elementText->onCharEnter = TextInput_onCharEnter;
 	m_elementText->onEndEdit = TextInput_onEndEdit;
+	m_elementText->onPaste = TextInput_onPaste;
 	
 	m_element->userData = this;
 
