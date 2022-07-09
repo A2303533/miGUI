@@ -44,11 +44,44 @@ namespace mgf
 		virtual ~TextInput();
 		virtual void SetTextProcessor(TextProcessor*) override;
 
+		// It will allocate memory and copy this text
 		void SetText(const mgUnicodeChar*);
-		//void SetFont(Font*);
+
+		// It will use pointer.
+		void SetDefaultText(const mgUnicodeChar*);
 
 		// 0 - no limit
 		void SetCharLimit(uint32_t);
+
+		const mgUnicodeChar* GetText();
+		size_t GetTextSize();
+
+		enum class EndEdit
+		{
+			_unknown,
+			_enterKey,
+			_click,
+			_escapeKey,
+		};
+		/// <summary>
+		/// When you enter text and press `Escape` or click somewhere
+		/// you may want discard all changes. Do it here, by yourself.
+		/// Return 1 if need to deactivate input
+		/// </summary>
+		virtual int OnEndEdit(EndEdit);
+
+		/// <summary>
+		/// Return this char if you want `enter` it to TextInput.
+		/// Return 0 to skip.
+		/// </summary>
+		virtual mgUnicodeChar OnCharEnter(mgUnicodeChar);
+
+		/// <summary>
+		/// Will be called on activation.
+		/// </summary>
+		virtual void OnActivate();
+
+		virtual int OnPaste(mgUnicodeChar*, size_t);
 	};
 }
 

@@ -57,15 +57,9 @@ namespace mgf
 	}
 }
 
-Rectangle::Rectangle()
-	:
-	Element()
-{
-}
-
 Rectangle::Rectangle(Window* w)
 	: 
-	Element()
+	Element(w)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);

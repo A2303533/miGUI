@@ -43,18 +43,6 @@ extern Backend* g_backend;
 
 namespace mgf
 {
-//	mgColor* Text_onColor(mgElement_s* e)
-//	{
-//		mgf::Text* text = static_cast<mgf::Text*>(e->userData);
-//		return &text->m_color;
-//	}
-//
-//	mgFont* Text_onFont(struct mgElement_s* e)
-//	{
-//		mgf::Text* text = static_cast<mgf::Text*>(e->userData);
-//		return text->m_font;
-//	}
-
 	const mgUnicodeChar* Text_onText(struct mgElement_s* e, size_t* textLen)
 	{
 		mgf::Text* text = static_cast<mgf::Text*>(e->userData);
@@ -65,18 +53,14 @@ namespace mgf
 
 Text::Text(Window* w, const mgUnicodeChar* t)
 	:
-	m_window(w)
+	Element(w)
 {
 	assert(t);
 
 	mgPoint p;
 	mgPointSet(&p, 0, 0);
 
-	m_color.setAsIntegerRGB(0);
 	m_text.Assign(t, mgUnicodeStrlen(t));
-
-	//m_font = ((FontImpl*)f)->m_font;
-#pragma message("!!!!! !!!! !!!! Maybe need to remove font and add SetTextProcessor: " __FILE__ __FUNCTION__ " LINE : ")
 
 	this->SetTextProcessor(g_backend->GetTextProcessor());
 
@@ -238,17 +222,6 @@ void Text::SetPosition(int x, int y)
 	p.x = x;
 	p.y = y;
 	SetPosition(&p);
-}
-
-
-void Text::SetColor(mgColor* c)
-{
-	m_color = *c;
-}
-
-void Text::SetColor(int i)
-{
-	mgColorSetAsIntegerARGB(&m_color, i);
 }
 
 uint32_t Text::GetWidth()

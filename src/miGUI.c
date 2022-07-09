@@ -41,6 +41,7 @@ void mgDockPanelUpdate(struct mgContext_s* c);
 void mgDrawPopup(struct mgContext_s* c, mgPopup* p);
 void mgUpdatePopup(struct mgContext_s* c, mgPopup* p);
 void mgDockPanelClear(struct mgContext_s* c);
+void mgTextInputFree(struct mgElementTextInput_s* e);
 
 /*
 * sometimes need to stop update elements, like when double click in list box 
@@ -59,7 +60,15 @@ mgDestroyElement_internal(mgElement* e)
 	}
 
 	if (e->implementation)
+	{
+		switch (e->type)
+		{
+		case MG_TYPE_TEXTINPUT:
+			mgTextInputFree(e->implementation);
+		break;
+		}
 		free(e->implementation);
+	}
 	free(e);
 }
 

@@ -57,6 +57,8 @@ namespace mgf
 }
 
 Button::Button(Window* w)
+	:
+	Element(w)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);

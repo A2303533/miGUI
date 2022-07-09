@@ -41,8 +41,10 @@ namespace mgf
 
 	class Element
 	{
+	protected:
+		Window* m_window = 0;
 	public:
-		Element();
+		Element(Window*);
 		virtual ~Element();
 
 		enum Alignment

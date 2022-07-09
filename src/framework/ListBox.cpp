@@ -46,6 +46,8 @@ void LB_onItemClick(struct mgElement_s* e, void* item, uint32_t itemIndex, uint3
 int LB_onDrawItem(struct mgElement_s*, void* item, uint32_t itemIndex, mgUnicodeChar** text, size_t* textlen);
 
 ListBox::ListBox(Window* w)
+	:
+	Element(w)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);

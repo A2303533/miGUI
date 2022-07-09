@@ -30,11 +30,14 @@
 
 #include "framework/mgf.h"
 #include "framework/Element.h"
+#include "framework/Window.h"
 
 using namespace mgf;
 
-Element::Element()
+Element::Element(Window* w)
 {
+	m_window = w;
+	m_window->m_elements.emplace_back(this);
 }
 
 Element::~Element()

@@ -38,9 +38,42 @@
 using namespace mgf;
 extern Backend* g_backend;
 
+
+int TextInput_onEndEdit(struct mgElement_s* e, int type)
+{
+	TextInput* impl = (TextInput*)e->userData;
+	TextInput::EndEdit ee = TextInput::EndEdit::_unknown;
+	switch (type)
+	{
+	case 1: ee = TextInput::EndEdit::_enterKey; break;
+	case 2: ee = TextInput::EndEdit::_click; break;
+	case 3: ee = TextInput::EndEdit::_escapeKey; break;
+	}
+	return impl->OnEndEdit(ee);
+}
+
+mgUnicodeChar TextInput_onCharEnter(struct mgElement_s* e, mgUnicodeChar c)
+{
+	TextInput* impl = (TextInput*)e->userData;
+	return impl->OnCharEnter(c);
+}
+
+void TextInput_onActivate(struct mgElement_s* e)
+{
+	TextInput* impl = (TextInput*)e->userData;
+	impl->OnActivate();
+}
+
+int TextInput_onPaste(struct mgElement_s* e, mgUnicodeChar* str, size_t sz)
+{
+	TextInput* impl = (TextInput*)e->userData;
+	return impl->OnPaste(str, sz);
+}
+
 TextInput::TextInput(Window* w)
-:
-m_elementText(0)
+	:
+	Element(w),
+	m_elementText(0)
 {
 	assert(w);
 
@@ -50,6 +83,11 @@ m_elementText(0)
 
 	m_element = mgCreateTextInput(w->m_window, &p, &p, m_textProcessor->GetTextProcessor());
 	m_elementText = (mgElementTextInput_s*)m_element->implementation;
+	m_elementText->onActivate = TextInput_onActivate;
+	m_elementText->onCharEnter = TextInput_onCharEnter;
+	m_elementText->onEndEdit = TextInput_onEndEdit;
+	
+	m_element->userData = this;
 
 	Element::PostInit();
 }
@@ -72,13 +110,44 @@ void TextInput::SetText(const mgUnicodeChar* text)
 	mgTextInputSetText(m_elementText, text);
 }
 
-//void TextInput::SetFont(Font* f)
-//{
-//	m_elementText->font = ((FontImpl*)f)->m_font;
-//}
+void TextInput::SetDefaultText(const mgUnicodeChar* text)
+{
+	m_elementText->defaultTextLen = 0;
+	m_elementText->defaultText = text;
+	if (text)
+		m_elementText->defaultTextLen = mgUnicodeStrlen(text);
+}
 
 void TextInput::SetCharLimit(uint32_t i)
 {
 	m_elementText->charLimit = i;
 }
 
+const mgUnicodeChar* TextInput::GetText()
+{
+	return m_elementText->text;
+}
+
+size_t TextInput::GetTextSize()
+{
+	return m_elementText->textLen;
+}
+
+int TextInput::OnEndEdit(EndEdit ee)
+{
+	return 1;
+}
+
+mgUnicodeChar TextInput::OnCharEnter(mgUnicodeChar c)
+{
+	return c;
+}
+
+void TextInput::OnActivate()
+{
+}
+
+int TextInput::OnPaste(mgUnicodeChar* s, size_t sz)
+{
+	return 1;
+}

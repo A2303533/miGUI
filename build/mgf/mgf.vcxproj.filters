@@ -22,21 +22,15 @@
     <Filter Include="Source Files\mgf\minizip">
       <UniqueIdentifier>{bb2c21b6-7c3c-498a-b152-f0094fb4db64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\mgf\GUIElements">
+      <UniqueIdentifier>{19f56f40-f091-4a18-89ed-157c29ed7aef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\framework\SystemWindow.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\Table.cpp">
-      <Filter>Source Files\mgf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\framework\Text.cpp">
-      <Filter>Source Files\mgf</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\framework\TextBuffer.cpp">
-      <Filter>Source Files\mgf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\framework\TextInput.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\framework\Vec.cpp">
@@ -55,9 +49,6 @@
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\framework\BackendOpenGL.cpp">
-      <Filter>Source Files\mgf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\framework\Button.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\framework\Context.cpp">
@@ -102,9 +93,6 @@
     <ClCompile Include="..\..\src\framework\Image_png.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\framework\ListBox.cpp">
-      <Filter>Source Files\mgf</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\framework\lodepng.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
@@ -124,9 +112,6 @@
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\framework\Ray.cpp">
-      <Filter>Source Files\mgf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\framework\Rectangle.cpp">
       <Filter>Source Files\mgf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\mgElementTable.c">
@@ -248,6 +233,24 @@
     </ClCompile>
     <ClCompile Include="..\..\src\mgUnicode.c">
       <Filter>Source Files\migui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Button.cpp">
+      <Filter>Source Files\mgf\GUIElements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\ListBox.cpp">
+      <Filter>Source Files\mgf\GUIElements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Rectangle.cpp">
+      <Filter>Source Files\mgf\GUIElements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\TextInput.cpp">
+      <Filter>Source Files\mgf\GUIElements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Text.cpp">
+      <Filter>Source Files\mgf\GUIElements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\framework\Table.cpp">
+      <Filter>Source Files\mgf\GUIElements</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

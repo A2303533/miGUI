@@ -35,9 +35,6 @@
 typedef struct mgElementTextInput_s {
 	struct mgElement_s* element;
 
-	//mgFont* font;
-	//mgTextCallbackColor onColor;
-	//mgTextCallbackFont onFont;
 	struct mgTextProcessor_s * textProcessor;
 
 	mgUnicodeChar* text;
@@ -74,6 +71,7 @@ typedef struct mgElementTextInput_s {
 	int(*onEndEdit)(struct mgElement_s*, int type);
 	mgUnicodeChar(*onCharEnter)(struct mgElement_s*, mgUnicodeChar);
 	void(*onActivate)(struct mgElement_s*);
+	int(*onPaste)(struct mgElement_s*, mgUnicodeChar*, size_t);
 
 	uint32_t isSelected;
 	uint32_t selectionStart;

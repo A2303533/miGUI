@@ -92,6 +92,11 @@ void mgElementList_textinput_onActivate(struct mgElement_s* e)
 	ti->selectionEnd = ti->textLen;
 	ti->textCursor = ti->textLen;
 }
+int mgElementList_textinput_onPaste(struct mgElement_s* e, mgUnicodeChar* str, size_t sz)
+{
+	return 1;
+}
+
 
 void
 miGUI_onUpdateTransform_list(mgElement* e)
@@ -419,6 +424,7 @@ mgCreateListBox(
 	((mgElementTextInput*)impl->textInput->implementation)->onActivate = mgElementList_textinput_onActivate;
 	((mgElementTextInput*)impl->textInput->implementation)->onEndEdit = mgElementList_textinput_onEndEdit;
 	((mgElementTextInput*)impl->textInput->implementation)->onCharEnter = mgElementList_textinput_onCharEnter;
+	((mgElementTextInput*)impl->textInput->implementation)->onPaste = mgElementList_textinput_onPaste;
 	mgSetParent(impl->textInput, newElement);
 
 	mgSetParent(newElement, 0);

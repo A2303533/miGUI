@@ -48,6 +48,7 @@ namespace mgf
 		friend class TextInput;
 		friend class ListBox;
 		friend class Table;
+		friend class Element;
 
 		mgContext_s* m_gui_context = 0;
 

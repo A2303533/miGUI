@@ -54,6 +54,8 @@ void Table_onBeginGetUserElement(struct mgElement_s*);
 
 
 Table::Table(Window* w, uint32_t colNum)
+	:
+	Element(w)
 {
 	mgPoint p;
 	mgPointSet(&p, 0, 0);

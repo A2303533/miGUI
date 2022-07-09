@@ -40,11 +40,6 @@ namespace mgf
 	{
 		UnicodeString m_text;
 		mgElementText_s* m_elementText = 0;
-		//mgFont* m_font = 0;
-		mgColor m_color;
-		Window* m_window = 0;
-		//friend mgColor* Text_onColor(mgElement_s* e);
-		//friend mgFont* Text_onFont(struct mgElement_s* e);
 		friend const mgUnicodeChar* Text_onText(struct mgElement_s* e, size_t* textLen);
 
 	public:
@@ -67,8 +62,6 @@ namespace mgf
 		
 		void SetPosition(mgPoint*);
 		void SetPosition(int x, int y);
-		void SetColor(mgColor*);
-		void SetColor(int); // ARGB 0xFFrrggbb
 
 		uint32_t GetWidth();
 	};

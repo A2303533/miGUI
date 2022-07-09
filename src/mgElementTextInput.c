@@ -149,7 +149,8 @@ mgTextInput_paste(mgElement* e)
 				size_t utf32sz = 0;
 				mgUnicodeFromUTF16(buffer, utf32, &utf32sz);
 
-				mgTextInputPutText(impl, utf32, utf32sz);
+				if(impl->onPaste(e, utf32, utf32sz))
+					mgTextInputPutText(impl, utf32, utf32sz);
 				free(utf32);
 			}
 		}
@@ -1279,4 +1280,12 @@ mgTextInputClear(struct mgElementTextInput_s* e, int freeMemory)
 	e->text[0] = 0;
 }
 
-
+void
+mgTextInputFree(struct mgElementTextInput_s* e)
+{
+	if (e->text)
+		free(e->text);
+	e->allocated = 0;
+	e->text = 0;
+	e->textLen = 0;
+}
