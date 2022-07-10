@@ -70,22 +70,81 @@ miGUI_onDraw_text(mgElement* e)
 
 	mgElementText* impl = (mgElementText*)e->implementation;
 
+	int isMultiline = 1;
+
 	size_t textLen = 0;
 	const mgUnicodeChar* text = impl->onText(e, &textLen);
 	if (text && textLen)
 	{
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
-		/*e->window->context->gpu->drawText(mgDrawTextReason_text, impl, &pos, 
-			text, textLen, 
-			impl->onColor,
-			impl->onFont);*/
-		impl->textProcessor->onDrawText(
-			mgDrawTextReason_text,
-			impl->textProcessor,
-			&pos,
-			text,
-			textLen,
-			0);
+
+		if (isMultiline)
+		{
+			mgUnicodeChar* b = &text[0];
+			mgUnicodeChar* e2 = b + textLen;
+			mgPoint ts;
+			size_t tl = 0;
+			while (1)
+			{
+				mgUnicodeChar* t2 = b;
+				while (1)
+				{
+					++t2;
+					++tl;
+
+					if (*t2 == 0x20)
+					{
+						break;
+					}
+
+					if (*t2 == 0)
+						break;
+				}
+
+				impl->textProcessor->onGetTextSize(mgDrawTextReason_text,
+					impl->textProcessor,
+					b,
+					tl,
+					&ts);
+
+				mgPoint pos2 = pos;
+				pos2.x += ts.x;
+				if (pos2.x > e->transformWorld.clipArea.right)
+				{
+					pos.y += ts.y;
+					pos.x = e->transformWorld.buildArea.left;
+
+					e->transformLocal.sz.y += ts.y;
+					miGUI_onUpdateTransform_text(e);
+				}
+
+				impl->textProcessor->onDrawText(
+					mgDrawTextReason_text,
+					impl->textProcessor,
+					&pos,
+					b,
+					tl,
+					0);
+
+				pos.x += ts.x;
+
+				b += tl;
+
+				tl = 0;
+				if (b >= e2)
+					break;
+			}
+		}
+		else
+		{
+			impl->textProcessor->onDrawText(
+				mgDrawTextReason_text,
+				impl->textProcessor,
+				&pos,
+				text,
+				textLen,
+				0);
+		}
 	}
 }
 
