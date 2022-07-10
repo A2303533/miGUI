@@ -209,12 +209,12 @@ mgTextInput_defaultPopup_onSelectAll(int id, struct mgPopupItem_s* item)
 void
 mgTextInput_defaultPopupOnShow(struct mgContext_s* c, struct mgPopup_s* p)
 {
-	if (!c->activeTextInput)
+	if (!c->textInputActive)
 		return;
 
-	p->items[0].info.isEnabled = c->activeTextInput->isSelected ? 1 : 0;/*cut*/
-	p->items[1].info.isEnabled = c->activeTextInput->isSelected ? 1 : 0;/*copy*/
-	p->items[3].info.isEnabled = c->activeTextInput->isSelected ? 1 : 0;/*delete*/
+	p->items[0].info.isEnabled = c->textInputActive->isSelected ? 1 : 0;/*cut*/
+	p->items[1].info.isEnabled = c->textInputActive->isSelected ? 1 : 0;/*copy*/
+	p->items[3].info.isEnabled = c->textInputActive->isSelected ? 1 : 0;/*delete*/
 
 	p->items[0].info.callback = mgTextInput_defaultPopup_onCut;
 	p->items[1].info.callback = mgTextInput_defaultPopup_onCopy;
@@ -222,11 +222,11 @@ mgTextInput_defaultPopupOnShow(struct mgContext_s* c, struct mgPopup_s* p)
 	p->items[3].info.callback = mgTextInput_defaultPopup_onDelete;
 	p->items[4].info.callback = mgTextInput_defaultPopup_onSelectAll;
 	
-	p->items[0].userData = c->activeTextInput->element;
-	p->items[1].userData = c->activeTextInput->element;
-	p->items[2].userData = c->activeTextInput->element;
-	p->items[3].userData = c->activeTextInput->element;
-	p->items[4].userData = c->activeTextInput->element;
+	p->items[0].userData = c->textInputActive->element;
+	p->items[1].userData = c->textInputActive->element;
+	p->items[2].userData = c->textInputActive->element;
+	p->items[3].userData = c->textInputActive->element;
+	p->items[4].userData = c->textInputActive->element;
 }
 
 void
@@ -282,17 +282,17 @@ miGUI_textinput_activate(mgElement* e, int is)
 	impl->textCursorTimer = 0.f;
 	if (is)
 	{
-		e->window->context->activeTextInput = impl;
+		e->window->context->textInputActive = impl;
 		if (impl->onActivate)
 			impl->onActivate(e);
 	}
 	else
 	{
-		e->window->context->activeTextInput = 0;
+		e->window->context->textInputActive = 0;
 		impl->h_scrollCurr = 0.f;
 		impl->h_scroll = 0.f;
 	}
-	g_skipFrame = 1;
+//	g_skipFrame = 1; // remove?
 }
 
 void MG_C_DECL 
@@ -302,6 +302,9 @@ mgTextInputActivate(struct mgContext_s* c, struct mgElementTextInput_s* e, int i
 	assert(e);
 	if (isActive)
 	{
+		if(c->textInputActive)
+			miGUI_textinput_activate(e->element, 0);
+
 		miGUI_textinput_activate(e->element, 1);
 	}
 	else
@@ -734,6 +737,8 @@ miGUI_onUpdate_textinput(mgElement* e)
 	
 	if (e->cursorInRect)
 	{
+		c->textInputUnderCursor = impl;
+
 		mgSetCursor(c, c->defaultCursors[mgCursorType_IBeam], mgCursorType_Arrow);
 
 		if (e->enabled)
@@ -742,7 +747,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 				|| (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
 				|| (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN))
 			{
-				if(impl != e->window->context->activeTextInput)
+				if(impl != e->window->context->textInputActive)
 					miGUI_textinput_activate(e, 1);
 			}
 			
@@ -753,7 +758,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 		if (e->elementState & 0x1)
 			mgSetCursor(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
-		if (e->enabled)
+		/*if (e->enabled)
 		{
 			if (c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
 			{
@@ -767,12 +772,12 @@ miGUI_onUpdate_textinput(mgElement* e)
 					miGUI_textinput_activate(e, 0);
 				}
 			}
-		}
+		}*/
 	}
 
 	miGUI_onUpdate_rectangle(e);
 
-	int isActive = impl == e->window->context->activeTextInput;
+	int isActive = impl == e->window->context->textInputActive;
 	if (isActive)
 	{
 		mgTextInput_updateScrollLimit(e);
@@ -974,7 +979,7 @@ miGUI_onDraw_textinput(mgElement* e)
 
 	mgContext* ctx = e->window->context;
 	mgElementTextInput* impl = (mgElementTextInput*)e->implementation;
-	int isActive = impl == e->window->context->activeTextInput;
+	int isActive = impl == e->window->context->textInputActive;
 
 	if (isActive)
 	{
@@ -1001,7 +1006,7 @@ miGUI_onDraw_textinput(mgElement* e)
 	{
 		mgColor* c = &style->textInputBGNotActive;
 
-		if (ctx->activeTextInput == impl)
+		if (ctx->textInputActive == impl)
 			c = &style->textInputBGActive;
 
 		ctx->gpu->drawRectangle(mgDrawRectangleReason_textInputBG,

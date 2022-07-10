@@ -473,11 +473,23 @@ mgUpdate(mgContext* c)
 			ok = 0;
 	}
 	
-	if (c->activeTextInput)
+	if (c->textInputActive)
 	{
-		mgUpdateElementLMBClick(c->activeTextInput->element->window->rootElement);
+		mgUpdateElementLMBClick(c->textInputActive->element->window->rootElement);
 
-		mgUpdateElement(c->activeTextInput->element);
+		mgUpdateElement(c->textInputActive->element);
+
+		if ((c->input->mouseButtonFlags1 & MG_MBFL_LMBDOWN)
+			|| (c->input->mouseButtonFlags1 & MG_MBFL_RMBDOWN)
+			|| (c->input->mouseButtonFlags1 & MG_MBFL_MMBDOWN))
+
+		{
+			if (!c->textInputUnderCursor)
+			{
+				mgTextInputActivate(c, c->textInputActive, 0, 2);
+			}
+		}
+
 		return;
 	}
 
@@ -551,6 +563,8 @@ mgStartFrame(mgContext* c)
 	assert(c);
 	g_skipFrame = 0;
 	
+	c->textInputUnderCursor = 0;
+
 	c->input->mouseMoveDeltaOld = c->input->mouseMoveDelta;
 	c->input->mouseWheelDeltaOld = c->input->mouseWheelDelta;
 	c->input->mousePositionOld = c->input->mousePosition;

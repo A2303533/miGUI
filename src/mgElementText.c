@@ -45,6 +45,15 @@ miGUI_onUpdateTransform_text(mgElement* e)
 	
 	e->transformWorld.clipArea.right = e->transformWorld.clipArea.left + e->transformLocal.sz.x;
 	e->transformWorld.clipArea.bottom = e->transformWorld.clipArea.top + e->transformLocal.sz.y;
+
+	if (e->transformWorld.clipArea.left < e->parent->transformWorld.clipArea.left)
+		e->transformWorld.clipArea.left = e->parent->transformWorld.clipArea.left;
+	if (e->transformWorld.clipArea.top < e->parent->transformWorld.clipArea.top)
+		e->transformWorld.clipArea.top = e->parent->transformWorld.clipArea.top;
+	if (e->transformWorld.clipArea.right > e->parent->transformWorld.clipArea.right)
+		e->transformWorld.clipArea.right = e->parent->transformWorld.clipArea.right;
+	if (e->transformWorld.clipArea.bottom > e->parent->transformWorld.clipArea.bottom)
+		e->transformWorld.clipArea.bottom = e->parent->transformWorld.clipArea.bottom;
 }
 
 void 

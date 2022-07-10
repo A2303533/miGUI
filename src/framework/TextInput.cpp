@@ -152,3 +152,9 @@ int TextInput::OnPaste(mgUnicodeChar* s, size_t sz)
 {
 	return 1;
 }
+
+void TextInput::SetLimit(int i)
+{
+	m_elementText->charLimit = i;
+}
+

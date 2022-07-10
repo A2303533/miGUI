@@ -306,7 +306,8 @@ typedef struct mgContext_s {
 	mgPopup* popupUnderCursor;
 	mgPopup* defaultPopupForTextInput;
 	mgMenu* activeMenu;
-	mgElementTextInput* activeTextInput;
+	mgElementTextInput* textInputActive;
+	mgElementTextInput* textInputUnderCursor;
 
 //	mgFont* defaultPopupFont;
 	int cursorInPopup;

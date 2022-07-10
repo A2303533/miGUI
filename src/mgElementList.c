@@ -52,7 +52,7 @@ struct lbData2
 int mgElementList_textinput_onEndEdit(struct mgElement_s* e, int type)
 {
 	e->visible = 0;
-	e->window->context->activeTextInput = 0;
+	e->window->context->textInputActive = 0;
 	
 	mgSetCursor(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 

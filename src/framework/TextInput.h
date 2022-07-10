@@ -81,7 +81,16 @@ namespace mgf
 		/// </summary>
 		virtual void OnActivate();
 
+		/// <summary>
+		/// Return 0 to ignore `paste`
+		/// </summary>
 		virtual int OnPaste(mgUnicodeChar*, size_t);
+
+		/// <summary>
+		/// Set 0 for no limit.
+		/// </summary>
+		/// <param name=""></param>
+		virtual void SetLimit(int);
 	};
 }
 

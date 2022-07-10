@@ -51,7 +51,7 @@ struct lbData2
 int mgElementTable_textinput_onEndEdit(struct mgElement_s* e, int type)
 {
 	e->visible = 0;
-	e->window->context->activeTextInput = 0;
+	e->window->context->textInputActive = 0;
 	
 	mgSetCursor(e->window->context, e->window->context->defaultCursors[mgCursorType_Arrow], mgCursorType_Arrow);
 
@@ -661,7 +661,7 @@ mgCreateTable(struct mgWindow_s* w,
 	((mgElementTextInput*)impl->textInput->implementation)->onActivate = mgElementTable_textinput_onActivate;
 	((mgElementTextInput*)impl->textInput->implementation)->onEndEdit = mgElementTable_textinput_onEndEdit;
 	((mgElementTextInput*)impl->textInput->implementation)->onCharEnter = mgElementTable_textinput_onCharEnter;
-	((mgElementTextInput*)impl->textInput->implementation)->onCharEnter = mgElementTable_textinput_onPaste;
+	((mgElementTextInput*)impl->textInput->implementation)->onPaste = mgElementTable_textinput_onPaste;
 	mgSetParent(impl->textInput, newElement);
 
 	mgSetParent(newElement, 0);
