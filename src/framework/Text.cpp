@@ -237,3 +237,8 @@ uint32_t Text::GetWidth()
 	}
 	return v;
 }
+
+void Text::SetMultiline(bool v)
+{
+	m_elementText->isMultiline = v ? 1 : 0;
+}

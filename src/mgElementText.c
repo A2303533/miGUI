@@ -70,15 +70,13 @@ miGUI_onDraw_text(mgElement* e)
 
 	mgElementText* impl = (mgElementText*)e->implementation;
 
-	int isMultiline = 1;
-
 	size_t textLen = 0;
 	const mgUnicodeChar* text = impl->onText(e, &textLen);
 	if (text && textLen)
 	{
 		e->window->context->gpu->setClipRect(&e->transformWorld.clipArea);
 
-		if (isMultiline)
+		if (impl->isMultiline)
 		{
 			mgUnicodeChar* b = &text[0];
 			mgUnicodeChar* e2 = b + textLen;

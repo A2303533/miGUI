@@ -32,6 +32,8 @@
 
 typedef struct mgElementText_s {
 	struct mgTextProcessor_s* textProcessor;
+	
+	int isMultiline; //0, go down when word outside cliprect
 
 	// You return text for drawing, and alse return textLen
 	const mgUnicodeChar* (*onText)(struct mgElement_s*, size_t* textLen);

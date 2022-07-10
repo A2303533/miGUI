@@ -64,6 +64,8 @@ namespace mgf
 		void SetPosition(int x, int y);
 
 		uint32_t GetWidth();
+		
+		void SetMultiline(bool);
 	};
 }
 
