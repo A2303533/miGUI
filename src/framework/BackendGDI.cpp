@@ -114,6 +114,7 @@ namespace mgf
 {
 	void BackendGDI_onDrawText(
 		int reason,
+		mgElement* element,
 		struct mgTextProcessor_s* tp,
 		mgPoint* position,
 		const mgUnicodeChar* text,
@@ -124,26 +125,29 @@ namespace mgf
 	}
 	struct mgFont_s* BackendGDI_onFont(
 		int reason,
+		mgElement* element,
 		struct mgTextProcessor_s* tp,
 		mgUnicodeChar c)
 	{
-		return g_backendGDI->m_textProcessor->OnFont(reason, c);
+		return g_backendGDI->m_textProcessor->OnFont(reason, (mgf::Element*)element->userData, c);
 	}
 	struct mgColor_s* BackendGDI_onColor(
 		int reason,
+		mgElement* element,
 		struct mgTextProcessor_s* tp,
 		mgUnicodeChar c)
 	{
-		return g_backendGDI->m_textProcessor->OnColor(reason, c);
+		return g_backendGDI->m_textProcessor->OnColor(reason, (mgf::Element*)element->userData, c);
 	}
 	void BackendGDI_onGetTextSize(
 		int reason,
+		mgElement* element,
 		struct mgTextProcessor_s* tp,
 		const mgUnicodeChar* text,
 		size_t textLen,
 		mgPoint* p)
 	{
-		g_backendGDI->m_textProcessor->OnGetTextSize(reason, text, textLen, p);
+		g_backendGDI->m_textProcessor->OnGetTextSize(reason, (mgf::Element*)element->userData, text, textLen, p);
 	}
 }
 
@@ -235,23 +239,23 @@ namespace mgf
 			if(m_tp) mgDestroyTextProcessor(m_tp);
 		}
 
-		virtual mgFont_s* OnFont(int reason, mgUnicodeChar c) override
+		virtual mgFont_s* OnFont(int reason, Element*, mgUnicodeChar c) override
 		{
 			return g_backendGDI->m_defaultFont->m_font;
 		}
 
-		virtual mgColor* OnColor(int reason, mgUnicodeChar c) override
+		virtual mgColor* OnColor(int reason, Element*, mgUnicodeChar c) override
 		{
 			static mgColor col(0x0);
 			return &col;
 		}
 
-		virtual void OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p) override
+		virtual void OnGetTextSize(int reason, Element* e, const mgUnicodeChar* text, size_t textLen, mgPoint* p) override
 		{
 			p->x = p->y = 0;
 			for (size_t i = 0; i < textLen; ++i)
 			{
-				mgFont* fnt = OnFont(reason, text[i]);
+				mgFont* fnt = OnFont(reason, e, text[i]);
 				g_backendGDI->GetTextSize(text, textLen, fnt, p);
 			}
 		}
@@ -960,7 +964,7 @@ void BackendGDI::OnDrawText(int reason,
 
 	for (size_t i = 0; i < textLen; ++i)
 	{
-		mgFont* fnt = m_textProcessor->OnFont(reason, text[i]);// g_fonts[1];
+		mgFont* fnt = m_textProcessor->OnFont(reason, 0, text[i]);// g_fonts[1];
 		
 		p.x += this->DrawText(reason, &p, &text[i], 1, c, fnt);
 	}

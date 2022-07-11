@@ -209,6 +209,7 @@ miGUI_onDraw_button(mgElement* e)
 			impl->onFont(e));*/
 		impl->textProcessor->onDrawText(
 			mgDrawTextReason_buttonText,
+			e,
 			impl->textProcessor,
 			&pos,
 			text,
@@ -232,7 +233,7 @@ miGUI_onRebuild_button(mgElement* e)
 	{
 		mgPoint p;
 		//e->window->context->getTextSize(text, impl->onFont(e), &p);
-		impl->textProcessor->onGetTextSize(mgDrawTextReason_buttonText, impl->textProcessor, text, textLen, &p);
+		impl->textProcessor->onGetTextSize(mgDrawTextReason_buttonText, e, impl->textProcessor, text, textLen, &p);
 
 		mgPoint buttonCenter;
 		buttonCenter.x = (int)((float)(e->transformLocal.buildArea.right - e->transformLocal.buildArea.left) * 0.5f);

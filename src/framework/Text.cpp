@@ -65,6 +65,7 @@ Text::Text(Window* w, const mgUnicodeChar* t)
 	this->SetTextProcessor(g_backend->GetTextProcessor());
 
 	m_element = mgCreateText(w->m_window, &p, m_textProcessor->GetTextProcessor());
+	m_element->userData = this;
 
 	m_elementText = (mgElementText*)m_element->implementation;
 	//m_elementText->onColor = Text_onColor;
@@ -231,7 +232,7 @@ uint32_t Text::GetWidth()
 	{
 		mgPoint p;
 		//m_window->m_gui_context->getTextSize(m_text.c_str(), m_font, &p);
-		m_textProcessor->OnGetTextSize(0, m_text.Data(), m_text.Size(), &p);
+		m_textProcessor->OnGetTextSize(0, 0, m_text.Data(), m_text.Size(), &p);
 
 		v = p.x;
 	}

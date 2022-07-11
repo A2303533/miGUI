@@ -92,11 +92,10 @@ typedef struct mgTextProcessor_s
 	// callbacks.
 	// You must set this callbacks.
 	// reason is mgDrawTextReason_****
-	void (*onDrawText)(int reason, struct mgTextProcessor_s*, mgPoint* position, const mgUnicodeChar* text, size_t textLen, struct mgColor_s*);
-	struct mgFont_s* (*onFont)(int reason, struct mgTextProcessor_s*, mgUnicodeChar);
-	struct mgColor_s* (*onColor)(int reason, struct mgTextProcessor_s*, mgUnicodeChar);
-	void (*onGetTextSize)(int reason, struct mgTextProcessor_s*, const mgUnicodeChar* text, size_t textLen, mgPoint*);
-	//void (*onDraw)(int reason, struct mgTextProcessor_s*, mgUnicodeChar, mgPoint* position, struct mgColor_s*, struct mgFont_s*);
+	void (*onDrawText)(int reason, struct mgElement_s*, struct mgTextProcessor_s*, mgPoint* position, const mgUnicodeChar* text, size_t textLen, struct mgColor_s*);
+	struct mgFont_s* (*onFont)(int reason, struct mgElement_s*, struct mgTextProcessor_s*, mgUnicodeChar);
+	struct mgColor_s* (*onColor)(int reason, struct mgElement_s*, struct mgTextProcessor_s*, mgUnicodeChar);
+	void (*onGetTextSize)(int reason, struct mgElement_s*, struct mgTextProcessor_s*, const mgUnicodeChar* text, size_t textLen, mgPoint*);
 
 	void* userData;
 } mgTextProcessor;

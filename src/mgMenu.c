@@ -58,6 +58,7 @@ mgCreateMenu(struct mgContext_s* c, mgMenuItemInfo* items, int itemsSize, struct
 			mgPoint tsz;
 			tp->onGetTextSize(
 				mgDrawTextReason_menu,
+				0,
 				tp,
 				newMenu->items[i].info.text,
 				newMenu->items[i].textLen,

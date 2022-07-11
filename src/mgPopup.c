@@ -257,6 +257,7 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 						//c->getTextSize(p->items[i].info.text, p->font, &tsz);
 						p->textProcessor->onGetTextSize(
 							mgDrawTextReason_popup,
+							0,
 							p->textProcessor,
 							p->items[i].info.text,
 							p->items[i].textLen,
@@ -274,6 +275,7 @@ mgPopupSetPosition(struct mgContext_s* c, mgPopup* p, mgPoint* position)
 						//c->getTextSize(p->items[i].info.shortcutText, p->font, &tsz);
 						p->textProcessor->onGetTextSize(
 							mgDrawTextReason_popupShortcut,
+							0,
 							p->textProcessor,
 							p->items[i].info.shortcutText,
 							p->items[i].shortcutTextLen,
@@ -456,6 +458,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 				p->font);*/
 			p->textProcessor->onDrawText(
 				mgDrawTextReason_popup,
+				0,
 				p->textProcessor,
 				&pt,
 				p->items[i].info.text,
@@ -480,6 +483,7 @@ mgDrawPopup(struct mgContext_s* c, mgPopup* p)
 					p->font);*/
 				p->textProcessor->onDrawText(
 					mgDrawTextReason_popupShortcut,
+					0,
 					p->textProcessor,
 					&pt2,
 					p->items[i].info.shortcutText,

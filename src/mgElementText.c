@@ -100,6 +100,7 @@ miGUI_onDraw_text(mgElement* e)
 				}
 
 				impl->textProcessor->onGetTextSize(mgDrawTextReason_text,
+					e,
 					impl->textProcessor,
 					b,
 					tl,
@@ -118,6 +119,7 @@ miGUI_onDraw_text(mgElement* e)
 
 				impl->textProcessor->onDrawText(
 					mgDrawTextReason_text,
+					e,
 					impl->textProcessor,
 					&pos,
 					b,
@@ -137,6 +139,7 @@ miGUI_onDraw_text(mgElement* e)
 		{
 			impl->textProcessor->onDrawText(
 				mgDrawTextReason_text,
+				e,
 				impl->textProcessor,
 				&pos,
 				text,
@@ -157,6 +160,7 @@ miGUI_onRebuild_text(mgElement* e) {
 		//e->window->context->getTextSize(text, impl->onFont, &p);
 		impl->textProcessor->onGetTextSize(
 			mgDrawTextReason_text,
+			e,
 			impl->textProcessor,
 			text,
 			textLen,

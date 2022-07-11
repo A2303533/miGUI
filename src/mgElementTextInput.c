@@ -170,6 +170,7 @@ mgTextInput_paste(mgElement* e)
 		//e->window->context->getTextSize(impl->text, impl->onFont, &tsz);
 		impl->textProcessor->onGetTextSize(
 			mgDrawTextReason_textInput,
+			e,
 			impl->textProcessor,
 			impl->text,
 			impl->textLen,
@@ -424,6 +425,7 @@ mgTextInputPutText(struct mgElementTextInput_s* e, const mgUnicodeChar* text, si
 	//e->element->window->context->getTextSize(text, e->onFont, &pt);
 	e->textProcessor->onGetTextSize(
 		mgDrawTextReason_textInput,
+		e->element,
 		e->textProcessor,
 		text,
 		len,
@@ -785,6 +787,7 @@ miGUI_onUpdate_textinput(mgElement* e)
 		//mgFont* fnt = impl->onFont(c->input->character, 0);
 		mgFont* fnt = impl->textProcessor->onFont(
 			mgDrawTextReason_textInput, 
+			e,
 			impl->textProcessor, c->input->character);
 
 		if (c->input->character)
@@ -1034,7 +1037,7 @@ miGUI_onDraw_textinput(mgElement* e)
 				mgUnicodeChar t[2] = { impl->text[i], 0 };
 
 				//mgFont* fnt = impl->onFont(ch1, ch2);
-				mgFont* fnt = impl->textProcessor->onFont(mgDrawTextReason_textInput, impl->textProcessor, impl->text[i]);
+				mgFont* fnt = impl->textProcessor->onFont(mgDrawTextReason_textInput, e, impl->textProcessor, impl->text[i]);
 
 				rect.left = pos.x;
 				rect.top = pos.y;				
@@ -1053,6 +1056,7 @@ miGUI_onDraw_textinput(mgElement* e)
 					//e->window->context->getTextSize(t, impl->font, &p);
 					impl->textProcessor->onGetTextSize(
 						mgDrawTextReason_textInput,
+						e,
 						impl->textProcessor,
 						t,
 						1,
@@ -1101,6 +1105,7 @@ miGUI_onDraw_textinput(mgElement* e)
 					impl->font);*/
 				impl->textProcessor->onDrawText(
 					mgDrawTextReason_textInputDefaultText,
+					e,
 					impl->textProcessor,
 					&pos2,
 					&impl->text[i],
@@ -1156,6 +1161,7 @@ miGUI_onDraw_textinput(mgElement* e)
 				impl->font);*/
 			impl->textProcessor->onDrawText(
 				mgDrawTextReason_textInputDefaultText,
+				e,
 				impl->textProcessor,
 				&pos,
 				impl->defaultText,

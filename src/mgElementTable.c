@@ -381,6 +381,7 @@ miGUI_onDraw_table(mgElement* e)
 					impl->font);*/
 				impl->textProcessor->onDrawText(
 					mgDrawTextReason_tableColTitle,
+					e,
 					impl->textProcessor,
 					&pos,
 					str,
@@ -553,6 +554,7 @@ miGUI_onDraw_table(mgElement* e)
 								impl->font);*/
 							impl->textProcessor->onDrawText(
 								mgDrawTextReason_table,
+								e,
 								impl->textProcessor,
 								&pos2,
 								str,

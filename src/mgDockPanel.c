@@ -385,6 +385,7 @@ mgDockPanelCheckRects(struct mgContext_s* c)
 						&pt);*/
 					c->dockPanel->textProcessor->onGetTextSize(
 						mgDrawTextReason_dockpanelTitlebar,
+						0,
 						c->dockPanel->textProcessor,
 						pw->windows[i2]->titlebarText,
 						pw->windows[i2]->titlebarTextLen,
@@ -650,6 +651,7 @@ mgDrawDockPanel(struct mgContext_s* c)
 							c->activeStyle);*/
 						c->dockPanel->textProcessor->onDrawText(
 							mgDrawTextReason_dockpanelTitlebar,
+							0,
 							c->dockPanel->textProcessor,
 							&p,
 							wnd->titlebarText,

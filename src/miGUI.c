@@ -775,6 +775,7 @@ mgDraw(mgContext* c)
 				//c->getTextSize(c->tooltipText, c->tooltipFont, &pt);
 				c->tooltipTextProcessor->onGetTextSize(
 					mgDrawTextReason_tooltip,
+					0,
 					c->tooltipTextProcessor,
 					c->tooltipText,
 					textLen,
@@ -823,6 +824,7 @@ mgDraw(mgContext* c)
 					c->tooltipFont);*/
 				c->tooltipTextProcessor->onDrawText(
 					mgDrawTextReason_tooltip,
+					0,
 					c->tooltipTextProcessor,
 					&pt,
 					c->tooltipText,

@@ -38,6 +38,7 @@ using namespace mgf;
 //extern Backend* g_backend;
 void mgf::TextProcessor_onDrawText(
 	int reason,
+	mgElement* element,
 	struct mgTextProcessor_s* tp,
 	mgPoint* position,
 	const mgUnicodeChar* text,
@@ -45,34 +46,37 @@ void mgf::TextProcessor_onDrawText(
 	struct mgColor_s* c)
 {
 	TextProcessor* textProcessor = (TextProcessor*)tp->userData;
-	textProcessor->OnDrawText(reason, position, text, textLen, c);
-
+	
+	textProcessor->OnDrawText(reason, (mgf::Element*)element->userData, position, text, textLen, c);
 }
 struct mgFont_s* TextProcessor_onFont(
 	int reason,
+	mgElement* element,
 	struct mgTextProcessor_s* tp,
 	mgUnicodeChar c)
 {
 	TextProcessor* textProcessor = (TextProcessor*)tp->userData;
-	return textProcessor->OnFont(reason, c);
+	return textProcessor->OnFont(reason, (mgf::Element*)element->userData, c);
 }
 struct mgColor_s* TextProcessor_onColor(
 	int reason,
+	mgElement* element,
 	struct mgTextProcessor_s* tp,
 	mgUnicodeChar c)
 {
 	TextProcessor* textProcessor = (TextProcessor*)tp->userData;
-	return textProcessor->OnColor(reason, c);
+	return textProcessor->OnColor(reason, (mgf::Element*)element->userData, c);
 }
 void TextProcessor_onGetTextSize(
 	int reason,
+	mgElement* element,
 	struct mgTextProcessor_s* tp,
 	const mgUnicodeChar* text,
 	size_t textLen,
 	mgPoint* p)
 {
 	TextProcessor* textProcessor = (TextProcessor*)tp->userData;
-	textProcessor->OnGetTextSize(reason, text, textLen, p);
+	textProcessor->OnGetTextSize(reason, (mgf::Element*)element->userData, text, textLen, p);
 }
 
 TextProcessor::TextProcessor(Backend* b)
@@ -93,28 +97,29 @@ TextProcessor::~TextProcessor()
 		mgDestroyTextProcessor(m_tp);
 }
 
-mgFont_s* TextProcessor::OnFont(int reason, mgUnicodeChar c)
+mgFont_s* TextProcessor::OnFont(int reason, Element* e, mgUnicodeChar c)
 {
 	return m_backend->GetDefaultFont()->m_font;
 }
 
-mgColor* TextProcessor::OnColor(int reason, mgUnicodeChar c)
+mgColor* TextProcessor::OnColor(int reason, Element* e, mgUnicodeChar c)
 {
 	static mgColor defCol(0x0);
 	return &defCol;
 }
 
-void TextProcessor::OnGetTextSize(int reason, const mgUnicodeChar* text, size_t textLen, mgPoint* p)
+void TextProcessor::OnGetTextSize(int reason, Element* e, const mgUnicodeChar* text, size_t textLen, mgPoint* p)
 {
 	p->x = p->y = 0;
 	for (size_t i = 0; i < textLen; ++i)
 	{
-		mgFont* fnt = OnFont(reason, text[i]);
+		mgFont* fnt = OnFont(reason, e, text[i]);
 		m_backend->GetTextSize(text, textLen, fnt, p);
 	}
 }
 
 void TextProcessor::OnDrawText(int reason, 
+	Element* e,
 	mgPoint* position, 
 	const mgUnicodeChar* text, 
 	size_t textLen, 
@@ -123,7 +128,7 @@ void TextProcessor::OnDrawText(int reason,
 	mgPoint p = *position;
 	for (size_t i = 0; i < textLen; ++i)
 	{
-		mgFont* fnt = OnFont(reason, text[i]);
-		p.x += m_backend->DrawText(reason, &p, &text[i], 1, c ? c : OnColor(reason, text[i]), fnt);
+		mgFont* fnt = OnFont(reason, e, text[i]);
+		p.x += m_backend->DrawText(reason, &p, &text[i], 1, c ? c : OnColor(reason, e, text[i]), fnt);
 	}
 }

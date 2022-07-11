@@ -325,6 +325,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->titlebarFont);*/
 				w->textProcessor->onDrawText(
 					mgDrawTextReason_windowTitlebar,
+					0,
 					w->textProcessor,
 					&pos,
 					w->titlebarText,
@@ -469,6 +470,7 @@ mgDrawWindow(struct mgWindow_s* w)
 					w->menu->font);*/
 				w->textProcessor->onDrawText(
 					mgDrawTextReason_windowMenu,
+					0,
 					w->textProcessor,
 					&pt,
 					w->menu->items[i].info.text,

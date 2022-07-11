@@ -355,6 +355,7 @@ miGUI_onDraw_list(mgElement* e)
 					impl->font);*/
 				impl->textProcessor->onDrawText(
 					mgDrawTextReason_listbox,
+					e,
 					impl->textProcessor,
 					&pos,
 					str,
