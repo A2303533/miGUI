@@ -129,7 +129,11 @@ namespace mgf
 		struct mgTextProcessor_s* tp,
 		mgUnicodeChar c)
 	{
-		return g_backendGDI->m_textProcessor->OnFont(reason, (mgf::Element*)element->userData, c);
+		void* ud = 0;
+		if (element)
+			ud = element->userData;
+
+		return g_backendGDI->m_textProcessor->OnFont(reason, (mgf::Element*)ud, c);
 	}
 	struct mgColor_s* BackendGDI_onColor(
 		int reason,
@@ -137,7 +141,11 @@ namespace mgf
 		struct mgTextProcessor_s* tp,
 		mgUnicodeChar c)
 	{
-		return g_backendGDI->m_textProcessor->OnColor(reason, (mgf::Element*)element->userData, c);
+		void* ud = 0;
+		if (element)
+			ud = element->userData;
+
+		return g_backendGDI->m_textProcessor->OnColor(reason, (mgf::Element*)ud, c);
 	}
 	void BackendGDI_onGetTextSize(
 		int reason,
@@ -147,7 +155,11 @@ namespace mgf
 		size_t textLen,
 		mgPoint* p)
 	{
-		g_backendGDI->m_textProcessor->OnGetTextSize(reason, (mgf::Element*)element->userData, text, textLen, p);
+		void* ud = 0;
+		if (element)
+			ud = element->userData;
+
+		g_backendGDI->m_textProcessor->OnGetTextSize(reason, (mgf::Element*)ud, text, textLen, p);
 	}
 }
 
