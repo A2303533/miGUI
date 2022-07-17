@@ -859,3 +859,19 @@ void UnicodeString::Append(double v)
 	int l = mgUnicodeSnprintf(buf, 30, U"%f", v);
 	Append(buf, l);
 }
+
+void UnicodeString::reallocate(size_t new_allocated)
+{
+	mgUnicodeChar* new_data = (mgUnicodeChar*)std::malloc((new_allocated + 1) * sizeof(mgUnicodeChar));
+	if (m_data)
+	{
+		std::memcpy(new_data, m_data, m_allocated * sizeof(mgUnicodeChar));
+		std::free(m_data);
+	}
+	else
+	{
+		std::memset(new_data, 0, new_allocated);
+	}
+	m_data = new_data;
+	m_allocated = new_allocated;
+}

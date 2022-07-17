@@ -32,6 +32,7 @@
 #include "framework/TextProcessor.h"
 #include "framework/Backend.h"
 #include "framework/Font.h"
+#include "framework/Element.h"
 
 using namespace mgf;
 
@@ -130,5 +131,15 @@ void TextProcessor::OnDrawText(int reason,
 	{
 		mgFont* fnt = OnFont(reason, e, text[i]);
 		p.x += m_backend->DrawText(reason, &p, &text[i], 1, c ? c : OnColor(reason, e, text[i]), fnt);
+		
+		if (text[i] == '\n')
+		{
+			mgPoint p2;
+			m_backend->GetTextSize(U"X", 1, fnt, &p2);
+
+			p.y += p2.y;
+			p.x = position->x;
+			e->GetElement()->transformLocal.sz.y += p2.y;
+		}
 	}
 }

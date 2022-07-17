@@ -979,6 +979,16 @@ void BackendGDI::OnDrawText(int reason,
 		mgFont* fnt = m_textProcessor->OnFont(reason, 0, text[i]);// g_fonts[1];
 		
 		p.x += this->DrawText(reason, &p, &text[i], 1, c, fnt);
+
+		if (text[i] == '\n')
+		{
+			mgPoint p2;
+			m_backend->GetTextSize(U"X", 1, fnt, &p2);
+
+			p.y += p2.y;
+			p.x = position->x;
+			e->GetElement()->transformLocal.sz.y += p2.y;
+		}
 	}
 }
 

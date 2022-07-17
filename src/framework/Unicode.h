@@ -72,21 +72,7 @@ namespace mgf
 		size_t m_size = 0;
 		size_t m_allocated = 0;
 
-		void reallocate(size_t new_allocated)
-		{
-			mgUnicodeChar* new_data = (mgUnicodeChar*)std::malloc(new_allocated * sizeof(mgUnicodeChar));
-			if (m_data)
-			{
-				std::memcpy(new_data, m_data, m_size * sizeof(mgUnicodeChar));
-				std::free(m_data);
-			}
-			else
-			{
-				std::memset(new_data, 0, new_allocated);
-			}
-			m_data = new_data;
-			m_allocated = new_allocated;
-		}
+		void reallocate(size_t new_allocated);
 	public:
 		UnicodeString()
 		{
