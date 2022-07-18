@@ -50,6 +50,7 @@ enum {
 	MG_TYPE_TEXTINPUT,
 	MG_TYPE_LIST,
 	MG_TYPE_TABLE,
+	MG_TYPE_CHECKBOX,
 };
 
 struct mgElement_s;
@@ -150,5 +151,6 @@ void mgElementDefaultInit(mgElement* e)
 #include "mgElementTextInput.h"
 #include "mgElementList.h"
 #include "mgElementTable.h"
+#include "mgElementCheckbox.h"
 
 #endif

@@ -164,6 +164,7 @@ void MG_C_DECL mgSetParent(mgElement* object, mgElement* parent);
 mgElement* MG_C_DECL mgCreateRectangle(struct mgWindow_s* w, mgPoint* position, mgPoint* size);
 mgElement* MG_C_DECL mgCreateText(struct mgWindow_s* w, mgPoint* position, struct mgTextProcessor_s*);
 mgElement* MG_C_DECL mgCreateButton(struct mgWindow_s* w, mgPoint* position, mgPoint* size, struct mgTextProcessor_s*);
+mgElement* MG_C_DECL mgCreateCheckbox(struct mgWindow_s* w, mgPoint* position, mgPoint* size, struct mgTextProcessor_s*);
 
 // arr and arrSz - can be 0, set this later
 mgElement* MG_C_DECL mgCreateListBox(struct mgWindow_s* w, mgPoint* position, mgPoint* size, void** items, uint32_t itemsSize, struct mgTextProcessor_s*);

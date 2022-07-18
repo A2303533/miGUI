@@ -70,6 +70,7 @@ struct mgTexture_s;
 struct mgElementTextInput_s;
 struct mgElementList_s;
 struct mgElementTable_s;
+struct mgElementCheckbox_s;
 
 enum mgBeginDrawReason
 {

@@ -42,11 +42,17 @@ extern Backend* g_backend;
 
 namespace mgf
 {
-	/*mgFont* Button_onFont(struct mgElement_s* e)
+	void Button_onPushOn(struct mgElement_s* e)
 	{
 		mgf::Button* btn = static_cast<mgf::Button*>(e->userData);
-		return btn->m_font;
-	}*/
+		btn->OnPushOn();
+	}
+
+	void Button_onPushOff(struct mgElement_s* e)
+	{
+		mgf::Button* btn = static_cast<mgf::Button*>(e->userData);
+		btn->OnPushOff();
+	}
 
 	const mgUnicodeChar* Button_onText(struct mgElement_s* e, size_t* textLen)
 	{
@@ -74,6 +80,8 @@ Button::Button(Window* w)
 	m_elementButton = (mgElementButton*)m_element->implementation;
 	//m_elementButton->onFont = Button_onFont;
 	m_elementButton->onText = Button_onText;
+	m_elementButton->onPushOn = Button_onPushOn;
+	m_elementButton->onPushOff = Button_onPushOff;
 	Element::PostInit();
 }
 
@@ -191,3 +199,7 @@ void Button::SetIcons(
 void Button::OnPushOn() {}
 void Button::OnPushOff() {}
 
+void Button::SetPushState(bool v)
+{
+	m_elementButton->pushButtonState = v ? 1 : 0;
+}

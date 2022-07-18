@@ -73,6 +73,8 @@ namespace mgf
 		virtual void OnPushOff();
 
 		virtual void SetTexture(mgTexture*);
+		
+		virtual void SetPushState(bool);
 	};
 }
 

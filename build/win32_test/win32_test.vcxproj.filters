@@ -90,5 +90,8 @@
     <ClCompile Include="..\..\src\miGUI.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\mgElementCheckbox.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

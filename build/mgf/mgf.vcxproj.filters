@@ -252,5 +252,8 @@
     <ClCompile Include="..\..\src\framework\Table.cpp">
       <Filter>Source Files\mgf\GUIElements</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\mgElementCheckbox.c">
+      <Filter>Source Files\migui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

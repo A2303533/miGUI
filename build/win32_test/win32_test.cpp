@@ -390,7 +390,7 @@ int gui_drawText(
 // you can set font for each symbol.
 // you can set color for each symbol or use `c`
 void textProcessor_onDrawText(
-    int reason, 
+    int reason, struct mgElement_s* e,
     struct mgTextProcessor_s* tp, 
     mgPoint* position, 
     const mgUnicodeChar* text, 
@@ -405,14 +405,14 @@ void textProcessor_onDrawText(
 
     for (size_t i = 0; i < textLen; ++i)
     {
-        mgFont* fnt = tp->onFont(reason, tp, text[i]);// g_fonts[1];
+        mgFont* fnt = tp->onFont(reason, e, tp, text[i]);// g_fonts[1];
         //position->x += gui_drawText(reason, position, &text[i], 1, c, fnt);        
-        p.x += tp->gpu->drawText(reason, &p, &text[i], 1, c, fnt);
+        p.x += gui_drawText(reason, &p, &text[i], 1, c, fnt);
     }
 }
 
 struct mgFont_s* textProcessor_onFont(
-    int reason, 
+    int reason, struct mgElement_s* e,
     struct mgTextProcessor_s* tp, 
     mgUnicodeChar c)
 {
@@ -462,16 +462,16 @@ struct mgFont_s* textProcessor_onFont(
 }
 
 struct mgColor_s* textProcessor_onColor(
-    int reason, 
+    int reason, struct mgElement_s* e,
     struct mgTextProcessor_s* tp, 
-    mgUnicodeChar c, 
-    struct mgStyle_s* s)
+    mgUnicodeChar c)
 {
-    return &s->button1;
+    static mgColor cc;
+    return &cc;
 }
 
 void textProcessor_onGetTextSize(
-    int reason, 
+    int reason, struct mgElement_s* e,
     struct mgTextProcessor_s* tp, 
     const mgUnicodeChar* text, 
     size_t textLen, 
@@ -482,7 +482,7 @@ void textProcessor_onGetTextSize(
     p->x = p->y = 0;
     for (size_t i = 0; i < textLen; ++i)
     {
-        mgFont* fnt = tp->onFont(reason, tp, text[i]);
+        mgFont* fnt = tp->onFont(reason, e, tp, text[i]);
 
         SelectObject(hdcMem, fnt->implementation);
 
@@ -802,7 +802,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR    lp
     g_fonts[1] = gui_createFont("Times New Roman", 0, 12);
     g_fonts[2] = gui_createFont("Noto Emoji", 0, 14);
 
-    mgTextProcessor* defaultTextProcessor = mgCreateTextProcessor(&gui_gpu);
+    mgTextProcessor* defaultTextProcessor = mgCreateTextProcessor();
     defaultTextProcessor->onColor = textProcessor_onColor;
     defaultTextProcessor->onDrawText = textProcessor_onDrawText;
     defaultTextProcessor->onFont = textProcessor_onFont;
