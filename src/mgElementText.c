@@ -31,6 +31,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 void miGUI_onUpdateTransform_rectangle(mgElement* e);
@@ -114,7 +115,7 @@ miGUI_onDraw_text(mgElement* e)
 					pos.x = e->transformWorld.buildArea.left;
 
 					e->transformLocal.sz.y += ts.y;
-					miGUI_onUpdateTransform_text(e);
+				//	miGUI_onUpdateTransform_text(e);
 				}
 
 				impl->textProcessor->onDrawText(
@@ -154,6 +155,8 @@ miGUI_onRebuild_text(mgElement* e) {
 	mgElementText* impl = (mgElementText*)e->implementation;
 	size_t textLen = 0;
 	const mgUnicodeChar* text = impl->onText(e, &textLen);
+	e->transformLocal.sz.x = 0;
+	e->transformLocal.sz.y = 0;
 	if (text && textLen)
 	{
 		mgPoint p;
@@ -167,7 +170,7 @@ miGUI_onRebuild_text(mgElement* e) {
 			&p);
 		e->transformLocal.sz = p;
 
-		miGUI_onUpdateTransform_rectangle(e);
+		miGUI_onUpdateTransform_text(e);
 	}
 }
 

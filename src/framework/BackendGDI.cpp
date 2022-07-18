@@ -983,11 +983,11 @@ void BackendGDI::OnDrawText(int reason,
 		if (text[i] == '\n')
 		{
 			mgPoint p2;
-			m_backend->GetTextSize(U"X", 1, fnt, &p2);
+			GetTextSize(U"X", 1, fnt, &p2);
 
 			p.y += p2.y;
 			p.x = position->x;
-			e->GetElement()->transformLocal.sz.y += p2.y;
+			//e->GetElement()->transformLocal.sz.y += p2.y;
 		}
 	}
 }
