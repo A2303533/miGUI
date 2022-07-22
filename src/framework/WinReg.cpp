@@ -112,6 +112,55 @@ bool WinReg::SetString(const wchar_t* namevalue, StringW& in)
 	if (!m_key)
 		return false;
 
-	return ERROR_SUCCESS == RegSetValueEx(m_key, namevalue, 0, REG_SZ, (BYTE*)in.data(),
+	return ERROR_SUCCESS == RegSetValueExW(m_key, namevalue, 0, REG_SZ, (BYTE*)in.data(),
 		in.size() * sizeof(wchar_t));
+}
+
+bool WinReg::GetString(const char* name, StringA& out)
+{
+	if (!m_key)
+		return false;
+
+	DWORD len = 0;
+	if (ERROR_SUCCESS == RegGetValueA(m_key, 0, name, RRF_RT_REG_SZ, 0, 0, &len))
+	{
+		out.clear();
+		out.reserve(len);
+		out.setSize(len);
+
+		return ERROR_SUCCESS == RegGetValueA(m_key, 0, name, RRF_RT_REG_SZ, 0, out.data(), &len);
+	}
+	return false;
+}
+
+bool WinReg::SetString(const char* namevalue, StringA& in)
+{
+	if(!m_key)
+		return false;
+
+	return ERROR_SUCCESS == RegSetValueExA(m_key, namevalue, 0, REG_SZ, (BYTE*)in.data(),in.size());
+}
+
+bool WinReg::SetBinary(const char* name, void* in, size_t size)
+{
+	if (!m_key)
+		return false;
+
+	return ERROR_SUCCESS == RegSetValueExA(m_key, name, 0, REG_BINARY, (BYTE*)in, size);
+}
+
+bool WinReg::GetBinary(const char* name, mgf::Array<uint8_t>& out)
+{
+	if (!m_key)
+		return false;
+
+	DWORD len = 0;
+	if (ERROR_SUCCESS == RegGetValueA(m_key, 0, name, RRF_RT_REG_BINARY, 0, 0, &len))
+	{
+		out.clear();
+		out.reserve(len);
+		out.m_size = len;
+		return ERROR_SUCCESS == RegGetValueA(m_key, 0, name, RRF_RT_REG_BINARY, 0, out.m_data, &len);
+	}
+	return false;
 }

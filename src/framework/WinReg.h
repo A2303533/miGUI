@@ -31,6 +31,7 @@
 #define _MGF_WINREG_H_
 
 #include "String.h"
+#include "Array.h"
 
 namespace mgf
 {
@@ -55,7 +56,11 @@ namespace mgf
 
 		bool GetString(const wchar_t* name, StringW& out);
 		bool SetString(const wchar_t* name, StringW& in);
-
+		bool GetString(const char* name, StringA& out);
+		bool SetString(const char* name, StringA& in);
+		
+		bool SetBinary(const char* name, void* in, size_t size);
+		bool GetBinary(const char* name, mgf::Array<uint8_t>& out);
 	};
 }
 
