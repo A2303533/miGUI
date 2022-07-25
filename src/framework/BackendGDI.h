@@ -60,11 +60,11 @@ namespace mgf
 		friend class Context;
 		friend class TextProcessor_GDI;
 
-		friend void BackendGDI_onDrawText(int reason, mgElement*, struct mgTextProcessor_s* tp, mgPoint* position,
+		friend void BackendGDI_onDrawText(int reason, mgElement_s*, struct mgTextProcessor_s* tp, mgPoint* position,
 			const mgUnicodeChar* text, size_t textLen, struct mgColor_s* c);
-		friend struct mgFont_s* BackendGDI_onFont(int reason, mgElement*, struct mgTextProcessor_s* tp, mgUnicodeChar c);
-		friend struct mgColor_s* BackendGDI_onColor(int reason, mgElement*, struct mgTextProcessor_s* tp, mgUnicodeChar c);
-		friend void BackendGDI_onGetTextSize(int reason, mgElement*, struct mgTextProcessor_s* tp, const mgUnicodeChar* text, size_t textLen, mgPoint* p);
+		friend struct mgFont_s* BackendGDI_onFont(int reason, mgElement_s*, struct mgTextProcessor_s* tp, mgUnicodeChar c);
+		friend struct mgColor_s* BackendGDI_onColor(int reason, mgElement_s*, struct mgTextProcessor_s* tp, mgUnicodeChar c);
+		friend void BackendGDI_onGetTextSize(int reason, mgElement_s*, struct mgTextProcessor_s* tp, const mgUnicodeChar* text, size_t textLen, mgPoint* p);
 		//mgSystemWindowOSData* m_currSystemWindowOSData = 0;
 
 		mgf::SystemWindow* m_currWindow = 0;
