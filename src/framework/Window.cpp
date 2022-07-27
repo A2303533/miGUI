@@ -329,28 +329,28 @@ void Window::UseMenu(bool v, bool useSystemWindowForPopup/*, Font* f*/)
 
 void Window_menuCallback(int id, struct mgPopupItem_s* pi)
 {
-	Window* window = (Window*)pi->userData;
+	Window* window = (Window*)pi->info.userData;
 	window->OnMenuCommand(id);
 }
 void Window::OnMenuCommand(int id){}
 
 int Window_onIsItemEnabled(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s* pi)
 {
-	Window* window = (Window*)pi->userData;
+	Window* window = (Window*)pi->info.userData;
 	return window->OnIsMenuItemEnabled(pi->info.id, pi->info.isEnabled);
 }
 bool Window::OnIsMenuItemEnabled(int id, bool prev) { return prev; }
 
 int Window_onIsItemChecked(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s* pi)
 {
-	Window* window = (Window*)pi->userData;
+	Window* window = (Window*)pi->info.userData;
 	return window->OnIsMenuChecked(pi->info.id, pi->info.isChecked);
 }
 bool Window::OnIsMenuChecked(int id, bool prev) { return prev; }
 
 int Window_onIsItemRadio(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s* pi)
 {
-	Window* window = (Window*)pi->userData;
+	Window* window = (Window*)pi->info.userData;
 	return window->OnIsMenuAsRadio(pi->info.id);
 }
 bool Window::OnIsMenuAsRadio(int id) { return false; }
@@ -358,7 +358,7 @@ bool Window::OnIsMenuAsRadio(int id) { return false; }
 int Window_onIcon(struct mgContext_s*, struct mgPopup_s*, struct mgPopupItem_s* pi,
 	struct mgIcons_s** icons, int* iconID, mgColor* color)
 {
-	Window* window = (Window*)pi->userData;
+	Window* window = (Window*)pi->info.userData;
 
 	mgf::Icons* mgf_icons = 0;
 
@@ -425,7 +425,7 @@ mgPopup* Window::_menu_rebuild_createPopup(_menuTreeNode* firstNode)
 		newPopup->onIcon = Window_onIcon;
 		for (int i = 0; i < newPopup->itemsSize; ++i)
 		{
-			newPopup->items[i].userData = this;
+			newPopup->items[i].info.userData = this;
 		}
 	}
 

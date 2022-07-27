@@ -184,27 +184,27 @@ mgTextInput_paste(mgElement* e)
 void
 mgTextInput_defaultPopup_onCut(int id, struct mgPopupItem_s* item)
 {
-	mgTextInput_cut(item->userData);
+	mgTextInput_cut(item->info.userData);
 }
 void
 mgTextInput_defaultPopup_onCopy(int id, struct mgPopupItem_s* item)
 {
-	mgTextInput_copy(item->userData);
+	mgTextInput_copy(item->info.userData);
 }
 void
 mgTextInput_defaultPopup_onPaste(int id, struct mgPopupItem_s* item)
 {
-	mgTextInput_paste(item->userData);
+	mgTextInput_paste(item->info.userData);
 }
 void
 mgTextInput_defaultPopup_onDelete(int id, struct mgPopupItem_s* item)
 {
-	mgTextInputDeleteSelected(((mgElement*)item->userData)->implementation);
+	mgTextInputDeleteSelected(((mgElement*)item->info.userData)->implementation);
 }
 void
 mgTextInput_defaultPopup_onSelectAll(int id, struct mgPopupItem_s* item)
 {
-	mgTextInput_selectAll(((mgElement*)item->userData)->implementation);
+	mgTextInput_selectAll(((mgElement*)item->info.userData)->implementation);
 }
 
 void
@@ -223,11 +223,11 @@ mgTextInput_defaultPopupOnShow(struct mgContext_s* c, struct mgPopup_s* p)
 	p->items[3].info.callback = mgTextInput_defaultPopup_onDelete;
 	p->items[4].info.callback = mgTextInput_defaultPopup_onSelectAll;
 	
-	p->items[0].userData = c->textInputActive->element;
-	p->items[1].userData = c->textInputActive->element;
-	p->items[2].userData = c->textInputActive->element;
-	p->items[3].userData = c->textInputActive->element;
-	p->items[4].userData = c->textInputActive->element;
+	p->items[0].info.userData = c->textInputActive->element;
+	p->items[1].info.userData = c->textInputActive->element;
+	p->items[2].info.userData = c->textInputActive->element;
+	p->items[3].info.userData = c->textInputActive->element;
+	p->items[4].info.userData = c->textInputActive->element;
 }
 
 void

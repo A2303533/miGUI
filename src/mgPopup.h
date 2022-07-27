@@ -51,6 +51,7 @@ typedef struct mgPopupItemInfo_s {
 	uint32_t isChecked;
 	const mgUnicodeChar* shortcutText;
 	uint32_t isEnabled;
+	void* userData;
 } mgPopupItemInfo;
 
 struct mgPopupItem_s {
@@ -59,7 +60,6 @@ struct mgPopupItem_s {
 	int shortcutTextLen;
 	int indentForShortcutText;
 	int shortcutTextWidth;
-	void* userData;
 };
 
 enum mgPopupFlags {
